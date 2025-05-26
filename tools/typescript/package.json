@@ -1,0 +1,8 @@
+{
+  "name": "@appabbang/typescript",
+  "type": "module",
+  "private": true,
+  "files": [
+    "*.json"
+  ]
+}
