@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "workspaces": [
     "packages/*",
-    "apps/*"
+    "apps/*",
+    "tools/*"
   ],
   "prettier": "@appabbang/prettier",
   "packageManager": "pnpm@10.11.0",
