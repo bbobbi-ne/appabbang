@@ -1,0 +1,7 @@
+{
+  "name": "@appabbang/tailwind",
+  "type": "module",
+  "exports": {
+    "./style.css": "./style.css"
+  }
+}
