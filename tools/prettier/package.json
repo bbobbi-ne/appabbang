@@ -1,0 +1,9 @@
+{
+  "name": "@appabbang/prettier",
+  "version": "1.0.0",
+  "main": "./prettier.config.cjs",
+  "exports": {
+    ".": "./prettier.config.cjs"
+  },
+  "private": true
+}
