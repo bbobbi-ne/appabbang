@@ -1,4 +1,4 @@
-import '@appabbang/tailwind/style.css';
+import './style.css';
 
 export { Button } from './src/components/ui/button';
 export type { ButtonProps } from './src//components/ui/button';
