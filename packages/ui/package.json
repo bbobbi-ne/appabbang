@@ -1,14 +1,16 @@
 {
   "name": "@appabbang/ui",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "private": true,
   "type": "module",
-  "main": "./src/index.tsx",
-  "types": "./src/index.tsx",
-  "scripts": {
-    "dev": "vite",
-    "lint": "eslint ."
+  "exports": {
+    ".": "./index.ts",
+    "./style.css": "./style.css"
   },
+  "prettier": "@appabbang/prettier",
   "dependencies": {
-    "class-variance-authority": "^0.7.1"
+    "@appabbang/typescript": "workspace:*",
+    "@appabbang/tailwind": "workspace:*",
+    "@appabbang/eslint": "workspace:*"
   }
 }
