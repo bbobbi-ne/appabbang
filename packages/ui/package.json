@@ -4,8 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./index.ts",
-    "./style.css": "./style.css"
+    ".": "./index.ts"
   },
   "dependencies": {
     "@appabbang/typescript": "workspace:*",
