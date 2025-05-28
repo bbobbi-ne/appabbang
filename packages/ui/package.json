@@ -7,7 +7,6 @@
     ".": "./index.ts",
     "./style.css": "./style.css"
   },
-  "prettier": "@appabbang/prettier",
   "dependencies": {
     "@appabbang/typescript": "workspace:*",
     "@appabbang/tailwind": "workspace:*",
