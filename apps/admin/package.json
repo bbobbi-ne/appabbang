@@ -8,15 +8,11 @@
     "build": "vite build && tsc",
     "serve": "vite preview",
     "test": "vitest run",
-    "lint": "eslint",
-    "format": "prettier",
-    "check": "prettier --write . && eslint --fix"
+    "lint": "eslint"
   },
-  "prettier": "@appabbang/prettier",
   "dependencies": {
     "@faker-js/faker": "^9.6.0",
     "@appabbang/ui": "workspace:*",
-    "@appabbang/prettier": "workspace:*",
     "@appabbang/typescript": "workspace:*",
     "@appabbang/tailwind": "workspace:*",
     "@appabbang/eslint": "workspace:*"
