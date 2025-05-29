@@ -3,10 +3,21 @@
   "private": true,
   "version": "1.0.0",
   "main": "index.ts",
+  "type": "module",
   "scripts": {
-    "dev": "node index.ts"
+    "dev": "nodemon --exec \"node --loader ts-node/esm\" ./index.ts"
+  },
+  "dependencies": {
+    "@appabbang/typescript": "workspace:*",
+    "@prisma/client": "^6.8.2",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "prisma": "^6.8.2"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.2",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2"
   }
 }
