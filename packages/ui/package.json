@@ -4,11 +4,15 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./index.ts",
-    "./style.css": "./style.css"
+    ".": "./index.ts"
   },
-  "prettier": "@appabbang/prettier",
   "dependencies": {
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-popover": "^1.1.14",
+    "@radix-ui/react-slot": "^1.2.3",
+    "lucide-react": "^0.511.0",
+    "@radix-ui/react-tooltip": "^1.2.7",
     "@appabbang/typescript": "workspace:*",
     "@appabbang/tailwind": "workspace:*",
     "@appabbang/eslint": "workspace:*"
