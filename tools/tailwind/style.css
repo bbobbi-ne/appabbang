@@ -1,1 +1,71 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+/* ✅ 사용자 정의 다크 모드 variant 생성 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ✅ 테마 토큰 정의 */
+@theme {
+  --color-background: hsl(0, 0%, 100%);
+  --color-foreground: hsl(0, 0%, 5%);
+
+  --color-card: hsl(0, 0%, 100%);
+  --color-card-foreground: hsl(0, 0%, 5%);
+
+  --color-popover: hsl(0, 0%, 100%);
+  --color-popover-foreground: hsl(0, 0%, 5%);
+
+  --color-primary: hsl(27, 53%, 33%);
+  --color-primary-foreground: hsl(0, 0%, 98%);
+
+  --color-secondary: hsl(0, 0%, 96%);
+  --color-secondary-foreground: hsl(0, 0%, 5%);
+
+  --color-muted: hsl(0, 0%, 96%);
+  --color-muted-foreground: hsl(0, 0%, 45%);
+
+  --color-accent: hsl(0, 0%, 96%);
+  --color-accent-foreground: hsl(0, 0%, 5%);
+
+  --color-destructive: hsl(0, 84%, 60%);
+  --color-destructive-foreground: hsl(0, 0%, 98%);
+
+  --color-border: hsl(0, 0%, 92%);
+  --color-input: hsl(0, 0%, 85%);
+  --color-ring: hsl(0, 0%, 76%);
+
+  --radius: 0.5rem;
+}
+
+/* ✅ 다크 모드에서 바뀌는 변수들 */
+@layer base {
+  @variant dark {
+    :root {
+      --color-background: hsl(20, 7%, 8%);
+      --color-foreground: hsl(60, 9%, 98%);
+
+      --color-card: hsl(20, 6%, 10%);
+      --color-card-foreground: hsl(60, 9%, 98%);
+
+      --color-popover: hsl(20, 6%, 10%);
+      --color-popover-foreground: hsl(60, 9%, 98%);
+
+      --color-primary: hsl(27, 53%, 33%);
+      --color-primary-foreground: hsl(60, 9%, 98%);
+
+      --color-secondary: hsl(30, 8%, 19%);
+      --color-secondary-foreground: hsl(60, 9%, 98%);
+
+      --color-muted: hsl(27, 7%, 29%);
+      --color-muted-foreground: hsl(27, 8%, 49%);
+
+      --color-accent: hsl(27, 71%, 19%);
+      --color-accent-foreground: hsl(60, 9%, 98%);
+
+      --color-destructive: hsl(0, 84%, 60%);
+      --color-destructive-foreground: hsl(0, 0%, 98%);
+
+      --color-border: hsl(24, 8%, 12%);
+      --color-input: hsl(23, 9%, 18%);
+      --color-ring: hsl(27, 53%, 40%);
+    }
+  }
+}
