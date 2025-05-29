@@ -2,6 +2,11 @@
   "name": "appabbang",
   "private": true,
   "version": "1.0.0",
+  "scripts": {
+    "server": "pnpm -F server dev",
+    "admin": "pnpm -F admin dev",
+    "web": "pnpm -F web dev"
+  },
   "workspaces": [
     "packages/*",
     "apps/*",
