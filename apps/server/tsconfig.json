@@ -1,0 +1,3 @@
+{
+    "extends": "@appabbang/typescript/tsconfig.base.json"
+}

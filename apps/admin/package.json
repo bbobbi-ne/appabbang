@@ -15,6 +15,7 @@
     "@appabbang/ui": "workspace:*",
     "@appabbang/typescript": "workspace:*",
     "@appabbang/tailwind": "workspace:*",
-    "@appabbang/eslint": "workspace:*"
+    "@appabbang/eslint": "workspace:*",
+    "axios": "^1.9.0"
   }
 }

@@ -1,13 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router';
+import axios from 'axios';
+import { useCallback } from 'react';
+import { useEffect } from 'react';
 import {
   Button,
   Card,
   CardContent,
   CardTitle,
   CardHeader,
-  CardDescription,
-  CardFooter,
-  Label,
   Input,
   Form,
   FormControl,
@@ -27,6 +27,16 @@ export const Route = createFileRoute('/')({
 });
 
 function App() {
+  const getMe = useCallback(async () => {
+    const response = await axios.get(`${import.meta.env.VITE_APPABBANG_API_URL}/auth/me`);
+    console.log(response);
+    console.log(response.data);
+    return response.data;
+  }, []);
+
+  useEffect(() => {
+    getMe();
+  }, []);
   const adminLoginSchema = z.object({
     userId: z.string().min(4, '아이디는 최소 4글자 이상이어야 합니다.'),
     password: z
