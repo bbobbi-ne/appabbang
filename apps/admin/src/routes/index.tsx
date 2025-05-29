@@ -66,18 +66,16 @@ function App() {
                 control={form.control}
                 name="userId"
                 render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center gap-4">
-                      <FormLabel className="whitespace-nowrap">아이디</FormLabel>
-                      <FormControl className="flex-1">
-                        <div className="relative ">
-                          <Input placeholder="shadcn" {...field} />
-                          <div className="absolute px-3">
-                            <FormDescription>아이디를 입력해주세요</FormDescription>
-                            <FormMessage />
-                          </div>
-                        </div>
+                  <FormItem className="flex">
+                    <FormLabel errorCheck={false} className="whitespace-nowrap px-2 py-3 flex-1/4">
+                      아이디
+                    </FormLabel>
+                    <div className="flex-3/4 space-y-1">
+                      <FormControl>
+                        <Input placeholder="shadcn" {...field} />
                       </FormControl>
+                      <FormDescription>아이디를 입력해주세요</FormDescription>
+                      <FormMessage />
                     </div>
                   </FormItem>
                 )}
@@ -86,13 +84,17 @@ function App() {
                 control={form.control}
                 name="password"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>비밀번호</FormLabel>
-                    <FormControl>
-                      <PasswordInput placeholder="shadcn" {...field} />
-                    </FormControl>
-                    <FormDescription>비밀번호를 입력해주세요</FormDescription>
-                    <FormMessage />
+                  <FormItem className="flex">
+                    <FormLabel errorCheck={false} className="whitespace-nowrap px-2 py-3 flex-1/4">
+                      비밀번호
+                    </FormLabel>
+                    <div className="flex-3/4 space-y-1">
+                      <FormControl>
+                        <PasswordInput placeholder="shadcn" {...field} />
+                      </FormControl>
+                      <FormDescription>비밀번호를 입력해주세요</FormDescription>
+                      <FormMessage />
+                    </div>
                   </FormItem>
                 )}
               />
