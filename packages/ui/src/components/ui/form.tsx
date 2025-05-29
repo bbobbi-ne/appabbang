@@ -2,12 +2,14 @@ import * as React from 'react';
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
 import { Controller, FormProvider, useFormContext } from 'react-hook-form';
-import type { ControllerProps, FieldPath, FieldValues } from 'react-hook-form';
+import type { ControllerProps, FieldPath, FieldValues, FormProviderProps } from 'react-hook-form';
 
 import { cn } from '../../lib/utils';
 import { Label } from '../ui/label';
 
-const Form = FormProvider;
+const Form: <TFieldValues extends FieldValues, TContext = any, TTransformedValues = TFieldValues>(
+  props: React.PropsWithChildren<FormProviderProps<TFieldValues, TContext, TTransformedValues>>,
+) => React.JSX.Element = FormProvider;
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
@@ -82,12 +84,14 @@ const FormLabel = React.forwardRef<
   return (
     <Label
       ref={ref}
-      className={cn(error && 'text-destructive', className)}
+      // className={cn(error && 'text-destructive', className)}
+      className={cn(className)}
       htmlFor={formItemId}
       {...props}
     />
   );
 });
+
 FormLabel.displayName = 'FormLabel';
 
 const FormControl = React.forwardRef<
