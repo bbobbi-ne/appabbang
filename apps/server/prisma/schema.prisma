@@ -1,0 +1,29 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  no         Int      @id @default(autoincrement()) // 기본 키: 숫자, 자동 증가
+  id         String   @unique                      // 사용자 아이디 (중복 불가)
+  pw         String                               // 비밀번호
+  name       String                               // 이름
+  role       Role                                 // 역할 (ADMIN 또는 SUB)
+  createdAt  DateTime @default(now())             // 생성일시 (자동 생성)
+}
+
+enum Role {
+  ADMIN
+  SUB
+}
