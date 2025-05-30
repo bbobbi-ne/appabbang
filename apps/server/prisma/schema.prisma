@@ -21,6 +21,7 @@ model User {
   name       String                               // 이름
   role       Role                                 // 역할 (ADMIN 또는 SUB)
   createdAt  DateTime @default(now())             // 생성일시 (자동 생성)
+  refreshToken String?  // 리프레시 토큰 저장용 필드 (nullable)
 }
 
 enum Role {
