@@ -1,3 +1,25 @@
 {
-    "extends": "@appabbang/typescript/tsconfig.base.json"
+  "extends": "@appabbang/typescript/tsconfig.base.json",
+
+  "compilerOptions": {
+    "target": "ES2022", // 최신 문법 사용 가능하도록 설정
+    "module": "CommonJS", // Node.js 서버용은 CommonJS 방식 권장
+    "moduleResolution": "node", // Node 방식으로 모듈을 찾도록 설정
+    "esModuleInterop": true, // CommonJS와 ESModule 호환 위해 필수 (예: import express from 'express')
+    "resolveJsonModule": true, // JSON 파일 import 허용
+    "strict": true, // 타입 안정성 강화를 위한 엄격 모드
+    "skipLibCheck": true, // node_modules의 타입 체크는 생략하여 속도 개선
+    "outDir": "dist", // 빌드 결과물이 나갈 폴더
+    "rootDir": "src", // 빌드 시작 위치
+    "baseUrl": ".", // 절대 경로 import를 위한 기준 경로
+    "paths": {
+      "@/*": ["src/*"] // 예: import x from "@/utils/x"
+    },
+    "incremental": true, // 변경된 부분만 다시 빌드해서 빠르게
+    "noEmitOnError": true, // 타입 오류 있을 경우 dist로 내보내지 않음
+    "verbatimModuleSyntax": false // 확장자 생략 가능 (`.js` 안 붙여도 됨, CommonJS에선 false 권장)
+  },
+
+  "include": ["src"], // 빌드 및 타입체크할 소스
+  "exclude": ["node_modules", "dist"] // 제외할 경로
 }

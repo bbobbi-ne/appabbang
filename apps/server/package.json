@@ -3,21 +3,31 @@
   "private": true,
   "version": "1.0.0",
   "main": "index.ts",
-  "type": "module",
   "scripts": {
-    "dev": "nodemon --exec \"node --loader ts-node/esm\" ./index.ts"
+    "dev": "nodemon --exec \"node -r tsconfig-paths/register -r ts-node/register\" src/index.ts",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --name init",
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@appabbang/typescript": "workspace:*",
     "@prisma/client": "^6.8.2",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "prisma": "^6.8.2"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.18",
     "@types/express": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^22.15.21",
     "nodemon": "^3.1.10",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0"
   }
 }
