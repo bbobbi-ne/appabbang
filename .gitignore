@@ -1,1 +1,55 @@
-node_modules
+# --- Node 및 패키지 매니저 ---
+node_modules/
+.pnpm-store/
+
+# --- 빌드 산출물 ---
+dist/
+build/
+*.tsbuildinfo
+
+# --- 환경 변수 ---
+.env
+.env.*
+!.env.example
+
+# --- 로그 파일 ---
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# --- IDE 및 에디터 관련 ---
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# --- 시스템 파일 ---
+.DS_Store
+Thumbs.db
+
+# --- 테스트 관련 ---
+coverage/
+*.snap
+vitest*.log
+
+# --- Prisma 관련 (apps/server) ---
+apps/server/prisma/dev.db
+apps/server/prisma/dev.db-journal
+apps/server/prisma/migrations/
+
+# --- ESLint / Prettier / Tailwind 캐시 ---
+.eslintcache
+.prettier-cache/
+tailwind.config.js
+
+# --- 앱별 빌드 폴더 ---
+apps/**/dist/
+apps/**/build/
+packages/**/dist/
+packages/**/build/
+tools/**/dist/
+tools/**/build/
+
+# --- TurboRepo 캐시 (사용 시) ---
+turbo/
+.cache/
