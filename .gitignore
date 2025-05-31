@@ -36,7 +36,7 @@ vitest*.log
 apps/server/prisma/dev.db
 apps/server/prisma/dev.db-journal
 apps/server/prisma/migrations/
-apps/server/prisma/generated/**
+apps/server/generated/prisma
 
 # --- ESLint / Prettier / Tailwind 캐시 ---
 .eslintcache
