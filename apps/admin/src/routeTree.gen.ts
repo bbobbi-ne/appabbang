@@ -11,11 +11,18 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as DashboardLayoutImport } from './routes/_dashboardLayout'
 import { Route as IndexImport } from './routes/index'
 import { Route as DemoTanstackQueryImport } from './routes/demo.tanstack-query'
 import { Route as DemoTableImport } from './routes/demo.table'
+import { Route as DashboardLayoutDashboardIndexImport } from './routes/_dashboardLayout/dashboard/index'
 
 // Create/Update Routes
+
+const DashboardLayoutRoute = DashboardLayoutImport.update({
+  id: '/_dashboardLayout',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -35,6 +42,13 @@ const DemoTableRoute = DemoTableImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const DashboardLayoutDashboardIndexRoute =
+  DashboardLayoutDashboardIndexImport.update({
+    id: '/dashboard/',
+    path: '/dashboard/',
+    getParentRoute: () => DashboardLayoutRoute,
+  } as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -44,6 +58,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/_dashboardLayout': {
+      id: '/_dashboardLayout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof DashboardLayoutImport
       parentRoute: typeof rootRoute
     }
     '/demo/table': {
@@ -60,47 +81,80 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoTanstackQueryImport
       parentRoute: typeof rootRoute
     }
+    '/_dashboardLayout/dashboard/': {
+      id: '/_dashboardLayout/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardLayoutDashboardIndexImport
+      parentRoute: typeof DashboardLayoutImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface DashboardLayoutRouteChildren {
+  DashboardLayoutDashboardIndexRoute: typeof DashboardLayoutDashboardIndexRoute
+}
+
+const DashboardLayoutRouteChildren: DashboardLayoutRouteChildren = {
+  DashboardLayoutDashboardIndexRoute: DashboardLayoutDashboardIndexRoute,
+}
+
+const DashboardLayoutRouteWithChildren = DashboardLayoutRoute._addFileChildren(
+  DashboardLayoutRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '': typeof DashboardLayoutRouteWithChildren
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/dashboard': typeof DashboardLayoutDashboardIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '': typeof DashboardLayoutRouteWithChildren
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/dashboard': typeof DashboardLayoutDashboardIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/_dashboardLayout': typeof DashboardLayoutRouteWithChildren
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/_dashboardLayout/dashboard/': typeof DashboardLayoutDashboardIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/demo/table' | '/demo/tanstack-query'
+  fullPaths: '/' | '' | '/demo/table' | '/demo/tanstack-query' | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/demo/table' | '/demo/tanstack-query'
-  id: '__root__' | '/' | '/demo/table' | '/demo/tanstack-query'
+  to: '/' | '' | '/demo/table' | '/demo/tanstack-query' | '/dashboard'
+  id:
+    | '__root__'
+    | '/'
+    | '/_dashboardLayout'
+    | '/demo/table'
+    | '/demo/tanstack-query'
+    | '/_dashboardLayout/dashboard/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardLayoutRoute: typeof DashboardLayoutRouteWithChildren
   DemoTableRoute: typeof DemoTableRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardLayoutRoute: DashboardLayoutRouteWithChildren,
   DemoTableRoute: DemoTableRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
 }
@@ -116,6 +170,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/_dashboardLayout",
         "/demo/table",
         "/demo/tanstack-query"
       ]
@@ -123,11 +178,21 @@ export const routeTree = rootRoute
     "/": {
       "filePath": "index.tsx"
     },
+    "/_dashboardLayout": {
+      "filePath": "_dashboardLayout.tsx",
+      "children": [
+        "/_dashboardLayout/dashboard/"
+      ]
+    },
     "/demo/table": {
       "filePath": "demo.table.tsx"
     },
     "/demo/tanstack-query": {
       "filePath": "demo.tanstack-query.tsx"
+    },
+    "/_dashboardLayout/dashboard/": {
+      "filePath": "_dashboardLayout/dashboard/index.tsx",
+      "parent": "/_dashboardLayout"
     }
   }
 }
