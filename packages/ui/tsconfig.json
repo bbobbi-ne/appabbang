@@ -8,6 +8,7 @@
     "emitDeclarationOnly": true,
     "noEmit": false,
     "outDir": "dist",
+    "lib": ["DOM"],
     "jsx": "react-jsx"
   },
   "include": ["src"]
