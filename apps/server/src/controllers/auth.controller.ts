@@ -6,6 +6,7 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
 } from '@/services/auth.service';
+import { User } from '@prisma/client';
 
 /** 로그인 */
 export async function login(req: Request, res: Response) {
@@ -25,8 +26,10 @@ export async function login(req: Request, res: Response) {
     return;
   }
 
-  const accessToken = generateAccessToken(user.no, user.role);
-  const refreshToken = generateRefreshToken({ id: user.id });
+  const { pw: _, ...rest } = user;
+
+  const accessToken = generateAccessToken({ ...rest });
+  const refreshToken = generateRefreshToken({ ...rest });
 
   // Refresh Token을 Secure HttpOnly 쿠키로 설정
   res.cookie('refreshToken', refreshToken, {
@@ -40,20 +43,25 @@ export async function login(req: Request, res: Response) {
 }
 
 /** 내 정보 조회 */
-export async function me(req: Request, res: Response) {
-  const { id } = (req as any).user;
+export async function me(_: Request, res: Response) {
+  try {
+    const { id } = res.locals.user;
 
-  const user = await prisma.user.findUnique({
-    where: { id },
-    select: { id: true, name: true, role: true }, // 비밀번호 등 제외
-  });
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: { id: true, name: true, role: true }, // 비밀번호 등 제외
+    });
 
-  if (!user) {
-    res.status(404).json({ message: 'User not found' });
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    res.status(200).json({ ...user });
+  } catch (err) {
+    res.status(401).json({ message: 'Invalid credentials' });
     return;
   }
-
-  res.status(200).json({ user });
 }
 
 /** 리프레시 토큰 재발급 */
@@ -67,8 +75,9 @@ export async function refresh(req: Request, res: Response) {
 
   try {
     const payload = verifyRefreshToken(refreshToken);
-    const user = payload;
-    const newAccessToken = generateAccessToken(user.id, user.role);
+    const { iat, exp, ...user } = payload;
+
+    const newAccessToken = generateAccessToken(user as Omit<User, 'pw'>);
     res.status(200).json({ accessToken: newAccessToken });
     return;
   } catch (err) {
