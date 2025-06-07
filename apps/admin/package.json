@@ -11,11 +11,12 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@faker-js/faker": "^9.6.0",
-    "@appabbang/ui": "workspace:*",
-    "@appabbang/typescript": "workspace:*",
-    "@appabbang/tailwind": "workspace:*",
     "@appabbang/eslint": "workspace:*",
-    "axios": "^1.9.0"
+    "@appabbang/tailwind": "workspace:*",
+    "@appabbang/typescript": "workspace:*",
+    "@appabbang/ui": "workspace:*",
+    "@faker-js/faker": "^9.6.0",
+    "axios": "^1.9.0",
+    "zustand": "^5.0.5"
   }
 }

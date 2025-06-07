@@ -1,6 +1,3 @@
-import axios from 'axios';
-import { useCallback } from 'react';
-import { useEffect } from 'react';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import {
   Button,
@@ -22,12 +19,14 @@ import {
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { login } from '@/service/api';
+import { useAuthStore } from '@/stores/authStore';
 
 export const Route = createFileRoute('/')({
-  beforeLoad: ({ context }) => {
-    const isLoggedIn = false;
+  beforeLoad: () => {
+    const { auth } = useAuthStore.getState() || sessionStorage.getItem('auth-storage');
 
-    if (isLoggedIn) {
+    if (auth) {
       throw redirect({ to: '/dashboard' });
     }
   },
@@ -35,8 +34,8 @@ export const Route = createFileRoute('/')({
 });
 
 export const adminLoginSchema = z.object({
-  userId: z.string().min(4, '아이디는 최소 4글자 이상이어야 합니다.'),
-  password: z
+  id: z.string().min(4, '아이디는 최소 4글자 이상이어야 합니다.'),
+  pw: z
     .string()
     .min(8, '비밀번호는 최소 8자 이상이어야 합니다.')
     .max(19, '비밀번호는 20자 미만이어야 합니다.')
@@ -45,40 +44,22 @@ export const adminLoginSchema = z.object({
 type AdminLoginForm = z.infer<typeof adminLoginSchema>;
 
 function RouteComponent() {
-  const getMe = useCallback(async () => {
-    const response = await axios.get(`${import.meta.env.VITE_APPABBANG_API_URL}/auth/me`);
-    console.log(response);
-    console.log(response.data);
-    return response.data;
-  }, []);
-
-  const login = async () => {
-    const response = await axios.post(`${import.meta.env.VITE_APPABBANG_API_URL}/auth/login`, {
-      id: 'admin',
-      pw: 'test1234',
-    });
-    console.log(response);
-    console.log(response.data);
-    return response.data;
-  };
-
-  useEffect(() => {
-    getMe();
-  }, []);
-
   const navigate = useNavigate();
+  const setAccessToken = useAuthStore((state) => state.setAccessToken);
 
   const form = useForm<AdminLoginForm>({
     resolver: zodResolver(adminLoginSchema),
     defaultValues: {
-      password: '',
-      userId: '',
+      id: 'admin',
+      pw: 'test1234!',
     },
   });
-  const onSubmit = (data: AdminLoginForm) => {
-    login();
-    console.log('로그인 시도:', data);
-    navigate({ to: '/dashboard' });
+  const onSubmit = async (data: AdminLoginForm) => {
+    const loginRes = await login(data);
+    if (loginRes.success) {
+      setAccessToken(loginRes.accessToken);
+      navigate({ to: '/dashboard' });
+    }
   };
 
   return (
@@ -93,7 +74,7 @@ function RouteComponent() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
-                name="userId"
+                name="id"
                 render={({ field }) => (
                   <FormItem className="flex">
                     <FormLabel errorCheck={false} className="whitespace-nowrap px-2 py-3 flex-1/4">
@@ -111,7 +92,7 @@ function RouteComponent() {
               />
               <FormField
                 control={form.control}
-                name="password"
+                name="pw"
                 render={({ field }) => (
                   <FormItem className="flex">
                     <FormLabel errorCheck={false} className="whitespace-nowrap px-2 py-3 flex-1/4">
