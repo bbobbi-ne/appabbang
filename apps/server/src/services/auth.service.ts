@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { User } from '@prisma/client';
+import { Users } from '@prisma/client';
 
 const SALT_ROUNDS = 10;
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || '';
@@ -19,12 +19,12 @@ export async function comparePassword(plain: string, hashed: string) {
 }
 
 /** 액세스 토큰 발급 */
-export function generateAccessToken(user: Omit<User, 'pw'>) {
+export function generateAccessToken(user: Omit<Users, 'pw'>) {
   return jwt.sign(user, JWT_ACCESS_SECRET, { expiresIn: JWT_ACCESS_EXPIRES_IN });
 }
 
 /** 리프레시 토큰 발급 */
-export function generateRefreshToken(user: Omit<User, 'pw'>) {
+export function generateRefreshToken(user: Omit<Users, 'pw'>) {
   return jwt.sign(user, JWT_REFRESH_SECRET, { expiresIn: JWT_REFRESH_EXPIRES_IN });
 }
 
