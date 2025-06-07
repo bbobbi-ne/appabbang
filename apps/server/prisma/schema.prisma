@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -14,14 +13,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Users {
   no         Int      @id @default(autoincrement()) // 기본 키: 숫자, 자동 증가
   id         String   @unique                      // 사용자 아이디 (중복 불가)
   pw         String                               // 비밀번호
   name       String                               // 이름
   role       Role                                 // 역할 (ADMIN 또는 SUB)
   createdAt  DateTime @default(now())             // 생성일시 (자동 생성)
-  refreshToken String?  // 리프레시 토큰 저장용 필드 (nullable)
+  refreshToken String? @map("refresh-token")  // 리프레시 토큰 저장용 필드 (nullable)
 }
 
 enum Role {

@@ -10,7 +10,7 @@ async function main() {
   const hashedPassword = await bcrypt.hash(pw, 10);
 
   // 기본 관리자 유저 생성
-  await prisma.user.upsert({
+  await prisma.users.upsert({
     where: { id },
     update: {
       pw: hashedPassword,
