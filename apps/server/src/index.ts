@@ -2,6 +2,7 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import authRouter from './routes/auth.route';
+import commonCodeRouter from './routes/common-code.route';
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(
 );
 
 // Routes
+app.use('/common-code', commonCodeRouter);
 app.use('/auth', authRouter);
 
 // 헬스 체크용 라우터
