@@ -7,6 +7,7 @@ import {
   SidebarMenuButton,
   SidebarFooter,
 } from '@appabbang/ui';
+import { Link, useRouterState } from '@tanstack/react-router';
 
 const items = [
   { title: 'Home', url: '/dashboard' },
@@ -18,6 +19,8 @@ const items = [
 ];
 
 export function Sidebar() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
   return (
     <SidebarRoot>
       <SidebarHeader>
@@ -26,8 +29,10 @@ export function Sidebar() {
       <SidebarContent>
         <SidebarMenu>
           {items.map(({ title, url }) => (
-            <SidebarMenuItem>
-              <SidebarMenuButton>{title}</SidebarMenuButton>
+            <SidebarMenuItem key={title}>
+              <SidebarMenuButton isActive={pathname.endsWith(url)} asChild>
+                <Link to={url}>{title}</Link>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
