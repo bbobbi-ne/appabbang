@@ -18,7 +18,6 @@ interface LoginErrorResponse {
 export async function login(req: LoginRequest): Promise<LoginSuccessResponse | LoginErrorResponse> {
   try {
     const response = await baseInstance.post('/auth/login', req);
-
     return {
       success: true,
       accessToken: response.data.accessToken,
@@ -46,9 +45,8 @@ export async function getMe(req: string) {
 }
 
 export async function refresh() {
-  const response = await baseInstance.post('/auth/refresh');
-
   try {
+    const response = await baseInstance.post('/auth/refresh');
     return response.data.accessToken;
   } catch (error: any) {
     return error.message;
