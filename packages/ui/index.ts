@@ -21,3 +21,5 @@ export * from './src/components/ui/sidebar';
 export * from './src/components/ui/skeleton';
 export * from './src/components/ui/sheet';
 export * from './src/components/ui/table';
+export * from './src/components/ui/dialog';
+export * from './src/components/ui/alert-dialog';
