@@ -49,7 +49,7 @@ export async function me(_: Request, res: Response) {
 
     const user = await prisma.users.findUnique({
       where: { id },
-      select: { id: true, name: true, role: true }, // 비밀번호 등 제외
+      select: { id: true, name: true, userRole: true }, // 비밀번호 등 제외
     });
 
     if (!user) {
