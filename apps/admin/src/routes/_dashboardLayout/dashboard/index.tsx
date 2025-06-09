@@ -1,3 +1,6 @@
+import { getMe } from '@/service/api';
+import { useAuthStore } from '@/stores/authStore';
+import { Button } from '@appabbang/ui';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_dashboardLayout/dashboard/')({
@@ -5,5 +8,17 @@ export const Route = createFileRoute('/_dashboardLayout/dashboard/')({
 });
 
 function RouteComponent() {
-  return <div>Hello "/_dashboardLayout/dashboard/"!</div>;
+  const accessToken = useAuthStore.getState().accessToken;
+
+  async function test() {
+    const res = await getMe(accessToken);
+
+    console.log(res);
+  }
+
+  return (
+    <>
+      <Button onClick={test}>Get Me</Button>
+    </>
+  );
 }
