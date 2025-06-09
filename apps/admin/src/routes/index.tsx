@@ -24,7 +24,13 @@ import { useAuthStore } from '@/stores/authStore';
 
 export const Route = createFileRoute('/')({
   beforeLoad: () => {
-    const { auth } = useAuthStore.getState() || sessionStorage.getItem('auth-storage');
+    const raw = sessionStorage.getItem('auth-storage');
+    const parsed = raw ? JSON.parse(raw) : null;
+    const cachedAuth = parsed?.state?.auth;
+
+    const auth = useAuthStore.getState().auth || cachedAuth;
+
+    console.log(auth);
 
     if (auth) {
       throw redirect({ to: '/dashboard' });
