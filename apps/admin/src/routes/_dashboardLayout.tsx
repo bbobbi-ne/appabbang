@@ -13,7 +13,6 @@ import {
 import { Sidebar } from '@/components/Sidebar';
 import { useInitializeAuth } from '@/hooks/useInitializeAuth';
 import { useAuthStore } from '@/stores/authStore';
-import { useEffect } from 'react';
 import { AlertDialog } from '@appabbang/ui';
 
 export const Route = createFileRoute('/_dashboardLayout')({
@@ -29,16 +28,10 @@ export default function DashboardLayout() {
 }
 
 function DashboardContent() {
-  const { data, isLoading, isError, isSuccess } = useInitializeAuth();
-  const { setAccessToken, clearAccessToken, setAuth, clearAuth } = useAuthStore();
+  const { isLoading, isError } = useInitializeAuth();
+  const { clearAccessToken, clearAuth } = useAuthStore();
 
   const navigate = useNavigate();
-  useEffect(() => {
-    if (isSuccess) {
-      setAccessToken(data.accessToken);
-      setAuth(data.auth);
-    }
-  }, [data, isSuccess]);
 
   const closeDialog = () => {
     clearAccessToken();

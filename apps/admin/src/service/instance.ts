@@ -43,14 +43,20 @@ const reqInt = (request: any) => {
 const resInt = async (error: any) => {
   const originalRequest = error.config;
 
-  if (error.response.status === 401 && !originalRequest._retry) {
+  if (error.response.status === 403 && !originalRequest._retry) {
     originalRequest._retry = true;
 
     const newAccessToken = await refresh();
+    if (newAccessToken.success) {
+      // ✅ store에 토큰 저장
+      useAuthStore.getState().setAccessToken(newAccessToken.accessToken);
 
-    originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+      // ✅ 헤더 갱신
+      originalRequest.headers['Authorization'] = `Bearer ${newAccessToken.accessToken}`;
 
-    return requireAccessTokenInstance(originalRequest);
+      // ✅ 재요청
+      return requireAccessTokenInstance(originalRequest);
+    }
   }
 
   return Promise.reject(error);
