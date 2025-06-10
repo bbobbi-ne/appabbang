@@ -228,6 +228,16 @@ importers:
       '@appabbang/typescript':
         specifier: workspace:*
         version: link:../../tools/typescript
+    devDependencies:
+      '@prisma/client':
+        specifier: '*'
+        version: 6.8.2(prisma@6.8.2(typescript@5.8.3))(typescript@5.8.3)
+      cloudinary:
+        specifier: '*'
+        version: 2.6.1
+      express-validator:
+        specifier: '*'
+        version: 7.2.1
 
   apps/web:
     dependencies:

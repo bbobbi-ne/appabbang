@@ -12,5 +12,10 @@
   },
   "dependencies": {
     "@appabbang/typescript": "workspace:*"
+  },
+  "devDependencies": {
+    "cloudinary": "*",
+    "@prisma/client": "*",
+    "express-validator": "*"
   }
 }

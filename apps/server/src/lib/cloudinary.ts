@@ -1,5 +1,5 @@
-import {
-  v2 as cloudinary,
+import { v2 as cloudinary } from 'cloudinary';
+import type {
   DeliveryType,
   ResourceType,
   ResponseCallback,
