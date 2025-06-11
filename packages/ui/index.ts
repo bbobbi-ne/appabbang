@@ -23,3 +23,8 @@ export * from './src/components/ui/sheet';
 export * from './src/components/ui/table';
 export * from './src/components/ui/dialog';
 export * from './src/components/ui/alert-dialog';
+export * from './src/components/ui/dropdown-menu';
+export * from './src/components/ui/checkbox';
+export * from './src/components/ui/aspect-ratio';
+export * from './src/components/ui/select';
+export * from './src/components/ui/pagination';
