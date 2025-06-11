@@ -1,5 +1,6 @@
 import { RequestHandler } from 'express';
 import { validationResult, body } from 'express-validator';
+import { CodeGroup } from '@/types';
 
 export const validate = (validators: RequestHandler[]): RequestHandler => {
   return (req, res, next) => {
@@ -20,6 +21,14 @@ export const validate = (validators: RequestHandler[]): RequestHandler => {
     })().catch(next);
   };
 };
+
+export const createCommonCodeValidator = [
+  body('groupName')
+    .isIn(Object.values(CodeGroup))
+    .withMessage(`유효한 그룹명이 아닙니다. (그룹명: ${Object.values(CodeGroup).join(', ')})`),
+  body('name').trim().notEmpty().withMessage('이름은 필수입니다'),
+  body('code').trim().notEmpty().withMessage('코드는 필수입니다'),
+];
 
 export const loginValidator = [
   body('id').trim().notEmpty().withMessage('id 는 필수입니다'),

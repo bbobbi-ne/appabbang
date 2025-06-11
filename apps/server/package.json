@@ -5,9 +5,10 @@
   "main": "index.ts",
   "scripts": {
     "dev": "nodemon --exec \"node -r tsconfig-paths/register -r ts-node/register\" src/index.ts",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev --name init",
-    "seed": "ts-node prisma/seed.ts"
+    "generate": "prisma generate",
+    "migrate": "prisma migrate dev",
+    "seed": "ts-node prisma/seed.ts",
+    "prisma:all": "pnpm run generate && pnpm run migrate && pnpm run seed"
   },
   "dependencies": {
     "@appabbang/typescript": "workspace:*",

@@ -13,17 +13,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
-  no         Int      @id @default(autoincrement()) // 기본 키: 숫자, 자동 증가
-  id         String   @unique                      // 사용자 아이디 (중복 불가)
-  pw         String                               // 비밀번호
-  name       String                               // 이름
-  role       Role                                 // 역할 (ADMIN 또는 SUB)
-  createdAt  DateTime @default(now())             // 생성일시 (자동 생성)
-  refreshToken String? @map("refresh-token")  // 리프레시 토큰 저장용 필드 (nullable)
+model CommonCode {
+  no          Int      @id @default(autoincrement())
+  groupName   String   @map("group_name") @db.VarChar(20)
+  code        String   @db.VarChar(5)
+  name        String   @db.VarChar(30)
+  remarkTxt   String?  @map("remark_txt") @db.VarChar(500)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("common_code")
 }
 
-enum Role {
-  ADMIN
-  SUB
+model Users {
+  no         Int      @id @default(autoincrement()) 
+  id         String   @unique                   
+  pw         String                           
+  name       String                            
+  userRole       String   @db.VarChar(5) @map("user_role") 
+  createdAt  DateTime @default(now())           
+  refreshToken String? @map("refresh_token") 
+
+  @@map("users")
 }
+
