@@ -10,7 +10,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@appabbang/ui';
-import { Sidebar } from '@/components/Sidebar';
+import { Sidebar } from '@/components/sidebar';
 import { useInitializeAuth } from '@/hooks/useInitializeAuth';
 import { useAuthStore } from '@/stores/authStore';
 import { AlertDialog } from '@appabbang/ui';
@@ -40,7 +40,7 @@ function DashboardContent() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <>
       {isError && (
         <AlertDialog open={true}>
           <AlertDialogContent>
@@ -58,8 +58,10 @@ function DashboardContent() {
       )}
 
       <Sidebar />
-      <SidebarTrigger />
+      <main>
+        <SidebarTrigger />
+      </main>
       <Outlet />
-    </div>
+    </>
   );
 }
