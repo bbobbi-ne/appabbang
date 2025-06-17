@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { Users } from '@prisma/client';
+import type { Users } from '@prisma/client';
 
 const SALT_ROUNDS = 10;
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || '';

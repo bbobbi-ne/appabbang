@@ -1,8 +1,13 @@
+/** packages */
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import authRouter from './routes/auth.route';
+import fileUpload from 'express-fileupload';
+
+/** routes */
 import commonCodeRouter from './routes/common-code.route';
+import commonImagesRouter from './routes/common-images.route';
+import authRouter from './routes/auth.route';
 
 const app = express();
 
@@ -15,9 +20,11 @@ app.use(
     credentials: true,
   }),
 );
+app.use(fileUpload({ useTempFiles: true }));
 
 // Routes
 app.use('/common-code', commonCodeRouter);
+app.use('/common-images', commonImagesRouter);
 app.use('/auth', authRouter);
 
 // 헬스 체크용 라우터

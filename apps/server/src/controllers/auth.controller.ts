@@ -6,7 +6,7 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
 } from '@/services/auth.service';
-import { Users } from '@prisma/client';
+import type { Users } from '@prisma/client';
 
 /** 로그인 */
 export async function login(req: Request, res: Response) {

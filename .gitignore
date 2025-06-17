@@ -54,3 +54,6 @@ tools/**/build/
 # --- TurboRepo 캐시 (사용 시) ---
 turbo/
 .cache/
+
+# --- 임시 파일 ---
+apps/server/tmp/*
