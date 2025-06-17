@@ -30,10 +30,36 @@ model Users {
   id         String   @unique                   
   pw         String                           
   name       String                            
-  userRole       String   @db.VarChar(5) @map("user_role") 
-  createdAt  DateTime @default(now())           
+  userRole   String   @db.VarChar(5) @map("user_role") 
+  createdAt  DateTime @default(now())
+  updatedAt   DateTime @updatedAt @map("updated_at")           
   refreshToken String? @map("refresh_token") 
 
   @@map("users")
 }
 
+model Images {
+  no              Int       @id @default(autoincrement())     // Images.no
+  url             String                                      // 이미지 URL
+  publicId        String    @map("public_id")                 // 퍼블릭 아이디 (Cloudinary 등)
+  imageTargetType String?   @map("image_target_type")         // 이미지 타입 (enum으로 관리 가능)
+  imageTargetNo   Int?      @map("image_target_no")           // 참조 대상 No
+  order           Int?                                        // 이미지 정렬 순서
+  name            String?                                     // 원본 파일명
+  createdAt       DateTime  @default(now()) @map("created_at") // 등록 시간
+  updatedAt       DateTime  @updatedAt @map("updated_at")     // 수정 시간
+
+  @@map("images")
+}
+
+model Breads {
+  no           Int      @id @default(autoincrement())
+  name         String
+  description  String?
+  unitPrice   Int
+  breadStatus String    @map("bread_status")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("breads")
+}

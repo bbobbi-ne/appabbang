@@ -72,6 +72,7 @@ delivery_type	20	CJ대한통운
       { code: '30', groupName: 'purchase_status', name: '발주완료', remarkTxt: '발주완료' },
       { code: '10', groupName: 'delivery_type', name: '우체국', remarkTxt: '우체국' },
       { code: '20', groupName: 'delivery_type', name: 'CJ대한통운', remarkTxt: 'CJ대한통운' },
+      { code: '10', groupName: 'image_target_type', name: 'breads', remarkTxt: '빵 이미지' },
     ],
   });
 }
