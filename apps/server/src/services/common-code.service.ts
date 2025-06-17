@@ -87,7 +87,6 @@ async function loadDeliveryTypeCodes() {
   });
 
   codes.forEach((code: any) => {
-    console.log(code);
     deliveryTypeMap.set(code.code, code.name);
   });
 }
