@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { validationResult, body } from 'express-validator';
+import { validationResult, body, query } from 'express-validator';
 import { CodeGroup } from '@/types';
 
 export const validate = (validators: RequestHandler[]): RequestHandler => {
@@ -33,6 +33,14 @@ export const createCommonCodeValidator = [
 export const loginValidator = [
   body('id').trim().notEmpty().withMessage('id 는 필수입니다'),
   body('pw').trim().notEmpty().withMessage('pw 는 필수입니다'),
+];
+
+export const getBreadsValidator = [
+  query('breadStatus')
+    .optional()
+    .trim()
+    .isIn(['10', '20', '30', '40', '50'])
+    .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
 ];
 
 export const createBreadValidator = [

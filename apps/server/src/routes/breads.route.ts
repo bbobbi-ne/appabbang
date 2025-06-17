@@ -5,6 +5,7 @@ import {
   createBreadValidator,
   deleteBreadValidator,
   deleteImageValidator,
+  getBreadsValidator,
   updateBreadValidator,
   validate,
 } from '@/middlewares/validators/validate';
@@ -12,7 +13,7 @@ import {
 const router = Router();
 
 // GET /breads
-router.get('/', authenticateToken, breadsController.getBreads);
+router.get('/', authenticateToken, validate(getBreadsValidator), breadsController.getBreads);
 
 // GET /breads/:no
 router.get('/:no', authenticateToken, breadsController.getBreadByNo);

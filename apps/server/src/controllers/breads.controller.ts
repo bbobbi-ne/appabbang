@@ -8,7 +8,25 @@ const MAX_UPLOAD_COUNT = 10;
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
 
 /** 빵 목록 조회 */
-export async function getBreads(_: Request, res: Response) {
+export async function getBreads(req: Request, res: Response) {
+  try {
+    const { breadStatus } = req.query;
+
+    if (breadStatus) {
+      const breads = await getBreadsByStatus(breadStatus as '10' | '20' | '30' | '40' | '50');
+      res.status(200).json(breads);
+    } else {
+      const breads = await getBreadsAll();
+      res.status(200).json(breads);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+  }
+}
+
+/** 빵 목록 전체 조회 */
+export async function getBreadsAll() {
   try {
     // 최대 10000 개 조회
     const breads = await prisma.breads.findMany({
@@ -36,10 +54,45 @@ export async function getBreads(_: Request, res: Response) {
       image: imageMap.get(bread.no),
     }));
 
-    res.status(200).json(data);
+    return data;
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+  }
+}
+
+/** 빵 상태값에 의한 조회 */
+export async function getBreadsByStatus(breadStatus: '10' | '20' | '30' | '40' | '50') {
+  try {
+    const breads = await prisma.breads.findMany({
+      where: { breadStatus },
+    });
+
+    const images = await prisma.images.findMany({
+      where: {
+        imageTargetType: '10',
+        imageTargetNo: { in: breads.map((bread: any) => bread.no) },
+      },
+      orderBy: {
+        order: 'asc',
+      },
+      select: {
+        publicId: true,
+        url: true,
+        name: true,
+        order: true,
+        imageTargetNo: true,
+      },
+    });
+
+    const data = breads.map((bread: any) => ({
+      ...bread,
+      breadStatus: getBreadStatusName(bread.breadStatus),
+      images: images.filter((img: any) => img.imageTargetNo === bread.no),
+    }));
+
+    return data;
+  } catch (error) {
+    console.error(error);
   }
 }
 
