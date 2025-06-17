@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { validationResult, body } from 'express-validator';
+import { validationResult, body, query } from 'express-validator';
 import { CodeGroup } from '@/types';
 
 export const validate = (validators: RequestHandler[]): RequestHandler => {
@@ -35,15 +35,66 @@ export const loginValidator = [
   body('pw').trim().notEmpty().withMessage('pw 는 필수입니다'),
 ];
 
+export const getBreadsValidator = [
+  query('breadStatus')
+    .optional()
+    .trim()
+    .isIn(['10', '20', '30', '40', '50'])
+    .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
+];
+
 export const createBreadValidator = [
   body('name').trim().notEmpty().withMessage('이름은 필수입니다'),
   body('unitPrice')
+    .trim()
     .notEmpty()
     .withMessage('가격은 필수입니다')
     .isFloat({ min: 0 })
     .withMessage('가격은 숫자여야 합니다')
     .toFloat(),
-  body('status')
-    .isIn(['available', 'unavailable', 'upcoming', 'draft'])
-    .withMessage('유효한 상태여야 합니다 (available, unavailable, upcoming, draft)'),
+  body('breadStatus')
+    .trim()
+    .notEmpty()
+    .isIn([10, 20, 30, 40, 50])
+    .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
+];
+
+export const updateBreadValidator = [
+  body('name').trim().notEmpty().withMessage('이름은 필수입니다'),
+  body('unitPrice')
+    .trim()
+    .notEmpty()
+    .withMessage('가격은 필수입니다')
+    .isFloat({ min: 0 })
+    .withMessage('가격은 숫자여야 합니다')
+    .toFloat(),
+  body('breadStatus')
+    .trim()
+    .notEmpty()
+    .isIn([10, 20, 30, 40, 50])
+    .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
+];
+
+export const deleteBreadValidator = [
+  body('noList')
+    .exists()
+    .withMessage('noList는 필수입니다')
+    .isArray({ min: 1 })
+    .withMessage('noList는 하나 이상의 요소를 가진 배열이어야 합니다.'),
+  body('noList.*').isInt().toInt().withMessage('noList 안의 값은 정수여야 합니다.'),
+];
+
+export const deleteImageValidator = [
+  body('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no는 정수여야 합니다.'),
+  body('publicId')
+    .exists()
+    .withMessage('publicId는 필수입니다')
+    .trim()
+    .notEmpty()
+    .withMessage('publicId는 비어있을 수 없습니다.'),
 ];
