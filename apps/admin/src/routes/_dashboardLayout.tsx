@@ -10,11 +10,10 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@appabbang/ui';
-import { Sidebar } from '@/components/Sidebar';
 import { useInitializeAuth } from '@/hooks/useInitializeAuth';
 import { useAuthStore } from '@/stores/authStore';
-import { useEffect } from 'react';
 import { AlertDialog } from '@appabbang/ui';
+import { Sidebar } from '@/components/sidebar';
 
 export const Route = createFileRoute('/_dashboardLayout')({
   component: DashboardLayout,
@@ -29,16 +28,10 @@ export default function DashboardLayout() {
 }
 
 function DashboardContent() {
-  const { data, isLoading, isError, isSuccess } = useInitializeAuth();
-  const { setAccessToken, clearAccessToken, setAuth, clearAuth } = useAuthStore();
+  const { isLoading, isError } = useInitializeAuth();
+  const { clearAccessToken, clearAuth } = useAuthStore();
 
   const navigate = useNavigate();
-  useEffect(() => {
-    if (isSuccess) {
-      setAccessToken(data.accessToken);
-      setAuth(data.auth);
-    }
-  }, [data, isSuccess]);
 
   const closeDialog = () => {
     clearAccessToken();
@@ -47,7 +40,7 @@ function DashboardContent() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <>
       {isError && (
         <AlertDialog open={true}>
           <AlertDialogContent>
@@ -65,8 +58,10 @@ function DashboardContent() {
       )}
 
       <Sidebar />
-      <SidebarTrigger />
-      <Outlet />
-    </div>
+      <main className="w-full">
+        <SidebarTrigger className="fixed" />
+        <Outlet />
+      </main>
+    </>
   );
 }
