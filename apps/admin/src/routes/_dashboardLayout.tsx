@@ -10,10 +10,10 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@appabbang/ui';
-import { Sidebar } from '@/components/sidebar';
 import { useInitializeAuth } from '@/hooks/useInitializeAuth';
 import { useAuthStore } from '@/stores/authStore';
 import { AlertDialog } from '@appabbang/ui';
+import { Sidebar } from '@/components/sidebar';
 
 export const Route = createFileRoute('/_dashboardLayout')({
   component: DashboardLayout,
@@ -58,10 +58,10 @@ function DashboardContent() {
       )}
 
       <Sidebar />
-      <main>
-        <SidebarTrigger />
+      <main className="w-full">
+        <SidebarTrigger className="fixed" />
+        <Outlet />
       </main>
-      <Outlet />
     </>
   );
 }
