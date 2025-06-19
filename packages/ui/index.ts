@@ -28,3 +28,5 @@ export * from './src/components/ui/checkbox';
 export * from './src/components/ui/aspect-ratio';
 export * from './src/components/ui/select';
 export * from './src/components/ui/pagination';
+export * from './src/components/ui/textarea';
+export * from './src/components/ui/radio-group';
