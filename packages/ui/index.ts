@@ -30,3 +30,4 @@ export * from './src/components/ui/select';
 export * from './src/components/ui/pagination';
 export * from './src/components/ui/textarea';
 export * from './src/components/ui/radio-group';
+export * from './src/components/ui/sonner';
