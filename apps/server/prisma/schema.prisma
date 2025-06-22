@@ -75,6 +75,7 @@ model Orders {
   totalPrice            Int               @map("total_price")
   orderPw               String            @map("order_pw")
   paid                  Boolean       
+  memo                  String
   createdAt             DateTime          @default(now()) @map("created_at")
   updatedAt             DateTime          @updatedAt @map("updated_at")
   customers             Customers         @relation(fields: [customerNo], references: [no])
