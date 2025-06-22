@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { authenticateToken } from '@/middlewares/auth.middleware';
 import * as addressController from '@/controllers/address.controller';
 import { updateAddressValidator, validate } from '@/middlewares/validators/validate';
 import { createAddressValidator } from '@/middlewares/validators/validate';
@@ -13,12 +12,12 @@ router.get('/', addressController.getList);
 router.get('/:no', addressController.getOne);
 
 // POST /address
-router.post('/', authenticateToken, validate(createAddressValidator), addressController.create);
+router.post('/', validate(createAddressValidator), addressController.create);
 
 // PUT /address/:no
-router.put('/:no', authenticateToken, validate(updateAddressValidator), addressController.update);
+router.put('/:no', validate(updateAddressValidator), addressController.update);
 
 // DELETE /address/:no
-router.delete('/:no', authenticateToken, addressController.remove);
+router.delete('/:no', addressController.remove);
 
 export default router;
