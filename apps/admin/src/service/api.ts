@@ -1,4 +1,5 @@
-import { baseInstance, requireAccessTokenInstance } from './instance';
+import { useAuthStore } from '@/stores/authStore';
+import { withCredentialsInstance, requireAccessTokenInstance } from './instance';
 
 interface LoginRequest {
   id: string;
@@ -43,7 +44,9 @@ export interface User {
 // ✅ 로그인
 export async function login(req: LoginRequest): Promise<LoginSuccessResponse | LoginErrorResponse> {
   try {
-    const response = await baseInstance.post('/auth/login', req);
+    const response = await withCredentialsInstance.post('/auth/login', req);
+
+    console.log(response);
     return {
       success: true,
       accessToken: response.data.accessToken,
@@ -58,14 +61,9 @@ export async function login(req: LoginRequest): Promise<LoginSuccessResponse | L
 }
 
 // ✅ 사용자 정보 조회
-export async function getMe(
-  accessToken: string | null,
-): Promise<GetMeSuccessResponse | GetMeErrorResponse> {
+export async function getMe(): Promise<GetMeSuccessResponse | GetMeErrorResponse> {
   try {
-    const response = await requireAccessTokenInstance.get<User>('/auth/me', {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-
+    const response = await requireAccessTokenInstance.get<User>('/auth/me');
     return {
       success: true,
       auth: response.data,
@@ -81,7 +79,7 @@ export async function getMe(
 // ✅ 리프레시 토큰으로 AccessToken 재발급
 export async function refresh(): Promise<RefreshSuccessResponse | RefreshErrorResponse> {
   try {
-    const response = await baseInstance.post('/auth/refresh');
+    const response = await withCredentialsInstance.post('/auth/refresh');
     return {
       success: true,
       accessToken: response.data.accessToken,
