@@ -119,8 +119,22 @@ export const createDeliveryMethodValidator = [
 ];
 
 export const updateDeliveryMethodValidator = [
-  body('fee').optional().isInt().toInt().withMessage('fee는 정수여야 합니다.'),
-  body('isActive').optional().isBoolean().toBoolean().withMessage('boolean 타입이어야 합니다.'),
+  body('deliveryType').trim().notEmpty().withMessage('deliveryType는 필수입니다'),
+  body('name').trim().notEmpty().withMessage('name은 필수입니다'),
+  body('fee')
+    .trim()
+    .notEmpty()
+    .withMessage('fee는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('fee는 정수여야 합니다.'),
+  body('isActive')
+    .trim()
+    .notEmpty()
+    .withMessage('isActive는 필수입니다')
+    .isBoolean()
+    .toBoolean()
+    .withMessage('boolean 타입이어야 합니다.'),
 ];
 
 export const createAddressValidator = [

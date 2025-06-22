@@ -148,10 +148,11 @@ model Address {
 
 model DeliveryMethod {
   no                    Int               @id @default(autoincrement())
-  deliveryType          String            @map("delivery_type")
+  name                  String
   memo                  String?
   fee                   Int
   isActive              Boolean           @map("is_active")
+  deliveryType          String            @map("delivery_type")
 
   createdAt             DateTime          @default(now()) @map("created_at") 
   updatedAt             DateTime          @updatedAt @map("updated_at")

@@ -23,7 +23,6 @@ export const getListAll = async () => {
   const deliveryMethods = await prisma.deliveryMethod.findMany();
   const data = deliveryMethods.map((deliveryMethod: any) => ({
     ...deliveryMethod,
-    deliveryTypeName: getCodeName(deliveryMethod.deliveryType),
   }));
 
   return data;
@@ -77,26 +76,11 @@ export const getOne = async (req: Request, res: Response) => {
 /** 배송 방법 생성 */
 export const create = async (req: Request, res: Response) => {
   try {
-    const { deliveryType, name, memo = '', fee, isActive } = req.body;
-
-    // 공통코드 중복 여부 확인
-    const commonCode = await prisma.commonCode.findFirst({
-      where: { code: deliveryType, groupName: 'delivery_type' },
-    });
-
-    if (commonCode) {
-      res.status(400).json({ message: '이미 존재하는 배송 방법(code)입니다.' });
-      return;
-    }
-
-    // 공통코드 생성.
-    await prisma.commonCode.create({
-      data: { code: deliveryType, name, groupName: 'delivery_type' },
-    });
+    const { name, memo = '', fee, isActive, deliveryType } = req.body;
 
     // 배송 방법 생성.
     const deliveryMethod = await prisma.deliveryMethod.create({
-      data: { deliveryType, memo, fee, isActive },
+      data: { name, memo, fee, isActive, deliveryType },
     });
 
     res.status(201).json(deliveryMethod);
@@ -110,7 +94,7 @@ export const create = async (req: Request, res: Response) => {
 export const update = async (req: Request, res: Response) => {
   try {
     const { no } = req.params;
-    const { name, memo = '', fee, isActive } = req.body;
+    const { name, memo = '', fee, isActive, deliveryType } = req.body;
 
     const deliveryMethod = await prisma.deliveryMethod.findUnique({ where: { no: Number(no) } });
 
@@ -119,14 +103,10 @@ export const update = async (req: Request, res: Response) => {
       return;
     }
 
-    if (name) {
-      await updateCommonCodeByDeliveryType(deliveryMethod.deliveryType, name);
-    }
-
     // 배송 방법 수정.
     const updatedDeliveryMethod = await prisma.deliveryMethod.update({
       where: { no: Number(no) },
-      data: { memo, fee, isActive },
+      data: { name, memo, fee, isActive, deliveryType },
     });
 
     res.status(200).json({
@@ -137,22 +117,6 @@ export const update = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).json({ message: '서버 오류가 발생했습니다.' });
   }
-};
-
-/** deliveryType 에 해당하는 공통코드 찾아서 수정. */
-const updateCommonCodeByDeliveryType = async (deliveryType: string, name: string) => {
-  const commonCode = await prisma.commonCode.findFirst({
-    where: { code: deliveryType, groupName: 'delivery_type' },
-  });
-
-  if (!commonCode) {
-    throw new Error('공통코드를 찾을 수 없습니다.');
-  }
-
-  await prisma.commonCode.update({
-    where: { no: commonCode?.no },
-    data: { name },
-  });
 };
 
 /** 배송 방법 삭제 */
@@ -166,7 +130,6 @@ export const remove = async (req: Request, res: Response) => {
       return;
     }
 
-    await deleteCommonCodeByDeliveryType(deliveryMethod.deliveryType);
     await prisma.deliveryMethod.delete({ where: { no: Number(no) } });
 
     res.status(204).json({ message: '배송 방법이 삭제되었습니다.' });
@@ -174,18 +137,4 @@ export const remove = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).json({ message: '서버 오류가 발생했습니다.' });
   }
-};
-
-const deleteCommonCodeByDeliveryType = async (deliveryType: string) => {
-  const commonCode = await prisma.commonCode.findFirst({
-    where: { code: deliveryType, groupName: 'delivery_type' },
-  });
-
-  if (!commonCode) {
-    throw new Error('공통코드를 찾을 수 없습니다.');
-  }
-
-  await prisma.commonCode.delete({
-    where: { no: commonCode.no },
-  });
 };
