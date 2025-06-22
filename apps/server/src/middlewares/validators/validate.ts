@@ -122,3 +122,19 @@ export const updateDeliveryMethodValidator = [
   body('fee').optional().isInt().toInt().withMessage('fee는 정수여야 합니다.'),
   body('isActive').optional().isBoolean().toBoolean().withMessage('boolean 타입이어야 합니다.'),
 ];
+
+export const createAddressValidator = [
+  body('address').trim().notEmpty().withMessage('address는 필수입니다'),
+  body('addressDetail').trim().notEmpty().withMessage('addressDetail는 필수입니다'),
+  body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
+  body('recipientName').trim().notEmpty().withMessage('recipientName은 필수입니다'),
+  body('recipientMobile').trim().notEmpty().withMessage('recipientMobile은 필수입니다'),
+];
+
+export const updateAddressValidator = [
+  body('address').trim().notEmpty().withMessage('address는 필수입니다'),
+  body('addressDetail').trim().notEmpty().withMessage('addressDetail는 필수입니다'),
+  body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
+  body('recipientName').trim().notEmpty().withMessage('recipientName은 필수입니다'),
+  body('recipientMobile').trim().notEmpty().withMessage('recipientMobile은 필수입니다'),
+];
