@@ -72,10 +72,18 @@ export function TablePagination({ table }: { table: Table<any> }) {
           <Input
             className="w-16 h-auto"
             type="number"
-            defaultValue={table.getState().pagination.pageIndex + 1}
+            min={1}
+            max={table.getPageCount()}
+            defaultValue={currentPage + 1}
             onChange={(e) => {
-              const page = e.target.value ? Number(e.target.value) - 1 : 0;
-              table.setPageIndex(page);
+              const raw = e.target.value;
+              let page = Number(raw);
+
+              if (!raw || isNaN(page)) return;
+
+              const clamped = Math.min(Math.max(1, page), table.getPageCount());
+
+              table.setPageIndex(clamped - 1);
             }}
           />
           <Select
