@@ -1,11 +1,11 @@
 import { prisma } from '@/lib/prisma';
-import { Customers } from '@prisma/client';
+import { Customer } from '@prisma/client';
 
 /** 고객 생성 (비회원) */
-export const createCustomer = async (customer: Customers) => {
+export const createCustomer = async (customer: Customer) => {
   const { name, mobileNumber } = customer;
 
-  const newCustomer = await prisma.customers.create({
+  const newCustomer = await prisma.customer.create({
     data: {
       name,
       mobileNumber,
@@ -16,7 +16,7 @@ export const createCustomer = async (customer: Customers) => {
 
 /** 기본 주소 변경 */
 export const updateDefaultAddressNo = async (customerNo: number, addressNo: number) => {
-  const updatedCustomer = await prisma.customers.update({
+  const updatedCustomer = await prisma.customer.update({
     where: { no: customerNo },
     data: {
       defaultAddressNo: addressNo,

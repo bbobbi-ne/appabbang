@@ -29,14 +29,14 @@ export async function getBreads(req: Request, res: Response) {
 export async function getBreadsAll() {
   try {
     // 최대 10000 개 조회
-    const breads = await prisma.breads.findMany({
+    const breads = await prisma.bread.findMany({
       take: 10000,
       orderBy: {
         no: 'desc',
       },
     });
 
-    const images = await prisma.images.findMany({
+    const images = await prisma.image.findMany({
       where: {
         imageTargetType: '10',
         order: 1,
@@ -63,11 +63,11 @@ export async function getBreadsAll() {
 /** 빵 상태값에 의한 조회 */
 export async function getBreadsByStatus(breadStatus: '10' | '20' | '30' | '40' | '50') {
   try {
-    const breads = await prisma.breads.findMany({
+    const breads = await prisma.bread.findMany({
       where: { breadStatus },
     });
 
-    const images = await prisma.images.findMany({
+    const images = await prisma.image.findMany({
       where: {
         imageTargetType: '10',
         imageTargetNo: { in: breads.map((bread: any) => bread.no) },
@@ -106,7 +106,7 @@ export async function getBreadByNo(req: Request, res: Response) {
       return;
     }
 
-    const bread = await prisma.breads.findUnique({
+    const bread = await prisma.bread.findUnique({
       where: { no: parseInt(no) },
     });
 
@@ -115,7 +115,7 @@ export async function getBreadByNo(req: Request, res: Response) {
       return;
     }
 
-    const images = await prisma.images.findMany({
+    const images = await prisma.image.findMany({
       where: { imageTargetType: '10', imageTargetNo: parseInt(no) },
       orderBy: {
         order: 'asc',
@@ -182,7 +182,7 @@ export async function createBread(req: Request, res: Response) {
       });
 
       // 빵 생성 (db)
-      const bread = await prisma.breads.create({
+      const bread = await prisma.bread.create({
         data: {
           name,
           description,
@@ -194,7 +194,7 @@ export async function createBread(req: Request, res: Response) {
       // 이미지 생성 (db)
       const uploadedImages = await Promise.all(
         uploadResults.map(async (result, index) => {
-          await prisma.images.create({
+          await prisma.image.create({
             data: {
               publicId: result.public_id,
               url: result.secure_url,
@@ -215,7 +215,7 @@ export async function createBread(req: Request, res: Response) {
 
       res.status(200).json({ ...bread, images: uploadedImages });
     } else {
-      const bread = await prisma.breads.create({
+      const bread = await prisma.bread.create({
         data: {
           name,
           description,
@@ -242,7 +242,7 @@ export async function updateBread(req: Request, res: Response) {
       return;
     }
 
-    const findBread = await prisma.breads.findUnique({
+    const findBread = await prisma.bread.findUnique({
       where: { no: parseInt(no) },
     });
 
@@ -257,7 +257,7 @@ export async function updateBread(req: Request, res: Response) {
 
     if (images) {
       // 기존 이미지 조회
-      const findedImages = await prisma.images.findMany({
+      const findedImages = await prisma.image.findMany({
         where: { imageTargetNo: parseInt(no), imageTargetType: '10' },
         orderBy: { order: 'asc' },
         select: { order: true, publicId: true, url: true, name: true },
@@ -288,7 +288,7 @@ export async function updateBread(req: Request, res: Response) {
       const uploadResults = await cloudinary.upload(files);
 
       // 빵 수정
-      const bread = await prisma.breads.update({
+      const bread = await prisma.bread.update({
         where: { no: parseInt(no) },
         data: { name, description, unitPrice, breadStatus },
       });
@@ -296,7 +296,7 @@ export async function updateBread(req: Request, res: Response) {
       // 이미지 생성 (db)
       const uploadedImages = await Promise.all(
         uploadResults.map(async (result, index) => {
-          await prisma.images.create({
+          await prisma.image.create({
             data: {
               publicId: result.public_id,
               url: result.secure_url,
@@ -317,12 +317,12 @@ export async function updateBread(req: Request, res: Response) {
 
       res.status(200).json({ ...bread, images: [...findedImages, ...uploadedImages] });
     } else {
-      const bread = await prisma.breads.update({
+      const bread = await prisma.bread.update({
         where: { no: parseInt(no) },
         data: { name, description, unitPrice, breadStatus },
       });
 
-      const images = await prisma.images.findMany({
+      const images = await prisma.image.findMany({
         where: { imageTargetNo: parseInt(no), imageTargetType: '10' },
         orderBy: { order: 'asc' },
         select: {
@@ -347,7 +347,7 @@ export async function deleteBread(req: Request, res: Response) {
     const { noList } = req.body;
 
     // 삭제 대상 publicId 조회
-    const idList = await prisma.images.findMany({
+    const idList = await prisma.image.findMany({
       where: { imageTargetNo: { in: noList }, imageTargetType: '10' },
       select: {
         publicId: true,
@@ -359,13 +359,13 @@ export async function deleteBread(req: Request, res: Response) {
       await cloudinary.destroy(idList.map((item: { publicId: string }) => item.publicId));
 
       // 이미지 삭제
-      await prisma.images.deleteMany({
+      await prisma.image.deleteMany({
         where: { imageTargetNo: { in: noList }, imageTargetType: '10' },
       });
     }
 
     // 빵 삭제
-    await prisma.breads.deleteMany({
+    await prisma.bread.deleteMany({
       where: { no: { in: noList } },
     });
 
@@ -383,7 +383,7 @@ export async function deleteImage(req: Request, res: Response) {
     const { no, publicId } = req.body;
 
     // 1. 삭제 대상 이미지 정보 먼저 조회
-    const deletedImage = await prisma.images.findFirst({
+    const deletedImage = await prisma.image.findFirst({
       where: { publicId, imageTargetNo: parseInt(no), imageTargetType: '10' },
     });
 
@@ -396,12 +396,12 @@ export async function deleteImage(req: Request, res: Response) {
     await cloudinary.destroy([publicId]);
 
     // 3. DB 이미지 삭제
-    await prisma.images.deleteMany({
+    await prisma.image.deleteMany({
       where: { publicId },
     });
 
     // 4. no 에 해당하는 빵 이미지 순서 조정
-    await prisma.images.updateMany({
+    await prisma.image.updateMany({
       where: {
         imageTargetType: '10',
         imageTargetNo: parseInt(no),

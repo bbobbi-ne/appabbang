@@ -6,13 +6,13 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
 } from '@/services/auth.service';
-import type { Users } from '@prisma/client';
+import type { User } from '@prisma/client';
 
 /** 로그인 */
 export async function login(req: Request, res: Response) {
   const { id, pw } = req.body;
 
-  const user = await prisma.users.findUnique({ where: { id } });
+  const user = await prisma.user.findUnique({ where: { id } });
 
   if (!user) {
     res.status(401).json({ message: 'Invalid credentials' });
@@ -47,7 +47,7 @@ export async function me(_: Request, res: Response) {
   try {
     const { id } = res.locals.user;
 
-    const user = await prisma.users.findUnique({
+    const user = await prisma.user.findUnique({
       where: { id },
       select: { id: true, name: true, userRole: true }, // 비밀번호 등 제외
     });
@@ -77,7 +77,7 @@ export async function refresh(req: Request, res: Response) {
     const payload = verifyRefreshToken(refreshToken);
     const { iat, exp, ...user } = payload;
 
-    const newAccessToken = generateAccessToken(user as Omit<Users, 'pw'>);
+    const newAccessToken = generateAccessToken(user as Omit<User, 'pw'>);
     res.status(200).json({ accessToken: newAccessToken });
     return;
   } catch (err) {

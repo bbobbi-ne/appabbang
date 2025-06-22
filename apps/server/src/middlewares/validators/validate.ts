@@ -35,7 +35,7 @@ export const loginValidator = [
   body('pw').trim().notEmpty().withMessage('pw 는 필수입니다'),
 ];
 
-export const getBreadsValidator = [
+export const getBreadValidator = [
   query('breadStatus')
     .optional()
     .trim()

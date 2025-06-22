@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { Address, Customers, OrderItems, Orders } from '@prisma/client';
+import { Address, Customer, OrderItem, Order } from '@prisma/client';
 import { hashPassword } from './auth.service';
 
 export const createNonMemberOrder = async ({
@@ -8,14 +8,14 @@ export const createNonMemberOrder = async ({
   orderItems,
   order,
 }: {
-  customer: Customers;
+  customer: Customer;
   address: Address;
-  orderItems: OrderItems[];
-  order: Orders;
+  orderItems: OrderItem[];
+  order: Order;
 }) => {
   try {
     const result = await prisma.$transaction(async (tx) => {
-      const newCustomer = await tx.customers.create({
+      const newCustomer = await tx.customer.create({
         data: customer,
       });
 
@@ -26,7 +26,7 @@ export const createNonMemberOrder = async ({
       const hashedOrderPw = await hashPassword(order.orderPw);
       const deliveryMethodNo = order.deliveryMethodNo;
 
-      const newOrder = await tx.orders.create({
+      const newOrder = await tx.order.create({
         data: {
           customerNo: newCustomer.no,
           addressNo: newAddress.no,
@@ -36,10 +36,11 @@ export const createNonMemberOrder = async ({
           totalPrice: 0, // 서버에서 입력함. (계산 필요)
           orderPw: hashedOrderPw,
           paid: false,
+          memo: '',
         },
       });
 
-      const newOrderItems = await tx.orderItems.createMany({
+      const newOrderItems = await tx.orderItem.createMany({
         data: orderItems.map((item) => ({
           ...item,
           orderNo: newOrder.no,

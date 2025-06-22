@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { authenticateToken } from '@/middlewares/auth.middleware';
-import * as breadsController from '@/controllers/breads.controller';
+import * as breadsController from '@/controllers/bread.controller';
 import {
   createBreadValidator,
   deleteBreadValidator,
   deleteImageValidator,
-  getBreadsValidator,
+  getBreadValidator,
   updateBreadValidator,
   validate,
 } from '@/middlewares/validators/validate';
@@ -13,7 +13,7 @@ import {
 const router = Router();
 
 // GET /breads
-router.get('/', authenticateToken, validate(getBreadsValidator), breadsController.getBreads);
+router.get('/', authenticateToken, validate(getBreadValidator), breadsController.getBreads);
 
 // GET /breads/:no
 router.get('/:no', authenticateToken, breadsController.getBreadByNo);
