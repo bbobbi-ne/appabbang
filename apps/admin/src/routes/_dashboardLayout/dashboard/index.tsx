@@ -11,7 +11,7 @@ function RouteComponent() {
   const accessToken = useAuthStore.getState().accessToken;
 
   async function test() {
-    const res = await getMe(accessToken);
+    const res = await getMe();
 
     console.log(res);
   }

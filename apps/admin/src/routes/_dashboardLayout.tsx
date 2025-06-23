@@ -64,7 +64,7 @@ function DashboardContent() {
       {isLoading ? (
         <>로딩임</>
       ) : (
-        <main className="w-full">
+        <main className="w-full p-2">
           <Toaster />
           <SidebarTrigger className="fixed" />
           <Outlet />
