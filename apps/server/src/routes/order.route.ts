@@ -5,10 +5,10 @@ import * as orderController from '@/controllers/order.controller';
 const router = Router();
 
 // GET /order
-router.get('/', orderController.getList);
+// router.get('/', orderController.getList);
 
 // GET /order/:no
-router.get('/:no', orderController.getOne);
+// router.get('/:no', orderController.getOne);
 
 // POST /order
 router.post(
@@ -18,14 +18,14 @@ router.post(
 );
 
 // PUT /order/:no
-router.put(
-  '/:no',
+// router.put(
+//   '/:no',
 
-  //   validate(_),
-  orderController.update,
-);
+//   //   validate(_),
+//   orderController.update,
+// );
 
 // DELETE /order/:no
-router.delete('/:no', orderController.remove);
+// router.delete('/:no', orderController.remove);
 
 export default router;
