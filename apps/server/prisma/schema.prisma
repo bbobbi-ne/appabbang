@@ -72,7 +72,7 @@ model Bread {
 
 model Order {
   no                    Int               @id @default(autoincrement())
-  ordersNumber          String            @unique @map("orders_number")
+  orderNumber           String            @unique @map("orders_number")
   orderStatus           String            @map("order_status")
   totalPrice            Int               @map("total_price")
   orderPw               String            @map("order_pw")
