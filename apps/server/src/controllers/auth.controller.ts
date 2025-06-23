@@ -3,6 +3,8 @@ import {
   comparePassword,
   generateAccessToken,
   generateRefreshToken,
+  REFRESH_TOKEN_COOKIE_NAME,
+  REFRESH_TOKEN_COOKIE_OPTIONS,
   verifyRefreshToken,
 } from '@/services/auth.service';
 import type { User } from '@prisma/client';
@@ -33,12 +35,7 @@ export async function login(req: Request, res: Response) {
     const refreshToken = generateRefreshToken(rest);
 
     // Refresh Token을 Secure HttpOnly 쿠키로 설정
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      // secure: true, // HTTPS에서만 동작
-      sameSite: 'strict', // CSRF 방지
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
-    });
+    res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
     await userService.updateRefreshToken(user.id, refreshToken);
 

@@ -46,6 +46,13 @@ export const createNonMemberOrder = async ({
           orderNo: newOrder.no,
         })),
       });
+
+      return {
+        newCustomer,
+        newAddress,
+        newOrder,
+        newOrderItems,
+      };
     });
 
     return result;
