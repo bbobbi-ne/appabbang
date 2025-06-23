@@ -1,4 +1,4 @@
-import { ImageUploadField } from '@/components/ImageUploadField';
+import { ImageUploadField } from '@/components/Image-upload-field';
 import { z } from 'zod';
 
 import {
@@ -6,6 +6,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -32,25 +33,30 @@ import { useCreateBreadMutation } from '@/hooks/useBreads';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
-export const breadsDailogSchema = z.object({
+export const breadSchema = z.object({
   name: z.string().trim().min(1, '메뉴명을 입력해주세요'),
   description: z.string().trim().min(1, '설명을 입력해주세요'),
   unitPrice: z.string().trim().min(1, '가격을 입력해주세요'),
   breadStatus: z.string({
     required_error: '상태를 선택해주세요',
   }),
-  image: z.array(z.instanceof(File)).min(1, '최소 1장의 이미지를 업로드해주세요'),
+  image: z.array(
+    z.union([
+      z.instanceof(File),
+      z.object({}).passthrough(), // 어떤 object든 허용
+    ]),
+  ),
 });
-type BreadsDailogForm = z.infer<typeof breadsDailogSchema>;
+type BreadsDailogForm = z.infer<typeof breadSchema>;
 
-export function BreadsDialog() {
-  const { data } = useBreadStatus();
-  const breadStatus = data?.breadStatus;
+export function BreadsCreateDialog() {
+  const { data: breadStatusData } = useBreadStatus();
+  const breadStatus = breadStatusData?.breadStatus;
   const { CreateBreadMutation, error, isError, isSuccess, isPending } = useCreateBreadMutation();
   const closeRef = useRef<HTMLButtonElement>(null);
 
   const form = useForm<BreadsDailogForm>({
-    resolver: zodResolver(breadsDailogSchema),
+    resolver: zodResolver(breadSchema),
     defaultValues: {
       name: '',
       description: '',
@@ -100,7 +106,7 @@ export function BreadsDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="ml-auto bg-accent-foreground">추가</Button>
+        <Button className="ml-auto bg-accent-foreground">빵 추가하기</Button>
       </DialogTrigger>
       <DialogContent
         onInteractOutside={(e) => {
@@ -117,6 +123,8 @@ export function BreadsDialog() {
         <DialogHeader>
           <DialogTitle>메뉴등록</DialogTitle>
         </DialogHeader>
+        <DialogDescription>메뉴를 등록해주세요</DialogDescription>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 ">
             <FormField
@@ -186,7 +194,7 @@ export function BreadsDialog() {
                   </FormLabel>
                   <div className="flex-3/4 space-y-1">
                     <FormControl>
-                      <ImageUploadField {...field} />
+                      <ImageUploadField field={field} />
                     </FormControl>
                     <FormMessage />
                   </div>
