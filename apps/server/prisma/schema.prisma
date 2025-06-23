@@ -115,14 +115,15 @@ model Customer {
   id                    String?           
   pw                    String?           
   name                  String            
-  mobileNumber          String            @map("mobile_number") // 전화번호 (not null)
+  mobileNumber          String            @map("mobile_number")               // 전화번호 (not null)
   defaultAddressNo      Int?              @map("default_address_no") 
 
-  createdAt             DateTime          @default(now()) @map("created_at") // 가입일 (not null)
+  createdAt             DateTime          @default(now()) @map("created_at")  // 가입일 (not null)
   updatedAt             DateTime          @updatedAt @map("updated_at")
 
   order                 Order[]
   address               Address[]
+  discountCustomer      DiscountCustomer[]                                    // 연결
 
   @@map("customers")
 }
@@ -160,4 +161,37 @@ model DeliveryMethod {
   order                 Order[]
 
   @@map("delivery_methods")
+}
+
+model Discount {
+  no                    Int               @id @default(autoincrement()) // PK
+  name                  String                                          // 할인정보명
+  fromDt                DateTime                                        // 시작일
+  toDt                  DateTime                                        // 종료일
+  amount                Int?                                            // 할인금액 (정액 할인)
+  percentage            Float?                                          // 할인률 (10%)
+  discountType          String            @map("discount_type")
+  memo                  String?                                         // 메모
+
+  createdAt             DateTime @default(now())                        // 등록 시간
+  updatedAt             DateTime @updatedAt                             // 수정 시간
+
+  discountCustomer      DiscountCustomer[]
+
+  @@map("discounts")
+}
+
+model DiscountCustomer {
+  customerNo            Int
+  discountNo            Int
+  isUsed                Boolean           @default(false)
+  
+  createdAt             DateTime          @default(now())               // 등록 시간
+  updatedAt             DateTime          @updatedAt                    // 수정 시간 
+
+  customer              Customer          @relation(fields: [customerNo], references: [no])
+  discount              Discount          @relation(fields: [discountNo], references: [no])
+
+  @@id([customerNo, discountNo])          // 복합 기본키
+  @@map("discount_customer")
 }
