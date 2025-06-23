@@ -2,10 +2,25 @@ import { Button, Input } from '@appabbang/ui';
 import type { ControllerRenderProps } from 'react-hook-form';
 import { useCallback, useRef } from 'react';
 import { Plus, X } from 'lucide-react';
+import { useDeleteBreadImgMutation } from '@/hooks/useBreads';
 
-export function ImageUploadField(field: ControllerRenderProps<any, any>) {
+interface CloudinaryFile {
+  name: string;
+  order: number;
+  publicId: string;
+  url: string;
+}
+
+export function ImageUploadField({
+  field,
+  no,
+}: {
+  field: ControllerRenderProps<any, any>;
+  no?: number;
+}) {
   const { value = [], onChange } = field;
   const inputRef = useRef<HTMLInputElement>(null);
+  const { deleteBreadImgMutation } = useDeleteBreadImgMutation();
 
   const handleInputClick = () => {
     inputRef.current?.click();
@@ -25,8 +40,16 @@ export function ImageUploadField(field: ControllerRenderProps<any, any>) {
     [value, onChange],
   );
 
-  const removeImage = (index: number) => {
-    onChange(value.filter((file: File, i: number) => i !== index));
+  const removeImage = (file: File | CloudinaryFile, index: number) => {
+    const isFile = typeof file === 'object' && file instanceof File;
+
+    if (!isFile) {
+      deleteBreadImgMutation({ no: no!, publicId: file.publicId });
+    }
+
+    const newImageArray = value.filter((file: File | CloudinaryFile, i: number) => i !== index);
+
+    onChange(newImageArray);
   };
 
   return (
@@ -49,8 +72,12 @@ export function ImageUploadField(field: ControllerRenderProps<any, any>) {
         </div>
       ) : (
         <div className="grid grid-cols-3 gap-3 p-2 border-2 border-dashed rounded">
-          {value.map((file: File, index: number) => {
-            const preview = URL.createObjectURL(file);
+          {value.map((file: File | CloudinaryFile, index: number) => {
+            const preview =
+              typeof file === 'object' && file instanceof File
+                ? URL.createObjectURL(file)
+                : file?.url;
+
             return (
               <div key={index} className="relative group border rounded overflow-hidden">
                 <img src={preview} alt="preview" className="object-cover w-full h-28 rounded" />
@@ -61,7 +88,7 @@ export function ImageUploadField(field: ControllerRenderProps<any, any>) {
                 )}
                 <Button
                   type="button"
-                  onClick={() => removeImage(index)}
+                  onClick={() => removeImage(file, index)}
                   size="icon"
                   className="absolute top-1 right-1 bg-black/60 text-white rounded opacity-0 group-hover:opacity-100 transition"
                 >
