@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { validationResult, body, query } from 'express-validator';
+import { validationResult, body, query, param } from 'express-validator';
 import { CodeGroup } from '@/types';
 
 export const validate = (validators: RequestHandler[]): RequestHandler => {
@@ -72,6 +72,17 @@ export const updateBreadValidator = [
     .trim()
     .notEmpty()
     .isIn([10, 20, 30, 40, 50])
+    .toInt()
+    .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
+];
+
+export const updateBreadStatusValidator = [
+  param('no').exists().withMessage('no는 필수입니다'),
+  body('breadStatus')
+    .trim()
+    .notEmpty()
+    .isIn([10, 20, 30, 40, 50])
+    .toInt()
     .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
 ];
 

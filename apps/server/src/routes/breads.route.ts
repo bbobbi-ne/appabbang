@@ -6,6 +6,7 @@ import {
   deleteBreadValidator,
   deleteImageValidator,
   getBreadValidator,
+  updateBreadStatusValidator,
   updateBreadValidator,
   validate,
 } from '@/middlewares/validators/validate';
@@ -23,6 +24,14 @@ router.post('/', authenticateToken, validate(createBreadValidator), breadsContro
 
 // PUT /breads/:no
 router.put('/:no', authenticateToken, validate(updateBreadValidator), breadsController.updateBread);
+
+// PUT /breads/:no/status (빵 상태 변경)
+router.put(
+  '/:no/status',
+  authenticateToken,
+  validate(updateBreadStatusValidator),
+  breadsController.updateBreadStatus,
+);
 
 // DELETE /breads (여러건)
 router.delete('/', authenticateToken, validate(deleteBreadValidator), breadsController.deleteBread);

@@ -116,6 +116,20 @@ export async function updateBread(req: Request, res: Response) {
   }
 }
 
+export async function updateBreadStatus(req: Request, res: Response) {
+  try {
+    const { no } = req.params;
+    const { breadStatus } = req.body;
+
+    const bread = await BreadService.updateWithoutImages(parseInt(no!), { breadStatus });
+
+    res.status(200).json(bread);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+  }
+}
+
 /** 빵 삭제 (여러건) */
 export async function deleteBread(req: Request, res: Response) {
   try {
