@@ -35,11 +35,17 @@ import {
 } from '@appabbang/ui';
 
 import { TablePagination } from '@/components/table-pagination';
-import { BreadsDialog } from '../../../../components/breads_dialog';
+import { BreadsCreateDialog } from '../../../../components/breads-create-dialog';
 import { useQuery } from '@tanstack/react-query';
 import { getBreads } from '@/service/breadApi';
 import { ArrowUpDown } from 'lucide-react';
 import { useBreadStatus } from '@/hooks/useBreadStatus';
+import {
+  useDeleteBreadMutation,
+  useGetBreadsQuery,
+  useUpdateBreadMutation,
+} from '@/hooks/useBreads';
+import { BreadModifyDialog } from '@/components/bread-modify-dialog';
 
 export type Breads = {
   no: number;
@@ -61,8 +67,10 @@ function RouteComponent() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
-  const { data } = useBreadStatus();
-  const breadStatus = data?.breadStatus;
+  const { data: breadStatusData } = useBreadStatus();
+  const breadStatus = breadStatusData?.breadStatus;
+  const { deleteBreadMutation } = useDeleteBreadMutation();
+  const { updateBreadMutation } = useUpdateBreadMutation();
 
   const columnHelper = createColumnHelper<Breads>();
 
@@ -143,7 +151,10 @@ function RouteComponent() {
       cell: ({ row }) => (
         <AspectRatio>
           <img
-            src={row.getValue('image')}
+            src={
+              row.getValue('image') ||
+              'https://res.cloudinary.com/appabbang/image/upload/v1750588032/breads/nfaxnkenijts73eglojy.jpg'
+            }
             alt={row.original.name}
             className="h-full w-full rounded-lg object-cover"
           />
@@ -164,7 +175,7 @@ function RouteComponent() {
             }}
           >
             <SelectTrigger>
-              <SelectValue placeholder="상태" />
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">전체</SelectItem>
@@ -181,12 +192,42 @@ function RouteComponent() {
       cell: (info) => {
         const value = info.getValue();
         const found = breadStatus?.find((item) => item.name === value);
-        return found?.name;
+        const no = info.row.original.no;
+
+        console.log(no);
+        console.log(value);
+
+        return (
+          <Select
+            value={value}
+            onValueChange={(val) => {
+              console.log(val);
+              // console.log(i)
+              // updateBreadMutation(no)
+              // info.setFilterValue(val === 'all' ? undefined : val);
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue>{found?.name}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {breadStatus?.map(({ name, code }) => (
+                <SelectItem key={code} value={code}>
+                  {name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+        // return (
+        //   <p className="z-20" onClick={(e) => e.preventDefault()}>
+        //     {found?.name}
+        //   </p>
+        // );
       },
 
       filterFn: (row, columnId, filterValue) => {
         const columnValue = breadStatus?.find((item) => item.name === row.getValue(columnId));
-
         return columnValue?.code === filterValue;
       },
 
@@ -226,19 +267,22 @@ function RouteComponent() {
           timeStyle: 'short',
         }).format(new Date(info.getValue())),
     }),
+
+    columnHelper.display({
+      id: 'delete',
+      cell: ({ row }) => (
+        <Button variant={'destructive'} onClick={() => deleteBreadMutation([row.original.no])}>
+          삭제
+        </Button>
+      ),
+    }),
   ];
 
-  const {
-    data: bradsData,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ['breads'],
-    queryFn: getBreads,
-  });
+  const { data: bradsData, isLoading, isError } = useGetBreadsQuery();
 
+  console.log(bradsData);
   const table = useReactTable<Breads>({
-    data: bradsData?.breads,
+    data: bradsData,
     columns,
     state: {
       pagination,
@@ -257,15 +301,18 @@ function RouteComponent() {
   if (isLoading) return <>로딩중</>;
   if (isError) return <>에러</>;
 
+  const selectedRows = table.getSelectedRowModel().rows.map((row) => row.original.no);
+
   return (
     <>
-      <Card className="">
-        <CardHeader className="py-0">
-          <BreadsDialog />
+      <Card className="shadow-none bg-background border-none">
+        <CardHeader>
+          <h1>빵관리</h1>
+          <BreadsCreateDialog />
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
+        <CardContent className="max-h-[550px] border-1 p-0 m-6 mt-0 rounded-lg overflow-auto relative">
+          <Table className="">
+            <TableHeader className="sticky top-0 z-10 bg-background">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
@@ -280,17 +327,24 @@ function RouteComponent() {
               {table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
+                    <BreadModifyDialog no={cell.row.original.no} key={cell.id}>
+                      <TableCell>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    </BreadModifyDialog>
                   ))}
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="space-x-2">
           <TablePagination table={table} />
+          {selectedRows.length > 0 && (
+            <Button onClick={() => deleteBreadMutation(selectedRows)} variant="destructive">
+              선택항목 삭제
+            </Button>
+          )}
         </CardFooter>
       </Card>
     </>
