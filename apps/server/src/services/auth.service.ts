@@ -19,12 +19,16 @@ export async function comparePassword(plain: string, hashed: string) {
 }
 
 /** 액세스 토큰 발급 */
-export function generateAccessToken(user: Omit<User, 'pw'>) {
+export function generateAccessToken(
+  user: Omit<User, 'pw' | 'refreshToken' | 'createdAt' | 'updatedAt'>,
+) {
   return jwt.sign(user, JWT_ACCESS_SECRET, { expiresIn: JWT_ACCESS_EXPIRES_IN });
 }
 
 /** 리프레시 토큰 발급 */
-export function generateRefreshToken(user: Omit<User, 'pw'>) {
+export function generateRefreshToken(
+  user: Omit<User, 'pw' | 'refreshToken' | 'createdAt' | 'updatedAt'>,
+) {
   return jwt.sign(user, JWT_REFRESH_SECRET, { expiresIn: JWT_REFRESH_EXPIRES_IN });
 }
 
