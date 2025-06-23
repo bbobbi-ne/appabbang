@@ -146,7 +146,7 @@ export const createWithImages = async (
       data: body,
     });
 
-    const uploadResults = await ImageService.create(images);
+    const uploadResults = await ImageService.createCloudinary(images);
 
     const uploadedImages = await Promise.all(
       uploadResults.map(async (result, index) => {
