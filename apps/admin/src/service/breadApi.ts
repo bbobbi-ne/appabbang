@@ -1,14 +1,5 @@
+import type { QueryFunctionContext } from '@tanstack/react-query';
 import { requireAccessTokenInstance } from './instance';
-
-export interface GetBreadsSuccessResponse {
-  success: true;
-  breads: any;
-}
-export interface GetBreadsErrorResponse {
-  success: false;
-  message: string;
-}
-
 export interface Bread {
   name: string;
   description: string;
@@ -21,13 +12,19 @@ export interface BreadFormData {
   description: string;
   unitPrice: string;
   breadStatus: string;
-  image: File[];
+  image: (File | Record<string, any>)[];
 }
 
 // ✅ 빵 정보 조회
-export async function getBreads(): Promise<any> {
+export async function getBreads({
+  queryKey,
+}: QueryFunctionContext<[string, { no: number }?]>): Promise<any> {
+  const [, params] = queryKey;
+
+  const url = params?.no ? `/breads/${params.no}` : '/breads';
+
   try {
-    const response = await requireAccessTokenInstance.get<Bread[]>('/breads', {});
+    const response = await requireAccessTokenInstance.get<Bread[]>(url, {});
     return {
       success: true,
       breads: response.data,
@@ -43,7 +40,7 @@ export async function getBreads(): Promise<any> {
 // ✅ 빵 생성
 export async function createBread(Bread: BreadFormData): Promise<any> {
   // return '완료!';
-  throw new Error('테스트에러입니다.');
+  // throw new Error('테스트에러입니다.');
   const formData = new FormData();
 
   formData.append('name', Bread.name);
@@ -52,10 +49,11 @@ export async function createBread(Bread: BreadFormData): Promise<any> {
   formData.append('breadStatus', Bread.breadStatus);
 
   Bread.image.forEach((file) => {
-    formData.append('image', file);
+    if (file instanceof File) {
+      formData.append('image', file);
+    }
   });
 
-  console.log(Array.from(formData));
   try {
     const response = await requireAccessTokenInstance.post<Bread>('/breads', formData, {
       headers: {
@@ -76,26 +74,9 @@ export async function createBread(Bread: BreadFormData): Promise<any> {
 }
 
 // ✅ 빵 삭제
-export async function deleteBread(Bread: BreadFormData): Promise<any> {
-  console.log(Bread);
-  const formData = new FormData();
-
-  formData.append('name', Bread.name);
-  formData.append('description', Bread.description);
-  formData.append('unitPrice', Bread.unitPrice);
-  formData.append('breadStatus', Bread.breadStatus);
-
-  Bread.image.forEach((file) => {
-    formData.append('image', file);
-  });
-
-  console.log(Array.from(formData));
+export async function deleteBread(noList: number[]): Promise<any> {
   try {
-    const response = await requireAccessTokenInstance.post<Bread>('/breads', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await requireAccessTokenInstance.delete<any>('/breads', { data: { noList } });
     return {
       success: true,
       breads: response.data,
@@ -110,26 +91,61 @@ export async function deleteBread(Bread: BreadFormData): Promise<any> {
 }
 
 // ✅ 빵 업데이트
-export async function updateBread(Bread: BreadFormData): Promise<any> {
-  console.log(Bread);
+export async function updateBread({
+  Bread,
+  no,
+}: {
+  Bread: BreadFormData;
+  no: number;
+}): Promise<any> {
   const formData = new FormData();
 
   formData.append('name', Bread.name);
+  formData.append('no', String(no));
   formData.append('description', Bread.description);
   formData.append('unitPrice', Bread.unitPrice);
   formData.append('breadStatus', Bread.breadStatus);
 
   Bread.image.forEach((file) => {
-    formData.append('image', file);
+    const isFile = typeof file === 'object' && file instanceof File;
+    if (isFile) {
+      formData.append('image', file);
+    }
   });
 
-  console.log(Array.from(formData));
   try {
-    const response = await requireAccessTokenInstance.post<Bread>('/breads', formData, {
+    const response = await requireAccessTokenInstance.put<Bread>(`/breads/${no}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
+
+    return {
+      success: true,
+      breads: response.data,
+    };
+  } catch (error: any) {
+    console.log(error, '서버에러');
+    return {
+      success: false,
+      message: error.response?.data?.message || '빵 정보를 불러오는데 실패했습니다.',
+    };
+  }
+}
+
+// ✅ 빵 이미지 삭제
+export async function deleteBreadImg({
+  no,
+  publicId,
+}: {
+  no: number;
+  publicId: string;
+}): Promise<any> {
+  try {
+    const response = await requireAccessTokenInstance.delete<any>('/breads/image', {
+      data: { no, publicId },
+    });
+
     return {
       success: true,
       breads: response.data,
