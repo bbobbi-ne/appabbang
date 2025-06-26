@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { validationResult, body, query } from 'express-validator';
+import { validationResult, body, query, param } from 'express-validator';
 import { CodeGroup } from '@/types';
 
 export const validate = (validators: RequestHandler[]): RequestHandler => {
@@ -35,7 +35,7 @@ export const loginValidator = [
   body('pw').trim().notEmpty().withMessage('pw 는 필수입니다'),
 ];
 
-export const getBreadsValidator = [
+export const getBreadValidator = [
   query('breadStatus')
     .optional()
     .trim()
@@ -72,6 +72,17 @@ export const updateBreadValidator = [
     .trim()
     .notEmpty()
     .isIn([10, 20, 30, 40, 50])
+    .toInt()
+    .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
+];
+
+export const updateBreadStatusValidator = [
+  param('no').exists().withMessage('no는 필수입니다'),
+  body('breadStatus')
+    .trim()
+    .notEmpty()
+    .isIn([10, 20, 30, 40, 50])
+    .toInt()
     .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
 ];
 
@@ -97,4 +108,58 @@ export const deleteImageValidator = [
     .trim()
     .notEmpty()
     .withMessage('publicId는 비어있을 수 없습니다.'),
+];
+
+export const createDeliveryMethodValidator = [
+  body('deliveryType').trim().notEmpty().withMessage('deliveryType는 필수입니다'),
+  body('name').trim().notEmpty().withMessage('name은 필수입니다'),
+  body('fee')
+    .trim()
+    .notEmpty()
+    .withMessage('fee는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('fee는 정수여야 합니다.'),
+  body('isActive')
+    .trim()
+    .notEmpty()
+    .withMessage('isActive는 필수입니다')
+    .isBoolean()
+    .toBoolean()
+    .withMessage('boolean 타입이어야 합니다.'),
+];
+
+export const updateDeliveryMethodValidator = [
+  body('deliveryType').trim().notEmpty().withMessage('deliveryType는 필수입니다'),
+  body('name').trim().notEmpty().withMessage('name은 필수입니다'),
+  body('fee')
+    .trim()
+    .notEmpty()
+    .withMessage('fee는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('fee는 정수여야 합니다.'),
+  body('isActive')
+    .trim()
+    .notEmpty()
+    .withMessage('isActive는 필수입니다')
+    .isBoolean()
+    .toBoolean()
+    .withMessage('boolean 타입이어야 합니다.'),
+];
+
+export const createAddressValidator = [
+  body('address').trim().notEmpty().withMessage('address는 필수입니다'),
+  body('addressDetail').trim().notEmpty().withMessage('addressDetail는 필수입니다'),
+  body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
+  body('recipientName').trim().notEmpty().withMessage('recipientName은 필수입니다'),
+  body('recipientMobile').trim().notEmpty().withMessage('recipientMobile은 필수입니다'),
+];
+
+export const updateAddressValidator = [
+  body('address').trim().notEmpty().withMessage('address는 필수입니다'),
+  body('addressDetail').trim().notEmpty().withMessage('addressDetail는 필수입니다'),
+  body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
+  body('recipientName').trim().notEmpty().withMessage('recipientName은 필수입니다'),
+  body('recipientMobile').trim().notEmpty().withMessage('recipientMobile은 필수입니다'),
 ];

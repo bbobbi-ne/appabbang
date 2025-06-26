@@ -14,52 +14,184 @@ datasource db {
 }
 
 model CommonCode {
-  no          Int      @id @default(autoincrement())
-  groupName   String   @map("group_name") @db.VarChar(20)
-  code        String   @db.VarChar(5)
-  name        String   @db.VarChar(30)
-  remarkTxt   String?  @map("remark_txt") @db.VarChar(500)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  no                    Int               @id @default(autoincrement())
+  groupName             String            @map("group_name") @db.VarChar(20)
+  code                  String            @db.VarChar(5)
+  name                  String            @db.VarChar(30)
+  remarkTxt             String?           @map("remark_txt") @db.VarChar(500)
+
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
 
   @@map("common_code")
 }
 
-model Users {
-  no         Int      @id @default(autoincrement()) 
-  id         String   @unique                   
-  pw         String                           
-  name       String                            
-  userRole   String   @db.VarChar(5) @map("user_role") 
-  createdAt  DateTime @default(now())
-  updatedAt   DateTime @updatedAt @map("updated_at")           
-  refreshToken String? @map("refresh_token") 
+model User {
+  no                    Int               @id @default(autoincrement()) 
+  id                    String            @unique                   
+  pw                    String                                    
+  name                  String                                     
+  userRole              String            @db.VarChar(5) @map("user_role") 
+  refreshToken          String?           @map("refresh_token") 
+
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt @map("updated_at")           
 
   @@map("users")
 }
 
-model Images {
-  no              Int       @id @default(autoincrement())     // Images.no
-  url             String                                      // 이미지 URL
-  publicId        String    @map("public_id")                 // 퍼블릭 아이디 (Cloudinary 등)
-  imageTargetType String?   @map("image_target_type")         // 이미지 타입 (enum으로 관리 가능)
-  imageTargetNo   Int?      @map("image_target_no")           // 참조 대상 No
-  order           Int?                                        // 이미지 정렬 순서
-  name            String?                                     // 원본 파일명
-  createdAt       DateTime  @default(now()) @map("created_at") // 등록 시간
-  updatedAt       DateTime  @updatedAt @map("updated_at")     // 수정 시간
+model Image {
+  no                    Int               @id @default(autoincrement())     // Images.no
+  url                   String                                              // 이미지 URL
+  publicId              String            @map("public_id")                 // 퍼블릭 아이디 (Cloudinary 등)
+  imageTargetType       String?           @map("image_target_type")         // 이미지 타입 (enum으로 관리 가능)
+  imageTargetNo         Int?              @map("image_target_no")           // 참조 대상 No
+  order                 Int?                                                // 이미지 정렬 순서
+  name                  String?                                             // 원본 파일명
+
+  createdAt             DateTime          @default(now()) @map("created_at") // 등록 시간
+  updatedAt             DateTime          @updatedAt @map("updated_at")     // 수정 시간
 
   @@map("images")
 }
 
-model Breads {
-  no           Int      @id @default(autoincrement())
-  name         String
-  description  String?
-  unitPrice   Int
-  breadStatus String    @map("bread_status")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+model Bread {
+  no                    Int               @id @default(autoincrement())
+  name                  String
+  description           String?
+  unitPrice             Int
+  breadStatus           String            @map("bread_status")
+
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+
+  orderItem             OrderItem[]
 
   @@map("breads")
+}
+
+model Order {
+  no                    Int               @id @default(autoincrement())
+  orderNumber           String            @unique @map("orders_number")
+  orderStatus           String            @map("order_status")
+  totalPrice            Int               @map("total_price")
+  orderPw               String            @map("order_pw")
+  paid                  Boolean       
+  memo                  String
+
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+
+  customerNo            Int               @map("customer_no")
+  addressNo             Int?              @map("address_no")
+  deliveryMethodNo      Int               @map("delivery_no")
+  customer              Customer          @relation(fields: [customerNo], references: [no])
+  address               Address?          @relation(fields: [addressNo], references: [no])
+  deliveryMethod        DeliveryMethod    @relation(fields: [deliveryMethodNo], references: [no])
+  orderItem             OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  no                    Int               @id @default(autoincrement())
+  quantity              Int     
+  unitPrice             Int               @map("unit_price")
+  totalPrice            Int               @map("total_price")
+
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+
+  orderNo               Int               @map("order_no")
+  breadNo               Int               @map("bread_no")
+  order                 Order             @relation(fields: [orderNo], references: [no], onDelete: Cascade)
+  bread                 Bread             @relation(fields: [breadNo], references: [no])
+
+  @@map("order_items")
+}
+
+model Customer {
+  no                    Int               @id @default(autoincrement())
+  id                    String?           
+  pw                    String?           
+  name                  String            
+  mobileNumber          String            @map("mobile_number")               // 전화번호 (not null)
+  defaultAddressNo      Int?              @map("default_address_no") 
+
+  createdAt             DateTime          @default(now()) @map("created_at")  // 가입일 (not null)
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+
+  order                 Order[]
+  address               Address[]
+  discountCustomer      DiscountCustomer[]                                    // 연결
+
+  @@map("customers")
+}
+
+model Address {
+  no                    Int               @id @default(autoincrement())
+  address               String            
+  addressDetail         String            @map("address_detail")
+  zipcode               String
+  message               String?
+  recipientName         String            @map("recipient_name")       // 수령인 이름
+  recipientMobile       String            @map("recipient_mobile")     // 수령인 전화번호
+
+  createdAt             DateTime          @default(now()) @map("created_at") 
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+
+  customerNo            Int               @map("customer_no")
+  customer              Customer          @relation(fields: [customerNo], references: [no], onDelete: Cascade)
+  order                 Order[]
+
+  @@map("addresses")
+}
+
+model DeliveryMethod {
+  no                    Int               @id @default(autoincrement())
+  name                  String
+  memo                  String?
+  fee                   Int
+  isActive              Boolean           @map("is_active")
+  deliveryType          String            @map("delivery_type")
+
+  createdAt             DateTime          @default(now()) @map("created_at") 
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+
+  order                 Order[]
+
+  @@map("delivery_methods")
+}
+
+model Discount {
+  no                    Int               @id @default(autoincrement()) // PK
+  name                  String                                          // 할인정보명
+  fromDt                DateTime                                        // 시작일
+  toDt                  DateTime                                        // 종료일
+  amount                Int?                                            // 할인금액 (정액 할인)
+  percentage            Float?                                          // 할인률 (10%)
+  discountType          String            @map("discount_type")
+  memo                  String?                                         // 메모
+
+  createdAt             DateTime @default(now())                        // 등록 시간
+  updatedAt             DateTime @updatedAt                             // 수정 시간
+
+  discountCustomer      DiscountCustomer[]
+
+  @@map("discounts")
+}
+
+model DiscountCustomer {
+  customerNo            Int
+  discountNo            Int
+  isUsed                Boolean           @default(false)
+  
+  createdAt             DateTime          @default(now())               // 등록 시간
+  updatedAt             DateTime          @updatedAt                    // 수정 시간 
+
+  customer              Customer          @relation(fields: [customerNo], references: [no])
+  discount              Discount          @relation(fields: [discountNo], references: [no])
+
+  @@id([customerNo, discountNo])          // 복합 기본키
+  @@map("discount_customer")
 }

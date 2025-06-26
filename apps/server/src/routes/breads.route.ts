@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { authenticateToken } from '@/middlewares/auth.middleware';
-import * as breadsController from '@/controllers/breads.controller';
+import * as breadsController from '@/controllers/bread.controller';
 import {
   createBreadValidator,
   deleteBreadValidator,
   deleteImageValidator,
-  getBreadsValidator,
+  getBreadValidator,
+  updateBreadStatusValidator,
   updateBreadValidator,
   validate,
 } from '@/middlewares/validators/validate';
@@ -13,7 +14,7 @@ import {
 const router = Router();
 
 // GET /breads
-router.get('/', authenticateToken, validate(getBreadsValidator), breadsController.getBreads);
+router.get('/', authenticateToken, validate(getBreadValidator), breadsController.getBreads);
 
 // GET /breads/:no
 router.get('/:no', authenticateToken, breadsController.getBreadByNo);
@@ -23,6 +24,14 @@ router.post('/', authenticateToken, validate(createBreadValidator), breadsContro
 
 // PUT /breads/:no
 router.put('/:no', authenticateToken, validate(updateBreadValidator), breadsController.updateBread);
+
+// PUT /breads/:no/status (빵 상태 변경)
+router.put(
+  '/:no/status',
+  authenticateToken,
+  validate(updateBreadStatusValidator),
+  breadsController.updateBreadStatus,
+);
 
 // DELETE /breads (여러건)
 router.delete('/', authenticateToken, validate(deleteBreadValidator), breadsController.deleteBread);

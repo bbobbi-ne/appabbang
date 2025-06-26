@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon --exec \"node -r tsconfig-paths/register -r ts-node/register\" src/index.ts",
     "generate": "prisma generate",
-    "migrate": "prisma migrate dev",
+    "migrate": "prisma migrate reset && prisma migrate dev",
     "seed": "ts-node prisma/seed.ts",
     "prisma:all": "pnpm run generate && pnpm run migrate && pnpm run seed"
   },

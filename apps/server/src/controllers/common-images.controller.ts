@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
 import cloudinary from '@/lib/cloudinary';
-
-const MAX_UPLOAD_COUNT = 10;
-const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
+import * as ImageService from '@/services/image.service';
 
 export const getImages = async (_: Request, res: Response) => {
   try {
@@ -23,25 +21,7 @@ export const uploadImages = async (req: Request, res: Response) => {
       return;
     }
 
-    const files = Array.isArray(images) ? images : [images];
-
-    // 최대 개수 제한
-    if (files.length > MAX_UPLOAD_COUNT) {
-      res
-        .status(400)
-        .json({ message: `이미지는 최대 ${MAX_UPLOAD_COUNT}개까지 업로드할 수 있습니다.` });
-      return;
-    }
-
-    // 확장자 검사
-    for (const file of files) {
-      if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
-        res.status(400).json({ message: 'jpg, jpeg, png 형식의 파일만 업로드할 수 있습니다.' });
-        return;
-      }
-    }
-
-    const uploadResults = await cloudinary.upload(files);
+    const uploadResults = await ImageService.createCloudinary(images);
 
     res.status(201).json(uploadResults);
   } catch (e) {
@@ -59,7 +39,7 @@ export const deleteImages = async (req: Request, res: Response) => {
       return;
     }
 
-    await cloudinary.destroy(publicIds);
+    await ImageService.removeCloudinary(publicIds);
 
     res.sendStatus(204);
   } catch (e) {
