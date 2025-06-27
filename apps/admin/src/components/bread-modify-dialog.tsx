@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@appabbang/ui';
-import { useGetBreadQuery, useUpdateBreadMutation } from '@/hooks/useBreads';
+import { useGetBreadQuery, useUpdateBreadMutation } from '@/hooks/use-breads';
 import { useEffect, useState } from 'react';
 import BreadForm, { type BreadsDailogForm } from './bread-form';
 

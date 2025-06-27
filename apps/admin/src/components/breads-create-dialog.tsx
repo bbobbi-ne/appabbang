@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from '@appabbang/ui';
 
-import { useCreateBreadMutation } from '@/hooks/useBreads';
+import { useCreateBreadMutation } from '@/hooks/use-breads';
 import BreadForm from './bread-form';
 
 export function BreadsCreateDialog() {

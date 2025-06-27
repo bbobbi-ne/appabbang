@@ -1,5 +1,4 @@
-import { useDeleteBreadMutation, useUpdateBreadMutation } from '@/hooks/useBreads';
-import { useBreadStatus } from '@/hooks/useBreadStatus';
+import { useDeleteBreadMutation, useUpdateBreadMutation, useBreadStatus } from '@/hooks/use-breads';
 import {
   AspectRatio,
   Button,

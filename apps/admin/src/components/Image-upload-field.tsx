@@ -2,7 +2,7 @@ import { Button, Input } from '@appabbang/ui';
 import type { ControllerRenderProps } from 'react-hook-form';
 import { useCallback, useRef } from 'react';
 import { Plus, X } from 'lucide-react';
-import { useDeleteBreadImgMutation } from '@/hooks/useBreads';
+import { useDeleteBreadImgMutation } from '@/hooks/use-breads';
 
 interface CloudinaryFile {
   name: string;
