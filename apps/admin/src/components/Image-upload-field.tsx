@@ -41,7 +41,7 @@ export function ImageUploadField({
   );
 
   const removeImage = (file: File | CloudinaryFile, index: number) => {
-    const isFile = typeof file === 'object' && file instanceof File;
+    const isFile = file instanceof File;
 
     if (!isFile) {
       deleteBreadImgMutation({ no: no!, publicId: file.publicId });
