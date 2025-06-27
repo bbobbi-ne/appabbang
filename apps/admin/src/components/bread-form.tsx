@@ -77,14 +77,6 @@ function BreadForm({ submitFn, currentValues, no, isError, error, isSuccess }: B
     if (isSuccess) {
       form.reset();
       closeRef.current?.click();
-      // toast.success('완료!', {
-      //   description: '빵목록이 추가되었습니다!.',
-      //   position: 'top-center',
-      //   action: {
-      //     label: '닫기',
-      //     onClick: () => {},
-      //   },
-      // });
       return;
     }
 
@@ -95,14 +87,6 @@ function BreadForm({ submitFn, currentValues, no, isError, error, isSuccess }: B
         type: 'manual',
         message,
       });
-      // toast.error('에러발생!', {
-      //   description: message,
-      //   position: 'top-center',
-      //   action: {
-      //     label: '닫기',
-      //     onClick: () => {},
-      //   },
-      // });
       return;
     }
   }, [isSuccess, isError, error]);
