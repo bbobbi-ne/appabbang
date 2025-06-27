@@ -1,3 +1,4 @@
+import type { Admin } from '@/service/auth-api';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
@@ -5,8 +6,8 @@ interface AuthState {
   accessToken: string | null;
   setAccessToken: (token: string) => void;
   clearAccessToken: () => void;
-  auth: any;
-  setAuth: (data: any) => void;
+  auth: Admin | null;
+  setAuth: (data: Admin) => void;
   clearAuth: () => void;
 }
 

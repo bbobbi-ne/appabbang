@@ -9,7 +9,6 @@ import * as TanStackQueryProvider from './integrations/tanstack-query/root-provi
 import { routeTree } from './routeTree.gen';
 
 import reportWebVitals from './reportWebVitals.ts';
-import '@appabbang/tailwind/style.css';
 
 // Create a new router instance
 const router = createRouter({

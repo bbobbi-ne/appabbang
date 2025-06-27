@@ -1,3 +1,5 @@
+import { getMe } from '@/service/auth-api';
+import { Button } from '@appabbang/ui';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_dashboardLayout/dashboard/')({
@@ -5,5 +7,15 @@ export const Route = createFileRoute('/_dashboardLayout/dashboard/')({
 });
 
 function RouteComponent() {
-  return <div>Hello "/_dashboardLayout/dashboard/"!</div>;
+  async function test() {
+    const res = await getMe();
+
+    console.log(res);
+  }
+
+  return (
+    <>
+      <Button onClick={test}>Get Me</Button>
+    </>
+  );
 }

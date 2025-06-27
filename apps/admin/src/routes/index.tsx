@@ -19,12 +19,14 @@ import {
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { login } from '@/service/api';
+import { login } from '@/service/auth-api';
 import { useAuthStore } from '@/stores/authStore';
+import { useMutation } from '@tanstack/react-query';
 
 export const Route = createFileRoute('/')({
   beforeLoad: () => {
-    const { auth } = useAuthStore.getState() || sessionStorage.getItem('auth-storage');
+    const raw = sessionStorage.getItem('auth-storage');
+    const auth = raw ? JSON.parse(raw).state.auth : null;
 
     if (auth) {
       throw redirect({ to: '/dashboard' });
@@ -46,6 +48,15 @@ type AdminLoginForm = z.infer<typeof adminLoginSchema>;
 function RouteComponent() {
   const navigate = useNavigate();
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
+  const onSubmit = useMutation({
+    mutationFn: login,
+    onSuccess: (res) => {
+      if (res) {
+        setAccessToken(res.data);
+        navigate({ to: '/dashboard' });
+      }
+    },
+  }).mutate;
 
   const form = useForm<AdminLoginForm>({
     resolver: zodResolver(adminLoginSchema),
@@ -54,13 +65,6 @@ function RouteComponent() {
       pw: 'test1234!',
     },
   });
-  const onSubmit = async (data: AdminLoginForm) => {
-    const loginRes = await login(data);
-    if (loginRes.success) {
-      setAccessToken(loginRes.accessToken);
-      navigate({ to: '/dashboard' });
-    }
-  };
 
   return (
     <div className="flex flex-col min-h-screen items-center justify-center gap-4 p-24">
@@ -71,7 +75,10 @@ function RouteComponent() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form
+              onSubmit={form.handleSubmit((data: AdminLoginForm) => onSubmit(data))}
+              className="space-y-8"
+            >
               <FormField
                 control={form.control}
                 name="id"
