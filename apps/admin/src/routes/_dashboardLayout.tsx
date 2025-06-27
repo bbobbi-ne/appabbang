@@ -9,13 +9,12 @@ import {
   Button,
   SidebarProvider,
   SidebarTrigger,
-  Toaster,
 } from '@appabbang/ui';
-import { useInitializeAuth } from '@/hooks/useInitializeAuth';
+import { useInitializeAuth } from '@/hooks/use-initialize-auth';
 import { useAuthStore } from '@/stores/authStore';
 import { AlertDialog } from '@appabbang/ui';
 import { Sidebar } from '@/components/sidebar';
-import { useBreadStatus } from '@/hooks/useBreadStatus';
+import { useBreadStatus } from '@/hooks/use-breads';
 
 export const Route = createFileRoute('/_dashboardLayout')({
   component: DashboardLayout,
@@ -30,7 +29,7 @@ export default function DashboardLayout() {
 }
 
 function DashboardContent() {
-  const { isLoading, isError } = useInitializeAuth();
+  const { isError, isSuccess } = useInitializeAuth();
   const { clearAccessToken, clearAuth } = useAuthStore();
   useBreadStatus();
 
@@ -61,11 +60,8 @@ function DashboardContent() {
       )}
 
       <Sidebar />
-      {isLoading ? (
-        <>로딩임</>
-      ) : (
+      {isSuccess && (
         <main className="w-full p-2">
-          <Toaster />
           <SidebarTrigger className="fixed" />
           <Outlet />
         </main>

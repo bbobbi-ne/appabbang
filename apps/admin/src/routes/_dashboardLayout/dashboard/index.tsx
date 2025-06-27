@@ -1,5 +1,4 @@
-import { getMe } from '@/service/api';
-import { useAuthStore } from '@/stores/authStore';
+import { getMe } from '@/service/auth-api';
 import { Button } from '@appabbang/ui';
 import { createFileRoute } from '@tanstack/react-router';
 
@@ -8,8 +7,6 @@ export const Route = createFileRoute('/_dashboardLayout/dashboard/')({
 });
 
 function RouteComponent() {
-  const accessToken = useAuthStore.getState().accessToken;
-
   async function test() {
     const res = await getMe();
 

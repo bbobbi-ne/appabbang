@@ -27,7 +27,7 @@ import {
 
 import { TablePagination } from '@/components/table-pagination';
 import { BreadsCreateDialog } from '../../../../components/breads-create-dialog';
-import { useDeleteBreadMutation, useGetBreadsQuery } from '@/hooks/useBreads';
+import { useDeleteBreadMutation, useGetBreadsQuery } from '@/hooks/use-breads';
 import { BreadModifyDialog } from '@/components/bread-modify-dialog';
 import { BreadsColumns } from '@/data/columns';
 
