@@ -1,6 +1,6 @@
 import { useAuthStore } from '@/stores/authStore';
 import axios from 'axios';
-import { refresh } from './api';
+import { refresh } from './auth-api';
 
 const API_BASE_URL = `${import.meta.env.VITE_APPABBANG_API_URL}`;
 
@@ -53,12 +53,12 @@ const resInt = async (error: any) => {
     originalRequest._retry = true;
 
     const newAccessToken = await refresh();
-    if (newAccessToken.success) {
+    if (newAccessToken.data) {
       // ✅ store에 토큰 저장
-      useAuthStore.getState().setAccessToken(newAccessToken.accessToken);
+      useAuthStore.getState().setAccessToken(newAccessToken.data!);
 
       // ✅ 헤더 갱신
-      originalRequest.headers['Authorization'] = `Bearer ${newAccessToken.accessToken}`;
+      originalRequest.headers['Authorization'] = `Bearer ${newAccessToken.data!}`;
 
       // ✅ 재요청
       return requireAccessTokenInstance(originalRequest);
