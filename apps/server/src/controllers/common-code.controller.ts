@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '@/lib/prisma';
-import { CodeGroup } from '@/types';
+import { CodeGroup, AppError } from '@/types';
 
 export const getCommonCode = async (_: Request, res: Response) => {
   // 최대 1000 개 조회
@@ -15,13 +15,14 @@ export const getCommonCodeByGroupName = async (req: Request, res: Response) => {
   const { groupName } = req.params;
 
   if (!groupName) {
-    getCommonCode(req, res);
+    return getCommonCode(req, res);
   }
 
   if (!Object.values(CodeGroup).includes(groupName as any)) {
-    res.status(400).json({
-      message: `'${groupName}'은(는) 유효하지 않은 코드 그룹입니다. (그룹명: ${Object.values(CodeGroup).join(', ')})`,
-    });
+    throw AppError.badRequest(
+      `'${groupName}'은(는) 유효하지 않은 코드 그룹입니다. (그룹명: ${Object.values(CodeGroup).join(', ')})`,
+      { invalidGroupName: groupName, validGroupNames: Object.values(CodeGroup) },
+    );
   }
 
   const commonCode = await prisma.commonCode.findMany({
@@ -29,7 +30,7 @@ export const getCommonCodeByGroupName = async (req: Request, res: Response) => {
     select: { code: true, name: true },
   });
 
-  res.status(200).json(commonCode);
+  return res.status(200).json(commonCode);
 };
 
 export const createCommonCode = async (req: Request, res: Response) => {
@@ -45,8 +46,7 @@ export const updateCommonCode = async (req: Request, res: Response) => {
   const { code, groupName, name, remarkTxt } = req.body;
 
   if (!no) {
-    res.status(400).json({ message: 'no 는 필수입니다' });
-    return;
+    throw AppError.badRequest('no 는 필수입니다');
   }
 
   await prisma.commonCode.update({
@@ -61,8 +61,7 @@ export const deleteCommonCode = async (req: Request, res: Response) => {
   const { no } = req.params;
 
   if (!no) {
-    res.status(400).json({ message: 'no 는 필수입니다' });
-    return;
+    throw AppError.badRequest('no 는 필수입니다');
   }
 
   await prisma.commonCode.delete({
