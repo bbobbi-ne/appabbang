@@ -73,7 +73,7 @@ function RouteComponent() {
           <BreadsCreateDialog />
         </CardHeader>
         <CardContent className="max-h-[550px] border-1 p-0 m-6 mt-0 rounded-lg overflow-auto relative">
-          <Table className="">
+          <Table className="table-fixed">
             <TableHeader className="sticky top-0 z-10 bg-background">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
@@ -86,6 +86,13 @@ function RouteComponent() {
               ))}
             </TableHeader>
             <TableBody>
+              {table.getRowModel().rows.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={10} className="p-4 text-center">
+                    빵을 등록해주세요.
+                  </TableCell>
+                </TableRow>
+              )}
               {table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
