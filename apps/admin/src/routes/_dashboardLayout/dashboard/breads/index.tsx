@@ -12,6 +12,15 @@ import {
 } from '@tanstack/react-table';
 
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
   Button,
   Card,
   CardContent,
@@ -110,9 +119,23 @@ function RouteComponent() {
         <CardFooter className="space-x-2">
           <TablePagination table={table} />
           {selectedRows.length > 0 && (
-            <Button onClick={() => deleteBreadMutation(selectedRows)} variant="destructive">
-              선택항목 삭제
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive">선택항목 삭제</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent onClick={(e) => e.preventDefault()}>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>정말로 삭제하시겠습니까?</AlertDialogTitle>
+                  <AlertDialogDescription>삭제시 복구가 어렵습니다.</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>취소</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => deleteBreadMutation(selectedRows)}>
+                    삭제
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           )}
         </CardFooter>
       </Card>

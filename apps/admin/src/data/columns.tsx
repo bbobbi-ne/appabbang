@@ -240,44 +240,6 @@ export const BreadsColumns = () => {
         </div>
       ),
     }),
-
-    columnHelper.display({
-      id: 'delete',
-      cell: ({ row }) => (
-        <div className="flex justify-center">
-          <AlertDialog
-            open={alertOpen}
-            onOpenChange={(open) => {
-              setAlertOpen(open);
-            }}
-          >
-            <AlertDialogTrigger asChild>
-              <Button
-                variant={'destructive'}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setAlertOpen(true);
-                }}
-              >
-                삭제
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent onClick={(e) => e.preventDefault()}>
-              <AlertDialogHeader>
-                <AlertDialogTitle>정말로 삭제하시겠습니까?</AlertDialogTitle>
-                <AlertDialogDescription>삭제시 복구가 어렵습니다.</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setAlertOpen(false)}>취소</AlertDialogCancel>
-                <AlertDialogAction onClick={() => deleteBreadMutation([row.original.no])}>
-                  삭제
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      ),
-    }),
   ];
 
   return columns;
