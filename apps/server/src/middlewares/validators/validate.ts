@@ -72,7 +72,6 @@ export const updateBreadValidator = [
     .trim()
     .notEmpty()
     .isIn([10, 20, 30, 40, 50])
-    .toInt()
     .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
 ];
 
@@ -82,7 +81,6 @@ export const updateBreadStatusValidator = [
     .trim()
     .notEmpty()
     .isIn([10, 20, 30, 40, 50])
-    .toInt()
     .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
 ];
 
@@ -162,4 +160,25 @@ export const updateAddressValidator = [
   body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
   body('recipientName').trim().notEmpty().withMessage('recipientName은 필수입니다'),
   body('recipientMobile').trim().notEmpty().withMessage('recipientMobile은 필수입니다'),
+];
+
+export const createOrderValidator = [
+  // body('customerNo').isInt().toInt().withMessage('customerNo는 정수여야 합니다'),
+  // body('addressNo').isInt().toInt().withMessage('addressNo는 정수여야 합니다'),
+  // body('deliveryMethodNo').isInt().toInt().withMessage('deliveryMethodNo는 정수여야 합니다'),
+  // body('deliveryDate').isISO8601().withMessage('deliveryDate는 유효한 날짜여야 합니다'),
+  // body('totalAmount')
+  //   .isFloat({ min: 0 })
+  //   .toFloat()
+  //   .withMessage('totalAmount는 0 이상의 숫자여야 합니다'),
+];
+
+export const updateOrderValidator = [
+  // body('addressNo').isInt().toInt().withMessage('addressNo는 정수여야 합니다'),
+  // body('deliveryMethodNo').isInt().toInt().withMessage('deliveryMethodNo는 정수여야 합니다'),
+  // body('deliveryDate').isISO8601().withMessage('deliveryDate는 유효한 날짜여야 합니다'),
+  // body('totalAmount')
+  //   .isFloat({ min: 0 })
+  //   .toFloat()
+  //   .withMessage('totalAmount는 0 이상의 숫자여야 합니다'),
 ];
