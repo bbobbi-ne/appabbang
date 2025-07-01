@@ -19,12 +19,24 @@ import { ImageUploadField } from './Image-upload-field';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useBreadStatus } from '@/hooks/use-breads';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
+import type { ApiResponse } from '@/service/common';
 
 export const breadSchema = z.object({
   name: z.string().trim().min(1, '메뉴명을 입력해주세요'),
   description: z.string().trim().min(1, '설명을 입력해주세요'),
-  unitPrice: z.string().trim().min(1, '가격을 입력해주세요'),
+  unitPrice: z
+    .string()
+    .trim()
+    .refine(
+      (val) => {
+        const num = Number(val.replace(/,/g, ''));
+        return !isNaN(num) && num >= 1000 && num <= 100000;
+      },
+      {
+        message: '단가는 1,000원 이상 100,000원 이하의 숫자로 입력해주세요.',
+      },
+    ),
   breadStatus: z.string({
     required_error: '상태를 선택해주세요',
   }),
@@ -38,15 +50,12 @@ export const breadSchema = z.object({
 export type BreadsDailogForm = z.infer<typeof breadSchema>;
 
 interface BreadFormProps {
-  submitFn: (arg: any) => void;
+  submitFn: (arg: any) => Promise<ApiResponse<any>>;
   currentValues?: BreadsDailogForm;
   no?: number;
-  error: Error | null;
-  isError: boolean;
-  isSuccess: boolean;
 }
 
-function BreadForm({ submitFn, currentValues, no, isError, error, isSuccess }: BreadFormProps) {
+function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
   const breadStatus = useBreadStatus().data;
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -64,32 +73,23 @@ function BreadForm({ submitFn, currentValues, no, isError, error, isSuccess }: B
   });
 
   const onSubmit = async (data: BreadsDailogForm) => {
-    submitFn({
-      ...data,
-      ...(no !== undefined ? { no } : {}),
-    });
-    if (isSuccess) {
-      form.reset();
-    }
-  };
+    try {
+      await submitFn({
+        ...data,
+        ...(no !== undefined ? { no } : {}),
+      });
 
-  useEffect(() => {
-    if (isSuccess) {
       form.reset();
       closeRef.current?.click();
-      return;
-    }
-
-    if (isError && error) {
+    } catch (error: any) {
       const message = error.message ?? '알 수 없는 에러가 발생했습니다. 잠시 후 다시 시도해주세요.';
-      console.log(error);
+
       form.setError('root', {
         type: 'manual',
         message,
       });
-      return;
     }
-  }, [isSuccess, isError, error]);
+  };
 
   return (
     <Form {...form}>
@@ -139,7 +139,7 @@ function BreadForm({ submitFn, currentValues, no, isError, error, isSuccess }: B
           render={({ field }) => (
             <FormItem className="flex">
               <FormLabel errorCheck={false} className="whitespace-nowrap px-2 py-3 flex-1/4">
-                단가
+                단가(원)
               </FormLabel>
               <div className="flex-3/4 space-y-1">
                 <FormControl>
