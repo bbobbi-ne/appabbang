@@ -1,4 +1,16 @@
-import { Button, Input } from '@appabbang/ui';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  Button,
+  Input,
+} from '@appabbang/ui';
 import type { ControllerRenderProps } from 'react-hook-form';
 import { useCallback, useRef } from 'react';
 import { Plus, X } from 'lucide-react';
@@ -73,27 +85,65 @@ export function ImageUploadField({
       ) : (
         <div className="grid grid-cols-3 gap-3 p-2 border-2 border-dashed rounded">
           {value.map((file: File | CloudinaryFile, index: number) => {
-            const preview =
-              typeof file === 'object' && file instanceof File
-                ? URL.createObjectURL(file)
-                : file?.url;
+            const isFile = typeof file === 'object' && file instanceof File;
+
+            if (isFile) {
+              return (
+                <div key={index} className="relative group border rounded overflow-hidden">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt="preview"
+                    className="object-cover w-full h-28 rounded"
+                  />
+                  {index === 0 && (
+                    <span className="absolute top-1 left-1 text-xs bg-blue-600 text-white px-2 py-0.5 rounded">
+                      대표
+                    </span>
+                  )}
+                  <Button
+                    type="button"
+                    onClick={() => removeImage(file, index)}
+                    size="icon"
+                    className="absolute top-1 right-1 bg-black/60 text-white rounded opacity-0 group-hover:opacity-100 transition"
+                  >
+                    <X size={16} />
+                  </Button>
+                </div>
+              );
+            }
 
             return (
               <div key={index} className="relative group border rounded overflow-hidden">
-                <img src={preview} alt="preview" className="object-cover w-full h-28 rounded" />
+                <img src={file?.url} alt="preview" className="object-cover w-full h-28 rounded" />
                 {index === 0 && (
                   <span className="absolute top-1 left-1 text-xs bg-blue-600 text-white px-2 py-0.5 rounded">
                     대표
                   </span>
                 )}
-                <Button
-                  type="button"
-                  onClick={() => removeImage(file, index)}
-                  size="icon"
-                  className="absolute top-1 right-1 bg-black/60 text-white rounded opacity-0 group-hover:opacity-100 transition"
-                >
-                  <X size={16} />
-                </Button>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      type="button"
+                      size="icon"
+                      className="absolute top-1 right-1 bg-black/60 text-white rounded opacity-0 group-hover:opacity-100 transition"
+                    >
+                      <X size={16} />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>저장된 이미지를 삭제하시겠습니까?</AlertDialogTitle>
+                      <AlertDialogDescription>삭제시 복구가 어렵습니다.</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>취소</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => removeImage(file, index)}>
+                        확인
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             );
           })}

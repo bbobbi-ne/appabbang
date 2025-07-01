@@ -6,6 +6,7 @@ import {
   getBreads,
   updateBread,
   getBreadStatus,
+  updateBreadStatus,
 } from '@/service/bread-api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -31,18 +32,18 @@ export function useGetBreadQuery(no: number) {
 
 export function useCreateBreadMutation() {
   const queryClient = useQueryClient();
-  const { mutate, error, isError, isSuccess, isPending } = useMutation({
+  const { mutateAsync, error, isError, isSuccess, isPending } = useMutation({
     mutationFn: createBread,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['breads'] });
     },
   });
 
-  return { CreateBreadMutation: mutate, isError, error, isSuccess, isPending };
+  return { CreateBreadMutation: mutateAsync, isError, error, isSuccess, isPending };
 }
 export function useUpdateBreadMutation() {
   const queryClient = useQueryClient();
-  const { mutate, isError, isSuccess, error } = useMutation({
+  const { mutateAsync, isError, isSuccess, error } = useMutation({
     mutationFn: updateBread,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['breads'] });
@@ -51,8 +52,21 @@ export function useUpdateBreadMutation() {
     },
   });
 
-  return { updateBreadMutation: mutate, isError, isSuccess, error };
+  return { updateBreadMutation: mutateAsync, isError, isSuccess, error };
 }
+
+export function useUpdateBreadStatusMutation() {
+  const queryClient = useQueryClient();
+  const { mutate, isError, isSuccess, error } = useMutation({
+    mutationFn: updateBreadStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['breads'] });
+    },
+  });
+
+  return { updateBreadStatusMutation: mutate, isError, isSuccess, error };
+}
+
 export function useDeleteBreadMutation() {
   const queryClient = useQueryClient();
   const { mutate } = useMutation({

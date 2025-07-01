@@ -28,7 +28,7 @@ export function BreadModifyDialog({ children, no }: breadModifyDialogProps) {
 
 function DialogForm({ no }: { no: number }) {
   const { data: currentData, isSuccess: currentDataIsSuccess } = useGetBreadQuery(no);
-  const { updateBreadMutation, isError, isSuccess, error } = useUpdateBreadMutation();
+  const { updateBreadMutation } = useUpdateBreadMutation();
   const [currentValues, setCurrentValues] = useState<BreadsDailogForm | undefined>();
 
   useEffect(() => {
@@ -63,14 +63,7 @@ function DialogForm({ no }: { no: number }) {
       <DialogDescription>메뉴를 수정해주세요</DialogDescription>
 
       {currentValues && (
-        <BreadForm
-          currentValues={currentValues}
-          submitFn={updateBreadMutation}
-          error={error}
-          isError={isError}
-          no={no}
-          isSuccess={isSuccess}
-        />
+        <BreadForm currentValues={currentValues} submitFn={updateBreadMutation} no={no} />
       )}
     </DialogContent>
   );

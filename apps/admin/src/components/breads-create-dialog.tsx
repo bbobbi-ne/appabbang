@@ -12,7 +12,7 @@ import { useCreateBreadMutation } from '@/hooks/use-breads';
 import BreadForm from './bread-form';
 
 export function BreadsCreateDialog() {
-  const { CreateBreadMutation, error, isError, isSuccess } = useCreateBreadMutation();
+  const { CreateBreadMutation } = useCreateBreadMutation();
 
   return (
     <Dialog>
@@ -29,12 +29,7 @@ export function BreadsCreateDialog() {
           <DialogTitle>메뉴등록</DialogTitle>
         </DialogHeader>
         <DialogDescription>메뉴를 등록해주세요</DialogDescription>
-        <BreadForm
-          isError={isError}
-          error={error}
-          isSuccess={isSuccess}
-          submitFn={CreateBreadMutation}
-        />
+        <BreadForm submitFn={CreateBreadMutation} />
       </DialogContent>
     </Dialog>
   );
