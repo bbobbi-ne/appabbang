@@ -1,5 +1,19 @@
-import { useDeleteBreadMutation, useUpdateBreadMutation, useBreadStatus } from '@/hooks/use-breads';
 import {
+  useDeleteBreadMutation,
+  useUpdateBreadMutation,
+  useBreadStatus,
+  useUpdateBreadStatusMutation,
+} from '@/hooks/use-breads';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
   AspectRatio,
   Button,
   Checkbox,
@@ -11,6 +25,7 @@ import {
 } from '@appabbang/ui';
 import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown } from 'lucide-react';
+import { useState } from 'react';
 
 export interface BreadsColumns {
   no: number;
@@ -29,26 +44,31 @@ export const columnHelper = createColumnHelper<BreadsColumns>();
 export const BreadsColumns = () => {
   const { data: breadStatus } = useBreadStatus();
   const { deleteBreadMutation } = useDeleteBreadMutation();
-  const { updateBreadMutation } = useUpdateBreadMutation();
+  const { updateBreadStatusMutation } = useUpdateBreadStatusMutation();
+  const [alertOpen, setAlertOpen] = useState<boolean>(false);
 
   const columns: ColumnDef<BreadsColumns, any>[] = [
     columnHelper.display({
       id: 'select',
       header: ({ table }) => (
-        <Checkbox
-          className="mr-2"
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate')
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        />
+        <div className="flex justify-center">
+          <Checkbox
+            className=""
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && 'indeterminate')
+            }
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          />
+        </div>
       ),
       cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-        />
+        <div className="flex justify-center">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+          />
+        </div>
       ),
     }),
 
@@ -148,16 +168,15 @@ export const BreadsColumns = () => {
 
       cell: (info) => {
         const value = info.getValue();
-        const found = breadStatus?.find((item) => item.name === value);
+        const found = breadStatus?.find((item) => item.code === value);
         const no = info.row.original.no;
 
         return (
           <Select
             value={value}
             onValueChange={(val) => {
-              // console.log(i)
-              // updateBreadMutation(no)
-              // info.setFilterValue(val === 'all' ? undefined : val);
+              console.log(val);
+              updateBreadStatusMutation({ no, breadStatus: val });
             }}
           >
             <SelectTrigger>
@@ -172,15 +191,10 @@ export const BreadsColumns = () => {
             </SelectContent>
           </Select>
         );
-        // return (
-        //   <p className="z-20" onClick={(e) => e.preventDefault()}>
-        //     {found?.name}
-        //   </p>
-        // );
       },
 
       filterFn: (row, columnId, filterValue) => {
-        const columnValue = breadStatus?.find((item) => item.name === row.getValue(columnId));
+        const columnValue = breadStatus?.find((item) => item.code === row.getValue(columnId));
         return columnValue?.code === filterValue;
       },
 
@@ -197,11 +211,14 @@ export const BreadsColumns = () => {
           생성일 <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: (info) =>
-        new Intl.DateTimeFormat('ko-KR', {
-          dateStyle: 'medium',
-          timeStyle: 'short',
-        }).format(new Date(info.getValue())),
+      cell: (info) => (
+        <div className="line-clamp-2 whitespace-normal break-words text-center">
+          {new Intl.DateTimeFormat('ko-KR', {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+          }).format(new Date(info.getValue()))}
+        </div>
+      ),
     }),
 
     columnHelper.accessor('updatedAt', {
@@ -214,25 +231,51 @@ export const BreadsColumns = () => {
           최근 수정일 <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: (info) =>
-        new Intl.DateTimeFormat('ko-KR', {
-          dateStyle: 'medium',
-          timeStyle: 'short',
-        }).format(new Date(info.getValue())),
+      cell: (info) => (
+        <div className="line-clamp-2 whitespace-normal break-words text-center">
+          {new Intl.DateTimeFormat('ko-KR', {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+          }).format(new Date(info.getValue()))}
+        </div>
+      ),
     }),
 
     columnHelper.display({
       id: 'delete',
       cell: ({ row }) => (
-        <Button
-          variant={'destructive'}
-          onClick={(e) => {
-            e.preventDefault();
-            deleteBreadMutation([row.original.no]);
-          }}
-        >
-          삭제
-        </Button>
+        <div className="flex justify-center">
+          <AlertDialog
+            open={alertOpen}
+            onOpenChange={(open) => {
+              setAlertOpen(open);
+            }}
+          >
+            <AlertDialogTrigger asChild>
+              <Button
+                variant={'destructive'}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setAlertOpen(true);
+                }}
+              >
+                삭제
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent onClick={(e) => e.preventDefault()}>
+              <AlertDialogHeader>
+                <AlertDialogTitle>정말로 삭제하시겠습니까?</AlertDialogTitle>
+                <AlertDialogDescription>삭제시 복구가 어렵습니다.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setAlertOpen(false)}>취소</AlertDialogCancel>
+                <AlertDialogAction onClick={() => deleteBreadMutation([row.original.no])}>
+                  삭제
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       ),
     }),
   ];
