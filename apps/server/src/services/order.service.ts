@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { Address, Customer, OrderItem, Order } from '@prisma/client';
 import { hashPassword } from './auth.service';
+import { AppError } from '@/types';
 
 const ORDER_STATUS_CODE = '10'; // 접수됨
 const DISCOUNT_TYPE_CODE = '10'; // 기간할인
@@ -117,7 +118,14 @@ export const createNonMemberOrder = async (
     });
 
     if (totalPrice !== originalTotalPrice - (discount?.amount ?? 0) + (deliveryMethod?.fee ?? 0)) {
-      throw new Error('주문 금액이 일치하지 않습니다.');
+      throw AppError.badRequest('주문 금액이 일치하지 않습니다.', {
+        calculatedTotalPrice:
+          originalTotalPrice - (discount?.amount ?? 0) + (deliveryMethod?.fee ?? 0),
+        yourTotalPrice: totalPrice,
+        breadsPrice: originalTotalPrice,
+        discountAmount: discount?.amount ?? 0,
+        deliveryFee: deliveryMethod?.fee ?? 0,
+      });
     }
 
     return {

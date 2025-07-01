@@ -1,6 +1,7 @@
 import cloudinary from '@/lib/cloudinary';
 import { prisma } from '@/lib/prisma';
 import { UploadedFile } from 'express-fileupload';
+import { AppError } from '@/types';
 
 export const MAX_UPLOAD_COUNT = 10;
 export const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
@@ -11,13 +12,19 @@ export const createCloudinary = async (images: UploadedFile[] | UploadedFile) =>
 
   // 최대 개수 제한
   if (files.length > MAX_UPLOAD_COUNT) {
-    throw new Error(`이미지는 최대 ${MAX_UPLOAD_COUNT}개까지 업로드할 수 있습니다.`);
+    throw AppError.badRequest(`이미지는 최대 ${MAX_UPLOAD_COUNT}개까지 업로드할 수 있습니다.`, {
+      maxCount: MAX_UPLOAD_COUNT,
+      currentCount: files.length,
+    });
   }
 
   // 확장자 검사
   for (const file of files) {
     if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
-      throw new Error(`jpg, jpeg, png 형식의 파일만 업로드할 수 있습니다.`);
+      throw AppError.badRequest(`jpg, jpeg, png 형식의 파일만 업로드할 수 있습니다.`, {
+        allowedTypes: ALLOWED_MIME_TYPES,
+        receivedType: file.mimetype,
+      });
     }
   }
 
@@ -36,7 +43,10 @@ export const updateCloudinary = async (
 
   // 최대 개수 제한
   if (files.length + lastOrder > MAX_UPLOAD_COUNT) {
-    throw new Error(`이미지는 최대 ${MAX_UPLOAD_COUNT}개까지 업로드할 수 있습니다.`);
+    throw AppError.badRequest(`이미지는 최대 ${MAX_UPLOAD_COUNT}개까지 업로드할 수 있습니다.`, {
+      maxCount: MAX_UPLOAD_COUNT,
+      currentCount: files.length + lastOrder,
+    });
   }
 
   const uploadResults = await createCloudinary(images);

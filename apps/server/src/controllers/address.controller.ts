@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as AddressService from '@/services/address.service';
+import { AppError } from '@/types';
 
 /** 주소 목록 조회 */
 export const getList = async (_: Request, res: Response) => {
@@ -12,15 +13,13 @@ export const getOne = async (req: Request, res: Response) => {
   const { no } = req.params;
 
   if (!no) {
-    res.status(400).json({ message: 'Address no is required' });
-    return;
+    throw AppError.badRequest('Address no is required');
   }
 
   const address = await AddressService.getAddress(parseInt(no));
 
   if (!address) {
-    res.status(404).json({ message: 'Address not found' });
-    return;
+    throw AppError.notFound('Address not found', { addressNo: no });
   }
 
   res.status(200).json(address);
@@ -31,68 +30,54 @@ export const getOne = async (req: Request, res: Response) => {
  * 비회원이라도 고객테이블에 데이터가 생성되어있어야함.
  */
 export const create = async (req: Request, res: Response) => {
-  try {
-    const { customerNo, address, addressDetail, zipcode, recipientName, recipientMobile, message } =
-      req.body;
+  const { customerNo, address, addressDetail, zipcode, recipientName, recipientMobile, message } =
+    req.body;
 
-    const createdAddress = await AddressService.createAddress({
-      address,
-      addressDetail,
-      zipcode,
-      recipientName,
-      recipientMobile,
-      customerNo,
-      message: message || '',
-    });
-    res.status(201).json(createdAddress);
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error' });
-  }
+  const createdAddress = await AddressService.createAddress({
+    address,
+    addressDetail,
+    zipcode,
+    recipientName,
+    recipientMobile,
+    customerNo,
+    message: message || '',
+  });
+  res.status(201).json(createdAddress);
 };
 
 /** 주소 수정
  * todo: 본인만 수정 가능
  */
 export const update = async (req: Request, res: Response) => {
-  try {
-    const { no } = req.params;
-    const { address, addressDetail, zipcode, recipientName, recipientMobile, message } = req.body;
+  const { no } = req.params;
+  const { address, addressDetail, zipcode, recipientName, recipientMobile, message } = req.body;
 
-    if (!no) {
-      res.status(400).json({ message: 'Address no is required' });
-      return;
-    }
-
-    const updatedAddress = await AddressService.updateAddress(Number(no), {
-      address,
-      addressDetail,
-      zipcode,
-      recipientName,
-      recipientMobile,
-      message: message || '',
-    });
-
-    res.status(200).json(updatedAddress);
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error' });
+  if (!no) {
+    throw AppError.badRequest('Address no is required');
   }
+
+  const updatedAddress = await AddressService.updateAddress(Number(no), {
+    address,
+    addressDetail,
+    zipcode,
+    recipientName,
+    recipientMobile,
+    message: message || '',
+  });
+
+  res.status(200).json(updatedAddress);
 };
 
 /** 주소 삭제
  * todo: 본인만 삭제 가능
  */
 export const remove = async (req: Request, res: Response) => {
-  try {
-    const { no } = req.params;
+  const { no } = req.params;
 
-    if (!no) {
-      res.status(400).json({ message: 'Address no is required' });
-      return;
-    }
-
-    await AddressService.deleteAddress(parseInt(no));
-    res.status(204).json({ message: 'Address deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error' });
+  if (!no) {
+    throw AppError.badRequest('Address no is required');
   }
+
+  await AddressService.deleteAddress(parseInt(no));
+  res.status(204).json({ message: 'Address deleted successfully' });
 };

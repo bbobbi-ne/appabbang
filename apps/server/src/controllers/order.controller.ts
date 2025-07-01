@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as OrderService from '@/services/order.service';
+import * as BreadService from '@/services/bread.service';
 // import { commonCodeMap } from '@/services/common-code.service';
 
 /** 코드 조회 */
@@ -29,43 +30,39 @@ export const getOne = async (_: Request, res: Response) => {
 };
 export const create = async (req: Request, res: Response) => {
   // 비회원 기준으로 작성됨. 회원 주문은 처리 예정.
-  try {
-    const {
-      name,
-      mobileNumber,
-      address,
-      addressDetail,
-      zipcode,
-      message,
-      recipientName,
-      recipientMobile,
-      orderItems,
-      deliveryMethodNo,
-      orderPw,
-      totalPrice,
-    } = req.body;
+  const {
+    name,
+    mobileNumber,
+    address,
+    addressDetail,
+    zipcode,
+    message,
+    recipientName,
+    recipientMobile,
+    orderItems,
+    deliveryMethodNo,
+    orderPw,
+    totalPrice,
+  } = req.body;
 
-    const payload = {
-      name,
-      mobileNumber,
-      address,
-      addressDetail,
-      zipcode,
-      message,
-      recipientName,
-      recipientMobile,
-      orderItems,
-      deliveryMethodNo,
-      orderPw,
-      totalPrice,
-    };
+  const payload = {
+    name,
+    mobileNumber,
+    address,
+    addressDetail,
+    zipcode,
+    message,
+    recipientName,
+    recipientMobile,
+    orderItems,
+    deliveryMethodNo,
+    orderPw,
+    totalPrice,
+  };
 
-    const newOrder = await OrderService.createNonMemberOrder(payload);
+  const newOrder = await OrderService.createNonMemberOrder(payload);
 
-    res.status(201).json(newOrder);
-  } catch (error) {
-    res.status(500).json({ message: '주문 생성 실패' });
-  }
+  res.status(201).json(newOrder);
 };
 export const update = async (_: Request, res: Response) => {
   res.status(200).json('Hello World');
