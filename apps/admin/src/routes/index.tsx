@@ -22,6 +22,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { login } from '@/service/auth-api';
 import { useAuthStore } from '@/stores/authStore';
 import { useMutation } from '@tanstack/react-query';
+import ThemeToggleBtn from '@/components/theme-toggle-btn';
 
 export const Route = createFileRoute('/')({
   beforeLoad: () => {
@@ -70,7 +71,10 @@ function RouteComponent() {
     <div className="flex flex-col min-h-screen items-center justify-center gap-4 p-24">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>관리자 로그인</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="inline">관리자 로그인</CardTitle>
+            <ThemeToggleBtn />
+          </div>
           <CardDescription>로그인 후 사용이 가능합니다!.</CardDescription>
         </CardHeader>
         <CardContent>
