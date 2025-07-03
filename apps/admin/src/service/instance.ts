@@ -6,7 +6,7 @@ const API_BASE_URL = `${import.meta.env.VITE_APPABBANG_API_URL}`;
 
 export const withCredentialsInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 2000,
+  timeout: 10000,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -15,7 +15,7 @@ export const withCredentialsInstance = axios.create({
 });
 export const baseInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 2000,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -24,7 +24,7 @@ export const baseInstance = axios.create({
 
 export const requireAccessTokenInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 2000,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -48,6 +48,11 @@ const reqInt = (request: any) => {
 
 const resInt = async (error: any) => {
   const originalRequest = error.config;
+
+  if (!error.response) {
+    console.error('응답이 없습니다:', error);
+    return Promise.reject(error);
+  }
 
   if (error.response.status === 403 && !originalRequest._retry) {
     originalRequest._retry = true;
