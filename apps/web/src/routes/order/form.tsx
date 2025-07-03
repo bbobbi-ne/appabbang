@@ -29,20 +29,48 @@ export const Route = createFileRoute('/order/form')({
 
 /** Main Function */
 function RouteComponent() {
-  const [breadList, setBreadList] = useState<BreadProps[]>(); // 빵 목록
+  const [breadList, setBreadList] = useState<BreadProps[]>([]); // 빵 목록
+  const [originBreadList, setOriginBreadList] = useState<BreadProps[]>([]); // 빵 목록(origin)
   const [loading, setLoading] = useState<boolean>(true); // 로딩 상태
   const [paymentList, setPaymentList] = useState<BreadProps[]>([]); // 결제목록
   const [errMsg, setErrMsg] = useState<string>(''); // 에러메세지
+  const [keyword, setKeyword] = useState<string>(''); // 빵 키워드
 
   /**********************************************************************************/
   /** Function */
-  /** 키워드 검색 onChange 함수 */
-  const checkSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const regExp = /^[가-힣+$]/g; // 한글 + 1글자 이상 입력된 경우
-    const value = e.target.value;
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    e.key === 'Enter' && checkSearch();
+  };
 
-    if (regExp.test(value)) {
+  /** 키워드 검색 onChange 함수 */
+  const checkSearch = () => {
+    const regExp = /^[가-힣+$]/g; // 한글 + 1글자 이상 입력된 경우
+    const tmpList = Array<BreadProps>();
+
+    // 빈 값으로 검색할 경우 모든 리스트 보여주기
+    if (keyword.length === 0) {
+      console.log(keyword);
+      console.log(originBreadList);
+      setBreadList(originBreadList);
+      return false;
+    }
+
+    if (regExp.test(keyword)) {
       // 정규표현식에 올바르다면, 텍스트에 포함되는 빵 목록을 보여준다.
+      breadList?.map((data, _) => {
+        const breadNm = data.name;
+
+        if (breadNm.includes(keyword)) {
+          tmpList.length === 0 && tmpList.push(data); // 데이터 0건이면 하나는 삽입
+
+          tmpList?.map((tmpBread, _) => {
+            tmpBread.no === tmpBread.no ? null : tmpList.push(data);
+          });
+        }
+      });
+
+      // 임시 빵 목록 삽입
+      setBreadList(tmpList);
     } else return false;
   };
 
@@ -51,7 +79,7 @@ function RouteComponent() {
     setPaymentList((prev) => [...prev, bread]);
   };
   /**********************************************************************************/
-
+  /** React Hooks */
   /** 빵 목록 조회 */
   useEffect(() => {
     client
@@ -62,6 +90,7 @@ function RouteComponent() {
       })
       .then((response) => {
         setBreadList(response.data);
+        setOriginBreadList(response.data);
         setLoading(false);
       })
       .catch(() => {
@@ -105,17 +134,23 @@ function RouteComponent() {
               <CardDescription>최소 1건 이상 선택해야 주문서 작성이 진행됩니다.</CardDescription>
 
               {/* 검색창 */}
-              <form className="w-72 flex flex-row gap-2">
+              <div className="w-72 flex flex-row gap-2">
                 <Input
                   type="text"
                   placeholder="빵이름을 입력하세요."
-                  onChange={checkSearch}
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   className="mt-5 mb-5"
                 />
-                <Button type="submit" className="mt-5 mb-5">
+                <Button
+                  type="submit"
+                  className="mt-5 mb-5 hover:cursor-pointer"
+                  onClick={checkSearch}
+                >
                   검색
                 </Button>
-              </form>
+              </div>
 
               <div className="flex flex-row flex-wrap gap-5 justify-start">
                 {loading ? (
