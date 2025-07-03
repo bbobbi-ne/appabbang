@@ -7,17 +7,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@appabbang/ui';
+import MaterialForm from './material-form';
 
-import { useCreateBreadMutation } from '@/hooks/use-breads';
-import BreadForm from './bread-form';
-
-export function BreadsCreateDialog() {
-  const { CreateBreadMutation } = useCreateBreadMutation();
-
+export function MaterialCreateDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="ml-auto">빵 추가하기</Button>
+        <Button className="ml-auto">재료등록</Button>
       </DialogTrigger>
       <DialogContent
         onInteractOutside={(e) => {
@@ -26,10 +22,10 @@ export function BreadsCreateDialog() {
         className="sm:max-w-xl overflow-y-auto max-h-full "
       >
         <DialogHeader>
-          <DialogTitle>메뉴등록</DialogTitle>
+          <DialogTitle>재료등록</DialogTitle>
         </DialogHeader>
-        <DialogDescription>메뉴를 등록해주세요</DialogDescription>
-        <BreadForm submitFn={CreateBreadMutation} />
+        <DialogDescription>재료를 등록해주세요</DialogDescription>
+        <MaterialForm />
       </DialogContent>
     </Dialog>
   );
