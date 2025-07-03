@@ -18,7 +18,7 @@ import { useForm } from 'react-hook-form';
 import { ImageUploadField } from './Image-upload-field';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useBreadStatus } from '@/hooks/use-breads';
+import { useGetBreadsAndStatusQuery } from '@/hooks/use-breads';
 import { useRef } from 'react';
 import type { ApiResponse } from '@/service/common';
 
@@ -56,7 +56,7 @@ interface BreadFormProps {
 }
 
 function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
-  const breadStatus = useBreadStatus().data;
+  const breadStatus = useGetBreadsAndStatusQuery().breadStatus;
   const closeRef = useRef<HTMLButtonElement>(null);
 
   const form = useForm<BreadsDailogForm>({

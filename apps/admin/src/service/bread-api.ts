@@ -7,7 +7,7 @@ export interface Breads {
   description: string;
   unitPrice: number;
   breadStatus: string;
-  image: string[];
+  images: string[];
 }
 
 export interface BreadImages {
@@ -56,7 +56,6 @@ export async function getBreads(): Promise<ApiResponse<Breads[]>> {
   try {
     const response = await requireAccessTokenInstance.get('/breads');
     // toast.success('빵 정보를 조회에 성공했습니다.');
-    console.log(response, '빵 목록정보');
 
     return {
       data: response.data,
@@ -78,7 +77,6 @@ export async function getBread({
 
   try {
     const response = await requireAccessTokenInstance.get(`/breads/${params.no}`);
-    console.log(response, '빵 단일정보');
     // toast.success('빵 정보를 조회에 성공했습니다.');
     return {
       data: response.data,
@@ -119,8 +117,9 @@ export async function createBread(Bread: BreadFormData): Promise<ApiResponse<{}>
       data: response.data,
     };
   } catch (error: any) {
-    console.log(error);
-    const message = error.response?.data?.message || '빵 목록 추가를 실패했습니다.';
+    console.log(error, '에러발생');
+    const message =
+      error?.response?.data?.message ?? error?.message ?? '빵 목록 추가를 실패했습니다.';
     toast.error('빵 목록 추가를 실패했습니다.', {
       description: message,
     });
@@ -162,7 +161,6 @@ export async function updateBread(Bread: BreadUpdateFormData): Promise<ApiRespon
       formData.append('image', file);
     }
   });
-  console.log(Array.from(formData));
 
   try {
     const response = await requireAccessTokenInstance.put(`/breads/${Bread.no}`, formData, {
@@ -176,7 +174,10 @@ export async function updateBread(Bread: BreadUpdateFormData): Promise<ApiRespon
       data: response.data,
     };
   } catch (error: any) {
-    const message = error.response?.data?.message || '빵 목록 업데이트를 실패했습니다.';
+    console.log(error, '에러발생');
+    const message =
+      error?.response?.data?.message ?? error?.message ?? '빵 목록 업데이트를 실패했습니다.';
+
     toast.error('빵 목록 업데이트를 실패했습니다.', {
       description: message,
     });
@@ -189,14 +190,19 @@ export async function updateBreadStatus({
   no,
 }: BreadUpadteStatusData): Promise<ApiResponse<{}>> {
   try {
-    const response = await requireAccessTokenInstance.put(`/breads/${no}/status`, { breadStatus });
+    const response = await requireAccessTokenInstance.put(`/breads/${no}/status`, {
+      breadStatus,
+    });
     toast.success('빵 상태가 업데이트 되었습니다.');
 
     return {
       data: response.data,
     };
   } catch (error: any) {
-    const message = error.response?.data?.message || '빵 상태 업데이트를 실패했습니다.';
+    console.log(error, '에러발생');
+
+    const message =
+      error?.response?.data?.message ?? error?.message ?? '빵 상태 업데이트를 실패했습니다.';
     toast.error('빵 상태 업데이트를 실패했습니다.', {
       description: message,
     });

@@ -1,17 +1,20 @@
+import { MaterialCreateDialog } from '@/components/material-create-dialog';
 import { TablePagination } from '@/components/table-pagination';
-import { customersColumns, type CustomerColumns } from '@/data/columns';
+import TableSkeleton from '@/components/table-skeletion';
+import { muterialColumns, type MaterialColumns } from '@/data/columns';
+import { useMaterialAndTypeQuery } from '@/hooks/use-material';
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
-  CardTitle,
+  CardFooter,
   Table,
-  TableBody,
-  TableCell,
-  TableHead,
   TableHeader,
   TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+  CardTitle,
 } from '@appabbang/ui';
 import { createFileRoute } from '@tanstack/react-router';
 import {
@@ -26,7 +29,7 @@ import {
 } from '@tanstack/react-table';
 import React from 'react';
 
-export const Route = createFileRoute('/_dashboardLayout/dashboard/customers/')({
+export const Route = createFileRoute('/_dashboardLayout/dashboard/material/')({
   component: RouteComponent,
 });
 
@@ -34,9 +37,10 @@ function RouteComponent() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
-  const columns = customersColumns();
+  const columns = muterialColumns();
+  const { materials, error, isError, isLoading } = useMaterialAndTypeQuery();
 
-  const table = useReactTable<CustomerColumns>({
+  const table = useReactTable<MaterialColumns>({
     data: [],
     columns,
     state: {
@@ -53,15 +57,15 @@ function RouteComponent() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  // if (isLoading) return <TableSkeleton />;
-  // if (isError) return <>에러임</>;
+  if (isLoading) return <TableSkeleton />;
+  if (isError) return <>에러임</>;
 
   return (
     <>
       <Card className="shadow-none bg-background border-none">
         <CardHeader>
-          <CardTitle>고객관리</CardTitle>
-          {/* <MaterialCreateDialog /> */}
+          <CardTitle>재료관리</CardTitle>
+          <MaterialCreateDialog />
         </CardHeader>
         <CardContent className="max-h-[550px] border-1 p-0 m-6 mt-0 rounded-lg overflow-auto relative">
           <Table className="table-fixed">
@@ -80,7 +84,7 @@ function RouteComponent() {
               {table.getRowModel().rows.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="p-4 text-center">
-                    등록된 고객이 없습니다.
+                    재료를 등록해주세요
                   </TableCell>
                 </TableRow>
               )}

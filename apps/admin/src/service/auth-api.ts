@@ -1,6 +1,6 @@
 import { toast } from 'sonner';
 import type { ApiResponse } from './common';
-import { withCredentialsInstance, requireAccessTokenInstance } from './instance';
+import { withCredentialsInstance, requireAccessTokenInstance, baseInstance } from './instance';
 
 export interface Admin {
   id: string;
@@ -8,10 +8,15 @@ export interface Admin {
   role: '10' | '20';
 }
 
+const USER_TYPE = 'user';
+
 // ✅ 로그인
 export async function login(req: { id: string; pw: string }): Promise<ApiResponse<string>> {
   try {
-    const response = await withCredentialsInstance.post('/auth/login', req);
+    const response = await withCredentialsInstance.post('/auth/login', {
+      ...req,
+      type: USER_TYPE,
+    });
     toast.success('로그인에 성공했습니다!.');
     return {
       data: response.data.accessToken,
@@ -58,3 +63,18 @@ export async function refresh(): Promise<ApiResponse<string>> {
     throw new Error(message);
   }
 }
+
+// export async function getUserRole(): Promise<ApiResponse<string>> {
+//   try {
+//     const response = await baseInstance.get('/common-code/user_role');
+//     return {
+//       data: response.data,
+//     };
+//   } catch (error: any) {
+//     const message = error.response?.data?.message || '유저 규칙을 불러오는데 실패했습니다.';
+//     toast.error('유저 규칙을 불러오는데 실패했습니다.', {
+//       description: message,
+//     });
+//     throw new Error(message);
+//   }
+// }

@@ -1,5 +1,4 @@
 import { getMe } from '@/service/auth-api';
-import { Button } from '@appabbang/ui';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_dashboardLayout/dashboard/')({
@@ -13,9 +12,5 @@ function RouteComponent() {
     console.log(res);
   }
 
-  return (
-    <>
-      <Button onClick={test}>Get Me</Button>
-    </>
-  );
+  return <>홈화면</>;
 }
