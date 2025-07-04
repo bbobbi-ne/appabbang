@@ -20,6 +20,7 @@ import RequiredBar from '../../components/RequiredBar';
 import BreadCard from '../../components/BreadCard';
 import { client } from '../../services/apis';
 import type { BreadProps } from '../../interface/BreadInterface';
+import OrderFormSkeleton from '../../components/OrderFormSkeleton';
 
 /**********************************************************************************/
 /** Route */
@@ -99,7 +100,9 @@ function RouteComponent() {
       });
   }, []);
 
-  return (
+  return loading ? (
+    <OrderFormSkeleton />
+  ) : (
     <div>
       <div className="flex flex-col items-center justify-center m-14">
         <span className="text-4xl">주문서</span>
@@ -155,10 +158,7 @@ function RouteComponent() {
               <div className="flex flex-row flex-wrap gap-5 justify-start">
                 {loading ? (
                   <Card>
-                    <CardHeader>
-                      빵 목록을 조회하는 데 실패했습니다. 잠시 후에 시도하세요.
-                    </CardHeader>
-                    <CardContent>{errMsg}</CardContent>
+                    <CardHeader className="text-red-600">{errMsg}</CardHeader>
                   </Card>
                 ) : (
                   // 빵 목록
