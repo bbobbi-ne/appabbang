@@ -10,6 +10,7 @@ import {
 } from '@appabbang/ui';
 import RequiredBar from './RequiredBar';
 import PageTitle from './PageTitle';
+import CardComment from './CardComment';
 
 function OrderFormSkeleton() {
   return (
@@ -32,8 +33,10 @@ function OrderFormSkeleton() {
           <div className="m-5">
             <RequiredBar />
             <CardContent>
-              <CardTitle className="mt-10 mb-2">구매할 빵을 검색하고 선택하세요.</CardTitle>
-              <CardDescription>최소 1건 이상 선택해야 주문서 작성이 진행됩니다.</CardDescription>
+              <CardComment
+                title="구매할 빵을 검색하고 선택하세요."
+                comment="최소 1건 이상 선택해야 주문서 작성이 진행됩니다."
+              />
 
               <div className="w-72 flex flex-row gap-2">
                 <Input type="text" placeholder="빵이름을 입력하세요." className="mt-5 mb-5" />

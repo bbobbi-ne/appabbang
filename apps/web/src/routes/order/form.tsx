@@ -21,6 +21,9 @@ import BreadCard from '../../components/BreadCard';
 import { client } from '../../services/apis';
 import type { BreadProps } from '../../interface/BreadInterface';
 import OrderFormSkeleton from '../../components/OrderFormSkeleton';
+import BreadSearch from '@/components/BreadSearch';
+import CardMent from '@/components/CardComment';
+import Payment from '@/components/Payment';
 
 /**********************************************************************************/
 /** Route */
@@ -39,12 +42,18 @@ function RouteComponent() {
 
   /**********************************************************************************/
   /** Function */
+  /** enter key 누를때 빵 검색 기능 수행 */
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    e.key === 'Enter' && checkSearch();
+    e.key === 'Enter' && breadSearch();
+  };
+
+  /** 키워드 저장 */
+  const keywordSetting = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setKeyword(e.target.value);
   };
 
   /** 키워드 검색 onChange 함수 */
-  const checkSearch = () => {
+  const breadSearch = () => {
     const regExp = /^[가-힣+$]/g; // 한글 + 1글자 이상 입력된 경우
     const tmpList = Array<BreadProps>();
 
@@ -78,6 +87,12 @@ function RouteComponent() {
   /** 빵 카드 click시 하단 결제목록 컴포넌트에 추가될 빵 list를 삽입함. */
   const handleBreadClick = (bread: BreadProps) => {
     setPaymentList((prev) => [...prev, bread]);
+  };
+
+  /** 결제목록 컴포넌트의 +, - 버튼을 클릭하면 수량의 개수가 다르게 표현되도록 설정. */
+  const countHandler = (bread: BreadProps, count: number, amount: number) => {
+    console.log('countHandler');
+    console.log(`부모에서 받은 bread: ${bread}, count: ${count}, amount: ${amount}`);
   };
   /**********************************************************************************/
   /** React Hooks */
@@ -133,41 +148,38 @@ function RouteComponent() {
           <div className="m-5">
             <RequiredBar />
             <CardContent>
-              <CardTitle className="mt-10 mb-2">구매할 빵을 검색하고 선택하세요.</CardTitle>
-              <CardDescription>최소 1건 이상 선택해야 주문서 작성이 진행됩니다.</CardDescription>
+              <CardMent
+                title="구매할 빵을 검색하고 선택하세요."
+                comment="최소 1건 이상 선택해야 주문서 작성이 진행됩니다."
+              />
 
               {/* 검색창 */}
-              <div className="w-72 flex flex-row gap-2">
-                <Input
-                  type="text"
-                  placeholder="빵이름을 입력하세요."
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  className="mt-5 mb-5"
-                />
-                <Button
-                  type="submit"
-                  className="mt-5 mb-5 hover:cursor-pointer"
-                  onClick={checkSearch}
-                >
-                  검색
-                </Button>
-              </div>
+              <BreadSearch
+                keyword={keyword}
+                onKeyDown={handleKeyDown}
+                onChange={keywordSetting}
+                onClick={breadSearch}
+              />
 
+              {/* 빵 목록 */}
               <div className="flex flex-row flex-wrap gap-5 justify-start">
                 {loading ? (
                   <Card>
                     <CardHeader className="text-red-600">{errMsg}</CardHeader>
                   </Card>
                 ) : (
-                  // 빵 목록
                   breadList?.map((data, i) => (
                     <BreadCard key={i} idx={i} bread={data} onClick={handleBreadClick} />
                   ))
                 )}
               </div>
             </CardContent>
+
+            {paymentList.length === 0
+              ? null
+              : paymentList.map((data, i) => (
+                  <Payment key={i} bread={data} onClick={countHandler} />
+                ))}
           </div>
         </Card>
       </div>

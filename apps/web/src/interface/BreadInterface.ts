@@ -18,3 +18,10 @@ export interface BreadCardProps {
   bread: BreadProps;
   onClick: (bread: BreadCardProps['bread']) => void;
 }
+
+/** 결제목록 :: 빵 정보 타입 */
+export interface PaymentProp {
+  key: number;
+  bread: BreadProps;
+  onClick: (bread: BreadProps, count: number, amount: number) => void;
+}
