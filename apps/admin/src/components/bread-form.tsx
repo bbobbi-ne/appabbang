@@ -31,10 +31,10 @@ export const breadSchema = z.object({
     .refine(
       (val) => {
         const num = Number(val.replace(/,/g, ''));
-        return !isNaN(num) && num >= 1000 && num <= 100000;
+        return !isNaN(num) && num >= 1000 && num < 100000;
       },
       {
-        message: '단가는 1,000원 이상 100,000원 이하의 숫자로 입력해주세요.',
+        message: '단가는 1,000원 이상 100,000원 미만의 숫자로 입력해주세요.',
       },
     ),
   breadStatus: z.string({
@@ -143,7 +143,39 @@ function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
               </FormLabel>
               <div className="flex-3/4 space-y-1">
                 <FormControl>
-                  <Input placeholder="단가를 입력해주세요" {...field} />
+                  <Input
+                    className="text-right"
+                    inputMode="numeric"
+                    placeholder="단가를 입력해주세요"
+                    {...field}
+                    value={
+                      field.value
+                        ? new Intl.NumberFormat('ko-KR', {
+                            style: 'currency',
+                            currency: 'KRW',
+                            maximumFractionDigits: 0,
+                          }).format(Number(field.value.toString().replace(/,/g, '')))
+                        : ''
+                    }
+                    onChange={(e) => {
+                      const onlyDigits = e.target.value.replace(/\D/g, '');
+                      if (onlyDigits.length > 5) {
+                        form.setError('unitPrice', {
+                          type: 'manual',
+                          message: '단가는 최대 100,000원까지만 입력할 수 있습니다.',
+                        });
+                      } else {
+                        form.clearErrors('unitPrice');
+                        field.onChange(onlyDigits);
+                      }
+                    }}
+                    onFocus={(e) => {
+                      const val = e.target.value;
+                      setTimeout(() => {
+                        e.target.setSelectionRange(val.length, val.length);
+                      }, 0);
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </div>

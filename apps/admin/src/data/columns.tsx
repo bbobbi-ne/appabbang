@@ -10,8 +10,7 @@ import {
   SelectValue,
 } from '@appabbang/ui';
 import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown } from 'lucide-react';
-
+import { SortAsc, SortDesc } from 'lucide-react';
 export interface BreadsColumns {
   no: number;
   name: string;
@@ -98,30 +97,38 @@ export const BreadsColumns = () => {
     }),
 
     columnHelper.accessor('no', {
-      header: ({ column }) => (
-        <Button
-          className="p-0"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          번호 <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted() === 'asc';
+
+        return (
+          <Button
+            className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary`}
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            {isSorted ? <SortAsc /> : <SortDesc />} 번호
+          </Button>
+        );
+      },
       cell: (info) => {
         return info.getValue();
       },
     }),
 
     columnHelper.accessor('name', {
-      header: ({ column }) => (
-        <Button
-          className="p-0"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          메뉴명 <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted() === 'asc';
+
+        return (
+          <Button
+            className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary`}
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            {isSorted ? <SortAsc /> : <SortDesc />} 메뉴명
+          </Button>
+        );
+      },
       cell: ({ row }) => row.getValue('name'),
     }),
 
@@ -133,15 +140,19 @@ export const BreadsColumns = () => {
     }),
 
     columnHelper.accessor('unitPrice', {
-      header: ({ column }) => (
-        <Button
-          className="p-0"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          단가 <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted() === 'asc';
+
+        return (
+          <Button
+            className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary`}
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            {isSorted ? <SortAsc /> : <SortDesc />} 단가
+          </Button>
+        );
+      },
       cell: (info) =>
         new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(
           info.getValue(),
@@ -157,11 +168,11 @@ export const BreadsColumns = () => {
           : 'https://cdn.imweb.me/upload/S202206178ecd8851ac794/cd0f057a7035b.jpg';
 
         return (
-          <AspectRatio>
+          <AspectRatio ratio={9 / 5}>
             <img
               src={src}
               alt={row.original.name}
-              className="h-full w-full rounded-lg object-cover"
+              className="h-full w-full rounded-lg object-fill"
             />
           </AspectRatio>
         );
@@ -225,20 +236,22 @@ export const BreadsColumns = () => {
         const columnValue = breadStatus?.find((item) => item.code === row.getValue(columnId));
         return columnValue?.code === filterValue;
       },
-
-      enableSorting: true,
     }),
 
     columnHelper.accessor('createdAt', {
-      header: ({ column }) => (
-        <Button
-          className="p-0"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          생성일 <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted() === 'asc';
+
+        return (
+          <Button
+            className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary`}
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            {isSorted ? <SortAsc /> : <SortDesc />} 생성일
+          </Button>
+        );
+      },
       cell: (info) => (
         <div className="line-clamp-2 whitespace-normal break-words text-center">
           {new Intl.DateTimeFormat('ko-KR', {
@@ -250,15 +263,19 @@ export const BreadsColumns = () => {
     }),
 
     columnHelper.accessor('updatedAt', {
-      header: ({ column }) => (
-        <Button
-          className="p-0"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          최근 수정일 <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted() === 'asc';
+
+        return (
+          <Button
+            className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary`}
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            {isSorted ? <SortAsc /> : <SortDesc />} 최근 수정일
+          </Button>
+        );
+      },
       cell: (info) => (
         <div className="line-clamp-2 whitespace-normal break-words text-center">
           {new Intl.DateTimeFormat('ko-KR', {
