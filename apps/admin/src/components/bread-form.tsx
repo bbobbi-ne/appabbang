@@ -20,7 +20,8 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useGetBreadsAndStatusQuery } from '@/hooks/use-breads';
 import { useRef } from 'react';
-import type { ApiResponse } from '@/service/common';
+import type { ApiResponse } from '@/service/common-api';
+import { formatKR } from '@/utils/format';
 
 export const breadSchema = z.object({
   name: z.string().trim().min(1, '메뉴명을 입력해주세요'),
@@ -148,15 +149,7 @@ function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
                     inputMode="numeric"
                     placeholder="단가를 입력해주세요"
                     {...field}
-                    value={
-                      field.value
-                        ? new Intl.NumberFormat('ko-KR', {
-                            style: 'currency',
-                            currency: 'KRW',
-                            maximumFractionDigits: 0,
-                          }).format(Number(field.value.toString().replace(/,/g, '')))
-                        : ''
-                    }
+                    value={formatKR(field.value)}
                     onChange={(e) => {
                       const onlyDigits = e.target.value.replace(/\D/g, '');
                       if (onlyDigits.length > 5) {
