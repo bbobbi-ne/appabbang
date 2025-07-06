@@ -51,7 +51,7 @@ export function OrderDialog({ children }: { children: ReactNode }) {
         onInteractOutside={(e) => {
           e.preventDefault();
         }}
-        className="sm:max-w-xl overflow-y-auto max-h-full "
+        className="sm:max-w-xl overflow-y-auto max-h-11/12"
       >
         <DialogHeader>
           <DialogTitle className="flex">

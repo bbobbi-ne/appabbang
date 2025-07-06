@@ -23,7 +23,7 @@ export function BreadsCreateDialog() {
         onInteractOutside={(e) => {
           e.preventDefault();
         }}
-        className="sm:max-w-xl overflow-y-auto max-h-full "
+        className="sm:max-w-xl overflow-y-auto max-h-11/12"
       >
         <DialogHeader>
           <DialogTitle>메뉴등록</DialogTitle>
