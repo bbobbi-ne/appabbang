@@ -1,21 +1,11 @@
 /**
  * [ 주문서 ]
- *
  * 로그인 세션을 서버로부터 호출하여 세션 존재유무에 따라 보여지는 화면.
- * CSS는 twakcn으로 처리한다.
  */
 
 import { createFileRoute } from '@tanstack/react-router';
-import React, { useEffect, useState } from 'react';
-import {
-  Button,
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  Input,
-} from '@appabbang/ui';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent } from '@appabbang/ui';
 import RequiredBar from '../../components/RequiredBar';
 import BreadCard from '../../components/BreadCard';
 import { client } from '../../services/apis';
@@ -56,6 +46,7 @@ function RouteComponent() {
   const breadSearch = () => {
     const regExp = /^[가-힣+$]/g; // 한글 + 1글자 이상 입력된 경우
     const tmpList = Array<BreadProps>();
+    let tmpCount = 0;
 
     // 빈 값으로 검색할 경우 모든 리스트 보여주기
     if (keyword.length === 0) {
@@ -72,8 +63,10 @@ function RouteComponent() {
           tmpList.length === 0 && tmpList.push(data); // 데이터 0건이면 하나는 삽입
 
           tmpList?.map((tmpBread, _) => {
-            tmpBread.no === tmpBread.no ? null : tmpList.push(data);
+            tmpBread.no === tmpBread.no ? tmpCount++ : null;
           });
+
+          tmpCount === 0 ? tmpList.push(data) : null;
         }
       });
 
@@ -90,17 +83,37 @@ function RouteComponent() {
       return false;
     }
 
+    let tmpCount = 0;
+
     // list에 동일한 빵이 있다면 추가하지 않는다.
     paymentList.map((payment, _) => {
-      payment.no === bread.no ? null : setPaymentList((prev) => [...prev, bread]);
+      payment.no === bread.no ? tmpCount++ : null;
+      tmpCount === 0 ? setPaymentList((prev) => [...prev, bread]) : null;
     });
   };
 
-  /** 결제목록 컴포넌트의 +, - 버튼을 클릭하면 수량의 개수가 다르게 표현되도록 설정. */
-  const countHandler = (bread: BreadProps, count: number, amount: number) => {
-    console.log('countHandler');
-    console.log(`부모에서 받은 bread: ${bread}, count: ${count}, amount: ${amount}`);
-  };
+  /** 결제목록 수량, 금액, 총금액 표시
+   * useCallback을 사용하여 handlers 객체를 메모이제이션 처리
+   */
+  const onCountChange = useCallback(
+    (bread: BreadProps, count: number, amount: number, type: string) => {
+      // console.log(`
+      // ***********************************
+      // onCountChange 정보
+      // bread: ${bread.name}
+      // count: ${count}
+      // amount: ${amount}
+      // type: ${type}
+      // ***********************************
+      // `);
+    },
+    [],
+  );
+
+  /** 결제목록에서 삭제 */
+  const onRemove = useCallback((bread: BreadProps) => {
+    setPaymentList((prev) => prev.filter((item) => item.no !== bread.no));
+  }, []);
   /**********************************************************************************/
   /** React Hooks */
   /** 빵 목록 조회 */
@@ -185,7 +198,14 @@ function RouteComponent() {
             {paymentList.length === 0
               ? null
               : paymentList.map((data, i) => (
-                  <Payment key={i} bread={data} onClick={countHandler} />
+                  <Payment
+                    key={i}
+                    bread={data}
+                    handlers={{
+                      onCountChange,
+                      onRemove,
+                    }}
+                  />
                 ))}
           </div>
         </Card>

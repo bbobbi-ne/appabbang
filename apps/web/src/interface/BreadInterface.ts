@@ -23,5 +23,8 @@ export interface BreadCardProps {
 export interface PaymentProp {
   key: number;
   bread: BreadProps;
-  onClick: (bread: BreadProps, count: number, amount: number) => void;
+  handlers: {
+    onCountChange: (bread: BreadProps, count: number, amount: number, type: string) => void;
+    onRemove?: (bread: BreadProps) => void;
+  };
 }

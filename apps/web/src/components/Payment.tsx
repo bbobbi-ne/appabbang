@@ -14,33 +14,41 @@ const countBtnCss = `
 `;
 
 /** Main Function */
-function Payment({ bread, onClick }: PaymentProp) {
+function Payment({ bread, handlers }: PaymentProp) {
   const [count, setCount] = useState<number>(0); // 수량
   const [amount, setAmount] = useState<number>(0); // 금액
+  const [type, setType] = useState<string>('');
 
   /** React Hooks  */
   useEffect(() => {
+    const price = bread.unitPrice;
+
     setCount(1);
-    setAmount(bread.unitPrice);
-  }, []);
+    setAmount(price);
+    setType('minus');
+
+    // 초기값을 부모 컴포넌트로 전달
+    handlers.onCountChange(bread, 1, price, '');
+  }, [bread.unitPrice, bread, handlers]);
 
   /** Functions */
   /** 결제목록 컴포넌트의 수량을 변경하고 form(부모) 컴포넌트로 빵 정보와 수량, 총 금액 전달 */
   const countHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
     const btnVal = e.currentTarget.value;
-    let newCount = 0;
-    let newAmount = 0;
-    // +, - 버튼 클릭 시 수량 증가, 감소 처리. 이 때, 최소한 1개 미만으로 내려가지 않도록 할 것.
-    setCount((prev) => {
-      newCount = btnVal.includes('plus') ? prev + 1 : prev > 1 ? prev - 1 : 1;
-      newAmount = bread.unitPrice * newCount;
-      onClick(bread, newCount, newAmount); // 빵 정보, 수량, 금액
-      return newCount;
-    });
 
-    setAmount((_) => {
-      return newAmount;
-    });
+    const newCount = btnVal.includes('plus') ? count + 1 : count > 1 ? count - 1 : 1;
+    const newAmount = bread.unitPrice * newCount;
+
+    // 상태 업데이트
+    setCount(newCount);
+    setAmount(newAmount);
+    setType(btnVal);
+
+    // 부모 컴포넌트로 즉시 전달
+    handlers.onCountChange(bread, newCount, newAmount, type);
+
+    // minus 버튼이고 수량이 1이 될 때 제거
+    btnVal.includes('minus') && count === 1 && handlers.onRemove?.(bread);
   };
 
   return (
@@ -63,7 +71,9 @@ function Payment({ bread, onClick }: PaymentProp) {
         </Button>
       </div>
 
-      <CardContent className="ml-auto mt-auto mb-auto">{amount.toLocaleString()} 원</CardContent>
+      <CardContent className="ml-auto mt-auto mb-auto">
+        <p className="mt-5">{amount.toLocaleString()} 원</p>
+      </CardContent>
     </Card>
   );
 }
