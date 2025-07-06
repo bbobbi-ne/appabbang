@@ -18,9 +18,10 @@ import { useForm } from 'react-hook-form';
 import { ImageUploadField } from './Image-upload-field';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useBreadStatus } from '@/hooks/use-breads';
+import { useGetBreadsAndStatusQuery } from '@/hooks/use-breads';
 import { useRef } from 'react';
-import type { ApiResponse } from '@/service/common';
+import type { ApiResponse } from '@/service/common-api';
+import { formatKR } from '@/utils/format';
 
 export const breadSchema = z.object({
   name: z.string().trim().min(1, '메뉴명을 입력해주세요'),
@@ -31,10 +32,10 @@ export const breadSchema = z.object({
     .refine(
       (val) => {
         const num = Number(val.replace(/,/g, ''));
-        return !isNaN(num) && num >= 1000 && num <= 100000;
+        return !isNaN(num) && num >= 1000 && num < 100000;
       },
       {
-        message: '단가는 1,000원 이상 100,000원 이하의 숫자로 입력해주세요.',
+        message: '단가는 1,000원 이상 100,000원 미만의 숫자로 입력해주세요.',
       },
     ),
   breadStatus: z.string({
@@ -56,7 +57,7 @@ interface BreadFormProps {
 }
 
 function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
-  const breadStatus = useBreadStatus().data;
+  const breadStatus = useGetBreadsAndStatusQuery().breadStatus;
   const closeRef = useRef<HTMLButtonElement>(null);
 
   const form = useForm<BreadsDailogForm>({
@@ -143,7 +144,31 @@ function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
               </FormLabel>
               <div className="flex-3/4 space-y-1">
                 <FormControl>
-                  <Input placeholder="단가를 입력해주세요" {...field} />
+                  <Input
+                    className="text-right"
+                    inputMode="numeric"
+                    placeholder="단가를 입력해주세요"
+                    {...field}
+                    value={formatKR(field.value)}
+                    onChange={(e) => {
+                      const onlyDigits = e.target.value.replace(/\D/g, '');
+                      if (onlyDigits.length > 5) {
+                        form.setError('unitPrice', {
+                          type: 'manual',
+                          message: '단가는 최대 100,000원까지만 입력할 수 있습니다.',
+                        });
+                      } else {
+                        form.clearErrors('unitPrice');
+                        field.onChange(onlyDigits);
+                      }
+                    }}
+                    onFocus={(e) => {
+                      const val = e.target.value;
+                      setTimeout(() => {
+                        e.target.setSelectionRange(val.length, val.length);
+                      }, 0);
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </div>

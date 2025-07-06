@@ -1,6 +1,6 @@
 import { toast } from 'sonner';
-import type { ApiResponse } from './common';
-import { withCredentialsInstance, requireAccessTokenInstance } from './instance';
+import type { ApiResponse } from '@/service/common-api';
+import { withCredentialsInstance, requireAccessTokenInstance } from '@/service/instance';
 
 export interface Admin {
   id: string;
@@ -8,10 +8,15 @@ export interface Admin {
   role: '10' | '20';
 }
 
+const USER_TYPE = 'user';
+
 // ✅ 로그인
 export async function login(req: { id: string; pw: string }): Promise<ApiResponse<string>> {
   try {
-    const response = await withCredentialsInstance.post('/auth/login', req);
+    const response = await withCredentialsInstance.post('/auth/login', {
+      ...req,
+      type: USER_TYPE,
+    });
     toast.success('로그인에 성공했습니다!.');
     return {
       data: response.data.accessToken,

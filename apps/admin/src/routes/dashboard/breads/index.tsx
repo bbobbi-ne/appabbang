@@ -26,6 +26,7 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
+  CardTitle,
   Table,
   TableBody,
   TableCell,
@@ -35,12 +36,13 @@ import {
 } from '@appabbang/ui';
 
 import { TablePagination } from '@/components/table-pagination';
-import { BreadsCreateDialog } from '../../../../components/breads-create-dialog';
-import { useDeleteBreadMutation, useGetBreadsQuery } from '@/hooks/use-breads';
+import { BreadCreateDialog } from '@/components/bread-create-dialog';
+import { useDeleteBreadMutation, useGetBreadsAndStatusQuery } from '@/hooks/use-breads';
 import { BreadModifyDialog } from '@/components/bread-modify-dialog';
 import { BreadsColumns } from '@/data/columns';
+import TableSkeleton from '@/components/table-skeletion';
 
-export const Route = createFileRoute('/_dashboardLayout/dashboard/breads/')({
+export const Route = createFileRoute('/dashboard/breads/')({
   component: RouteComponent,
 });
 
@@ -48,12 +50,12 @@ function RouteComponent() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
-  const { data: bradsData, isLoading, isError } = useGetBreadsQuery();
+  const { breads, isError, isLoading } = useGetBreadsAndStatusQuery();
   const { deleteBreadMutation } = useDeleteBreadMutation();
   const columns = BreadsColumns();
 
   const table = useReactTable<BreadsColumns>({
-    data: bradsData as BreadsColumns[],
+    data: breads as BreadsColumns[],
     columns,
     state: {
       pagination,
@@ -69,7 +71,7 @@ function RouteComponent() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  if (isLoading) return;
+  if (isLoading) return <TableSkeleton />;
   if (isError) return <>에러</>;
 
   const selectedRows = table.getSelectedRowModel().rows.map((row) => row.original.no);
@@ -78,8 +80,8 @@ function RouteComponent() {
     <>
       <Card className="shadow-none bg-background border-none">
         <CardHeader>
-          <h1>빵관리</h1>
-          <BreadsCreateDialog />
+          <CardTitle>빵관리</CardTitle>
+          <BreadCreateDialog />
         </CardHeader>
         <CardContent className="max-h-[550px] border-1 p-0 m-6 mt-0 rounded-lg overflow-auto relative">
           <Table className="table-fixed">
@@ -97,7 +99,7 @@ function RouteComponent() {
             <TableBody>
               {table.getRowModel().rows.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={10} className="p-4 text-center">
+                  <TableCell colSpan={columns.length} className="p-4 text-center">
                     빵을 등록해주세요.
                   </TableCell>
                 </TableRow>

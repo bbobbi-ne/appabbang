@@ -8,11 +8,12 @@ import {
   SidebarFooter,
 } from '@appabbang/ui';
 import { Link, useRouterState } from '@tanstack/react-router';
+import ThemeToggleBtn from './theme-toggle-btn';
 
 const items = [
   { title: 'Home', url: '/dashboard' },
   { title: '빵관리', url: '/dashboard/breads' },
-  { title: '재료관리', url: '/dashboard/ingredients' },
+  { title: '재료관리', url: '/dashboard/materials' },
   { title: '주문관리', url: '/dashboard/orders' },
   { title: '발주관리', url: '/dashboard/purchases' },
   { title: '고객센터', url: '/dashboard/customers' },
@@ -37,7 +38,9 @@ export function Sidebar() {
           ))}
         </SidebarMenu>
       </SidebarContent>
-      <SidebarFooter>Footer</SidebarFooter>
+      <SidebarFooter>
+        <ThemeToggleBtn />
+      </SidebarFooter>
     </SidebarRoot>
   );
 }

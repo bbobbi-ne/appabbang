@@ -1,13 +1,13 @@
 import type { QueryFunctionContext } from '@tanstack/react-query';
-import { baseInstance, requireAccessTokenInstance } from './instance';
-import type { ApiResponse } from './common';
+import { requireAccessTokenInstance } from '@/service/instance';
+import type { ApiResponse } from '@/service/common-api';
 import { toast } from 'sonner';
 export interface Breads {
   name: string;
   description: string;
   unitPrice: number;
   breadStatus: string;
-  image: string[];
+  images: string[];
 }
 
 export interface BreadImages {
@@ -44,19 +44,11 @@ export interface BreadUpadteStatusData {
   breadStatus: string;
 }
 
-export interface BreadStatusItem {
-  name: string;
-  code: string;
-}
-
-export type BreadStatusResponse = BreadStatusItem[];
-
 // ✅ 빵 정보 조회
 export async function getBreads(): Promise<ApiResponse<Breads[]>> {
   try {
     const response = await requireAccessTokenInstance.get('/breads');
     // toast.success('빵 정보를 조회에 성공했습니다.');
-    console.log(response, '빵 목록정보');
 
     return {
       data: response.data,
@@ -78,7 +70,6 @@ export async function getBread({
 
   try {
     const response = await requireAccessTokenInstance.get(`/breads/${params.no}`);
-    console.log(response, '빵 단일정보');
     // toast.success('빵 정보를 조회에 성공했습니다.');
     return {
       data: response.data,
@@ -119,8 +110,9 @@ export async function createBread(Bread: BreadFormData): Promise<ApiResponse<{}>
       data: response.data,
     };
   } catch (error: any) {
-    console.log(error);
-    const message = error.response?.data?.message || '빵 목록 추가를 실패했습니다.';
+    console.log(error, '에러발생');
+    const message =
+      error?.response?.data?.message ?? error?.message ?? '빵 목록 추가를 실패했습니다.';
     toast.error('빵 목록 추가를 실패했습니다.', {
       description: message,
     });
@@ -162,7 +154,6 @@ export async function updateBread(Bread: BreadUpdateFormData): Promise<ApiRespon
       formData.append('image', file);
     }
   });
-  console.log(Array.from(formData));
 
   try {
     const response = await requireAccessTokenInstance.put(`/breads/${Bread.no}`, formData, {
@@ -176,7 +167,10 @@ export async function updateBread(Bread: BreadUpdateFormData): Promise<ApiRespon
       data: response.data,
     };
   } catch (error: any) {
-    const message = error.response?.data?.message || '빵 목록 업데이트를 실패했습니다.';
+    console.log(error, '에러발생');
+    const message =
+      error?.response?.data?.message ?? error?.message ?? '빵 목록 업데이트를 실패했습니다.';
+
     toast.error('빵 목록 업데이트를 실패했습니다.', {
       description: message,
     });
@@ -189,14 +183,19 @@ export async function updateBreadStatus({
   no,
 }: BreadUpadteStatusData): Promise<ApiResponse<{}>> {
   try {
-    const response = await requireAccessTokenInstance.put(`/breads/${no}/status`, { breadStatus });
+    const response = await requireAccessTokenInstance.put(`/breads/${no}/status`, {
+      breadStatus,
+    });
     toast.success('빵 상태가 업데이트 되었습니다.');
 
     return {
       data: response.data,
     };
   } catch (error: any) {
-    const message = error.response?.data?.message || '빵 상태 업데이트를 실패했습니다.';
+    console.log(error, '에러발생');
+
+    const message =
+      error?.response?.data?.message ?? error?.message ?? '빵 상태 업데이트를 실패했습니다.';
     toast.error('빵 상태 업데이트를 실패했습니다.', {
       description: message,
     });
@@ -224,21 +223,6 @@ export async function deleteBreadImg({
   } catch (error: any) {
     const message = error.response?.data?.message || '빵 이미지삭제를 실패했습니다.';
     toast.error('빵 이미지삭제를 실패했습니다.', {
-      description: message,
-    });
-    throw new Error(message);
-  }
-}
-
-export async function getBreadStatus(): Promise<ApiResponse<BreadStatusResponse>> {
-  try {
-    const response = await baseInstance.get('/common-code/bread_status');
-    return {
-      data: response.data,
-    };
-  } catch (error: any) {
-    const message = error.response?.data?.message || '빵 상태를 불러오는데 실패했습니다.';
-    toast.error('빵 상태를 불러오는데 실패했습니다.', {
       description: message,
     });
     throw new Error(message);

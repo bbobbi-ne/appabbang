@@ -2,7 +2,7 @@ import { Toaster as Sonner } from 'sonner';
 import type { ToasterProps } from 'sonner';
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const theme = 'light';
+  const theme = props.theme;
 
   return (
     <Sonner

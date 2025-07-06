@@ -11,16 +11,20 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as DashboardLayoutImport } from './routes/_dashboardLayout'
+import { Route as DashboardImport } from './routes/dashboard'
 import { Route as IndexImport } from './routes/index'
-import { Route as DemoTanstackQueryImport } from './routes/demo.tanstack-query'
-import { Route as DemoTableImport } from './routes/demo.table'
-import { Route as DashboardLayoutDashboardIndexImport } from './routes/_dashboardLayout/dashboard/index'
+import { Route as DashboardIndexImport } from './routes/dashboard/index'
+import { Route as DashboardPurchasesIndexImport } from './routes/dashboard/purchases/index'
+import { Route as DashboardOrdersIndexImport } from './routes/dashboard/orders/index'
+import { Route as DashboardMaterialsIndexImport } from './routes/dashboard/materials/index'
+import { Route as DashboardCustomersIndexImport } from './routes/dashboard/customers/index'
+import { Route as DashboardBreadsIndexImport } from './routes/dashboard/breads/index'
 
 // Create/Update Routes
 
-const DashboardLayoutRoute = DashboardLayoutImport.update({
-  id: '/_dashboardLayout',
+const DashboardRoute = DashboardImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -30,24 +34,41 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const DemoTanstackQueryRoute = DemoTanstackQueryImport.update({
-  id: '/demo/tanstack-query',
-  path: '/demo/tanstack-query',
-  getParentRoute: () => rootRoute,
+const DashboardIndexRoute = DashboardIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
 } as any)
 
-const DemoTableRoute = DemoTableImport.update({
-  id: '/demo/table',
-  path: '/demo/table',
-  getParentRoute: () => rootRoute,
+const DashboardPurchasesIndexRoute = DashboardPurchasesIndexImport.update({
+  id: '/purchases/',
+  path: '/purchases/',
+  getParentRoute: () => DashboardRoute,
 } as any)
 
-const DashboardLayoutDashboardIndexRoute =
-  DashboardLayoutDashboardIndexImport.update({
-    id: '/dashboard/',
-    path: '/dashboard/',
-    getParentRoute: () => DashboardLayoutRoute,
-  } as any)
+const DashboardOrdersIndexRoute = DashboardOrdersIndexImport.update({
+  id: '/orders/',
+  path: '/orders/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+
+const DashboardMaterialsIndexRoute = DashboardMaterialsIndexImport.update({
+  id: '/materials/',
+  path: '/materials/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+
+const DashboardCustomersIndexRoute = DashboardCustomersIndexImport.update({
+  id: '/customers/',
+  path: '/customers/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+
+const DashboardBreadsIndexRoute = DashboardBreadsIndexImport.update({
+  id: '/breads/',
+  path: '/breads/',
+  getParentRoute: () => DashboardRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -60,103 +81,156 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/_dashboardLayout': {
-      id: '/_dashboardLayout'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof DashboardLayoutImport
-      parentRoute: typeof rootRoute
-    }
-    '/demo/table': {
-      id: '/demo/table'
-      path: '/demo/table'
-      fullPath: '/demo/table'
-      preLoaderRoute: typeof DemoTableImport
-      parentRoute: typeof rootRoute
-    }
-    '/demo/tanstack-query': {
-      id: '/demo/tanstack-query'
-      path: '/demo/tanstack-query'
-      fullPath: '/demo/tanstack-query'
-      preLoaderRoute: typeof DemoTanstackQueryImport
-      parentRoute: typeof rootRoute
-    }
-    '/_dashboardLayout/dashboard/': {
-      id: '/_dashboardLayout/dashboard/'
+    '/dashboard': {
+      id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardLayoutDashboardIndexImport
-      parentRoute: typeof DashboardLayoutImport
+      preLoaderRoute: typeof DashboardImport
+      parentRoute: typeof rootRoute
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexImport
+      parentRoute: typeof DashboardImport
+    }
+    '/dashboard/breads/': {
+      id: '/dashboard/breads/'
+      path: '/breads'
+      fullPath: '/dashboard/breads'
+      preLoaderRoute: typeof DashboardBreadsIndexImport
+      parentRoute: typeof DashboardImport
+    }
+    '/dashboard/customers/': {
+      id: '/dashboard/customers/'
+      path: '/customers'
+      fullPath: '/dashboard/customers'
+      preLoaderRoute: typeof DashboardCustomersIndexImport
+      parentRoute: typeof DashboardImport
+    }
+    '/dashboard/materials/': {
+      id: '/dashboard/materials/'
+      path: '/materials'
+      fullPath: '/dashboard/materials'
+      preLoaderRoute: typeof DashboardMaterialsIndexImport
+      parentRoute: typeof DashboardImport
+    }
+    '/dashboard/orders/': {
+      id: '/dashboard/orders/'
+      path: '/orders'
+      fullPath: '/dashboard/orders'
+      preLoaderRoute: typeof DashboardOrdersIndexImport
+      parentRoute: typeof DashboardImport
+    }
+    '/dashboard/purchases/': {
+      id: '/dashboard/purchases/'
+      path: '/purchases'
+      fullPath: '/dashboard/purchases'
+      preLoaderRoute: typeof DashboardPurchasesIndexImport
+      parentRoute: typeof DashboardImport
     }
   }
 }
 
 // Create and export the route tree
 
-interface DashboardLayoutRouteChildren {
-  DashboardLayoutDashboardIndexRoute: typeof DashboardLayoutDashboardIndexRoute
+interface DashboardRouteChildren {
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardBreadsIndexRoute: typeof DashboardBreadsIndexRoute
+  DashboardCustomersIndexRoute: typeof DashboardCustomersIndexRoute
+  DashboardMaterialsIndexRoute: typeof DashboardMaterialsIndexRoute
+  DashboardOrdersIndexRoute: typeof DashboardOrdersIndexRoute
+  DashboardPurchasesIndexRoute: typeof DashboardPurchasesIndexRoute
 }
 
-const DashboardLayoutRouteChildren: DashboardLayoutRouteChildren = {
-  DashboardLayoutDashboardIndexRoute: DashboardLayoutDashboardIndexRoute,
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardIndexRoute: DashboardIndexRoute,
+  DashboardBreadsIndexRoute: DashboardBreadsIndexRoute,
+  DashboardCustomersIndexRoute: DashboardCustomersIndexRoute,
+  DashboardMaterialsIndexRoute: DashboardMaterialsIndexRoute,
+  DashboardOrdersIndexRoute: DashboardOrdersIndexRoute,
+  DashboardPurchasesIndexRoute: DashboardPurchasesIndexRoute,
 }
 
-const DashboardLayoutRouteWithChildren = DashboardLayoutRoute._addFileChildren(
-  DashboardLayoutRouteChildren,
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
 )
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '': typeof DashboardLayoutRouteWithChildren
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/dashboard': typeof DashboardLayoutDashboardIndexRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/breads': typeof DashboardBreadsIndexRoute
+  '/dashboard/customers': typeof DashboardCustomersIndexRoute
+  '/dashboard/materials': typeof DashboardMaterialsIndexRoute
+  '/dashboard/orders': typeof DashboardOrdersIndexRoute
+  '/dashboard/purchases': typeof DashboardPurchasesIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '': typeof DashboardLayoutRouteWithChildren
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/dashboard': typeof DashboardLayoutDashboardIndexRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/dashboard/breads': typeof DashboardBreadsIndexRoute
+  '/dashboard/customers': typeof DashboardCustomersIndexRoute
+  '/dashboard/materials': typeof DashboardMaterialsIndexRoute
+  '/dashboard/orders': typeof DashboardOrdersIndexRoute
+  '/dashboard/purchases': typeof DashboardPurchasesIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/_dashboardLayout': typeof DashboardLayoutRouteWithChildren
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/_dashboardLayout/dashboard/': typeof DashboardLayoutDashboardIndexRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/breads/': typeof DashboardBreadsIndexRoute
+  '/dashboard/customers/': typeof DashboardCustomersIndexRoute
+  '/dashboard/materials/': typeof DashboardMaterialsIndexRoute
+  '/dashboard/orders/': typeof DashboardOrdersIndexRoute
+  '/dashboard/purchases/': typeof DashboardPurchasesIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '' | '/demo/table' | '/demo/tanstack-query' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/dashboard/'
+    | '/dashboard/breads'
+    | '/dashboard/customers'
+    | '/dashboard/materials'
+    | '/dashboard/orders'
+    | '/dashboard/purchases'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/demo/table' | '/demo/tanstack-query' | '/dashboard'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/dashboard/breads'
+    | '/dashboard/customers'
+    | '/dashboard/materials'
+    | '/dashboard/orders'
+    | '/dashboard/purchases'
   id:
     | '__root__'
     | '/'
-    | '/_dashboardLayout'
-    | '/demo/table'
-    | '/demo/tanstack-query'
-    | '/_dashboardLayout/dashboard/'
+    | '/dashboard'
+    | '/dashboard/'
+    | '/dashboard/breads/'
+    | '/dashboard/customers/'
+    | '/dashboard/materials/'
+    | '/dashboard/orders/'
+    | '/dashboard/purchases/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DashboardLayoutRoute: typeof DashboardLayoutRouteWithChildren
-  DemoTableRoute: typeof DemoTableRoute
-  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DashboardLayoutRoute: DashboardLayoutRouteWithChildren,
-  DemoTableRoute: DemoTableRoute,
-  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  DashboardRoute: DashboardRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -170,29 +244,46 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/_dashboardLayout",
-        "/demo/table",
-        "/demo/tanstack-query"
+        "/dashboard"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/_dashboardLayout": {
-      "filePath": "_dashboardLayout.tsx",
+    "/dashboard": {
+      "filePath": "dashboard.tsx",
       "children": [
-        "/_dashboardLayout/dashboard/"
+        "/dashboard/",
+        "/dashboard/breads/",
+        "/dashboard/customers/",
+        "/dashboard/materials/",
+        "/dashboard/orders/",
+        "/dashboard/purchases/"
       ]
     },
-    "/demo/table": {
-      "filePath": "demo.table.tsx"
+    "/dashboard/": {
+      "filePath": "dashboard/index.tsx",
+      "parent": "/dashboard"
     },
-    "/demo/tanstack-query": {
-      "filePath": "demo.tanstack-query.tsx"
+    "/dashboard/breads/": {
+      "filePath": "dashboard/breads/index.tsx",
+      "parent": "/dashboard"
     },
-    "/_dashboardLayout/dashboard/": {
-      "filePath": "_dashboardLayout/dashboard/index.tsx",
-      "parent": "/_dashboardLayout"
+    "/dashboard/customers/": {
+      "filePath": "dashboard/customers/index.tsx",
+      "parent": "/dashboard"
+    },
+    "/dashboard/materials/": {
+      "filePath": "dashboard/materials/index.tsx",
+      "parent": "/dashboard"
+    },
+    "/dashboard/orders/": {
+      "filePath": "dashboard/orders/index.tsx",
+      "parent": "/dashboard"
+    },
+    "/dashboard/purchases/": {
+      "filePath": "dashboard/purchases/index.tsx",
+      "parent": "/dashboard"
     }
   }
 }
