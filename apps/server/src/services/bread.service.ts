@@ -3,6 +3,7 @@ import { commonCodeMap } from './common-code.service';
 import { Bread, Image } from '@prisma/client';
 import * as ImageService from './image.service';
 import { UploadedFile } from 'express-fileupload';
+import { AppError } from '@/types';
 
 const IMAGE_TARGET_TYPE = '10'; // 빵 이미지 코드
 
@@ -33,7 +34,7 @@ export const getAll = async () => {
     const data = breads.map((bread: any) => ({
       ...bread,
       breadStatusName: getBreadStatusName(bread.breadStatus),
-      images: [{ url: imageMap.get(bread.no) }],
+      images: [...(imageMap.get(bread.no) ? [{ url: imageMap.get(bread.no) }] : [])],
     }));
 
     return data;
@@ -99,7 +100,9 @@ export const getByNo = async (no: number) => {
       where: { no },
     });
 
-    if (!bread) throw new Error('빵을 찾을 수 없습니다.');
+    if (!bread) {
+      throw AppError.notFound('빵을 찾을 수 없습니다.', { breadNo: no });
+    }
 
     const images = await tx.image.findMany({
       where: { imageTargetType: IMAGE_TARGET_TYPE, imageTargetNo: no },

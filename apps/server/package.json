@@ -8,13 +8,18 @@
     "generate": "prisma generate",
     "migrate": "prisma migrate reset && prisma migrate dev",
     "seed": "ts-node prisma/seed.ts",
-    "prisma:all": "pnpm run generate && pnpm run migrate && pnpm run seed"
+    "prisma:all": "pnpm run generate && pnpm run migrate && pnpm run seed",
+    "swagger": "ts-node src/swagger/swagger.ts"
   },
   "dependencies": {
-    "@appabbang/typescript": "workspace:*"
+    "@appabbang/typescript": "workspace:*",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@prisma/client": "*",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "cloudinary": "*",
     "express-validator": "*",
     "prisma": "*"
