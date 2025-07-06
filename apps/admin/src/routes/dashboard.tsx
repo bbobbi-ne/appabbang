@@ -15,7 +15,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { AlertDialog } from '@appabbang/ui';
 import { Sidebar } from '@/components/sidebar';
 
-export const Route = createFileRoute('/_dashboardLayout')({
+export const Route = createFileRoute('/dashboard')({
   component: DashboardLayout,
 });
 
