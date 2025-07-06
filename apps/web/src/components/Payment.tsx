@@ -21,28 +21,30 @@ function Payment({ bread, onClick }: PaymentProp) {
   /** React Hooks  */
   useEffect(() => {
     setCount(1);
+    setAmount(bread.unitPrice);
   }, []);
 
   /** Functions */
   /** 결제목록 컴포넌트의 수량을 변경하고 form(부모) 컴포넌트로 빵 정보와 수량, 총 금액 전달 */
   const countHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
     const btnVal = e.currentTarget.value;
+    let newCount = 0;
+    let newAmount = 0;
     // +, - 버튼 클릭 시 수량 증가, 감소 처리. 이 때, 최소한 1개 미만으로 내려가지 않도록 할 것.
     setCount((prev) => {
-      let newCount = btnVal.includes('plus') ? prev + 1 : prev > 1 ? prev - 1 : 1;
-      let newAmount = bread.unitPrice * newCount;
+      newCount = btnVal.includes('plus') ? prev + 1 : prev > 1 ? prev - 1 : 1;
+      newAmount = bread.unitPrice * newCount;
       onClick(bread, newCount, newAmount); // 빵 정보, 수량, 금액
       return newCount;
     });
 
     setAmount((_) => {
-      let newAmount = bread.unitPrice * count;
       return newAmount;
     });
   };
 
   return (
-    <Card className="flex flex-row items-start">
+    <Card className="flex flex-row items-start m-4">
       <CardTitle className="mt-auto mb-auto ml-8 h-auto w-1/3 text-[18px] ">{bread.name}</CardTitle>
 
       <div className="flex flex-row items-start *:mt-5 *:mb-5">

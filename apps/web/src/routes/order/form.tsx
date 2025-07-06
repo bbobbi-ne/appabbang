@@ -59,8 +59,6 @@ function RouteComponent() {
 
     // 빈 값으로 검색할 경우 모든 리스트 보여주기
     if (keyword.length === 0) {
-      console.log(keyword);
-      console.log(originBreadList);
       setBreadList(originBreadList);
       return false;
     }
@@ -86,7 +84,16 @@ function RouteComponent() {
 
   /** 빵 카드 click시 하단 결제목록 컴포넌트에 추가될 빵 list를 삽입함. */
   const handleBreadClick = (bread: BreadProps) => {
-    setPaymentList((prev) => [...prev, bread]);
+    if (paymentList.length === 0) {
+      // 1건도 결제목록이 존재하지 않으면 삽입하고 종료
+      setPaymentList((prev) => [...prev, bread]);
+      return false;
+    }
+
+    // list에 동일한 빵이 있다면 추가하지 않는다.
+    paymentList.map((payment, _) => {
+      payment.no === bread.no ? null : setPaymentList((prev) => [...prev, bread]);
+    });
   };
 
   /** 결제목록 컴포넌트의 +, - 버튼을 클릭하면 수량의 개수가 다르게 표현되도록 설정. */
