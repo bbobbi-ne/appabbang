@@ -1,5 +1,4 @@
-import type { ApiResponse } from '@/service/common';
-import { getMaterialType, type MaterialTypeResponse } from '@/service/material-api';
+import { getMaterialType, type ApiResponse, type MaterialTypeResponse } from '@/service/common-api';
 import { useQueries } from '@tanstack/react-query';
 
 export function useMaterialAndTypeQuery() {

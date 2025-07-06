@@ -1,10 +1,10 @@
-import type { ApiResponse } from '@/service/common';
 import {
   getOrderdDliveryType,
   getOrderStatus,
+  type ApiResponse,
   type OrderDliveryTypeResponse,
   type OrderStatusResponse,
-} from '@/service/order-api';
+} from '@/service/common-api';
 import { useQueries } from '@tanstack/react-query';
 
 export function useOrderAndStatusAndDliveryTypeQuery() {

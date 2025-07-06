@@ -1,6 +1,6 @@
 import { useAuthStore } from '@/stores/authStore';
 import axios from 'axios';
-import { refresh } from './auth-api';
+import { refresh } from '@/service/auth-api';
 
 const API_BASE_URL = `${import.meta.env.VITE_APPABBANG_API_URL}`;
 

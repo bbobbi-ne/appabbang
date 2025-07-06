@@ -1,6 +1,6 @@
 import type { QueryFunctionContext } from '@tanstack/react-query';
-import { baseInstance, requireAccessTokenInstance } from './instance';
-import type { ApiResponse } from './common';
+import { requireAccessTokenInstance } from '@/service/instance';
+import type { ApiResponse } from '@/service/common-api';
 import { toast } from 'sonner';
 export interface Breads {
   name: string;
@@ -43,13 +43,6 @@ export interface BreadUpadteStatusData {
   no: number;
   breadStatus: string;
 }
-
-export interface BreadStatusItem {
-  name: string;
-  code: string;
-}
-
-export type BreadStatusResponse = BreadStatusItem[];
 
 // ✅ 빵 정보 조회
 export async function getBreads(): Promise<ApiResponse<Breads[]>> {
@@ -230,21 +223,6 @@ export async function deleteBreadImg({
   } catch (error: any) {
     const message = error.response?.data?.message || '빵 이미지삭제를 실패했습니다.';
     toast.error('빵 이미지삭제를 실패했습니다.', {
-      description: message,
-    });
-    throw new Error(message);
-  }
-}
-
-export async function getBreadStatus(): Promise<ApiResponse<BreadStatusResponse>> {
-  try {
-    const response = await baseInstance.get('/common-code/bread_status');
-    return {
-      data: response.data,
-    };
-  } catch (error: any) {
-    const message = error.response?.data?.message || '빵 상태를 불러오는데 실패했습니다.';
-    toast.error('빵 상태를 불러오는데 실패했습니다.', {
       description: message,
     });
     throw new Error(message);
