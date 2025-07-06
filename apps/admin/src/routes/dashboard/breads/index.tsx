@@ -36,7 +36,7 @@ import {
 } from '@appabbang/ui';
 
 import { TablePagination } from '@/components/table-pagination';
-import { BreadsCreateDialog } from '@/components/breads-create-dialog';
+import { BreadCreateDialog } from '@/components/bread-create-dialog';
 import { useDeleteBreadMutation, useGetBreadsAndStatusQuery } from '@/hooks/use-breads';
 import { BreadModifyDialog } from '@/components/bread-modify-dialog';
 import { BreadsColumns } from '@/data/columns';
@@ -81,7 +81,7 @@ function RouteComponent() {
       <Card className="shadow-none bg-background border-none">
         <CardHeader>
           <CardTitle>빵관리</CardTitle>
-          <BreadsCreateDialog />
+          <BreadCreateDialog />
         </CardHeader>
         <CardContent className="max-h-[550px] border-1 p-0 m-6 mt-0 rounded-lg overflow-auto relative">
           <Table className="table-fixed">

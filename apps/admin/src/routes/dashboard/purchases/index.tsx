@@ -1,20 +1,17 @@
-import { MaterialCreateDialog } from '@/components/material-create-dialog';
 import { TablePagination } from '@/components/table-pagination';
-import TableSkeleton from '@/components/table-skeletion';
-import { muterialColumns, type MaterialColumns } from '@/data/columns';
-import { useMaterialAndTypeQuery } from '@/hooks/use-material';
+import { purchaseColumns, type PurchaseColumns } from '@/data/columns';
 import {
   Card,
   CardContent,
-  CardHeader,
   CardFooter,
+  CardHeader,
+  CardTitle,
   Table,
-  TableHeader,
-  TableRow,
-  TableHead,
   TableBody,
   TableCell,
-  CardTitle,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@appabbang/ui';
 import { createFileRoute } from '@tanstack/react-router';
 import {
@@ -29,7 +26,7 @@ import {
 } from '@tanstack/react-table';
 import React from 'react';
 
-export const Route = createFileRoute('/dashboard/material/')({
+export const Route = createFileRoute('/dashboard/purchases/')({
   component: RouteComponent,
 });
 
@@ -37,10 +34,9 @@ function RouteComponent() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
-  const columns = muterialColumns();
-  const { materials, error, isError, isLoading } = useMaterialAndTypeQuery();
+  const columns = purchaseColumns();
 
-  const table = useReactTable<MaterialColumns>({
+  const table = useReactTable<PurchaseColumns>({
     data: [],
     columns,
     state: {
@@ -57,15 +53,11 @@ function RouteComponent() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  if (isLoading) return <TableSkeleton />;
-  if (isError) return <>에러임</>;
-
   return (
     <>
       <Card className="shadow-none bg-background border-none">
         <CardHeader>
-          <CardTitle>재료관리</CardTitle>
-          <MaterialCreateDialog />
+          <CardTitle>발주관리</CardTitle>
         </CardHeader>
         <CardContent className="max-h-[550px] border-1 p-0 m-6 mt-0 rounded-lg overflow-auto relative">
           <Table className="table-fixed">
@@ -84,7 +76,7 @@ function RouteComponent() {
               {table.getRowModel().rows.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="p-4 text-center">
-                    재료를 등록해주세요
+                    목록이 없습니다.
                   </TableCell>
                 </TableRow>
               )}

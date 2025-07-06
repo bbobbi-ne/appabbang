@@ -14,9 +14,9 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as DashboardImport } from './routes/dashboard'
 import { Route as IndexImport } from './routes/index'
 import { Route as DashboardIndexImport } from './routes/dashboard/index'
-import { Route as DashboardPurchaseIndexImport } from './routes/dashboard/purchase/index'
+import { Route as DashboardPurchasesIndexImport } from './routes/dashboard/purchases/index'
 import { Route as DashboardOrdersIndexImport } from './routes/dashboard/orders/index'
-import { Route as DashboardMaterialIndexImport } from './routes/dashboard/material/index'
+import { Route as DashboardMaterialsIndexImport } from './routes/dashboard/materials/index'
 import { Route as DashboardCustomersIndexImport } from './routes/dashboard/customers/index'
 import { Route as DashboardBreadsIndexImport } from './routes/dashboard/breads/index'
 
@@ -40,9 +40,9 @@ const DashboardIndexRoute = DashboardIndexImport.update({
   getParentRoute: () => DashboardRoute,
 } as any)
 
-const DashboardPurchaseIndexRoute = DashboardPurchaseIndexImport.update({
-  id: '/purchase/',
-  path: '/purchase/',
+const DashboardPurchasesIndexRoute = DashboardPurchasesIndexImport.update({
+  id: '/purchases/',
+  path: '/purchases/',
   getParentRoute: () => DashboardRoute,
 } as any)
 
@@ -52,9 +52,9 @@ const DashboardOrdersIndexRoute = DashboardOrdersIndexImport.update({
   getParentRoute: () => DashboardRoute,
 } as any)
 
-const DashboardMaterialIndexRoute = DashboardMaterialIndexImport.update({
-  id: '/material/',
-  path: '/material/',
+const DashboardMaterialsIndexRoute = DashboardMaterialsIndexImport.update({
+  id: '/materials/',
+  path: '/materials/',
   getParentRoute: () => DashboardRoute,
 } as any)
 
@@ -109,11 +109,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardCustomersIndexImport
       parentRoute: typeof DashboardImport
     }
-    '/dashboard/material/': {
-      id: '/dashboard/material/'
-      path: '/material'
-      fullPath: '/dashboard/material'
-      preLoaderRoute: typeof DashboardMaterialIndexImport
+    '/dashboard/materials/': {
+      id: '/dashboard/materials/'
+      path: '/materials'
+      fullPath: '/dashboard/materials'
+      preLoaderRoute: typeof DashboardMaterialsIndexImport
       parentRoute: typeof DashboardImport
     }
     '/dashboard/orders/': {
@@ -123,11 +123,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardOrdersIndexImport
       parentRoute: typeof DashboardImport
     }
-    '/dashboard/purchase/': {
-      id: '/dashboard/purchase/'
-      path: '/purchase'
-      fullPath: '/dashboard/purchase'
-      preLoaderRoute: typeof DashboardPurchaseIndexImport
+    '/dashboard/purchases/': {
+      id: '/dashboard/purchases/'
+      path: '/purchases'
+      fullPath: '/dashboard/purchases'
+      preLoaderRoute: typeof DashboardPurchasesIndexImport
       parentRoute: typeof DashboardImport
     }
   }
@@ -139,18 +139,18 @@ interface DashboardRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardBreadsIndexRoute: typeof DashboardBreadsIndexRoute
   DashboardCustomersIndexRoute: typeof DashboardCustomersIndexRoute
-  DashboardMaterialIndexRoute: typeof DashboardMaterialIndexRoute
+  DashboardMaterialsIndexRoute: typeof DashboardMaterialsIndexRoute
   DashboardOrdersIndexRoute: typeof DashboardOrdersIndexRoute
-  DashboardPurchaseIndexRoute: typeof DashboardPurchaseIndexRoute
+  DashboardPurchasesIndexRoute: typeof DashboardPurchasesIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardBreadsIndexRoute: DashboardBreadsIndexRoute,
   DashboardCustomersIndexRoute: DashboardCustomersIndexRoute,
-  DashboardMaterialIndexRoute: DashboardMaterialIndexRoute,
+  DashboardMaterialsIndexRoute: DashboardMaterialsIndexRoute,
   DashboardOrdersIndexRoute: DashboardOrdersIndexRoute,
-  DashboardPurchaseIndexRoute: DashboardPurchaseIndexRoute,
+  DashboardPurchasesIndexRoute: DashboardPurchasesIndexRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
@@ -163,9 +163,9 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/breads': typeof DashboardBreadsIndexRoute
   '/dashboard/customers': typeof DashboardCustomersIndexRoute
-  '/dashboard/material': typeof DashboardMaterialIndexRoute
+  '/dashboard/materials': typeof DashboardMaterialsIndexRoute
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
-  '/dashboard/purchase': typeof DashboardPurchaseIndexRoute
+  '/dashboard/purchases': typeof DashboardPurchasesIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -173,9 +173,9 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardIndexRoute
   '/dashboard/breads': typeof DashboardBreadsIndexRoute
   '/dashboard/customers': typeof DashboardCustomersIndexRoute
-  '/dashboard/material': typeof DashboardMaterialIndexRoute
+  '/dashboard/materials': typeof DashboardMaterialsIndexRoute
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
-  '/dashboard/purchase': typeof DashboardPurchaseIndexRoute
+  '/dashboard/purchases': typeof DashboardPurchasesIndexRoute
 }
 
 export interface FileRoutesById {
@@ -185,9 +185,9 @@ export interface FileRoutesById {
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/breads/': typeof DashboardBreadsIndexRoute
   '/dashboard/customers/': typeof DashboardCustomersIndexRoute
-  '/dashboard/material/': typeof DashboardMaterialIndexRoute
+  '/dashboard/materials/': typeof DashboardMaterialsIndexRoute
   '/dashboard/orders/': typeof DashboardOrdersIndexRoute
-  '/dashboard/purchase/': typeof DashboardPurchaseIndexRoute
+  '/dashboard/purchases/': typeof DashboardPurchasesIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -198,18 +198,18 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/dashboard/breads'
     | '/dashboard/customers'
-    | '/dashboard/material'
+    | '/dashboard/materials'
     | '/dashboard/orders'
-    | '/dashboard/purchase'
+    | '/dashboard/purchases'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard'
     | '/dashboard/breads'
     | '/dashboard/customers'
-    | '/dashboard/material'
+    | '/dashboard/materials'
     | '/dashboard/orders'
-    | '/dashboard/purchase'
+    | '/dashboard/purchases'
   id:
     | '__root__'
     | '/'
@@ -217,9 +217,9 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/dashboard/breads/'
     | '/dashboard/customers/'
-    | '/dashboard/material/'
+    | '/dashboard/materials/'
     | '/dashboard/orders/'
-    | '/dashboard/purchase/'
+    | '/dashboard/purchases/'
   fileRoutesById: FileRoutesById
 }
 
@@ -256,9 +256,9 @@ export const routeTree = rootRoute
         "/dashboard/",
         "/dashboard/breads/",
         "/dashboard/customers/",
-        "/dashboard/material/",
+        "/dashboard/materials/",
         "/dashboard/orders/",
-        "/dashboard/purchase/"
+        "/dashboard/purchases/"
       ]
     },
     "/dashboard/": {
@@ -273,16 +273,16 @@ export const routeTree = rootRoute
       "filePath": "dashboard/customers/index.tsx",
       "parent": "/dashboard"
     },
-    "/dashboard/material/": {
-      "filePath": "dashboard/material/index.tsx",
+    "/dashboard/materials/": {
+      "filePath": "dashboard/materials/index.tsx",
       "parent": "/dashboard"
     },
     "/dashboard/orders/": {
       "filePath": "dashboard/orders/index.tsx",
       "parent": "/dashboard"
     },
-    "/dashboard/purchase/": {
-      "filePath": "dashboard/purchase/index.tsx",
+    "/dashboard/purchases/": {
+      "filePath": "dashboard/purchases/index.tsx",
       "parent": "/dashboard"
     }
   }

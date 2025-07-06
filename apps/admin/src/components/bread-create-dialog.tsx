@@ -11,7 +11,7 @@ import {
 import { useCreateBreadMutation } from '@/hooks/use-breads';
 import BreadForm from './bread-form';
 
-export function BreadsCreateDialog() {
+export function BreadCreateDialog() {
   const { CreateBreadMutation } = useCreateBreadMutation();
 
   return (
