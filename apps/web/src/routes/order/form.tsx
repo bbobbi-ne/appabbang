@@ -6,11 +6,11 @@
 import { createFileRoute } from '@tanstack/react-router';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent } from '@appabbang/ui';
-import RequiredBar from '../../components/RequiredBar';
-import BreadCard from '../../components/BreadCard';
-import { client } from '../../services/apis';
-import type { BreadProps } from '../../interface/BreadInterface';
-import OrderFormSkeleton from '../../components/OrderFormSkeleton';
+import RequiredBar from '@/components/RequiredBar';
+import BreadCard from '@/components/BreadCard';
+import { client } from '@/services/apis';
+import type { BreadProps } from '@/interface/BreadInterface';
+import OrderFormSkeleton from '@/components/OrderFormSkeleton';
 import BreadSearch from '@/components/BreadSearch';
 import CardMent from '@/components/CardComment';
 import Payment from '@/components/Payment';

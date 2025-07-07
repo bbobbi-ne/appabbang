@@ -3,7 +3,7 @@
  */
 import { Button, Card, CardContent, CardTitle, Input } from '@appabbang/ui';
 import { useEffect, useState } from 'react';
-import type { PaymentProp } from '../interface/BreadInterface';
+import type { PaymentProp } from '@/interface/BreadInterface';
 
 /** plus, minus 버튼 CSS */
 const countBtnCss = `
