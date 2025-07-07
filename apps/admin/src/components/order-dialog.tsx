@@ -16,7 +16,6 @@ import {
   FormLabel,
   FormMessage,
   Input,
-  Label,
   Table,
   TableBody,
   TableCell,
@@ -28,6 +27,7 @@ import type { ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import AdressButton from './address-button';
 export const orderScheme = z.object({
   name: z.string().trim().min(1, '주문인의 이름을 입력해주세요'),
   recipient_name: z.string().trim().min(1, '수령인을 입력해주세요'),
@@ -44,6 +44,10 @@ export type OrderDialogScheme = z.infer<typeof orderScheme>;
 export function OrderDialog({ children }: { children: ReactNode }) {
   const form = useForm<OrderDialogScheme>();
 
+  const setFullAddress = (value: string) => {
+    form.setValue('address', value);
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -54,13 +58,11 @@ export function OrderDialog({ children }: { children: ReactNode }) {
         className="sm:max-w-xl overflow-y-auto max-h-11/12"
       >
         <DialogHeader>
-          <DialogTitle className="flex">
-            <h2 className="font-semibold">주문번호</h2>
-          </DialogTitle>
+          <DialogTitle>주문번호</DialogTitle>
         </DialogHeader>
-        <DialogDescription className="flex space-x-2 text-foreground">
-          <p className="font-semibold">100020000ABCD</p>
-          <p>[제조중]</p>
+        <DialogDescription className="text-foreground">
+          <strong className="font-semibold mr-1.5">100020000ABCD</strong>
+          [제조중]
         </DialogDescription>
         <DialogTitle>주문정보</DialogTitle>
         <Table className="table-fixed">
@@ -121,11 +123,6 @@ export function OrderDialog({ children }: { children: ReactNode }) {
                   <div className="flex-3/4 space-y-1">
                     <FormControl>
                       <Input placeholder="수령인 이름을 입력해주세요" {...field} />
-                      {/* <Textarea
-                        placeholder="설명을 입력해주세요"
-                        className="resize-none w-full break-all"
-                        {...field}
-                      /> */}
                     </FormControl>
                     <FormMessage />
                   </div>
@@ -182,7 +179,7 @@ export function OrderDialog({ children }: { children: ReactNode }) {
                       <FormControl>
                         <div className="flex items-center gap-2">
                           <Input placeholder="배송지 주소를 입력해주세요" {...field} />
-                          <Button variant="outline">주소검색</Button>
+                          <AdressButton setValue={setFullAddress} className="h-10" />
                         </div>
                       </FormControl>
                       <FormMessage />
