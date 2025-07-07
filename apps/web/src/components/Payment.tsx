@@ -17,7 +17,6 @@ const countBtnCss = `
 function Payment({ bread, handlers }: PaymentProp) {
   const [count, setCount] = useState<number>(0); // 수량
   const [amount, setAmount] = useState<number>(0); // 금액
-  const [type, setType] = useState<string>('');
 
   /** React Hooks  */
   useEffect(() => {
@@ -25,10 +24,6 @@ function Payment({ bread, handlers }: PaymentProp) {
 
     setCount(1);
     setAmount(price);
-    setType('minus');
-
-    // 초기값을 부모 컴포넌트로 전달
-    // handlers.onCountChange(bread, 1, price, '');
   }, []);
 
   /** Functions */
@@ -45,7 +40,6 @@ function Payment({ bread, handlers }: PaymentProp) {
     // 상태 업데이트
     setCount(newCount);
     setAmount(newAmount);
-    setType(btnVal);
 
     // 부모 컴포넌트로 즉시 전달
     handlers.onCountChange(bread, btnVal);

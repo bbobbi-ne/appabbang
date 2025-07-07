@@ -91,7 +91,7 @@ function RouteComponent() {
     paymentList.map((payment, _) => {
       payment.no === bread.no ? tmpCount++ : null;
     });
-    tmpCount === 0 ? setPaymentList((prev) => [...prev, bread]) : null;
+    tmpCount === 0 ? setPaymentList((prev) => [...prev, { ...bread, count: 1 }]) : null;
   };
 
   /** 결제목록 수량, 금액 */
