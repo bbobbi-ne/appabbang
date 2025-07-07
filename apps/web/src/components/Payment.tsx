@@ -28,8 +28,8 @@ function Payment({ bread, handlers }: PaymentProp) {
     setType('minus');
 
     // 초기값을 부모 컴포넌트로 전달
-    handlers.onCountChange(bread, 1, price, '');
-  }, [bread.unitPrice, bread, handlers]);
+    // handlers.onCountChange(bread, 1, price, '');
+  }, []);
 
   /** Functions */
   /** 결제목록 컴포넌트의 수량을 변경하고 form(부모) 컴포넌트로 빵 정보와 수량, 총 금액 전달 */
@@ -39,13 +39,16 @@ function Payment({ bread, handlers }: PaymentProp) {
     const newCount = btnVal.includes('plus') ? count + 1 : count > 1 ? count - 1 : 1;
     const newAmount = bread.unitPrice * newCount;
 
+    bread.count = newCount;
+    bread.price = newAmount;
+
     // 상태 업데이트
     setCount(newCount);
     setAmount(newAmount);
     setType(btnVal);
 
     // 부모 컴포넌트로 즉시 전달
-    handlers.onCountChange(bread, newCount, newAmount, type);
+    handlers.onCountChange(bread, btnVal);
 
     // minus 버튼이고 수량이 1이 될 때 제거
     btnVal.includes('minus') && count === 1 && handlers.onRemove?.(bread);

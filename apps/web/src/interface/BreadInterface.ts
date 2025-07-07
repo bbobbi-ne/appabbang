@@ -10,6 +10,8 @@ export interface BreadProps {
       url: string;
     },
   ];
+  count: number;
+  price: number;
 }
 
 /** 빵 카드 */
@@ -24,7 +26,7 @@ export interface PaymentProp {
   key: number;
   bread: BreadProps;
   handlers: {
-    onCountChange: (bread: BreadProps, count: number, amount: number, type: string) => void;
+    onCountChange: (bread: BreadProps, type: string) => void;
     onRemove?: (bread: BreadProps) => void;
   };
 }
