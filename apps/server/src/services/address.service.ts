@@ -1,48 +1,66 @@
 import { prisma } from '@/lib/prisma';
 import { Address } from '@prisma/client';
 
-/** 주소 목록 조회 */
-export const getAddressList = async () => {
-  const addressList = await prisma.address.findMany({
+/** 목록 조회 */
+export const getListByCustomerNo = async (no: number) => {
+  const list = await prisma.address.findMany({
     orderBy: {
       updatedAt: 'desc',
     },
+    where: {
+      customerNo: no,
+    },
   });
-  return addressList;
+  return list;
 };
 
-/** 주소 조회 */
-export const getAddress = async (no: number) => {
-  const address = await prisma.address.findUnique({
-    where: { no },
+/** 조회 */
+export const getOne = async (no: number) => {
+  const one = await prisma.address.findUnique({
+    where: {
+      no,
+    },
   });
-  return address;
+
+  return one;
 };
 
-/** 주소 생성 */
-export const createAddress = async (address: Omit<Address, 'no' | 'createdAt' | 'updatedAt'>) => {
-  const newAddress = await prisma.address.create({
-    data: address,
+export const getOneByCustomerNo = async (customerNo: number, no: number) => {
+  const one = await prisma.address.findUnique({
+    where: {
+      no,
+      customerNo,
+    },
   });
-  return newAddress;
+
+  return one;
 };
 
-/** 주소 수정 */
-export const updateAddress = async (
+/** 생성 */
+export const create = async (data: Omit<Address, 'no' | 'createdAt' | 'updatedAt'>) => {
+  const created = await prisma.address.create({
+    data,
+  });
+  return created;
+};
+
+/** 수정 */
+export const update = async (
   no: number,
-  address: Omit<Address, 'no' | 'customerNo' | 'createdAt' | 'updatedAt'>,
+  customerNo: number,
+  data: Omit<Address, 'no' | 'customerNo' | 'createdAt' | 'updatedAt'>,
 ) => {
-  const updatedAddress = await prisma.address.update({
-    where: { no },
-    data: address,
+  const updated = await prisma.address.update({
+    where: { no, customerNo },
+    data,
   });
-  return updatedAddress;
+  return updated;
 };
 
-/** 주소 삭제 */
-export const deleteAddress = async (no: number) => {
-  const deletedAddress = await prisma.address.delete({
-    where: { no },
+/** 삭제 */
+export const remove = async (no: number, customerNo: number) => {
+  const removed = await prisma.address.delete({
+    where: { no, customerNo },
   });
-  return deletedAddress;
+  return removed;
 };

@@ -7,56 +7,77 @@ import {
   REFRESH_TOKEN_COOKIE_OPTIONS,
   verifyRefreshToken,
 } from '@/services/auth.service';
-import type { User } from '@prisma/client';
 import * as userService from '@/services/user.service';
+import * as customerService from '@/services/customer.service';
 import { AppError } from '@/types';
+import { ClientPayload, ClientType } from '@/types/client-payload';
 
 /** 로그인 */
-export async function login(req: Request, res: Response) {
-  const { id, pw } = req.body;
+export const login = async (req: Request, res: Response) => {
+  const { id, pw, type } = req.body;
 
-  const user = await userService.getById(id);
+  const client = await getClientForLogin(id, type);
+  const isValid = await comparePassword(pw, client.pw);
 
-  if (!user) {
-    throw AppError.unauthorized('Invalid credentials');
+  if (!isValid) {
+    throw AppError.unauthorized('아이디 또는 비밀번호를 확인해주세요.');
   }
 
-  const valid = await comparePassword(pw, user.pw);
+  const { pw: _, ...payload } = client;
 
-  if (!valid) {
-    throw AppError.unauthorized('Invalid credentials');
-  }
+  const accessToken = generateAccessToken(payload);
+  const refreshToken = generateRefreshToken(payload);
 
-  const { pw: userPw, ...rest } = user;
-
-  const accessToken = generateAccessToken(rest);
-  const refreshToken = generateRefreshToken(rest);
-
-  // Refresh Token을 Secure HttpOnly 쿠키로 설정
   res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
-
-  await userService.updateRefreshToken(user.id, refreshToken);
+  if (type === ClientType.USER) {
+    await userService.updateRefreshToken(client.id, refreshToken);
+  } else if (type === ClientType.CUSTOMER) {
+    // await customerService.updateRefreshToken(client.id, refreshToken);
+  }
 
   res.status(200).json({ accessToken });
+};
+
+// 클라이언트 조회
+async function getClientForLogin(id: string, type: ClientType) {
+  if (type === ClientType.USER) {
+    const user = await userService.getByIdForLogin(id);
+    if (!user) throw AppError.unauthorized('아이디 또는 비밀번호를 확인해주세요.');
+    return {
+      ...user,
+      type,
+      pw: user.pw,
+      userRole: user.userRole as 'admin' | 'subadmin',
+    };
+  }
+
+  if (type === ClientType.CUSTOMER) {
+    const customer = await customerService.getByIdForLogin(id);
+    if (!customer?.pw || !customer.id) {
+      throw AppError.unauthorized('아이디 또는 비밀번호를 확인해주세요.');
+    }
+    return {
+      name: customer.name,
+      id: customer.id,
+      pw: customer.pw,
+      type,
+    };
+  }
+
+  throw AppError.badRequest('잘못된 로그인 유형입니다.');
 }
 
 /** 내 정보 조회 */
-export async function me(_: Request, res: Response) {
-  const { id } = res.locals.user;
-
-  const user = await userService.getById(id);
-
-  if (!user) {
-    throw AppError.notFound('User not found');
+export const me = async (req: Request, res: Response) => {
+  if (!req.user) {
+    throw AppError.unauthorized('User not found');
   }
 
-  const { pw: userPw, no, ...rest } = user;
+  res.status(200).json(req.user);
+};
 
-  res.status(200).json({ ...rest });
-}
-
-/** 리프레시 토큰 재발급 */
-export async function refresh(req: Request, res: Response) {
+/** 리프레시 토큰으로 엑세스 토큰 재발급 */
+export const refresh = async (req: Request, res: Response) => {
   const refreshToken = req.cookies.refreshToken;
 
   if (!refreshToken) {
@@ -65,11 +86,11 @@ export async function refresh(req: Request, res: Response) {
 
   try {
     const payload = verifyRefreshToken(refreshToken);
-    const { iat, exp, ...user } = payload;
+    const { iat, exp, ...client } = payload;
 
-    const newAccessToken = generateAccessToken(user as Omit<User, 'pw'>);
+    const newAccessToken = generateAccessToken(client as ClientPayload);
     res.status(200).json({ accessToken: newAccessToken });
   } catch (err) {
     throw AppError.forbidden('Invalid refresh token');
   }
-}
+};

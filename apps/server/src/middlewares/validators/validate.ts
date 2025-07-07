@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import { validationResult, body, query, param } from 'express-validator';
-import { CodeGroup } from '@/types';
+import { AppError, CodeGroup } from '@/types';
 
 export const validate = (validators: RequestHandler[]): RequestHandler => {
   return (req, res, next) => {
@@ -17,30 +17,39 @@ export const validate = (validators: RequestHandler[]): RequestHandler => {
         return next();
       }
 
-      res.status(400).json({ message: errors.array()[0]?.msg });
+      throw AppError.badRequest(errors.array()[0]?.msg);
     })().catch(next);
   };
 };
 
-export const createCommonCodeValidator = [
-  body('groupName')
-    .isIn(Object.values(CodeGroup))
-    .withMessage(`유효한 그룹명이 아닙니다. (그룹명: ${Object.values(CodeGroup).join(', ')})`),
-  body('name').trim().notEmpty().withMessage('이름은 필수입니다'),
-  body('code').trim().notEmpty().withMessage('코드는 필수입니다'),
-];
-
+//AUTH//////////////////////////////////////////////////////////
 export const loginValidator = [
   body('id').trim().notEmpty().withMessage('id 는 필수입니다'),
   body('pw').trim().notEmpty().withMessage('pw 는 필수입니다'),
+  body('type')
+    .trim()
+    .notEmpty()
+    .withMessage('type 는 필수입니다')
+    .isIn(['user', 'customer'])
+    .withMessage('유효한 타입이 아닙니다.'),
 ];
 
-export const getBreadValidator = [
+//BREAD//////////////////////////////////////////////////////////
+export const getBreadsValidator = [
   query('breadStatus')
     .optional()
     .trim()
     .isIn(['10', '20', '30', '40', '50'])
     .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
+];
+
+export const getBreadValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
 ];
 
 export const createBreadValidator = [
@@ -60,6 +69,12 @@ export const createBreadValidator = [
 ];
 
 export const updateBreadValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
   body('name').trim().notEmpty().withMessage('이름은 필수입니다'),
   body('unitPrice')
     .trim()
@@ -108,6 +123,130 @@ export const deleteImageValidator = [
     .withMessage('publicId는 비어있을 수 없습니다.'),
 ];
 
+//COMMON CODE//////////////////////////////////////////////////////////
+export const getCommonCodeListValidator = [
+  param('groupName')
+    .trim()
+    .isIn(Object.values(CodeGroup))
+    .withMessage(`유효한 그룹명이 아닙니다. (그룹명: ${Object.values(CodeGroup).join(', ')})`),
+];
+
+export const createCommonCodeValidator = [
+  body('groupName')
+    .isIn(Object.values(CodeGroup))
+    .withMessage(`유효한 그룹명이 아닙니다. (그룹명: ${Object.values(CodeGroup).join(', ')})`),
+  body('name').trim().notEmpty().withMessage('이름은 필수입니다'),
+  body('code').trim().notEmpty().withMessage('코드는 필수입니다'),
+];
+
+export const updateCommonCodeValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  body('groupName')
+    .isIn(Object.values(CodeGroup))
+    .withMessage(`유효한 그룹명이 아닙니다. (그룹명: ${Object.values(CodeGroup).join(', ')})`),
+  body('name').trim().notEmpty().withMessage('이름은 필수입니다'),
+  body('code').trim().notEmpty().withMessage('코드는 필수입니다'),
+];
+
+export const deleteCommonCodeValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+];
+
+//CUSTOMER//////////////////////////////////////////////////////////
+
+export const getCustomerAddressesValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+];
+
+export const getCustomerAddressValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  param('addressNo')
+    .exists()
+    .withMessage('addressNo는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('addressNo 를 올바르게 입력해주세요.'),
+];
+
+export const createAddressValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  body('address').trim().notEmpty().withMessage('address는 필수입니다'),
+  body('addressDetail').trim().notEmpty().withMessage('addressDetail는 필수입니다'),
+  body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
+  body('recipientName').trim().notEmpty().withMessage('recipientName은 필수입니다'),
+  body('recipientMobile').trim().notEmpty().withMessage('recipientMobile은 필수입니다'),
+];
+
+export const updateAddressValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  param('addressNo')
+    .exists()
+    .withMessage('addressNo는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('addressNo 를 올바르게 입력해주세요.'),
+  body('address').trim().notEmpty().withMessage('address는 필수입니다'),
+  body('addressDetail').trim().notEmpty().withMessage('addressDetail는 필수입니다'),
+  body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
+  body('recipientName').trim().notEmpty().withMessage('recipientName은 필수입니다'),
+  body('recipientMobile').trim().notEmpty().withMessage('recipientMobile은 필수입니다'),
+];
+
+export const deleteAddressValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  param('addressNo')
+    .exists()
+    .withMessage('addressNo는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('addressNo 를 올바르게 입력해주세요.'),
+];
+
+//DELIVERY METHOD//////////////////////////////////////////////////////////
+export const getDeliveryMethodValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+];
+
 export const createDeliveryMethodValidator = [
   body('deliveryType').trim().notEmpty().withMessage('deliveryType는 필수입니다'),
   body('name').trim().notEmpty().withMessage('name은 필수입니다'),
@@ -128,6 +267,12 @@ export const createDeliveryMethodValidator = [
 ];
 
 export const updateDeliveryMethodValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
   body('deliveryType').trim().notEmpty().withMessage('deliveryType는 필수입니다'),
   body('name').trim().notEmpty().withMessage('name은 필수입니다'),
   body('fee')
@@ -146,39 +291,125 @@ export const updateDeliveryMethodValidator = [
     .withMessage('boolean 타입이어야 합니다.'),
 ];
 
-export const createAddressValidator = [
-  body('address').trim().notEmpty().withMessage('address는 필수입니다'),
-  body('addressDetail').trim().notEmpty().withMessage('addressDetail는 필수입니다'),
-  body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
-  body('recipientName').trim().notEmpty().withMessage('recipientName은 필수입니다'),
-  body('recipientMobile').trim().notEmpty().withMessage('recipientMobile은 필수입니다'),
+export const deleteDeliveryMethodValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
 ];
 
-export const updateAddressValidator = [
-  body('address').trim().notEmpty().withMessage('address는 필수입니다'),
-  body('addressDetail').trim().notEmpty().withMessage('addressDetail는 필수입니다'),
-  body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
-  body('recipientName').trim().notEmpty().withMessage('recipientName은 필수입니다'),
-  body('recipientMobile').trim().notEmpty().withMessage('recipientMobile은 필수입니다'),
-];
-
+//ORDER//////////////////////////////////////////////////////////
 export const createOrderValidator = [
-  // body('customerNo').isInt().toInt().withMessage('customerNo는 정수여야 합니다'),
-  // body('addressNo').isInt().toInt().withMessage('addressNo는 정수여야 합니다'),
-  // body('deliveryMethodNo').isInt().toInt().withMessage('deliveryMethodNo는 정수여야 합니다'),
-  // body('deliveryDate').isISO8601().withMessage('deliveryDate는 유효한 날짜여야 합니다'),
-  // body('totalAmount')
-  //   .isFloat({ min: 0 })
-  //   .toFloat()
-  //   .withMessage('totalAmount는 0 이상의 숫자여야 합니다'),
+  body('name').trim().notEmpty().withMessage('name은 필수입니다'),
+  body('mobileNumber').trim().notEmpty().withMessage('mobileNumber는 필수입니다'),
+  body('address').trim().notEmpty().withMessage('address는 필수입니다'),
+  body('addressDetail').trim().notEmpty().withMessage('addressDetail는 필수입니다'),
+  body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
+  body('recipientName').trim().notEmpty().withMessage('recipientName은 필수입니다'),
+  body('recipientMobile').trim().notEmpty().withMessage('recipientMobile은 필수입니다'),
+  body('orderItems')
+    .exists()
+    .withMessage('orderItems는 필수입니다')
+    .isArray({ min: 1 })
+    .withMessage('orderItems는 하나 이상의 요소를 가진 배열이어야 합니다.'),
+  body('orderItems.*.breadNo')
+    .exists()
+    .withMessage('breadNo는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('breadNo는 정수여야 합니다'),
+  body('orderItems.*.quantity')
+    .exists()
+    .withMessage('quantity는 필수입니다')
+    .isInt({ min: 1 })
+    .toInt()
+    .withMessage('quantity는 1 이상의 숫자여야 합니다.'),
+  body('deliveryMethodNo')
+    .trim()
+    .notEmpty()
+    .withMessage('deliveryMethodNo는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('deliveryMethodNo를 올바르게 입력해주세요.'),
+  body('totalPrice')
+    .trim()
+    .notEmpty()
+    .withMessage('totalPrice는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('totalPrice는 정수여야 합니다'),
+  body('discountAmount')
+    .trim()
+    .notEmpty()
+    .withMessage('discountAmount는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('discountAmount는 정수여야 합니다'),
 ];
 
 export const updateOrderValidator = [
-  // body('addressNo').isInt().toInt().withMessage('addressNo는 정수여야 합니다'),
-  // body('deliveryMethodNo').isInt().toInt().withMessage('deliveryMethodNo는 정수여야 합니다'),
-  // body('deliveryDate').isISO8601().withMessage('deliveryDate는 유효한 날짜여야 합니다'),
-  // body('totalAmount')
-  //   .isFloat({ min: 0 })
-  //   .toFloat()
-  //   .withMessage('totalAmount는 0 이상의 숫자여야 합니다'),
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  body('orderStatus')
+    .trim()
+    .notEmpty()
+    .withMessage('orderStatus는 필수입니다')
+    .isIn(['10', '20', '30', '40', '50'])
+    .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
+  body('paid')
+    .trim()
+    .notEmpty()
+    .withMessage('paid는 필수입니다')
+    .isBoolean()
+    .toBoolean()
+    .withMessage('boolean 타입이어야 합니다.'),
+  body('address').trim().notEmpty().withMessage('address는 필수입니다'),
+  body('addressDetail').trim().notEmpty().withMessage('addressDetail는 필수입니다'),
+  body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
+];
+
+export const updateOrderStatusValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  body('orderStatus')
+    .trim()
+    .notEmpty()
+    .withMessage('orderStatus는 필수입니다')
+    .isIn(['10', '20', '30', '40', '50'])
+    .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
+];
+
+export const updateOrderPaidValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  body('paid')
+    .trim()
+    .notEmpty()
+    .withMessage('paid는 필수입니다')
+    .isBoolean()
+    .toBoolean()
+    .withMessage('boolean 타입이어야 합니다.'),
+];
+
+export const deleteOrderValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
 ];
