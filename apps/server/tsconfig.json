@@ -17,7 +17,11 @@
     },
     "incremental": true, // 변경된 부분만 다시 빌드해서 빠르게
     "noEmitOnError": true, // 타입 오류 있을 경우 dist로 내보내지 않음
-    "verbatimModuleSyntax": false // 확장자 생략 가능 (`.js` 안 붙여도 됨, CommonJS에선 false 권장)
+    "verbatimModuleSyntax": false, // 확장자 생략 가능 (`.js` 안 붙여도 됨, CommonJS에선 false 권장)
+    "typeRoots": [
+      "./node_modules/@types", // 기본 타입들
+      "./src/types" // 내 프로젝트 커스텀 타입들
+    ]
   },
 
   "include": ["src"], // 빌드 및 타입체크할 소스
