@@ -1,33 +1,20 @@
 import { toast } from 'sonner';
-import { baseInstance } from '@/service/instance';
+import { CustomHttpClient } from '@/service/instance';
+import { CommonCode } from '@/api/CommonCode';
+import type { ApiConfig } from '@/api/http-client';
 
-export interface ApiResponse<T> {
-  data: T;
+export class CustomAuth extends CommonCode {
+  constructor(config: ApiConfig = {}) {
+    super(config);
+    this.instance = new CustomHttpClient(config).instance;
+  }
 }
 
-export interface BreadStatusItem {
-  name: string;
-  code: string;
-}
-
-export type BreadStatusResponse = BreadStatusItem[];
-
-export interface OrderStatusItem {
-  name: string;
-  code: string;
-}
-
-export interface OrderDliveryTypeItem {
-  name: string;
-  code: string;
-}
-
-export type OrderStatusResponse = OrderStatusItem[];
-export type OrderDliveryTypeResponse = OrderStatusItem[];
+const commonCodeApi = new CustomAuth();
 
 // export async function getUserRole(): Promise<ApiResponse<string>> {
 //   try {
-//     const response = await baseInstance.get('/common-code/user_role');
+//     const response = await commonCodeApi.commonCodeDetail('user_role');
 //     return {
 //       data: response.data,
 //     };
@@ -40,9 +27,9 @@ export type OrderDliveryTypeResponse = OrderStatusItem[];
 //   }
 // }
 
-export async function getBreadStatus(): Promise<ApiResponse<BreadStatusResponse>> {
+export async function getBreadStatus() {
   try {
-    const response = await baseInstance.get('/common-code/bread_status');
+    const response = await commonCodeApi.commonCodeDetail('bread_status');
     return {
       data: response.data,
     };
@@ -62,9 +49,9 @@ export interface MaterialTypeItem {
 
 export type MaterialTypeResponse = MaterialTypeItem[];
 
-export async function getMaterialType(): Promise<ApiResponse<MaterialTypeResponse>> {
+export async function getMaterialType() {
   try {
-    const response = await baseInstance.get('/common-code/material_type');
+    const response = await commonCodeApi.commonCodeDetail('material_type');
 
     return {
       data: response.data,
@@ -78,9 +65,9 @@ export async function getMaterialType(): Promise<ApiResponse<MaterialTypeRespons
   }
 }
 
-export async function getOrderStatus(): Promise<ApiResponse<OrderStatusResponse>> {
+export async function getOrderStatus() {
   try {
-    const response = await baseInstance.get('/common-code/order_status');
+    const response = await commonCodeApi.commonCodeDetail('order_status');
     return {
       data: response.data,
     };
@@ -92,9 +79,9 @@ export async function getOrderStatus(): Promise<ApiResponse<OrderStatusResponse>
     throw new Error(message);
   }
 }
-export async function getOrderdDliveryType(): Promise<ApiResponse<OrderDliveryTypeResponse>> {
+export async function getOrderdDliveryType() {
   try {
-    const response = await baseInstance.get('/common-code/delivery_type');
+    const response = await commonCodeApi.commonCodeDetail('delivery_type');
     return {
       data: response.data,
     };
@@ -107,9 +94,9 @@ export async function getOrderdDliveryType(): Promise<ApiResponse<OrderDliveryTy
   }
 }
 
-export async function getPurchaseStatus(): Promise<ApiResponse<string>> {
+export async function getPurchaseStatus() {
   try {
-    const response = await baseInstance.get('/common-code/purchase_status');
+    const response = await commonCodeApi.commonCodeDetail('purchase_status');
     return {
       data: response.data,
     };
