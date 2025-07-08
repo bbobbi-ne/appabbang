@@ -19,8 +19,7 @@ import {
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { login } from '@/service/auth-api';
-import { useAuthStore } from '@/stores/authStore';
+import { loginCreate } from '@/service/auth-api';
 import { useMutation } from '@tanstack/react-query';
 import ThemeToggleBtn from '@/components/theme-toggle-btn';
 
@@ -48,12 +47,10 @@ type AdminLoginForm = z.infer<typeof adminLoginSchema>;
 
 function RouteComponent() {
   const navigate = useNavigate();
-  const setAccessToken = useAuthStore((state) => state.setAccessToken);
   const onSubmit = useMutation({
-    mutationFn: login,
+    mutationFn: loginCreate,
     onSuccess: (res) => {
       if (res) {
-        setAccessToken(res.data);
         navigate({ to: '/dashboard' });
       }
     },

@@ -11,7 +11,6 @@ import {
   SidebarTrigger,
 } from '@appabbang/ui';
 import { useInitializeAuth } from '@/hooks/use-initialize-auth';
-import { useAuthStore } from '@/stores/authStore';
 import { AlertDialog } from '@appabbang/ui';
 import { Sidebar } from '@/components/sidebar';
 
@@ -29,13 +28,10 @@ export default function DashboardLayout() {
 
 function DashboardContent() {
   const { isError, isSuccess } = useInitializeAuth();
-  const { clearAccessToken, clearAuth } = useAuthStore();
 
   const navigate = useNavigate();
 
   const closeDialog = () => {
-    clearAccessToken();
-    clearAuth();
     navigate({ to: '/' });
   };
 

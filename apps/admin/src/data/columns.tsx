@@ -1,4 +1,5 @@
-import { useGetBreadsAndStatusQuery, useUpdateBreadStatusMutation } from '@/hooks/use-breads';
+import type { BreadsListData } from '@/api/data-contracts';
+import { useGetBreadsAndStatusQuery, useStatusUpdateMutation } from '@/hooks/use-breads';
 import {
   AspectRatio,
   Button,
@@ -11,17 +12,7 @@ import {
 } from '@appabbang/ui';
 import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
 import { SortAsc, SortDesc } from 'lucide-react';
-export interface BreadsColumns {
-  no: number;
-  name: string;
-  description: string;
-  unitPrice: number;
-  breadStatus: any;
-  image_url: string;
-  createdAt: Date;
-  updatedAt: Date;
-  images: string[];
-}
+
 export interface MaterialColumns {
   no: number;
   name: string;
@@ -66,16 +57,18 @@ export interface CustomerColumns {
   created_at: Date;
 }
 
+export type BreadListItem = BreadsListData[number];
+
 export const BreadsColumns = () => {
   const breadStatus = useGetBreadsAndStatusQuery().breadStatus;
-  const { updateBreadStatusMutation } = useUpdateBreadStatusMutation();
-  const columnHelper = createColumnHelper<BreadsColumns>();
+  const { statusUpdateMutation } = useStatusUpdateMutation();
+  const columnHelper = createColumnHelper<BreadListItem>();
 
-  const columns: ColumnDef<BreadsColumns, any>[] = [
+  const columns: ColumnDef<BreadListItem, any>[] = [
     columnHelper.display({
       id: 'select',
       header: ({ table }) => (
-        <div className="flex justify-center">
+        <div className="w-fit mx-auto">
           <Checkbox
             className=""
             checked={
@@ -87,7 +80,7 @@ export const BreadsColumns = () => {
         </div>
       ),
       cell: ({ row }) => (
-        <div className="flex justify-center">
+        <div onClick={(e) => e.preventDefault()} className="w-fit mx-auto">
           <Checkbox
             checked={row.getIsSelected()}
             onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -214,8 +207,8 @@ export const BreadsColumns = () => {
         return (
           <Select
             value={value}
-            onValueChange={(val) => {
-              updateBreadStatusMutation({ no, breadStatus: val });
+            onValueChange={(val: '10' | '20' | '30' | '40' | '50') => {
+              statusUpdateMutation({ no, payload: { breadStatus: val } });
             }}
           >
             <SelectTrigger>

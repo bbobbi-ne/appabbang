@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@appabbang/ui';
-import { useGetBreadQuery, useUpdateBreadMutation } from '@/hooks/use-breads';
+import { useBreadsDetailQuery, useBreadsUpdateMutation } from '@/hooks/use-breads';
 import { useEffect, useState } from 'react';
 import BreadForm, { type BreadsDailogForm } from './bread-form';
 
@@ -27,15 +27,15 @@ export function BreadModifyDialog({ children, no }: breadModifyDialogProps) {
 }
 
 function DialogForm({ no }: { no: number }) {
-  const { data: currentData, isSuccess: currentDataIsSuccess } = useGetBreadQuery(no);
-  const { updateBreadMutation } = useUpdateBreadMutation();
+  const { data: currentData, isSuccess: currentDataIsSuccess } = useBreadsDetailQuery(no);
+  const { breadsUpdateMutation } = useBreadsUpdateMutation();
   const [currentValues, setCurrentValues] = useState<BreadsDailogForm | undefined>();
 
   useEffect(() => {
     if (currentDataIsSuccess) {
       const { breadStatus, description, images, name, unitPrice } = currentData;
 
-      const mappedImages = images.map((img) => ({
+      const mappedImages = images?.map((img) => ({
         url: img.url,
         publicId: img.publicId,
       }));
@@ -63,7 +63,7 @@ function DialogForm({ no }: { no: number }) {
       <DialogDescription>메뉴를 수정해주세요</DialogDescription>
 
       {currentValues && (
-        <BreadForm currentValues={currentValues} submitFn={updateBreadMutation} no={no} />
+        <BreadForm currentValues={currentValues} submitFn={breadsUpdateMutation} no={no} />
       )}
     </DialogContent>
   );
