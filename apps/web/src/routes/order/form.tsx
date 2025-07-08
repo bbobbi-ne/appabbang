@@ -5,10 +5,11 @@
 
 import { createFileRoute } from '@tanstack/react-router';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent } from '@appabbang/ui';
 import RequiredBar from '@/components/RequiredBar';
 import BreadCard from '@/components/BreadCard';
-import { client } from '@/services/apis';
+import { searchBreadList } from '@/services/apis';
 import type { BreadProps } from '@/interface/BreadInterface';
 import OrderFormSkeleton from '@/components/OrderFormSkeleton';
 import BreadSearch from '@/components/BreadSearch';
@@ -25,7 +26,6 @@ export const Route = createFileRoute('/order/form')({
 function RouteComponent() {
   const [breadList, setBreadList] = useState<BreadProps[]>([]); // 빵 목록
   const [originBreadList, setOriginBreadList] = useState<BreadProps[]>([]); // 빵 목록(origin)
-  const [loading, setLoading] = useState<boolean>(true); // 로딩 상태
   const [paymentList, setPaymentList] = useState<BreadProps[]>([]); // 결제목록
   const [errMsg, setErrMsg] = useState<string>(''); // 에러메세지
   const [keyword, setKeyword] = useState<string>(''); // 빵 키워드
@@ -115,24 +115,17 @@ function RouteComponent() {
   );
   /**********************************************************************************/
   /** React Hooks */
-  /** 빵 목록 조회 */
+  /** 빵 목록 조회 API */
+  const { isLoading, data, error } = useQuery({
+    queryKey: ['allBreadList'],
+    queryFn: searchBreadList,
+  });
+
+  /** 빵 목록 조회 및 설정 */
   useEffect(() => {
-    client
-      .get('/breads', {
-        params: {
-          breadStatus: 10,
-        },
-      })
-      .then((response) => {
-        setBreadList(response.data);
-        setOriginBreadList(response.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setErrMsg('빵 목록을 조회하는 데 문제가 발생했습니다.');
-        setLoading(true);
-      });
-  }, []);
+    data && setBreadList(data.data) && setOriginBreadList(data.data);
+    error && setErrMsg('빵 목록을 조회하는 데 문제가 발생했습니다.');
+  }, [data, error]);
 
   /** 빵 결제목록의 총 개수, 총 금액 계산 */
   useEffect(() => {
@@ -146,7 +139,7 @@ function RouteComponent() {
     setTotalPrice(price);
   }, [paymentList]);
 
-  return loading ? (
+  return isLoading ? (
     <OrderFormSkeleton />
   ) : (
     <div>
@@ -194,7 +187,7 @@ function RouteComponent() {
 
               {/* 빵 목록 */}
               <div className="flex flex-row flex-wrap gap-5 justify-start">
-                {loading ? (
+                {isLoading ? (
                   <Card>
                     <CardHeader className="text-red-600">{errMsg}</CardHeader>
                   </Card>
