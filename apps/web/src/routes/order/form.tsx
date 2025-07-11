@@ -6,7 +6,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent } from '@appabbang/ui';
+import { Button, Card, CardHeader, CardTitle, CardContent, Input, Label } from '@appabbang/ui';
 import RequiredBar from '@/components/RequiredBar';
 import BreadCard from '@/components/BreadCard';
 import { searchBreadList } from '@/services/apis';
@@ -16,6 +16,7 @@ import BreadSearch from '@/components/BreadSearch';
 import CardMent from '@/components/CardComment';
 import Payment from '@/components/Payment';
 import GuestPrivacyAgreement from '@/components/GuestPrivacyAgreement';
+import { useForm } from 'react-hook-form';
 
 /**********************************************************************************/
 /** Route */
@@ -32,6 +33,9 @@ function RouteComponent() {
   const [keyword, setKeyword] = useState<string>(''); // 빵 키워드
   const [totalCount, setTotalCount] = useState<number>(0); // 최종 수량
   const [totalPrice, setTotalPrice] = useState<number>(0); // 최종 금액
+  const [agreed, setAgreed] = useState<boolean>(false); // 비회원 동의
+  const { register, watch, handleSubmit, formState } = useForm(); // 비회원정보 Form
+  const pattern = /^[가-힣+$]/;
 
   /**********************************************************************************/
   /** Function */
@@ -116,7 +120,9 @@ function RouteComponent() {
   );
 
   /** 비회원 개인정보처리방침 동의 flag 처리 */
-  const onAgreed = () => {};
+  const onAgreed = (flag: boolean) => {
+    setAgreed(flag);
+  };
   /**********************************************************************************/
   /** React Hooks */
   /** 빵 목록 조회 API */
@@ -152,25 +158,11 @@ function RouteComponent() {
       </div>
 
       <div className="relative flex w-6xl h-auto m-auto">
-        <Button className="absolute -top-10 right-0 ml-auto">주문</Button>
         <Card className="w-full bg-[#fcfcfc]">
-          <GuestPrivacyAgreement onAgreed={onAgreed} />
-          {/* <div className="p-5">
-            <CardTitle className="pt-5">
-              <span className="pr-2">김가나</span>
-              <span className="text-lg">test01</span>
-            </CardTitle>
-            <CardDescription className="mt-2">010-1234-5656</CardDescription>
-            <CardDescription className="mt-2">
-              경기도 성남시 수정구 신흥1동 6729번지 1층
-            </CardDescription>
-          </div> */}
-
           <div className="m-5">
-            <RequiredBar />
             <CardContent>
               <CardMent
-                title="구매할 빵을 검색하고 선택하세요."
+                title="1. 구매할 빵을 검색하고 선택하세요."
                 comment="최소 1건 이상 선택해야 주문서 작성이 진행됩니다."
               />
 
@@ -206,8 +198,56 @@ function RouteComponent() {
               총 금액 : {totalPrice.toLocaleString()}원 ({totalCount}개)
             </CardTitle>
           </div>
+
+          <div className="m-auto h-20" />
+
+          {/* 비회원 정보 입력 form */}
+          <div className="m-5">
+            <CardContent>
+              <CardMent
+                title="2. 비회원 정보를 입력 해주세요."
+                comment="필수항목을 입력해야 주문이 진행됩니다."
+              />
+            </CardContent>
+            <form>
+              <Label>
+                <span className="text-red-700">*</span> 주문자
+              </Label>
+              <Input
+                type="text"
+                {...register('customer', {
+                  required: '비회원 주문자 성함을 입력바랍니다.',
+                  pattern: {
+                    value: pattern,
+                    message: '비회원 주문자 성함은 최소 한글 1자 이상이어야 합니다.',
+                  },
+                })}
+                placeholder="주문자 이름 입력"
+              />
+
+              <Label>
+                <span className="text-red-700">*</span> 수령인
+              </Label>
+              <Input
+                type="text"
+                {...register('recipient', {
+                  required: '수령인 성함을 입력바랍니다.',
+                  pattern: {
+                    value: pattern,
+                    message: '수령인 성함은 최소 한글 1자 이상이어야 합니다.',
+                  },
+                })}
+              />
+            </form>
+          </div>
+
+          <GuestPrivacyAgreement onAgreed={onAgreed} />
+
+          <Button className="relative top-10 ">주문하기</Button>
         </Card>
       </div>
+
+      {/* <Button className="absolute -top-10 right-0 ml-auto">주문</Button> */}
     </div>
   );
 }
