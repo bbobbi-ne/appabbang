@@ -1,6 +1,20 @@
 import { prisma } from '@/lib/prisma';
 import { Customer } from '@prisma/client';
 
+export const getByIdForLogin = async (id: string) => {
+  const customer = await prisma.customer.findFirst({
+    where: { id },
+    select: {
+      no: true,
+      id: true,
+      pw: true,
+      name: true,
+    },
+  });
+
+  return customer;
+};
+
 /** 고객 생성 (비회원) */
 export const createCustomer = async (customer: Customer) => {
   const { name, mobileNumber } = customer;

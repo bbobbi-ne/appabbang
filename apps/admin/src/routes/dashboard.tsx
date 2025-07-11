@@ -14,9 +14,8 @@ import { useInitializeAuth } from '@/hooks/use-initialize-auth';
 import { useAuthStore } from '@/stores/authStore';
 import { AlertDialog } from '@appabbang/ui';
 import { Sidebar } from '@/components/sidebar';
-import { useBreadStatus } from '@/hooks/use-breads';
 
-export const Route = createFileRoute('/_dashboardLayout')({
+export const Route = createFileRoute('/dashboard')({
   component: DashboardLayout,
 });
 
@@ -31,7 +30,6 @@ export default function DashboardLayout() {
 function DashboardContent() {
   const { isError, isSuccess } = useInitializeAuth();
   const { clearAccessToken, clearAuth } = useAuthStore();
-  useBreadStatus();
 
   const navigate = useNavigate();
 

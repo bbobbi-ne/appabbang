@@ -52,6 +52,7 @@ async function main() {
       { code: '10', groupName: 'image_target_type', name: 'breads', remarkTxt: '빵 이미지' },
       { code: '10', groupName: 'discount_type', name: '기간할인', remarkTxt: '기간할인' },
       { code: '20', groupName: 'discount_type', name: '고객할인', remarkTxt: '고객할인' },
+      { code: '10', groupName: 'provider_type', name: '카카오', remarkTxt: '카카오 로그인' },
     ],
   });
 

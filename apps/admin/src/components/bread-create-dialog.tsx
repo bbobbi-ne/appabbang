@@ -11,19 +11,19 @@ import {
 import { useCreateBreadMutation } from '@/hooks/use-breads';
 import BreadForm from './bread-form';
 
-export function BreadsCreateDialog() {
+export function BreadCreateDialog() {
   const { CreateBreadMutation } = useCreateBreadMutation();
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="ml-auto bg-accent-foreground">빵 추가하기</Button>
+        <Button className="ml-auto">빵 추가하기</Button>
       </DialogTrigger>
       <DialogContent
         onInteractOutside={(e) => {
           e.preventDefault();
         }}
-        className="sm:max-w-xl overflow-y-auto max-h-full "
+        className="sm:max-w-xl overflow-y-auto max-h-11/12"
       >
         <DialogHeader>
           <DialogTitle>메뉴등록</DialogTitle>

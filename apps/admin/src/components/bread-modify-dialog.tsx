@@ -55,7 +55,7 @@ function DialogForm({ no }: { no: number }) {
       onInteractOutside={(e) => {
         e.preventDefault();
       }}
-      className="sm:max-w-xl overflow-y-auto max-h-full "
+      className="sm:max-w-xl overflow-y-auto max-h-11/12"
     >
       <DialogHeader>
         <DialogTitle>메뉴수정</DialogTitle>

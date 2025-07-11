@@ -5,19 +5,41 @@ import {
   getBread,
   getBreads,
   updateBread,
-  getBreadStatus,
   updateBreadStatus,
+  type Breads,
 } from '@/service/bread-api';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { getBreadStatus, type ApiResponse, type BreadStatusResponse } from '@/service/common-api';
+import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 
-export function useGetBreadsQuery() {
-  return useQuery({
-    queryKey: ['breads'],
-    queryFn: getBreads,
-    staleTime: Infinity,
-    retry: 1,
-    select: (res) => res.data,
+export function useGetBreadsAndStatusQuery() {
+  const results = useQueries({
+    queries: [
+      {
+        queryKey: ['breads'],
+        queryFn: getBreads,
+        staleTime: Infinity,
+        retry: 1,
+        select: (res) => (res as ApiResponse<Breads[]>).data,
+      },
+      {
+        queryKey: ['breadStatus', 'common'],
+        queryFn: getBreadStatus,
+        staleTime: Infinity,
+        retry: 1,
+        select: (res) => (res as ApiResponse<BreadStatusResponse>).data,
+      },
+    ],
   });
+
+  const [breadsQuery, breadStatusQuery] = results;
+
+  return {
+    breads: breadsQuery.data,
+    breadStatus: breadStatusQuery.data,
+    isLoading: breadsQuery.isLoading || breadStatusQuery.isLoading,
+    isError: breadsQuery.isError || breadStatusQuery.isError,
+    error: breadsQuery.error || breadStatusQuery.error,
+  };
 }
 
 export function useGetBreadQuery(no: number) {
@@ -41,6 +63,7 @@ export function useCreateBreadMutation() {
 
   return { CreateBreadMutation: mutateAsync, isError, error, isSuccess, isPending };
 }
+
 export function useUpdateBreadMutation() {
   const queryClient = useQueryClient();
   const { mutateAsync, isError, isSuccess, error } = useMutation({
@@ -89,14 +112,4 @@ export function useDeleteBreadImgMutation() {
   });
 
   return { deleteBreadImgMutation: mutate, isPending };
-}
-
-export function useBreadStatus() {
-  return useQuery({
-    queryKey: ['breadStatus', 'common'],
-    queryFn: getBreadStatus,
-    staleTime: Infinity,
-    retry: 1,
-    select: (res) => res.data,
-  });
 }
