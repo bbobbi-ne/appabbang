@@ -75,9 +75,12 @@ model Order {
   orderNumber           String            @unique @map("orders_number")
   orderStatus           String            @map("order_status")
   totalPrice            Int               @map("total_price")
-  orderPw               String            @map("order_pw")
+  discountAmount        Int               @map("discount_amount")
+  orderPw               String?           @map("order_pw")
   paid                  Boolean       
-  memo                  String
+  memo                  String?
+  trackingNumber        String?           @map("tracking_number")
+  canceledAt            DateTime?         @map("canceled_at")
 
   createdAt             DateTime          @default(now()) @map("created_at")
   updatedAt             DateTime          @updatedAt @map("updated_at")
@@ -85,9 +88,11 @@ model Order {
   customerNo            Int               @map("customer_no")
   addressNo             Int?              @map("address_no")
   deliveryMethodNo      Int               @map("delivery_no")
+  discountNo            Int?              @map("discount_no")
   customer              Customer          @relation(fields: [customerNo], references: [no])
   address               Address?          @relation(fields: [addressNo], references: [no])
   deliveryMethod        DeliveryMethod    @relation(fields: [deliveryMethodNo], references: [no])
+  discount              Discount?         @relation(fields: [discountNo], references: [no])
   orderItem             OrderItem[]
 
   @@map("orders")
@@ -117,6 +122,8 @@ model Customer {
   name                  String            
   mobileNumber          String            @map("mobile_number")               // 전화번호 (not null)
   defaultAddressNo      Int?              @map("default_address_no") 
+  providerType          String?           @map("provider_type")               // 소셜 로그인 타입 코드 (nullable)
+  socialId              String?           @map("social_id")                   // 소셜 로그인 식별자 (nullable)
 
   createdAt             DateTime          @default(now()) @map("created_at")  // 가입일 (not null)
   updatedAt             DateTime          @updatedAt @map("updated_at")
@@ -177,6 +184,7 @@ model Discount {
   updatedAt             DateTime @updatedAt                             // 수정 시간
 
   discountCustomer      DiscountCustomer[]
+  order                 Order[]
 
   @@map("discounts")
 }

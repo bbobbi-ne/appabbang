@@ -1,0 +1,2502 @@
+openapi: 3.0.0
+info:
+  title: Appabbang API
+  version: 1.0.0
+  description: 아빠빵 어드민 API 문서
+  # contact:
+  #   name: bbobbi-ne Team
+  #   email: '-'
+servers:
+  - url: http://localhost:4000
+    description: 개발 서버
+  # - url: https://api.appabbang.com
+  #   description: 운영 서버
+tags:
+  - name: Auth
+    description: 인증 API
+  - name: Breads
+    description: 빵 API
+  - name: Orders
+    description: 주문 API
+  - name: Customers
+    description: 고객 API
+  - name: DeliveryMethods
+    description: 배송 방법 API
+  - name: CommonCodes
+    description: 공통 코드 API
+  - name: CommonImages
+    description: 클라우디너리 이미지 API
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT 토큰을 Bearer 형식으로 전송하세요.
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: 로그인
+      description: 관리자 또는 고객이 로그인을 수행합니다. (권한: 없음 - 누구나 접근 가능)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - pw
+                - type
+              properties:
+                id:
+                  type: string
+                  description: 사용자 ID
+                  example: admin
+                pw:
+                  type: string
+                  description: 비밀번호
+                  example: test1234!
+                type:
+                  type: string
+                  description: 클라이언트 타입 (user, client)
+                  example: 'user'
+      responses:
+        '200':
+          description: 로그인 성공
+          headers:
+            Set-Cookie:
+              description: 리프레시 토큰이 쿠키로 설정됩니다
+              schema:
+                type: string
+                example: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; HttpOnly; Secure; SameSite=Strict
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - accessToken
+                properties:
+                  accessToken:
+                    type: string
+                    description: 액세스 토큰
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: 내 정보 조회
+      description: 현재 로그인한 클라이언트의 정보를 조회합니다. (권한: 로그인 필요 - 관리자/고객 모두)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 사용자 정보 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - no
+                  - id
+                  - name
+                  - type
+                  - iat
+                  - exp
+                properties:
+                  no:
+                    type: number
+                    description: 사용자키
+                    example: 1
+                  id:
+                    type: string
+                    description: 사용자 ID
+                    example: admin
+                  name:
+                    type: string
+                    description: 사용자 이름
+                    example: 관리자
+                  userRole:
+                    type: string
+                    enum: ['10', '20']
+                    description: '관리자 역할 (10-관리자, 20-서브관리자)'
+                    example: '10'
+                  type:
+                    type: string
+                    description: 클라이언트 타입 (user, client)
+                    example: 'user'
+                  iat:
+                    type: number
+                    description: 토큰 발급 시간
+                    example: 1715000000
+                  exp:
+                    type: number
+                    description: 토큰 만료 시간
+                    example: 1715000000
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: 액세스 토큰 재발급
+      description: 쿠키의 리프레시 토큰을 사용하여 새로운 액세스 토큰을 발급받습니다. (권한: 없음 - 누구나 접근 가능)
+      responses:
+        '200':
+          description: 액세스 토큰 재발급 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - accessToken
+                properties:
+                  accessToken:
+                    type: string
+                    description: 새로운 액세스 토큰
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+  /breads:
+    get:
+      tags: [Breads]
+      summary: 빵 목록 조회
+      description: 빵 목록을 조회합니다. breadStatus 쿼리 파라미터로 상태별 필터링이 가능합니다. (권한: 선택적 로그인 - 어드민은 추가 정보 제공)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: breadStatus
+          description: '빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)'
+          schema:
+            type: string
+            enum: ['10', '20', '30', '40', '50']
+      responses:
+        '200':
+          description: 빵 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - no
+                    - name
+                    - description
+                    - unitPrice
+                    - breadStatus
+                    - breadStatusName
+                    - images
+                  properties:
+                    no:
+                      type: integer
+                      description: 빵 번호
+                      example: 1
+                    name:
+                      type: string
+                      description: 빵 이름
+                      example: '크로아상'
+                    description:
+                      type: string
+                      description: 빵 설명
+                      example: '바삭한 크로아상'
+                    unitPrice:
+                      type: integer
+                      description: 단가
+                      example: 3000
+                    breadStatus:
+                      type: string
+                      enum: ['10', '20', '30', '40', '50']
+                      description: '빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)'
+                      example: '10'
+                    breadStatusName:
+                      type: string
+                      description: '빵 상태 이름'
+                      example: '판매'
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: '생성일시'
+                      example: '2024-01-01T00:00:00.000Z'
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      description: '수정일시'
+                      example: '2024-01-01T00:00:00.000Z'
+                    images:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          url:
+                            type: string
+                            description: 이미지 URL
+                            example: 'https://example.com/image.jpg'
+
+    post:
+      tags: [Breads]
+      summary: 빵 등록
+      description: 새로운 빵을 등록합니다. 이미지 업로드가 선택적으로 가능합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - name
+                - unitPrice
+                - breadStatus
+              properties:
+                name:
+                  type: string
+                  description: 빵 이름
+                  example: '크로아상'
+                description:
+                  type: string
+                  description: 빵 설명
+                  example: '바삭한 크로아상'
+                unitPrice:
+                  type: integer
+                  description: 단가
+                  example: 3000
+                breadStatus:
+                  type: string
+                  enum: ['10', '20', '30', '40', '50']
+                  description: '빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)'
+                  example: '10'
+                image:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: 빵 이미지 (선택사항)
+      responses:
+        '201':
+          description: 빵 등록 성공
+          # content:
+          #   application/json:
+          #     schema:
+          #       type: object
+          #       properties:
+          #         no:
+          #           type: integer
+          #           description: 생성된 빵 번호
+          #           example: 1
+          #         name:
+          #           type: string
+          #           description: 빵 이름
+          #           example: '크로아상'
+          #         description:
+          #           type: string
+          #           description: 빵 설명
+          #           example: '바삭한 크로아상'
+          #         unitPrice:
+          #           type: integer
+          #           description: 단가
+          #           example: 3000
+          #         breadStatus:
+          #           type: string
+          #           description: '빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)'
+          #           example: '10'
+
+    delete:
+      tags: [Breads]
+      summary: 빵 삭제 (여러건)
+      description: 여러 빵을 한 번에 삭제합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - noList
+              properties:
+                noList:
+                  type: array
+                  items:
+                    type: integer
+                  description: 삭제할 빵 번호 목록
+                  example: [1, 2, 3]
+      responses:
+        '204':
+          description: 빵 삭제 성공
+
+  /breads/{no}:
+    get:
+      tags: [Breads]
+      summary: 빵 상세 조회
+      description: 특정 빵의 상세 정보를 조회합니다. (권한: 선택적 로그인 - 어드민은 추가 정보 제공)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 빵 번호
+          example: 1
+      responses:
+        '200':
+          description: 빵 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - no
+                  - name
+                  - description
+                  - unitPrice
+                  - breadStatus
+                  - images
+                properties:
+                  no:
+                    type: integer
+                    description: 빵 번호
+                    example: 1
+                  name:
+                    type: string
+                    description: 빵 이름
+                    example: '크로아상'
+                  description:
+                    type: string
+                    description: 빵 설명
+                    example: '바삭한 크로아상'
+                  unitPrice:
+                    type: integer
+                    description: 단가
+                    example: 3000
+                  breadStatus:
+                    type: string
+                    enum: ['10', '20', '30', '40', '50']
+                    description: '빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)'
+                    example: '10'
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: '생성일시'
+                    example: '2024-01-01T00:00:00.000Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: '수정일시'
+                    example: '2024-01-01T00:00:00.000Z'
+                  images:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - url
+                        - name
+                        - order
+                      properties:
+                        publicId:
+                          type: string
+                          description: 이미지 공개 ID
+                          example: 'bread_123'
+                        url:
+                          type: string
+                          description: 이미지 URL
+                          example: 'https://example.com/image.jpg'
+                        name:
+                          type: string
+                          description: 원본 파일명
+                          example: 'croissant.jpg'
+                        order:
+                          type: integer
+                          description: 이미지 순서
+                          example: 1
+
+    put:
+      tags: [Breads]
+      summary: 빵 수정
+      description: 기존 빵의 정보를 수정합니다. 이미지 업로드가 선택적으로 가능합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 빵 번호
+          example: 1
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - name
+                - unitPrice
+                - breadStatus
+              properties:
+                name:
+                  type: string
+                  description: 빵 이름
+                  example: '크로아상'
+                description:
+                  type: string
+                  description: 빵 설명
+                  example: '바삭한 크로아상'
+                unitPrice:
+                  type: integer
+                  description: 단가
+                  example: 3000
+                breadStatus:
+                  type: string
+                  enum: ['10', '20', '30', '40', '50']
+                  description: '빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)'
+                  example: '10'
+                image:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: 빵 이미지 (선택사항)
+      responses:
+        '200':
+          description: 빵 수정 성공
+          # content:
+          #   application/json:
+          #     schema:
+          #       type: object
+          #       properties:
+          #         no:
+          #           type: integer
+          #           description: 빵 번호
+          #           example: 1
+          #         name:
+          #           type: string
+          #           description: 빵 이름
+          #           example: '크로아상'
+          #         description:
+          #           type: string
+          #           description: 빵 설명
+          #           example: '바삭한 크로아상'
+          #         unitPrice:
+          #           type: integer
+          #           description: 단가
+          #           example: 3000
+          #         breadStatus:
+          #           type: string
+          #           description: '빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)'
+          #           example: '10'
+
+  /breads/{no}/status:
+    put:
+      tags: [Breads]
+      summary: 빵 상태 수정
+      description: 빵의 상태만 수정합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 빵 번호
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - breadStatus
+              properties:
+                breadStatus:
+                  type: string
+                  enum: ['10', '20', '30', '40', '50']
+                  description: '변경할 빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)'
+                  example: '10'
+      responses:
+        '200':
+          description: 빵 상태 수정 성공
+          # content:
+          #   application/json:
+          #     schema:
+          #       type: object
+          #       properties:
+          #         no:
+          #           type: integer
+          #           description: 빵 번호
+          #           example: 1
+          #         breadStatus:
+          #           type: string
+          #           description: '변경된 빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)'
+          #           example: '10'
+
+  /breads/image:
+    delete:
+      tags: [Breads]
+      summary: 빵 이미지 삭제
+      description: 특정 빵의 이미지를 삭제합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - publicId
+              properties:
+                publicId:
+                  type: string
+                  description: 삭제할 이미지의 공개 ID
+                  example: 'breads/image123'
+      responses:
+        '204':
+          description: 이미지 삭제 성공
+
+  /orders:
+    get:
+      tags: [Orders]
+      summary: 주문 목록 조회
+      description: 모든 주문 목록을 조회합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 주문 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - no
+                    - orderNumber
+                    - orderStatus
+                    - orderStatusName
+                    - totalPrice
+                    - paid
+                    - createdAt
+                    - updatedAt
+                    - customer
+                    - address
+                    - deliveryMethod
+                  properties:
+                    no:
+                      type: integer
+                      description: 주문 번호
+                      example: 1
+                    orderNumber:
+                      type: string
+                      description: 주문 고유번호
+                      example: ORD-20240622-12345
+                    orderStatus:
+                      type: string
+                      enum: ['10', '20', '30', '40', '50']
+                      description: '주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소됨)'
+                      example: '10'
+                    orderStatusName:
+                      type: string
+                      description: 주문 상태명
+                      example: '접수됨'
+                    totalPrice:
+                      type: integer
+                      description: 총 주문 금액
+                      example: 15000
+                    paid:
+                      type: boolean
+                      description: 결제 여부
+                      example: false
+                    trackingNumber:
+                      type: string
+                      description: 운송장 번호
+                      example: '123456789'
+                    canceledAt:
+                      type: string
+                      format: date-time
+                      nullable: true
+                      description: 주문 취소 일시
+                      example: null
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: 주문 생성일시
+                      example: '2024-06-22T12:34:56.000Z'
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      description: 주문 수정일시
+                      example: '2024-06-22T12:34:56.000Z'
+                    customer:
+                      type: object
+                      description: 주문자 정보
+                      required:
+                        - no
+                        - name
+                        - mobileNumber
+                      properties:
+                        no:
+                          type: integer
+                          description: 고객 번호
+                          example: 1
+                        name:
+                          type: string
+                          description: 고객명
+                          example: 홍길동
+                        mobileNumber:
+                          type: string
+                          description: 전화번호
+                          example: '010-1234-5678'
+                    address:
+                      type: object
+                      description: 배송지 정보
+                      required:
+                        - no
+                        - address
+                        - addressDetail
+                        - zipcode
+                        - recipientName
+                        - recipientMobile
+                      properties:
+                        no:
+                          type: integer
+                          description: 주소 번호
+                          example: 1
+                        address:
+                          type: string
+                          description: 주소
+                          example: '서울시 강남구'
+                        addressDetail:
+                          type: string
+                          description: 상세주소
+                          example: '123-45'
+                        zipcode:
+                          type: string
+                          description: 우편번호
+                          example: '12345'
+                        message:
+                          type: string
+                          description: 배송 메시지
+                          example: '문 앞에 놓아주세요'
+                        recipientName:
+                          type: string
+                          description: 수령인 이름
+                          example: '홍길동'
+                        recipientMobile:
+                          type: string
+                          description: 수령인 전화번호
+                          example: '010-1234-5678'
+                    deliveryMethod:
+                      type: object
+                      description: 배송 방법 정보
+                      required:
+                        - no
+                        - name
+                      properties:
+                        no:
+                          type: integer
+                          description: 배송 방법 번호
+                          example: 1
+                        name:
+                          type: string
+                          description: 배송 방법 이름
+                          example: '우체국'
+
+    post:
+      tags: [Orders]
+      summary: 주문 생성 (비회원)
+      description: 비회원 주문을 생성합니다. (권한: 없음 - 누구나 접근 가능)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              description: |
+                [필수값 안내]
+                - 비회원 주문: name, mobileNumber, address, addressDetail, zipcode, recipientName, recipientMobile, orderItems, deliveryMethodNo, orderPw, totalPrice, discountAmount
+                - 회원 주문: orderItems, addressNo, deliveryMethodNo, totalPrice, discountAmount
+                - 할인 적용 시: discountNo
+                (상세 예시는 아래 examples 참고)
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 고객명
+                mobileNumber:
+                  type: string
+                  description: 전화번호
+                address:
+                  type: string
+                  description: 주소
+                addressDetail:
+                  type: string
+                  description: 상세주소
+                zipcode:
+                  type: string
+                  description: 우편번호
+                message:
+                  type: string
+                  description: 배송 메시지
+                recipientName:
+                  type: string
+                  description: 수령인 이름
+                recipientMobile:
+                  type: string
+                  description: 수령인 전화번호
+                orderItems:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      breadNo:
+                        type: integer
+                        description: 빵 번호
+                      quantity:
+                        type: integer
+                        description: 수량
+                deliveryMethodNo:
+                  type: integer
+                  description: 배송 방법 번호
+                orderPw:
+                  type: string
+                  description: 주문 비밀번호
+                totalPrice:
+                  type: integer
+                  description: 총 주문 금액
+                discountNo:
+                  type: integer
+                  description: 할인 번호
+                discountAmount:
+                  type: integer
+                  description: 할인 금액
+                customerNo:
+                  type: integer
+                  description: 회원 번호
+                addressNo:
+                  type: integer
+                  description: 회원 주소 번호
+            examples:
+              NonMember:
+                summary: 비회원 주문 예시
+                value:
+                  name: 홍길동
+                  mobileNumber: "010-1234-5678"
+                  address: "서울시 강남구"
+                  addressDetail: "123-45"
+                  zipcode: "12345"
+                  message: "문 앞에 놓아주세요"
+                  recipientName: "홍길동"
+                  recipientMobile: "010-1234-5678"
+                  orderItems:
+                    - breadNo: 1
+                      quantity: 2
+                  deliveryMethodNo: 1
+                  orderPw: "1234"
+                  totalPrice: 9000
+                  discountAmount: 0
+              Member:
+                summary: 회원 주문 예시
+                value:
+                  orderItems:
+                    - breadNo: 1
+                      quantity: 2
+                  addressNo: 1
+                  deliveryMethodNo: 1
+                  discountNo: 1
+                  totalPrice: 15000
+                  discountAmount: 1000
+      responses:
+        '201':
+          description: 주문 생성 성공
+          # content:
+          #   application/json:
+          #     schema:
+          #       type: object
+          #       properties:
+          #         orderNumber:
+          #           type: string
+          #           description: 주문번호
+          #           example: 'ORD-20240622-12345678'
+          #         name:
+          #           type: string
+          #           description: 고객명
+          #           example: '홍길동'
+          #         mobileNumber:
+          #           type: string
+          #           description: 전화번호
+          #           example: '010-1234-5678'
+          #         address:
+          #           type: string
+          #           description: 주소
+          #           example: '서울시 강남구'
+          #         addressDetail:
+          #           type: string
+          #           description: 상세주소
+          #           example: '123-45'
+          #         zipcode:
+          #           type: string
+          #           description: 우편번호
+          #           example: '12345'
+          #         message:
+          #           type: string
+          #           description: 배송 메시지
+          #           example: '문 앞에 놓아주세요'
+          #         recipientName:
+          #           type: string
+          #           description: 수령인 이름
+          #           example: '홍길동'
+          #         recipientMobile:
+          #           type: string
+          #           description: 수령인 전화번호
+          #           example: '010-1234-5678'
+          #         orderItems:
+          #           type: array
+          #           items:
+          #             type: object
+          #             properties:
+          #               breadNo:
+          #                 type: integer
+          #                 description: 빵 번호
+          #                 example: 1
+          #               quantity:
+          #                 type: integer
+          #                 description: 수량
+          #                 example: 2
+          #         deliveryMethodNo:
+          #           type: integer
+          #           description: 배송 방법 번호
+          #           example: 1
+          #         totalPrice:
+          #           type: integer
+          #           description: 총 주문 금액
+          #           example: 15000
+
+  /orders/{no}:
+    get:
+      tags: [Orders]
+      summary: 주문 상세 조회
+      description: 특정 주문의 상세 정보를 조회합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 주문 번호
+          example: 1
+      responses:
+        '200':
+          description: 주문 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - no
+                  - orderNumber
+                  - orderStatus
+                  - totalPrice
+                  - discountAmount
+                  - paid
+                  - createdAt
+                  - updatedAt
+                  - customer
+                  - address
+                  - deliveryMethod
+                  - orderItem
+                properties:
+                  no:
+                    type: integer
+                    description: 주문 번호
+                    example: 1
+                  orderNumber:
+                    type: string
+                    description: 주문 고유번호
+                    example: ORD-20240622-12345
+                  orderStatus:
+                    type: string
+                    enum: ['10', '20', '30', '40', '50']
+                    description: '주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소됨)'
+                    example: '10'
+                  totalPrice:
+                    type: integer
+                    description: 총 주문 금액
+                    example: 15000
+                  paid:
+                    type: boolean
+                    description: 결제 여부
+                    example: false
+                  trackingNumber:
+                    type: string
+                    description: 운송장 번호
+                    example: '123456789'
+                  canceledAt:
+                    type: string
+                    format: date-time
+                    nullable: true
+                    description: 주문 취소 일시
+                    example: null
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: 주문 생성일시
+                    example: '2024-06-22T12:34:56.000Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: 주문 수정일시
+                    example: '2024-06-22T12:34:56.000Z'
+                  orderItem:
+                    type: array
+                    description: 주문 아이템 목록
+                    items:
+                      type: object
+                      required:
+                        - breadNo
+                        - quantity
+                        - unitPrice
+                        - totalPrice
+                        - bread
+                      properties:
+                        breadNo:
+                          type: integer
+                          description: 빵 번호
+                          example: 1
+                        quantity:
+                          type: integer
+                          description: 수량
+                          example: 2
+                        unitPrice:
+                          type: integer
+                          description: 단가
+                          example: 3000
+                        totalPrice:
+                          type: integer
+                          description: 합계 금액
+                          example: 6000
+                        discountAmount:
+                          type: integer
+                          description: 할인 금액
+                          example: 0
+                        bread:
+                          type: object
+                          required:
+                            - no
+                            - name
+                          properties:
+                            no:
+                              type: integer
+                              description: 빵 번호
+                              example: 1
+                            name:
+                              type: string
+                              description: 빵 이름
+                              example: 크로아상
+                  customer:
+                    type: object
+                    description: 주문자 정보
+                    required:
+                      - no
+                      - name
+                      - mobileNumber
+                    properties:
+                      no:
+                        type: integer
+                        description: 고객 번호
+                        example: 1
+                      name:
+                        type: string
+                        description: 고객명
+                        example: 홍길동
+                      mobileNumber:
+                        type: string
+                        description: 전화번호
+                        example: '010-1234-5678'
+                  address:
+                    type: object
+                    description: 배송지 정보
+                    required:
+                      - no
+                      - address
+                      - addressDetail
+                      - zipcode
+                      - recipientName
+                      - recipientMobile
+                    properties:
+                      no:
+                        type: integer
+                        description: 주소 번호
+                        example: 1
+                      address:
+                        type: string
+                        description: 주소
+                        example: '서울시 강남구'
+                      addressDetail:
+                        type: string
+                        description: 상세주소
+                        example: '123-45'
+                      zipcode:
+                        type: string
+                        description: 우편번호
+                        example: '12345'
+                      message:
+                        type: string
+                        description: 배송 메시지
+                        example: '문 앞에 놓아주세요'
+                      recipientName:
+                        type: string
+                        description: 수령인 이름
+                        example: '홍길동'
+                      recipientMobile:
+                        type: string
+                        description: 수령인 전화번호
+                        example: '010-1234-5678'
+                  deliveryMethod:
+                    type: object
+                    description: 배송 방법 정보
+                    required:
+                      - no
+                      - name
+                      - fee
+                    properties:
+                      no:
+                        type: integer
+                        description: 배송 방법 번호
+                        example: 1
+                      name:
+                        type: string
+                        description: 배송 방법 이름
+                        example: '우체국'
+                      fee:
+                        type: integer
+                        description: 배송비
+                        example: 3000
+
+    put:
+      tags: [Orders]
+      summary: 주문 수정
+      description: 기존 주문의 정보를 수정합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 주문 번호
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - addressNo
+                - deliveryMethodNo
+                - deliveryDate
+                - totalAmount
+              properties:
+                addressNo:
+                  type: integer
+                  description: 주소 번호
+                  example: 1
+                deliveryMethodNo:
+                  type: integer
+                  description: 배송 방법 번호
+                  example: 1
+                deliveryDate:
+                  type: string
+                  format: date-time
+                  description: 배송 날짜
+                  example: '2024-01-16T10:30:00Z'
+                totalAmount:
+                  type: number
+                  description: 총 금액
+                  example: 25000
+      responses:
+        '200':
+          description: 주문 수정 성공
+          # content:
+          #   application/json:
+          #     schema:
+          #       type: object
+          #       properties:
+          #         no:
+          #           type: integer
+          #           description: 주문 번호
+          #           example: 1
+          #         customerNo:
+          #           type: integer
+          #           description: 고객 번호
+          #           example: 1
+          #         addressNo:
+          #           type: integer
+          #           description: 주소 번호
+          #           example: 1
+          #         deliveryMethodNo:
+          #           type: integer
+          #           description: 배송 방법 번호
+          #           example: 1
+          #         orderDate:
+          #           type: string
+          #           format: date-time
+          #           description: 주문 날짜
+          #           example: '2024-01-15T10:30:00Z'
+          #         deliveryDate:
+          #           type: string
+          #           format: date-time
+          #           description: 배송 날짜
+          #           example: '2024-01-16T10:30:00Z'
+          #         status:
+          #           type: string
+          #           description: '주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소됨)'
+          #           example: '10'
+          #         totalAmount:
+          #           type: number
+          #           description: 총 금액
+          #           example: 25000
+
+    delete:
+      tags: [Orders]
+      summary: 주문 삭제
+      description: 특정 주문을 삭제합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 주문 번호
+          example: 1
+      responses:
+        '204':
+          description: 주문 삭제 성공
+
+  /customers:
+    get:
+      tags: [Customers]
+      summary: 고객 목록 조회
+      description: 모든 고객 목록을 조회합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 고객 목록 조회 성공
+          # content:
+          #   application/json:
+          #     schema:
+          #       type: array
+          #       items:
+          #         type: object
+          #         properties:
+          #           no:
+          #             type: integer
+          #             description: 고객 번호
+          #             example: 1
+          #           name:
+          #             type: string
+          #             description: 고객명
+          #             example: '홍길동'
+          #           mobileNumber:
+          #             type: string
+          #             description: 전화번호
+          #             example: '010-1234-5678'
+          #           createdAt:
+          #             type: string
+          #             format: date-time
+          #             description: '생성일시'
+          #             example: '2024-01-01T00:00:00.000Z'
+          #           updatedAt:
+          #             type: string
+          #             format: date-time
+          #             description: '수정일시'
+          #             example: '2024-01-01T00:00:00.000Z'
+
+    post:
+      tags: [Customers]
+      summary: 고객 생성
+      description: 새로운 고객을 생성합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      # requestBody:
+      #   required: true
+      #   content:
+      #     application/json:
+      #       schema:
+      #         type: object
+      #         required:
+      #           - name
+      #           - mobileNumber
+      #         properties:
+      #           name:
+      #             type: string
+      #             description: 고객명
+      #             example: '홍길동'
+      #           mobileNumber:
+      #             type: string
+      #             description: 전화번호
+      #             example: '010-1234-5678'
+      responses:
+        '201':
+          description: 고객 생성 성공
+          # content:
+          #   application/json:
+          #     schema:
+          #       type: object
+          #       properties:
+          #         no:
+          #           type: integer
+          #           description: 생성된 고객 번호
+          #           example: 1
+          #         name:
+          #           type: string
+          #           description: 고객명
+          #           example: '홍길동'
+          #         mobileNumber:
+          #           type: string
+          #           description: 전화번호
+          #           example: '010-1234-5678'
+          #         createdAt:
+          #           type: string
+          #           format: date-time
+          #           description: '생성일시'
+          #           example: '2024-01-01T00:00:00.000Z'
+          #         updatedAt:
+          #           type: string
+          #           format: date-time
+          #           description: '수정일시'
+          #           example: '2024-01-01T00:00:00.000Z'
+
+  /customers/{no}:
+    get:
+      tags: [Customers]
+      summary: 고객 상세 조회
+      description: 특정 고객의 상세 정보를 조회합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 고객 번호
+          example: 1
+      responses:
+        '200':
+          description: 고객 상세 조회 성공
+          # content:
+          #   application/json:
+          #     schema:
+          #       type: object
+          #       properties:
+          #         no:
+          #           type: integer
+          #           description: 고객 번호
+          #           example: 1
+          #         name:
+          #           type: string
+          #           description: 고객명
+          #           example: '홍길동'
+          #         mobileNumber:
+          #           type: string
+          #           description: 전화번호
+          #           example: '010-1234-5678'
+          #         createdAt:
+          #           type: string
+          #           format: date-time
+          #           description: '생성일시'
+          #           example: '2024-01-01T00:00:00.000Z'
+          #         updatedAt:
+          #           type: string
+          #           format: date-time
+          #           description: '수정일시'
+          #           example: '2024-01-01T00:00:00.000Z'
+
+    put:
+      tags: [Customers]
+      summary: 고객 수정
+      description: 기존 고객의 정보를 수정합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 고객 번호
+          example: 1
+      # requestBody:
+      #   required: true
+      #   content:
+      #     application/json:
+      #       schema:
+      #         type: object
+      #         required:
+      #           - name
+      #           - mobileNumber
+      #         properties:
+      #           name:
+      #             type: string
+      #             description: 고객명
+      #             example: '홍길동'
+      #           mobileNumber:
+      #             type: string
+      #             description: 전화번호
+      #             example: '010-1234-5678'
+      responses:
+        '200':
+          description: 고객 수정 성공
+          # content:
+          #   application/json:
+          #     schema:
+          #       type: object
+          #       properties:
+          #         no:
+          #           type: integer
+          #           description: 고객 번호
+          #           example: 1
+          #         name:
+          #           type: string
+          #           description: 고객명
+          #           example: '홍길동'
+          #         mobileNumber:
+          #           type: string
+          #           description: 전화번호
+          #           example: '010-1234-5678'
+          #         createdAt:
+          #           type: string
+          #           format: date-time
+          #           description: '생성일시'
+          #           example: '2024-01-01T00:00:00.000Z'
+          #         updatedAt:
+          #           type: string
+          #           format: date-time
+          #           description: '수정일시'
+          #           example: '2024-01-01T00:00:00.000Z'
+
+    delete:
+      tags: [Customers]
+      summary: 고객 삭제
+      description: 특정 고객을 삭제합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 고객 번호
+          example: 1
+      responses:
+        '204':
+          description: 고객 삭제 성공
+
+  /customers/{no}/address:
+    get:
+      tags: [Customers]
+      summary: 고객 주소 목록 조회
+      description: 특정 고객의 주소 목록을 조회합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 고객 번호
+          example: 1
+      responses:
+        '200':
+          description: 고객 주소 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - no
+                    - customerNo
+                    - address
+                    - addressDetail
+                    - zipcode
+                    - recipientName
+                    - recipientMobile
+                    - createdAt
+                    - updatedAt
+                  properties:
+                    no:
+                      type: integer
+                      description: 주소 번호
+                      example: 1
+                    customerNo:
+                      type: integer
+                      description: 고객 번호
+                      example: 1
+                    address:
+                      type: string
+                      description: 주소
+                      example: '서울시 강남구 테헤란로 123'
+                    addressDetail:
+                      type: string
+                      description: 상세주소
+                      example: '456동 789호'
+                    zipcode:
+                      type: string
+                      description: 우편번호
+                      example: '06123'
+                    recipientName:
+                      type: string
+                      description: 수령인 이름
+                      example: '홍길동'
+                    recipientMobile:
+                      type: string
+                      description: 수령인 휴대폰 번호
+                      example: '010-1234-5678'
+                    message:
+                      type: string
+                      description: 배송 메시지
+                      example: '문 앞에 놓아주세요'
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: '생성일시'
+                      example: '2024-01-01T00:00:00.000Z'
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      description: '수정일시'
+                      example: '2024-01-01T00:00:00.000Z'
+
+    post:
+      tags: [Customers]
+      summary: 고객 주소 생성
+      description: 특정 고객의 새로운 주소를 생성합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 고객 번호
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - address
+                - addressDetail
+                - zipcode
+                - recipientName
+                - recipientMobile
+              properties:
+                address:
+                  type: string
+                  description: 주소
+                  example: '서울시 강남구 테헤란로 123'
+                addressDetail:
+                  type: string
+                  description: 상세주소
+                  example: '456동 789호'
+                zipcode:
+                  type: string
+                  description: 우편번호
+                  example: '06123'
+                recipientName:
+                  type: string
+                  description: 수령인 이름
+                  example: '홍길동'
+                recipientMobile:
+                  type: string
+                  description: 수령인 휴대폰 번호
+                  example: '010-1234-5678'
+                message:
+                  type: string
+                  description: 배송 메시지 (선택사항)
+                  example: '문 앞에 놓아주세요'
+      responses:
+        '201':
+          description: 고객 주소 생성 성공
+          # content:
+          #   application/json:
+          #     schema:
+          #       type: object
+          #       properties:
+          #         no:
+          #           type: integer
+          #           description: 생성된 주소 번호
+          #           example: 1
+          #         customerNo:
+          #           type: integer
+          #           description: 고객 번호
+          #           example: 1
+          #         address:
+          #           type: string
+          #           description: 주소
+          #           example: '서울시 강남구 테헤란로 123'
+          #         addressDetail:
+          #           type: string
+          #           description: 상세주소
+          #           example: '456동 789호'
+          #         zipcode:
+          #           type: string
+          #           description: 우편번호
+          #           example: '06123'
+          #         recipientName:
+          #           type: string
+          #           description: 수령인 이름
+          #           example: '홍길동'
+          #         recipientMobile:
+          #           type: string
+          #           description: 수령인 휴대폰 번호
+          #           example: '010-1234-5678'
+          #         message:
+          #           type: string
+          #           description: 배송 메시지
+          #           example: '문 앞에 놓아주세요'
+          #         createdAt:
+          #           type: string
+          #           format: date-time
+          #           description: '생성일시'
+          #           example: '2024-01-01T00:00:00.000Z'
+          #         updatedAt:
+          #           type: string
+          #           format: date-time
+          #           description: '수정일시'
+          #           example: '2024-01-01T00:00:00.000Z'
+
+  /customers/{no}/address/{addressNo}:
+    get:
+      tags: [Customers]
+      summary: 고객 주소 상세 조회
+      description: 특정 고객의 특정 주소 상세 정보를 조회합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 고객 번호
+          example: 1
+        - in: path
+          name: addressNo
+          required: true
+          schema:
+            type: integer
+          description: 주소 번호
+          example: 1
+      responses:
+        '200':
+          description: 고객 주소 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - no
+                  - customerNo
+                  - address
+                  - addressDetail
+                  - zipcode
+                  - recipientName
+                  - recipientMobile
+                  - createdAt
+                  - updatedAt
+                properties:
+                  no:
+                    type: integer
+                    description: 주소 번호
+                    example: 1
+                  customerNo:
+                    type: integer
+                    description: 고객 번호
+                    example: 1
+                  address:
+                    type: string
+                    description: 주소
+                    example: '서울시 강남구 테헤란로 123'
+                  addressDetail:
+                    type: string
+                    description: 상세주소
+                    example: '456동 789호'
+                  zipcode:
+                    type: string
+                    description: 우편번호
+                    example: '06123'
+                  recipientName:
+                    type: string
+                    description: 수령인 이름
+                    example: '홍길동'
+                  recipientMobile:
+                    type: string
+                    description: 수령인 휴대폰 번호
+                    example: '010-1234-5678'
+                  message:
+                    type: string
+                    description: 배송 메시지
+                    example: '문 앞에 놓아주세요'
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: '생성일시'
+                    example: '2024-01-01T00:00:00.000Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: '수정일시'
+                    example: '2024-01-01T00:00:00.000Z'
+
+    put:
+      tags: [Customers]
+      summary: 고객 주소 수정
+      description: 특정 고객의 특정 주소 정보를 수정합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 고객 번호
+          example: 1
+        - in: path
+          name: addressNo
+          required: true
+          schema:
+            type: integer
+          description: 주소 번호
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - address
+                - addressDetail
+                - zipcode
+                - recipientName
+                - recipientMobile
+              properties:
+                address:
+                  type: string
+                  description: 주소
+                  example: '서울시 강남구 테헤란로 123'
+                addressDetail:
+                  type: string
+                  description: 상세주소
+                  example: '456동 789호'
+                zipcode:
+                  type: string
+                  description: 우편번호
+                  example: '06123'
+                recipientName:
+                  type: string
+                  description: 수령인 이름
+                  example: '홍길동'
+                recipientMobile:
+                  type: string
+                  description: 수령인 휴대폰 번호
+                  example: '010-1234-5678'
+                message:
+                  type: string
+                  description: 배송 메시지 (선택사항)
+                  example: '문 앞에 놓아주세요'
+      responses:
+        '200':
+          description: 고객 주소 수정 성공
+          # content:
+          #   application/json:
+          #     schema:
+          #       type: object
+          #       properties:
+          #         no:
+          #           type: integer
+          #           description: 주소 번호
+          #           example: 1
+          #         customerNo:
+          #           type: integer
+          #           description: 고객 번호
+          #           example: 1
+          #         address:
+          #           type: string
+          #           description: 주소
+          #           example: '서울시 강남구 테헤란로 123'
+          #         addressDetail:
+          #           type: string
+          #           description: 상세주소
+          #           example: '456동 789호'
+          #         zipcode:
+          #           type: string
+          #           description: 우편번호
+          #           example: '06123'
+          #         recipientName:
+          #           type: string
+          #           description: 수령인 이름
+          #           example: '홍길동'
+          #         recipientMobile:
+          #           type: string
+          #           description: 수령인 휴대폰 번호
+          #           example: '010-1234-5678'
+          #         message:
+          #           type: string
+          #           description: 배송 메시지
+          #           example: '문 앞에 놓아주세요'
+          #         createdAt:
+          #           type: string
+          #           format: date-time
+          #           description: '생성일시'
+          #           example: '2024-01-01T00:00:00.000Z'
+          #         updatedAt:
+          #           type: string
+          #           format: date-time
+          #           description: '수정일시'
+          #           example: '2024-01-01T00:00:00.000Z'
+
+    delete:
+      tags: [Customers]
+      summary: 고객 주소 삭제
+      description: 특정 고객의 특정 주소를 삭제합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 고객 번호
+          example: 1
+        - in: path
+          name: addressNo
+          required: true
+          schema:
+            type: integer
+          description: 주소 번호
+          example: 1
+      responses:
+        '204':
+          description: 고객 주소 삭제 성공
+
+  /delivery-methods:
+    get:
+      tags: [DeliveryMethods]
+      summary: 배송 방법 목록 조회
+      description: 배송 방법 목록을 조회합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 배송 방법 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - no
+                    - name
+                    - fee
+                    - isActive
+                    - deliveryType
+                    - deliveryTypeName
+                    - createdAt
+                    - updatedAt
+                  properties:
+                    no:
+                      type: integer
+                      description: 배송 방법 번호
+                      example: 1
+                    name:
+                      type: string
+                      description: 배송 방법 이름
+                      example: '우체국'
+                    memo:
+                      type: string
+                      description: 메모
+                      example: '1-2일 소요'
+                    fee:
+                      type: integer
+                      description: 배송비
+                      example: 3000
+                    isActive:
+                      type: boolean
+                      description: 활성화 여부
+                      example: true
+                    deliveryType:
+                      type: string
+                      enum: ['10', '20', '90']
+                      description: '배송 타입 (10-택배배송, 20-직접수령, 90-기타)'
+                      example: '10'
+                    deliveryTypeName:
+                      type: string
+                      description: '배송 타입 이름 (쿼리 파라미터가 있을 때만 포함)'
+                      example: '택배배송'
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: '생성일시'
+                      example: '2024-01-01T00:00:00.000Z'
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      description: '수정일시'
+                      example: '2024-01-01T00:00:00.000Z'
+
+    post:
+      tags: [DeliveryMethods]
+      summary: 배송 방법 생성
+      description: 새로운 배송 방법을 생성합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - deliveryType
+                - name
+                - fee
+                - isActive
+              properties:
+                deliveryType:
+                  type: string
+                  enum: ['10', '20', '90']
+                  description: '배송 타입 (10-택배배송, 20-직접수령, 90-기타)'
+                  example: '10'
+                name:
+                  type: string
+                  description: 배송 방법 이름
+                  example: '우체국'
+                fee:
+                  type: integer
+                  description: 배송비
+                  example: 3000
+                isActive:
+                  type: boolean
+                  description: 활성화 여부
+                  example: true
+      responses:
+        '201':
+          description: 배송 방법 생성 성공
+          # content:
+          #   application/json:
+          #     schema:
+          #       type: object
+          #       properties:
+          #         no:
+          #           type: integer
+          #           description: 생성된 배송 방법 번호
+          #           example: 1
+          #         deliveryType:
+          #           type: string
+          #           description: '배송 타입 (10-택배배송, 20-직접수령, 90-기타)'
+          #           example: '10'
+          #         name:
+          #           type: string
+          #           description: 배송 방법 이름
+          #           example: '우체국'
+          #         fee:
+          #           type: integer
+          #           description: 배송비
+          #           example: 3000
+          #         isActive:
+          #           type: boolean
+          #           description: 활성화 여부
+          #           example: true
+
+  /delivery-methods/active:
+    get:
+      tags: [DeliveryMethods]
+      summary: 활성화된 배송 방법 목록 조회
+      description: 활성화된 배송 방법만 조회합니다. (권한: 없음 - 누구나 접근 가능)
+      responses:
+        '200':
+          description: 활성화된 배송 방법 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - no
+                    - name
+                    - fee
+                    - isActive
+                    - deliveryType
+                    - deliveryTypeName
+                    - createdAt
+                    - updatedAt
+                  properties:
+                    no:
+                      type: integer
+                      description: 배송 방법 번호
+                      example: 1
+                    name:
+                      type: string
+                      description: 배송 방법 이름
+                      example: '우체국'
+                    memo:
+                      type: string
+                      description: 메모
+                      example: '1-2일 소요'
+                    fee:
+                      type: integer
+                      description: 배송비
+                      example: 3000
+                    isActive:
+                      type: boolean
+                      description: 활성화 여부
+                      example: true
+                    deliveryType:
+                      type: string
+                      enum: ['10', '20', '90']
+                      description: '배송 타입 (10-택배배송, 20-직접수령, 90-기타)'
+                      example: '10'
+                    deliveryTypeName:
+                      type: string
+                      description: '배송 타입 이름'
+                      example: '택배배송'
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: '생성일시'
+                      example: '2024-01-01T00:00:00.000Z'
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      description: '수정일시'
+                      example: '2024-01-01T00:00:00.000Z'
+
+  /delivery-methods/{no}:
+    get:
+      tags: [DeliveryMethods]
+      summary: 배송 방법 상세 조회
+      description: 특정 배송 방법의 상세 정보를 조회합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 배송 방법 번호
+          example: 1
+      responses:
+        '200':
+          description: 배송 방법 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - no
+                  - name
+                  - fee
+                  - isActive
+                  - deliveryType
+                  - deliveryTypeName
+                  - createdAt
+                  - updatedAt
+                properties:
+                  no:
+                    type: integer
+                    description: 배송 방법 번호
+                    example: 1
+                  name:
+                    type: string
+                    description: 배송 방법 이름
+                    example: '우체국'
+                  memo:
+                    type: string
+                    description: 메모
+                    example: '1-2일 소요'
+                  fee:
+                    type: integer
+                    description: 배송비
+                    example: 3000
+                  isActive:
+                    type: boolean
+                    description: 활성화 여부
+                    example: true
+                  deliveryType:
+                    type: string
+                    enum: ['10', '20', '90']
+                    description: '배송 타입 (10-택배배송, 20-직접수령, 90-기타)'
+                    example: '10'
+                  deliveryTypeName:
+                    type: string
+                    description: '배송 타입 이름'
+                    example: '택배배송'
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: '생성일시'
+                    example: '2024-01-01T00:00:00.000Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: '수정일시'
+                    example: '2024-01-01T00:00:00.000Z'
+
+    put:
+      tags: [DeliveryMethods]
+      summary: 배송 방법 수정
+      description: 기존 배송 방법의 정보를 수정합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 배송 방법 번호
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - deliveryType
+                - name
+                - fee
+                - isActive
+              properties:
+                deliveryType:
+                  type: string
+                  enum: ['10', '20', '90']
+                  description: '배송 타입 (10-택배배송, 20-직접수령, 90-기타)'
+                  example: '10'
+                name:
+                  type: string
+                  description: 배송 방법 이름
+                  example: '우체국'
+                fee:
+                  type: integer
+                  description: 배송비
+                  example: 3000
+                isActive:
+                  type: boolean
+                  description: 활성화 여부
+                  example: true
+      responses:
+        '200':
+          description: 배송 방법 수정 성공
+          # content:
+          #   application/json:
+          #     schema:
+          #       type: object
+          #       properties:
+          #         no:
+          #           type: integer
+          #           description: 배송 방법 번호
+          #           example: 1
+          #         deliveryType:
+          #           type: string
+          #           description: '배송 타입 (10-택배배송, 20-직접수령, 90-기타)'
+          #           example: '10'
+          #         name:
+          #           type: string
+          #           description: 배송 방법 이름
+          #           example: '우체국'
+          #         fee:
+          #           type: integer
+          #           description: 배송비
+          #           example: 3000
+          #         isActive:
+          #           type: boolean
+          #           description: 활성화 여부
+          #           example: true
+
+    delete:
+      tags: [DeliveryMethods]
+      summary: 배송 방법 삭제
+      description: 특정 배송 방법을 삭제합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 배송 방법 번호
+          example: 1
+      responses:
+        '204':
+          description: 배송 방법 삭제 성공
+
+  /common-code:
+    get:
+      tags: [CommonCodes]
+      summary: 공통 코드 목록 조회
+      description: 모든 공통 코드 목록을 조회합니다. 최대 1000개까지 조회 가능합니다. (권한: 없음 - 누구나 접근 가능)
+      responses:
+        '200':
+          description: 공통 코드 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - no
+                    - groupName
+                    - code
+                    - name
+                    - createdAt
+                    - updatedAt
+                  properties:
+                    no:
+                      type: integer
+                      description: 코드 번호
+                      example: 1
+                    groupName:
+                      type: string
+                      description: 코드 그룹명
+                      example: 'delivery_type'
+                    code:
+                      type: string
+                      description: 코드값
+                      example: '10'
+                    name:
+                      type: string
+                      description: 코드명
+                      example: '택배'
+                    remarkTxt:
+                      type: string
+                      description: 비고
+                      example: '택배 배송'
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: '생성일시'
+                      example: '2024-01-01T00:00:00.000Z'
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      description: '수정일시'
+                      example: '2024-01-01T00:00:00.000Z'
+
+    post:
+      tags: [CommonCodes]
+      summary: 공통 코드 생성
+      description: 새로운 공통 코드를 생성합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - groupName
+                - name
+              properties:
+                code:
+                  type: string
+                  description: 코드값
+                  example: '10'
+                groupName:
+                  type: string
+                  description: 코드 그룹명
+                  example: 'delivery_type'
+                name:
+                  type: string
+                  description: 코드명
+                  example: '택배'
+                remarkTxt:
+                  type: string
+                  description: 비고 (선택사항)
+                  example: '1-2일 소요'
+      responses:
+        '201':
+          description: 공통 코드 생성 성공
+
+  /common-code/{groupName}:
+    get:
+      tags: [CommonCodes]
+      summary: 공통 코드 그룹별 조회
+      description: 특정 그룹의 공통 코드만 조회합니다. (권한: 없음 - 누구나 접근 가능)
+      parameters:
+        - in: path
+          name: groupName
+          required: true
+          schema:
+            type: string
+            enum: [user_role, bread_status, material_type, order_status, purchase_status, delivery_type, image_target_type, discount_type, provider_type]
+          example: bread_status
+      responses:
+        '200':
+          description: 공통 코드 그룹별 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                required:
+                items:
+                  type: object
+                  required:
+                    - code
+                    - name
+                  properties: 
+                    code:
+                      type: string
+                      description: 코드값
+                      example: '10'
+                    name:
+                      type: string
+                      description: 코드명
+                      example: '판매'
+
+  /common-code/{no}:
+    put:
+      tags: [CommonCodes]
+      summary: 공통 코드 수정 
+      description: 기존 공통 코드의 정보를 수정합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 공통 코드 번호
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - groupName
+                - name
+              properties:
+                code:
+                  type: string
+                  description: 코드값
+                  example: '10'
+                groupName:
+                  type: string
+                  description: 코드 그룹명
+                  example: 'delivery_type'
+                name:
+                  type: string
+                  description: 코드명
+                  example: '택배'
+                remarkTxt:
+                  type: string
+                  description: 비고 (선택사항)
+                  example: '1-2일 소요'
+      responses:
+        '200':
+          description: 공통 코드 수정 성공
+
+    delete:
+      tags: [CommonCodes]
+      summary: 공통 코드 삭제
+      description: 특정 공통 코드를 삭제합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 공통 코드 번호
+          example: 1
+      responses:
+        '204':
+          description: 공통 코드 삭제 성공
+
+  /common-images:
+    get:
+      tags: [CommonImages]
+      summary: 공통 이미지 목록 조회
+      description: Cloudinary에 업로드된 모든 이미지 목록을 조회합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 이미지 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  resources:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        public_id:
+                          type: string
+                          description: 이미지 공개 ID
+                          example: 'bread_123'
+                        secure_url:
+                          type: string
+                          description: 이미지 URL
+                          example: 'https://res.cloudinary.com/example/image/upload/v1234567890/bread_123.jpg'
+                        format:
+                          type: string
+                          description: 이미지 형식
+                          example: 'jpg'
+                        width:
+                          type: integer
+                          description: 이미지 너비
+                          example: 800
+                        height:
+                          type: integer
+                          description: 이미지 높이
+                          example: 600
+                        bytes:
+                          type: integer
+                          description: 파일 크기 (바이트)
+                          example: 123456
+                        created_at:
+                          type: string
+                          format: date-time
+                          description: 업로드 시간
+                          example: '2024-01-01T00:00:00.000Z'
+                  rate_limit_allowed:
+                    type: integer
+                    description: 허용된 요청 수
+                    example: 500
+                  rate_limit_reset_at:
+                    type: string
+                    format: date-time
+                    description: 요청 제한 리셋 시간
+                    example: '2024-01-01T00:00:00.000Z'
+                  rate_limit_remaining:
+                    type: integer
+                    description: 남은 요청 수
+                    example: 499
+
+  /common-images/upload:
+    post:
+      tags: [CommonImages]
+      summary: 공통 이미지 업로드
+      description: Cloudinary에 이미지를 업로드합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+              properties:
+                image:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: 업로드할 이미지 파일들
+      responses:
+        '201':
+          description: 이미지 업로드 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    public_id:
+                      type: string
+                      description: 이미지 공개 ID
+                      example: 'bread_123'
+                    secure_url:
+                      type: string
+                      description: 이미지 URL
+                      example: 'https://res.cloudinary.com/example/image/upload/v1234567890/bread_123.jpg'
+                    original_filename:
+                      type: string
+                      description: 원본 파일명
+                      example: 'croissant.jpg'
+                    format:
+                      type: string
+                      description: 이미지 형식
+                      example: 'jpg'
+                    width:
+                      type: integer
+                      description: 이미지 너비
+                      example: 800
+                    height:
+                      type: integer
+                      description: 이미지 높이
+                      example: 600
+                    bytes:
+                      type: integer
+                      description: 파일 크기 (바이트)
+                      example: 123456
+
+  /common-images/delete:
+    delete:
+      tags: [CommonImages]
+      summary: 공통 이미지 삭제
+      description: Cloudinary에서 이미지를 삭제합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - publicIds
+              properties:
+                publicIds:
+                  type: array
+                  items:
+                    type: string
+                  description: 삭제할 이미지들의 public ID 배열
+                  example: ['bread_123', 'bread_456']
+      responses:
+        '204':
+          description: 이미지 삭제 성공

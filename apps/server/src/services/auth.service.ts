@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import type { User } from '@prisma/client';
 import { CookieOptions } from 'express';
+import { ClientPayload } from '@/types/client-payload';
 
 const SALT_ROUNDS = 10;
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || '';
@@ -28,17 +28,13 @@ export async function comparePassword(plain: string, hashed: string) {
 }
 
 /** 액세스 토큰 발급 */
-export function generateAccessToken(
-  user: Omit<User, 'pw' | 'refreshToken' | 'createdAt' | 'updatedAt'>,
-) {
-  return jwt.sign(user, JWT_ACCESS_SECRET, { expiresIn: JWT_ACCESS_EXPIRES_IN });
+export function generateAccessToken(client: ClientPayload) {
+  return jwt.sign(client, JWT_ACCESS_SECRET, { expiresIn: JWT_ACCESS_EXPIRES_IN });
 }
 
 /** 리프레시 토큰 발급 */
-export function generateRefreshToken(
-  user: Omit<User, 'pw' | 'refreshToken' | 'createdAt' | 'updatedAt'>,
-) {
-  return jwt.sign(user, JWT_REFRESH_SECRET, { expiresIn: JWT_REFRESH_EXPIRES_IN });
+export function generateRefreshToken(client: ClientPayload) {
+  return jwt.sign(client, JWT_REFRESH_SECRET, { expiresIn: JWT_REFRESH_EXPIRES_IN });
 }
 
 /** 리프레시 토큰 검증 */

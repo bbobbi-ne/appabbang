@@ -1,51 +1,51 @@
 /** packages */
+import 'dotenv/config';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import fileUpload from 'express-fileupload';
 import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+import path from 'path';
 
 /** routes */
-import commonCodeRouter from './routes/common-code.route';
-import commonImagesRouter from './routes/common-images.route';
 import authRouter from './routes/auth.route';
-import breadsRouter from './routes/breads.route';
-import deliveryMethodsRouter from './routes/delivery-methods.route';
-import addressRouter from './routes/address.route';
+import breadRouter from './routes/bread.route';
+import commonCodeRouter from './routes/common-code.route';
+import commonImageRouter from './routes/common-image.route';
+import customerRouter from './routes/customer.route';
+import deliveryMethodRouter from './routes/delivery-method.route';
 import orderRouter from './routes/order.route';
-import sampleRouter from './routes/sample.route';
 
 /** utils */
 import { loadAllCommonCodes } from './services/common-code.service';
-
-/** docs */
-import { swaggerSpec } from './docs/swagger';
 
 /** middlewares */
 import { errorHandler, notFoundHandler } from './middlewares/error.middleware';
 
 const app = express();
+const swaggerPath = path.resolve(__dirname, './docs/swagger.yaml');
+const swaggerDocument = YAML.load(swaggerPath);
 
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'http://localhost:3300'],
     credentials: true,
   }),
 );
 app.use(fileUpload({ useTempFiles: true }));
 
 // Routes
-app.use('/common-code', commonCodeRouter);
-app.use('/common-images', commonImagesRouter);
 app.use('/auth', authRouter);
-app.use('/breads', breadsRouter);
-app.use('/delivery-methods', deliveryMethodsRouter);
-app.use('/address', addressRouter);
+app.use('/breads', breadRouter);
+app.use('/common-code', commonCodeRouter);
+app.use('/common-images', commonImageRouter);
+app.use('/customers', customerRouter);
+app.use('/delivery-methods', deliveryMethodRouter);
 app.use('/orders', orderRouter);
-app.use('/sample', sampleRouter);
 
 // 헬스 체크용 라우터
 app.get('/', (_, res) => {
@@ -57,7 +57,7 @@ if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_SWAGGER === 'tru
   app.use(
     '/api-docs',
     swaggerUi.serve,
-    swaggerUi.setup(swaggerSpec, {
+    swaggerUi.setup(swaggerDocument, {
       customCss: `
         .curl-command,
         .opblock-section-header:has(.curl-command),
@@ -75,6 +75,11 @@ if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_SWAGGER === 'tru
       },
     }),
   );
+
+  app.get('/swagger.json', (_, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.json(swaggerDocument);
+  });
 }
 
 // 404 에러 핸들러 (라우터보다 뒤에 위치)
