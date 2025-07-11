@@ -246,7 +246,6 @@ function RouteComponent() {
         </Card>
       </div>
 
-      {/* test commit and push */}
       {/* <Button className="absolute -top-10 right-0 ml-auto">주문</Button> */}
     </div>
   );
