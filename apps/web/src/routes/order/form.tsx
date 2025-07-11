@@ -7,7 +7,6 @@ import { createFileRoute } from '@tanstack/react-router';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button, Card, CardHeader, CardTitle, CardContent, Input, Label } from '@appabbang/ui';
-import RequiredBar from '@/components/RequiredBar';
 import BreadCard from '@/components/BreadCard';
 import { searchBreadList } from '@/services/apis';
 import type { BreadProps } from '@/interface/BreadInterface';
@@ -247,6 +246,7 @@ function RouteComponent() {
         </Card>
       </div>
 
+      {/* test commit and push */}
       {/* <Button className="absolute -top-10 right-0 ml-auto">주문</Button> */}
     </div>
   );
