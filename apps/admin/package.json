@@ -3,12 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3000",
+    "dev": "vite --port 3300",
     "start": "vite --port 3000",
     "build": "vite build && tsc",
     "serve": "vite preview",
     "test": "vitest run",
-    "lint": "eslint"
+    "lint": "eslint",
+    "gen:api": "swagger-typescript-api generate -p http://localhost:4000/swagger.json -o src/api -n index.ts --axios -r --modular -d --extract-request-body --extract-response-body --extract-response-error --type-prefix type --type-import"
   },
   "dependencies": {
     "@appabbang/eslint": "workspace:*",
