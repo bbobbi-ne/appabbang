@@ -4,9 +4,12 @@ import { Bread, Image } from '@prisma/client';
 import * as ImageService from './image.service';
 import { UploadedFile } from 'express-fileupload';
 import { AppError } from '@/types';
+import { ClientType } from '@/types/client-payload';
 
 const IMAGE_TARGET_TYPE = '10'; // 빵 이미지 코드
+const CUSTOMER_AVALIABLE_BREAD_STATUS = ['10', '40', '50']; // 고객은 판매, 재료소진, 출시예정 만 조회 가능
 
+/** 빵 목록 전체 조회 */
 export const getAll = async () => {
   // 최대 10000 개 조회
   const result = await prisma.$transaction(async (tx) => {
@@ -14,6 +17,52 @@ export const getAll = async () => {
       take: 10000,
       orderBy: {
         no: 'desc',
+      },
+      select: {
+        no: true,
+        name: true,
+        unitPrice: true,
+        breadStatus: true,
+        createdAt: true,
+      },
+    });
+
+    const images = await tx.image.findMany({
+      take: 10000,
+      orderBy: [{ no: 'desc' }, { order: 'asc' }],
+      where: {
+        imageTargetType: IMAGE_TARGET_TYPE,
+        order: 1,
+      },
+    });
+
+    const imageMap = new Map<number, string>();
+    images.forEach((img: any) => {
+      imageMap.set(img.imageTargetNo, img.url);
+    });
+
+    const data = breads.map((bread: any) => ({
+      ...bread,
+      breadStatusName: getBreadStatusName(bread.breadStatus),
+      images: [...(imageMap.get(bread.no) ? [{ url: imageMap.get(bread.no) }] : [])],
+    }));
+
+    return data;
+  });
+
+  return result;
+};
+
+/** 고객을 위한 빵 전체 조회 */
+export const getAllForCustomer = async () => {
+  const result = await prisma.$transaction(async (tx) => {
+    const breads = await tx.bread.findMany({
+      where: { breadStatus: { in: CUSTOMER_AVALIABLE_BREAD_STATUS } },
+      select: {
+        no: true,
+        name: true,
+        unitPrice: true,
+        breadStatus: true,
       },
     });
 
@@ -94,7 +143,7 @@ export function getBreadStatusName(code: string): string {
 }
 
 /** 빵 상세 조회 */
-export const getByNo = async (no: number) => {
+export const getByNo = async (type: ClientType | undefined, no: number) => {
   const result = await prisma.$transaction(async (tx) => {
     const bread = await tx.bread.findUnique({
       where: { no },
@@ -102,6 +151,11 @@ export const getByNo = async (no: number) => {
 
     if (!bread) {
       throw AppError.notFound('빵을 찾을 수 없습니다.', { breadNo: no });
+    }
+
+    // 고객은 판매, 재료소진, 출시예정 만 조회 가능
+    if (type !== ClientType.USER && !CUSTOMER_AVALIABLE_BREAD_STATUS.includes(bread.breadStatus)) {
+      throw AppError.badRequest('잘못된 요청입니다.', { type, breadStatus: bread.breadStatus });
     }
 
     const images = await tx.image.findMany({

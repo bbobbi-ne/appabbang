@@ -8,6 +8,7 @@ const orderStatusMap = new Map<string, string>();
 const purchaseStatusMap = new Map<string, string>();
 const deliveryTypeMap = new Map<string, string>();
 const imageTargetTypeMap = new Map<string, string>();
+const providerTypeMap = new Map<string, string>();
 
 export const commonCodeMap = {
   userRoleMap,
@@ -17,6 +18,7 @@ export const commonCodeMap = {
   purchaseStatusMap,
   deliveryTypeMap,
   imageTargetTypeMap,
+  providerTypeMap,
 };
 
 export async function loadAllCommonCodes() {
@@ -28,6 +30,7 @@ export async function loadAllCommonCodes() {
     loadPurchaseStatusCodes(),
     loadDeliveryTypeCodes(),
     loadImageTargetTypeCodes(),
+    loadProviderTypeCodes(),
   ]);
 }
 
@@ -100,3 +103,61 @@ async function loadImageTargetTypeCodes() {
     imageTargetTypeMap.set(code.code, code.name);
   });
 }
+
+async function loadProviderTypeCodes() {
+  const codes = await prisma.commonCode.findMany({
+    where: { groupName: 'provider_type' },
+  });
+
+  codes.forEach((code: any) => {
+    providerTypeMap.set(code.code, code.name);
+  });
+}
+
+/** 공통 코드 목록 조회 */
+export const getList = async () => {
+  const list = await prisma.commonCode.findMany({
+    // select: { groupName: true, code: true, name: true, remarkTxt: true },
+  });
+  return list;
+};
+
+/** 공통 코드 그룹별 조회 */
+export const getListByGroupName = async (groupName: string) => {
+  const list = await prisma.commonCode.findMany({
+    where: { groupName },
+    select: { code: true, name: true },
+  });
+  return list;
+};
+
+/** 공통 코드 생성 */
+export const create = async (groupName: string, code: string, name: string, remarkTxt: string) => {
+  const created = await prisma.commonCode.create({
+    data: { groupName, code, name, remarkTxt },
+  });
+  return created;
+};
+
+/** 공통 코드 수정 */
+export const update = async (
+  no: number,
+  groupName: string,
+  code: string,
+  name: string,
+  remarkTxt: string,
+) => {
+  const updated = await prisma.commonCode.update({
+    where: { no },
+    data: { groupName, code, name, remarkTxt },
+  });
+  return updated;
+};
+
+/** 공통 코드 삭제 */
+export const remove = async (no: number) => {
+  const deleted = await prisma.commonCode.delete({
+    where: { no },
+  });
+  return deleted;
+};

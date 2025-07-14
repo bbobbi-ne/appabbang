@@ -2,9 +2,11 @@ import { prisma } from '@/lib/prisma';
 import { Address, Customer, OrderItem, Order } from '@prisma/client';
 import { hashPassword } from './auth.service';
 import { AppError } from '@/types';
+import { commonCodeMap } from './common-code.service';
 
 const ORDER_STATUS_CODE = '10'; // 접수됨
-const DISCOUNT_TYPE_CODE = '10'; // 기간할인
+const DISCOUNT_TYPE_CODE_PERIOD = '10'; // 기간할인
+const DISCOUNT_TYPE_CODE_CUSTOMER = '20'; // 고객할인
 
 /* 비회원 주문 생성 */
 export const createNonMemberOrder = async (
@@ -14,7 +16,10 @@ export const createNonMemberOrder = async (
       'address' | 'addressDetail' | 'zipcode' | 'message' | 'recipientName' | 'recipientMobile'
     > & {
       orderItems: Pick<OrderItem, 'breadNo' | 'quantity'>[];
-    } & Pick<Order, 'deliveryMethodNo' | 'orderPw' | 'totalPrice'>,
+    } & Pick<
+      Order,
+      'deliveryMethodNo' | 'discountNo' | 'orderPw' | 'totalPrice' | 'discountAmount'
+    >,
 ) => {
   const {
     name,
@@ -29,7 +34,13 @@ export const createNonMemberOrder = async (
     deliveryMethodNo,
     orderPw,
     totalPrice,
+    discountNo,
+    discountAmount,
   } = body;
+
+  if (discountAmount && !discountNo) {
+    throw AppError.badRequest('할인 금액에 해당하는 할인 코드가 없습니다.');
+  }
 
   const result = await prisma.$transaction(async (tx) => {
     const newCustomer = await tx.customer.create({
@@ -59,7 +70,14 @@ export const createNonMemberOrder = async (
       },
     });
 
-    const hashedOrderPw = await hashPassword(orderPw);
+    // 비밀번호 검증
+    // const isOrderPwValid = await comparePassword(orderPw!, hashedOrderPw);
+    // if (!isOrderPwValid) {
+    //   throw AppError.badRequest('비밀번호가 일치하지 않습니다.');
+    // }
+
+    const hashedOrderPw = await hashPassword(orderPw!);
+
     const newOrder = await tx.order.create({
       data: {
         customerNo: newCustomer.no,
@@ -68,9 +86,12 @@ export const createNonMemberOrder = async (
         orderNumber: generateOrderNumber(),
         orderStatus: ORDER_STATUS_CODE,
         totalPrice, // 계산 검증 필요
+        discountAmount: discountAmount ?? 0,
         orderPw: hashedOrderPw,
         paid: false,
         memo: '',
+        trackingNumber: '',
+        canceledAt: null,
       },
     });
 
@@ -98,17 +119,45 @@ export const createNonMemberOrder = async (
       0,
     );
 
+    let calculatedDiscountAmount = 0;
     // 할인 (기간할인)
-    const discount = await tx.discount.findFirst({
-      where: {
-        discountType: DISCOUNT_TYPE_CODE,
-        fromDt: { lte: new Date() },
-        toDt: { gte: new Date() },
-      },
-      orderBy: {
-        amount: 'desc',
-      },
-    });
+    if (discountNo && discountAmount) {
+      const discount = await tx.discount.findFirst({
+        where: {
+          discountType: DISCOUNT_TYPE_CODE_PERIOD,
+          fromDt: { lte: new Date() },
+          toDt: { gte: new Date() },
+          no: discountNo,
+        },
+        orderBy: {
+          amount: 'desc',
+        },
+        select: {
+          no: true,
+          amount: true,
+        },
+      });
+
+      if (!discount) {
+        throw AppError.badRequest('해당하는 할인 코드가 없습니다.');
+      }
+
+      if (discountAmount !== discount.amount) {
+        throw AppError.badRequest('할인 금액이 일치하지 않습니다.', {
+          calculatedDiscountAmount: discount?.amount,
+          discountAmount,
+        });
+      } else {
+        tx.order.update({
+          where: { no: newOrder.no },
+          data: {
+            discountNo: discount.no,
+          },
+        });
+
+        calculatedDiscountAmount = discount.amount ?? 0;
+      }
+    }
 
     // 배송비
     const deliveryMethod = await tx.deliveryMethod.findUnique({
@@ -117,13 +166,13 @@ export const createNonMemberOrder = async (
       },
     });
 
-    if (totalPrice !== originalTotalPrice - (discount?.amount ?? 0) + (deliveryMethod?.fee ?? 0)) {
+    if (totalPrice !== originalTotalPrice - calculatedDiscountAmount + (deliveryMethod?.fee ?? 0)) {
       throw AppError.badRequest('주문 금액이 일치하지 않습니다.', {
         calculatedTotalPrice:
-          originalTotalPrice - (discount?.amount ?? 0) + (deliveryMethod?.fee ?? 0),
+          originalTotalPrice - calculatedDiscountAmount + (deliveryMethod?.fee ?? 0),
         yourTotalPrice: totalPrice,
         breadsPrice: originalTotalPrice,
-        discountAmount: discount?.amount ?? 0,
+        discountAmount: calculatedDiscountAmount,
         deliveryFee: deliveryMethod?.fee ?? 0,
       });
     }
@@ -140,9 +189,152 @@ export const createNonMemberOrder = async (
       recipientMobile,
       orderItems,
       deliveryMethodNo,
-      orderPw,
       totalPrice,
+      discountAmount: calculatedDiscountAmount,
     };
+  });
+
+  return result;
+};
+
+/* 회원 주문 생성 */
+export const createMemberOrder = async (
+  body: {
+    orderItems: Pick<OrderItem, 'breadNo' | 'quantity'>[];
+  } & Pick<
+    Order,
+    'customerNo' | 'addressNo' | 'deliveryMethodNo' | 'discountNo' | 'totalPrice' | 'discountAmount'
+  >,
+) => {
+  const {
+    customerNo,
+    addressNo,
+    deliveryMethodNo,
+    discountNo,
+    totalPrice,
+    orderItems,
+    discountAmount,
+  } = body;
+
+  const result = await prisma.$transaction(async (tx) => {
+    const newOrder = await tx.order.create({
+      data: {
+        customerNo,
+        addressNo,
+        deliveryMethodNo,
+        orderNumber: generateOrderNumber(),
+        orderStatus: ORDER_STATUS_CODE,
+        totalPrice, // 계산 검증 필요
+        discountAmount: discountAmount ?? 0,
+        paid: false,
+        memo: '',
+        trackingNumber: '',
+        canceledAt: null,
+      },
+    });
+
+    const breadNos = orderItems.map((item) => item.breadNo);
+    const breads = await tx.bread.findMany({
+      where: { no: { in: breadNos } },
+      select: { no: true, unitPrice: true },
+    });
+    const breadPriceMap = new Map(breads.map((bread) => [bread.no, bread.unitPrice]));
+
+    await tx.orderItem.createMany({
+      data: orderItems.map((item) => ({
+        breadNo: item.breadNo,
+        quantity: item.quantity,
+        unitPrice: breadPriceMap.get(item.breadNo) ?? 0,
+        totalPrice: (breadPriceMap.get(item.breadNo) ?? 0) * item.quantity,
+        orderNo: newOrder.no,
+      })),
+    });
+
+    /////////////////////////계산 검증/////////////////////////
+    // 원가
+    const originalTotalPrice = orderItems.reduce(
+      (acc, item) => acc + (breadPriceMap.get(item.breadNo) ?? 0) * item.quantity,
+      0,
+    );
+
+    // 할인 금액
+    let calculatedDiscountAmount = 0;
+
+    if (discountNo) {
+      const discount = await tx.discount.findUnique({
+        where: {
+          no: discountNo,
+          fromDt: { lte: new Date() },
+          toDt: { gte: new Date() },
+        },
+        select: {
+          discountType: true,
+          amount: true,
+        },
+      });
+
+      if (!discount) {
+        throw AppError.badRequest('할인 코드가 일치하지 않습니다.');
+      }
+
+      // 고객 할인 검증 후 isUsed 업데이트 및 할인 금액 적용
+      if (discount?.discountType === DISCOUNT_TYPE_CODE_CUSTOMER) {
+        const discountCustomer = await tx.discountCustomer.findFirst({
+          where: {
+            customerNo,
+            discountNo,
+            isUsed: false,
+          },
+        });
+
+        if (!discountCustomer) {
+          throw AppError.badRequest('고객 할인 코드가 일치하지 않습니다.');
+        }
+
+        await tx.discountCustomer.update({
+          where: {
+            customerNo_discountNo: {
+              customerNo,
+              discountNo,
+            },
+          },
+          data: {
+            isUsed: true,
+          },
+        });
+
+        calculatedDiscountAmount = discount.amount ?? 0;
+      } else if (discount?.discountType === DISCOUNT_TYPE_CODE_PERIOD) {
+        calculatedDiscountAmount = discount.amount ?? 0;
+      }
+
+      if (discountAmount !== calculatedDiscountAmount) {
+        throw AppError.badRequest('할인 금액이 일치하지 않습니다.', {
+          calculatedDiscountAmount,
+          discountAmount,
+        });
+      }
+    }
+
+    // 배송비
+    const deliveryMethod = await tx.deliveryMethod.findUnique({
+      where: {
+        no: deliveryMethodNo,
+      },
+    });
+
+    if (totalPrice !== originalTotalPrice - calculatedDiscountAmount + (deliveryMethod?.fee ?? 0)) {
+      throw AppError.badRequest('주문 금액이 일치하지 않습니다.', {
+        calculatedTotalPrice:
+          originalTotalPrice - calculatedDiscountAmount + (deliveryMethod?.fee ?? 0),
+        yourTotalPrice: totalPrice,
+        breadsPrice: originalTotalPrice,
+        discountAmount: calculatedDiscountAmount,
+        deliveryFee: deliveryMethod?.fee ?? 0,
+      });
+    }
+
+    return newOrder;
   });
 
   return result;
@@ -157,4 +349,189 @@ export const generateOrderNumber = () => {
     .toString()
     .padStart(3, '0');
   return `ORD-${date}-${time}${random}`;
+};
+
+export const getOrderList = async () => {
+  const orders = await prisma.order.findMany({
+    select: {
+      no: true,
+      orderNumber: true,
+      orderStatus: true,
+      totalPrice: true,
+      paid: true,
+      trackingNumber: true,
+      canceledAt: true,
+      createdAt: true,
+      updatedAt: true,
+      customer: {
+        select: {
+          no: true,
+          name: true,
+          mobileNumber: true,
+        },
+      },
+      address: {
+        select: {
+          no: true,
+          address: true,
+          addressDetail: true,
+          zipcode: true,
+          message: true,
+          recipientName: true,
+          recipientMobile: true,
+        },
+      },
+      deliveryMethod: {
+        select: {
+          no: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  const result = orders.map((order) => ({
+    ...order,
+    orderStatusName: getOrderStatusName(order.orderStatus),
+  }));
+
+  return result;
+};
+
+export const getOrderByNo = async (no: number) => {
+  const order = await prisma.order.findUnique({
+    where: { no },
+    select: {
+      no: true,
+      orderNumber: true,
+      orderStatus: true,
+      totalPrice: true,
+      discountAmount: true,
+      paid: true,
+      trackingNumber: true,
+      canceledAt: true,
+      createdAt: true,
+      updatedAt: true,
+      orderItem: {
+        select: {
+          breadNo: true,
+          quantity: true,
+          unitPrice: true,
+          totalPrice: true,
+          bread: {
+            select: {
+              no: true,
+              name: true,
+            },
+          },
+        },
+      },
+      customer: {
+        select: {
+          no: true,
+          name: true,
+          mobileNumber: true,
+        },
+      },
+      address: {
+        select: {
+          no: true,
+          address: true,
+          addressDetail: true,
+          zipcode: true,
+          message: true,
+          recipientName: true,
+          recipientMobile: true,
+        },
+      },
+      deliveryMethod: {
+        select: {
+          no: true,
+          name: true,
+          fee: true,
+        },
+      },
+    },
+  });
+
+  return order;
+};
+
+/** 주문 이름 조회 */
+export function getOrderStatusName(code: string): string {
+  return commonCodeMap.orderStatusMap.get(code) || '-';
+}
+
+/** 주문 수정  */
+export const updateOrder = async (
+  no: number,
+  body: {
+    orderStatus: string;
+    paid: boolean;
+    trackingNumber: string;
+    address: string;
+    addressDetail: string;
+    zipcode: string;
+    message: string;
+  },
+) => {
+  const updated = await prisma.order.update({
+    where: { no },
+    data: {
+      orderStatus: body.orderStatus,
+      paid: body.paid,
+      trackingNumber: body.trackingNumber,
+      address: {
+        update: {
+          address: body.address,
+          addressDetail: body.addressDetail,
+          zipcode: body.zipcode,
+          message: body.message,
+        },
+      },
+    },
+  });
+
+  return updated;
+};
+
+/** 주문 상태 수정 */
+export const updateOrderStatus = async (no: number, orderStatus: string) => {
+  const updated = await prisma.order.update({
+    where: { no },
+    data: {
+      orderStatus,
+    },
+  });
+
+  return updated;
+};
+
+/** 주문 입금확인여부 수정  */
+export const updateOrderPaid = async (no: number, paid: boolean) => {
+  const updated = await prisma.order.update({
+    where: { no },
+    data: { paid },
+  });
+
+  return updated;
+};
+
+/** 주문 삭제  */
+export const remove = async (no: number) => {
+  // orderStatus 가 10 접수됨, 20 제조중, 30 배송중 일 경우 삭제 불가
+  const order = await prisma.order.findUnique({
+    where: { no },
+    select: { orderStatus: true },
+  });
+
+  if (order?.orderStatus === '10' || order?.orderStatus === '20' || order?.orderStatus === '30') {
+    throw AppError.badRequest('주문 상태가 접수됨, 제조중, 배송중일 경우 삭제 불가');
+  }
+
+  const removed = await prisma.order.delete({
+    where: { no },
+  });
+
+  return removed;
 };

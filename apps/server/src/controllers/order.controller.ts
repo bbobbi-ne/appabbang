@@ -1,35 +1,22 @@
 import { Request, Response } from 'express';
 import * as OrderService from '@/services/order.service';
-import * as BreadService from '@/services/bread.service';
-// import { commonCodeMap } from '@/services/common-code.service';
+import { AppError } from '@/types';
 
-/** 코드 조회 */
-// export function getCodeName(code: string): string {
-//   return commonCodeMap.deliveryTypeMap.get(code) || '-';
-// }
-
+/** 주문 목록 조회 */
 export const getList = async (_: Request, res: Response) => {
-  res.status(200).json('Hello World');
-};
-export const getListAll = async (_: Request, res: Response) => {
-  res.status(200).json('Hello World');
-};
-export const getOne = async (_: Request, res: Response) => {
-  // 주문서 보기
-  /*
-  1. 비회원일경우 
-      orderPw 와 mobileNumber 로 주문서 조회
+  const orders = await OrderService.getOrderList();
 
-  2. 회원일경우 
-      orderNumber 로 주문서 조회  (본인 확인 후 조회)
-
-  3. 관리자일 경우 
-      no ?  로 주문서 조회  (권한 확인 후 조회 )
-  */
-  res.status(200).json('Hello World');
+  res.status(200).json(orders);
 };
+
+/** 주문 상세 조회 */
+export const getOne = async (req: Request, res: Response) => {
+  const order = await OrderService.getOrderByNo(Number(req.params.no));
+  res.status(200).json(order);
+};
+
+/** 주문 생성 (비회원, 회원) */
 export const create = async (req: Request, res: Response) => {
-  // 비회원 기준으로 작성됨. 회원 주문은 처리 예정.
   const {
     name,
     mobileNumber,
@@ -43,30 +30,90 @@ export const create = async (req: Request, res: Response) => {
     deliveryMethodNo,
     orderPw,
     totalPrice,
+    discountNo,
+    discountAmount,
   } = req.body;
 
-  const payload = {
-    name,
-    mobileNumber,
+  const user = req.user;
+
+  if (!user && !orderPw) {
+    throw AppError.badRequest('주문 비밀번호를 입력해주세요.');
+  }
+
+  if (!user) {
+    const newOrder = await OrderService.createNonMemberOrder({
+      name,
+      mobileNumber,
+      address,
+      addressDetail,
+      zipcode,
+      message,
+      recipientName,
+      recipientMobile,
+      orderItems,
+      deliveryMethodNo,
+      orderPw,
+      totalPrice,
+      discountNo,
+      discountAmount,
+    });
+    res.status(201).json(newOrder);
+  } else {
+    const newOrder = await OrderService.createMemberOrder({
+      orderItems,
+      customerNo: user.no,
+      addressNo: user.addressNo,
+      deliveryMethodNo,
+      discountNo,
+      totalPrice,
+      discountAmount,
+    });
+    res.status(201).json(newOrder);
+  }
+};
+
+/** 주문 수정 */
+export const update = async (req: Request, res: Response) => {
+  const { no } = req.params;
+  const { orderStatus, paid, trackingNumber, address, addressDetail, zipcode, message } = req.body;
+
+  const updated = await OrderService.updateOrder(Number(no), {
+    orderStatus,
+    paid,
+    trackingNumber,
     address,
     addressDetail,
     zipcode,
     message,
-    recipientName,
-    recipientMobile,
-    orderItems,
-    deliveryMethodNo,
-    orderPw,
-    totalPrice,
-  };
+  });
 
-  const newOrder = await OrderService.createNonMemberOrder(payload);
+  res.status(200).json(updated);
+};
 
-  res.status(201).json(newOrder);
+/** 주문 상태 수정 */
+export const updateOrderStatus = async (req: Request, res: Response) => {
+  const { no } = req.params;
+  const { orderStatus } = req.body;
+
+  const updated = await OrderService.updateOrderStatus(Number(no), orderStatus);
+
+  res.status(200).json(updated);
 };
-export const update = async (_: Request, res: Response) => {
-  res.status(200).json('Hello World');
+
+/** 주문 입금확인여부 수정 */
+export const updateOrderPaid = async (req: Request, res: Response) => {
+  const { no } = req.params;
+  const { paid } = req.body;
+
+  const updated = await OrderService.updateOrderPaid(Number(no), paid);
+
+  res.status(200).json(updated);
 };
-export const remove = async (_: Request, res: Response) => {
-  res.status(204).json('Hello World');
+
+/** 주문 삭제 */
+export const remove = async (req: Request, res: Response) => {
+  const { no } = req.params;
+  const removed = await OrderService.remove(Number(no));
+
+  res.status(204).json(removed);
 };
