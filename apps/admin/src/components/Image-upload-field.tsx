@@ -14,7 +14,7 @@ import {
 import type { ControllerRenderProps } from 'react-hook-form';
 import { useCallback, useRef } from 'react';
 import { Plus, X } from 'lucide-react';
-import { useDeleteBreadImgMutation } from '@/hooks/use-breads';
+import { useimageDeleteMutation } from '@/hooks/use-breads';
 
 interface CloudinaryFile {
   name: string;
@@ -32,7 +32,7 @@ export function ImageUploadField({
 }) {
   const { value = [], onChange } = field;
   const inputRef = useRef<HTMLInputElement>(null);
-  const { deleteBreadImgMutation } = useDeleteBreadImgMutation();
+  const { imageDeleteMutation } = useimageDeleteMutation();
 
   const handleInputClick = () => {
     inputRef.current?.click();
@@ -56,7 +56,7 @@ export function ImageUploadField({
     const isFile = file instanceof File;
 
     if (!isFile) {
-      deleteBreadImgMutation({ no: no!, publicId: file.publicId });
+      imageDeleteMutation({ no: no!, publicId: file.publicId });
     }
 
     const newImageArray = value.filter((file: File | CloudinaryFile, i: number) => i !== index);

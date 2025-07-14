@@ -1,4 +1,5 @@
-import { getMaterialType, type ApiResponse, type MaterialTypeResponse } from '@/service/common-api';
+import type { CommonCodeDetailData } from '@/api/data-contracts';
+import { getMaterialType } from '@/service/common-api';
 import { useQueries } from '@tanstack/react-query';
 
 export function useMaterialAndTypeQuery() {
@@ -17,7 +18,7 @@ export function useMaterialAndTypeQuery() {
         queryFn: getMaterialType,
         staleTime: Infinity,
         retry: 1,
-        select: (res) => (res as ApiResponse<MaterialTypeResponse>).data,
+        select: (res) => (res as { data: CommonCodeDetailData }).data,
       },
     ],
   });

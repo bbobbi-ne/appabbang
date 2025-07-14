@@ -37,9 +37,9 @@ import {
 
 import { TablePagination } from '@/components/table-pagination';
 import { BreadCreateDialog } from '@/components/bread-create-dialog';
-import { useDeleteBreadMutation, useGetBreadsAndStatusQuery } from '@/hooks/use-breads';
+import { useBreadsDeleteMutation, useGetBreadsAndStatusQuery } from '@/hooks/use-breads';
 import { BreadModifyDialog } from '@/components/bread-modify-dialog';
-import { BreadsColumns } from '@/data/columns';
+import { BreadsColumns, type BreadListItem } from '@/data/columns';
 import TableSkeleton from '@/components/table-skeletion';
 
 export const Route = createFileRoute('/dashboard/breads/')({
@@ -51,11 +51,11 @@ function RouteComponent() {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
   const { breads, isError, isLoading } = useGetBreadsAndStatusQuery();
-  const { deleteBreadMutation } = useDeleteBreadMutation();
+  const { deleteBreadMutation } = useBreadsDeleteMutation();
   const columns = BreadsColumns();
 
-  const table = useReactTable<BreadsColumns>({
-    data: breads as BreadsColumns[],
+  const table = useReactTable<BreadListItem>({
+    data: breads || [],
     columns,
     state: {
       pagination,
@@ -132,7 +132,7 @@ function RouteComponent() {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>취소</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => deleteBreadMutation(selectedRows)}>
+                  <AlertDialogAction onClick={() => deleteBreadMutation({ noList: selectedRows })}>
                     삭제
                   </AlertDialogAction>
                 </AlertDialogFooter>

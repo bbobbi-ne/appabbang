@@ -1,4 +1,4 @@
-import type { Admin } from '@/service/auth-api';
+import type { GetAuthData } from '@/api/data-contracts';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
@@ -6,8 +6,8 @@ interface AuthState {
   accessToken: string | null;
   setAccessToken: (token: string) => void;
   clearAccessToken: () => void;
-  auth: Admin | null;
-  setAuth: (data: Admin) => void;
+  auth: GetAuthData | null;
+  setAuth: (data: GetAuthData) => void;
   clearAuth: () => void;
 }
 

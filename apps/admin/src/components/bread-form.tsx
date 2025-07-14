@@ -20,7 +20,6 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useGetBreadsAndStatusQuery } from '@/hooks/use-breads';
 import { useRef } from 'react';
-import type { ApiResponse } from '@/service/common-api';
 import { formatKR } from '@/utils/format';
 
 export const breadSchema = z.object({
@@ -51,7 +50,7 @@ export const breadSchema = z.object({
 export type BreadsDailogForm = z.infer<typeof breadSchema>;
 
 interface BreadFormProps {
-  submitFn: (arg: any) => Promise<ApiResponse<any>>;
+  submitFn: (arg: any) => Promise<any>;
   currentValues?: BreadsDailogForm;
   no?: number;
 }
@@ -74,11 +73,25 @@ function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
   });
 
   const onSubmit = async (data: BreadsDailogForm) => {
+    const formData = new FormData();
+
+    formData.append('name', data.name);
+    formData.append('description', data.description);
+    formData.append('unitPrice', data.unitPrice);
+    formData.append('breadStatus', data.breadStatus);
+
+    data.image.forEach((file) => {
+      if (file instanceof File) {
+        formData.append('image', file);
+      }
+    });
+
+    if (no !== undefined) {
+      formData.append('no', String(no));
+    }
+
     try {
-      await submitFn({
-        ...data,
-        ...(no !== undefined ? { no } : {}),
-      });
+      await submitFn({ formData: formData, no: no || {} });
 
       form.reset();
       closeRef.current?.click();

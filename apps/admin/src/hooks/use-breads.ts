@@ -1,14 +1,14 @@
+import type { BreadsListData, CommonCodeDetailData } from '@/api/data-contracts';
 import {
-  createBread,
-  deleteBread,
-  deleteBreadImg,
-  getBread,
+  breadsCreate,
+  breadsDelete,
+  imageDelete,
   getBreads,
-  updateBread,
-  updateBreadStatus,
-  type Breads,
+  breadsUpdate,
+  statusUpdate,
+  breadsDetail,
 } from '@/service/bread-api';
-import { getBreadStatus, type ApiResponse, type BreadStatusResponse } from '@/service/common-api';
+import { getBreadStatus } from '@/service/common-api';
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export function useGetBreadsAndStatusQuery() {
@@ -19,14 +19,14 @@ export function useGetBreadsAndStatusQuery() {
         queryFn: getBreads,
         staleTime: Infinity,
         retry: 1,
-        select: (res) => (res as ApiResponse<Breads[]>).data,
+        select: (res) => (res as { data: BreadsListData }).data,
       },
       {
         queryKey: ['breadStatus', 'common'],
         queryFn: getBreadStatus,
         staleTime: Infinity,
         retry: 1,
-        select: (res) => (res as ApiResponse<BreadStatusResponse>).data,
+        select: (res) => (res as { data: CommonCodeDetailData }).data,
       },
     ],
   });
@@ -42,58 +42,57 @@ export function useGetBreadsAndStatusQuery() {
   };
 }
 
-export function useGetBreadQuery(no: number) {
+export function useBreadsDetailQuery(no: number) {
   return useQuery({
     queryKey: ['bread', { no }],
-    queryFn: getBread,
+    queryFn: breadsDetail,
     staleTime: Infinity,
     retry: 1,
     select: (res) => res.data,
   });
 }
 
-export function useCreateBreadMutation() {
+export function useBreadsCreateMutation() {
   const queryClient = useQueryClient();
   const { mutateAsync, error, isError, isSuccess, isPending } = useMutation({
-    mutationFn: createBread,
+    mutationFn: breadsCreate,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['breads'] });
     },
   });
 
-  return { CreateBreadMutation: mutateAsync, isError, error, isSuccess, isPending };
+  return { breadsCreateMutation: mutateAsync, isError, error, isSuccess, isPending };
 }
 
-export function useUpdateBreadMutation() {
+export function useBreadsUpdateMutation() {
   const queryClient = useQueryClient();
   const { mutateAsync, isError, isSuccess, error } = useMutation({
-    mutationFn: updateBread,
+    mutationFn: breadsUpdate,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['breads'] });
-
       queryClient.invalidateQueries({ queryKey: ['bread', { no: variables.no }] });
     },
   });
 
-  return { updateBreadMutation: mutateAsync, isError, isSuccess, error };
+  return { breadsUpdateMutation: mutateAsync, isError, isSuccess, error };
 }
 
-export function useUpdateBreadStatusMutation() {
+export function useStatusUpdateMutation() {
   const queryClient = useQueryClient();
   const { mutate, isError, isSuccess, error } = useMutation({
-    mutationFn: updateBreadStatus,
+    mutationFn: statusUpdate,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['breads'] });
     },
   });
 
-  return { updateBreadStatusMutation: mutate, isError, isSuccess, error };
+  return { statusUpdateMutation: mutate, isError, isSuccess, error };
 }
 
-export function useDeleteBreadMutation() {
+export function useBreadsDeleteMutation() {
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
-    mutationFn: deleteBread,
+    mutationFn: breadsDelete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['breads'] });
     },
@@ -102,14 +101,15 @@ export function useDeleteBreadMutation() {
   return { deleteBreadMutation: mutate };
 }
 
-export function useDeleteBreadImgMutation() {
+export function useimageDeleteMutation() {
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
-    mutationFn: deleteBreadImg,
+    mutationFn: imageDelete,
     onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['breads'] });
       queryClient.invalidateQueries({ queryKey: ['bread', { no: variables.no }] });
     },
   });
 
-  return { deleteBreadImgMutation: mutate, isPending };
+  return { imageDeleteMutation: mutate, isPending };
 }
