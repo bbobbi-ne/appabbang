@@ -10,3 +10,8 @@ export async function searchBreadList() {
   const breadStatus = 10; // 판매중
   return client.get(`/breads?breadStatus=${breadStatus}`);
 }
+
+/** 배송방법 목록 조회 */
+export async function searchDeliveryList() {
+  return client.get(`/delivery-methods/active`);
+}
