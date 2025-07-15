@@ -19,6 +19,7 @@
     "axios": "^1.9.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.0",
+    "react-daum-postcode": "^3.2.0",
     "styled-components": "^6.1.19"
   }
 }
