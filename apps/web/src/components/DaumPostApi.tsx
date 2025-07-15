@@ -14,7 +14,6 @@ function DaumPostApi({ setAddress }: any) {
   const onComplete = (data: any) => {
     let fullAddress = data.address;
     let extraAddress = ''; //추가될 주소
-    let localAddress = data.sido + ' ' + data.sigungu; //지역주소(시, 도 + 시, 군, 구)
 
     //주소타입이 도로명주소일 경우
     if (data.addressType === 'R') {
