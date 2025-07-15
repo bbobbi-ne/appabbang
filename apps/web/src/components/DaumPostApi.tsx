@@ -11,7 +11,7 @@ function DaumPostApi({ setAddress }: any) {
   const open = useDaumPostcodePopup(postcodeScriptUrl);
 
   /** 핸들러 */
-  const handleComplete = (data: any) => {
+  const onComplete = (data: any) => {
     let fullAddress = data.address;
     let extraAddress = ''; //추가될 주소
     let localAddress = data.sido + ' ' + data.sigungu; //지역주소(시, 도 + 시, 군, 구)
@@ -22,17 +22,14 @@ function DaumPostApi({ setAddress }: any) {
       data.buildingName !== '' &&
         (extraAddress += extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName); // 건물명
 
-      fullAddress = fullAddress.replace(localAddress, ''); //지역주소 제외 전체주소 치환
       fullAddress += extraAddress !== '' ? ` (${extraAddress})` : '';
     }
-    debugger;
+
     setAddress(fullAddress); // setAddress를 호출하여 부모 컴포넌트의 상태 업데이트
   };
 
   /** 주소 검색 버튼 클릭 시 활성화되는 이벤트 - 결과 주소를 클릭하면 해당 함수가 수행된다 */
-  const handleClick = () => {
-    open({ onComplete: handleComplete });
-  };
+  const handleClick = () => open({ onComplete });
 
   return (
     <>
