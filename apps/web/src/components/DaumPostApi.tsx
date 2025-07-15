@@ -5,13 +5,59 @@
 import { Button } from '@appabbang/ui';
 import { useDaumPostcodePopup } from 'react-daum-postcode';
 
-function DaumPostApi({ setAddress }: any) {
+interface ParamsProp {
+  setAddress: (address: string) => void;
+}
+
+interface ResultPostProp {
+  address: string;
+  addressEnglish: string;
+  addressType: string;
+  apartment: string;
+  autoJibunAddress: string;
+  autoJibunAddressEnglish: string;
+  autoRoadAddress: string;
+  autoRoadAddressEnglish: string;
+  bcode: string;
+  bname: string;
+  bname1: string;
+  bname1English: string;
+  bname2: string;
+  bname2English: string;
+  bnameEnglish: string;
+  buildingCode: string;
+  buildingName: string;
+  hname: string;
+  jibunAddress: string;
+  jibunAddressEnglish: string;
+  noSelected: string;
+  postcode: string;
+  postcode1: string;
+  postcode2: string;
+  postcodeSeq: string;
+  query: string;
+  roadAddress: string;
+  roadAddressEnglish: string;
+  roadname: string;
+  roadnameCode: string;
+  roadnameEnglish: string;
+  sido: string;
+  sidoEnglish: string;
+  sigungu: string;
+  sigunguCode: string;
+  sigunguEnglish: string;
+  userLanguageType: string;
+  userSelectedType: string;
+  zonecode: string;
+}
+
+function DaumPostApi({ setAddress }: ParamsProp) {
   //클릭 시 수행될 팝업 생성 함수
   const postcodeScriptUrl = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
   const open = useDaumPostcodePopup(postcodeScriptUrl);
 
   /** 핸들러 */
-  const onComplete = (data: any) => {
+  const onComplete = (data: ResultPostProp) => {
     let fullAddress = data.address;
     let extraAddress = ''; //추가될 주소
 
@@ -28,7 +74,7 @@ function DaumPostApi({ setAddress }: any) {
   };
 
   /** 주소 검색 버튼 클릭 시 활성화되는 이벤트 - 결과 주소를 클릭하면 해당 함수가 수행된다 */
-  const handleClick = () => open({ onComplete });
+  const handleClick = () => open({ onComplete: onComplete as any });
 
   return (
     <>
