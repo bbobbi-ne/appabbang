@@ -57,7 +57,6 @@ function RouteComponent() {
   const [totalCount, setTotalCount] = useState<number>(0); // 최종 수량
   const [totalPrice, setTotalPrice] = useState<number>(0); // 최종 금액
   const [agreed, setAgreed] = useState<boolean>(false); // 비회원 동의
-  const [deliveryList, setDeliveryList] = useState<DeliveryProps[]>([]);
   const [address, setAddress] = useState<string>(''); // 주소
   const [addressDetail, setAddressDetail] = useState<string>(''); // 상세주소
   /**********************************************************************************/
@@ -229,11 +228,6 @@ function RouteComponent() {
     error && setErrMsg('빵 목록을 조회하는 데 문제가 발생했습니다.');
   }, [data, error]);
 
-  /** 배송방법 목록 조회 및 설정 */
-  useEffect(() => {
-    deliveryData && setDeliveryList(deliveryData.data);
-  }, [deliveryData, deliveryErr]);
-
   /** 빵 결제목록의 총 개수, 총 금액 계산 */
   useEffect(() => {
     const count = paymentList.reduce((sum, bread) => sum + (bread.count ?? 0), 0);
@@ -321,6 +315,10 @@ function RouteComponent() {
                           placeholder="주문자 이름 입력"
                           {...field}
                           {...form.register('name')}
+                          onChange={(e) => {
+                            form.setValue('recipientName', e.target.value);
+                            field.onChange(e);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -341,6 +339,10 @@ function RouteComponent() {
                           type="text"
                           {...field}
                           {...form.register('mobileNumber')}
+                          onChange={(e) => {
+                            form.setValue('recipientMobile', e.target.value);
+                            field.onChange(e);
+                          }}
                           placeholder="주문자 전화번호 입력"
                         />
                       </FormControl>
@@ -472,7 +474,7 @@ function RouteComponent() {
                             </SelectTrigger>
                           </Select>
                         ) : (
-                          <Select>
+                          <Select value={field.value} onValueChange={field.onChange}>
                             <SelectTrigger className="w-[180px]">
                               <SelectValue placeholder="선택하세요." />
                             </SelectTrigger>
