@@ -29,7 +29,7 @@ import {
   Checkbox,
 } from '@appabbang/ui';
 import BreadCard from '@/components/BreadCard';
-import { searchBreadList, searchDeliveryList } from '@/services/apis';
+import { insertOrders, searchBreadList, searchDeliveryList } from '@/services/apis';
 import type { BreadProps, DeliveryProps } from '@/interface/BreadInterface';
 import OrderFormSkeleton from '@/components/OrderFormSkeleton';
 import BreadSearch from '@/components/BreadSearch';
@@ -41,7 +41,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formSchema } from '@/validate/formSchema';
 import type { FormSchema } from '@/validate/formSchema';
-import AlertError from '@/components/AlertError';
+import { toast } from 'sonner';
 
 /**********************************************************************************/
 /** Route */
@@ -58,7 +58,6 @@ function RouteComponent() {
   const [keyword, setKeyword] = useState<string>(''); // 빵 키워드
   const [totalCount, setTotalCount] = useState<number>(0); // 최종 수량
   const [totalPrice, setTotalPrice] = useState<number>(0); // 최종 금액
-  // const [agreed, setAgreed] = useState<boolean>(false); // 비회원 동의
 
   /**********************************************************************************/
   /**
@@ -211,10 +210,9 @@ function RouteComponent() {
       data.orderItems = orderItems;
       data.totalPrice = totalPrice;
 
-      console.log(data);
+      insertOrders(data); // 비회원 주문서 저장
     } catch (e: any) {
-      alert(e.message);
-      return false;
+      toast.error(e.message);
     }
   };
 
