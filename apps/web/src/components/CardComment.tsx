@@ -8,7 +8,7 @@ interface CardCommentProp {
 function CardComment({ title, comment }: CardCommentProp) {
   return (
     <>
-      <CardTitle className="mt-10 mb-2">{title}</CardTitle>
+      <CardTitle className="mb-2">{title}</CardTitle>
       <CardDescription>{comment}</CardDescription>
     </>
   );
