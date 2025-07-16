@@ -39,9 +39,31 @@ export const formSchema = z.object({
     .max(addrMax, { message: `배송지 상세주소는 ${addrMaxMsg}` }),
   zipcode: z // 우편번호
     .string(),
-  invoiceNum: z // 송장번호
-    .string({ required_error: '송장번호를 입력 바랍니다.' })
-    .min(minNum, { message: `송장번호는 ${minMsg}` }),
+  message: z // 배송메세지
+    .string()
+    .max(200, { message: '배송메세지는 200자 이내로 입력 바랍니다.' }),
+  orderItems: z // 주문목록
+    .array(
+      z.object({
+        breadNo: z.number({ required_error: '빵 번호가 필요합니다.' }),
+        quantity: z
+          .number({ required_error: '수량이 필요합니다.' })
+          .min(1, { message: '수량은 최소 1개 이상이어야 합니다.' }),
+      }),
+    )
+    .min(1, { message: '주문목록은 최소 1개 이상이어야 합니다.' }),
+  orderPw: z // 주문 비밀번호
+    .string({ required_error: '주문 비밀번호를 입력 바랍니다.' })
+    .min(4, { message: '주문 비밀번호는 최소 4자 이상이어야 합니다.' })
+    .max(20, { message: '주문 비밀번호는 최대 20자입니다.' }),
+  paid: z // 입금확인여부
+    .boolean(),
+  totalPrice: z // 최종금액
+    .number(),
+  discountAmount: z // 할인금액
+    .number(),
+  agreed: z // 동의여부(화면에서만 사용)
+    .boolean(),
 });
 
 export type FormSchema = z.infer<typeof formSchema>;

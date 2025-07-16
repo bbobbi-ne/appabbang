@@ -26,6 +26,7 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
+  Checkbox,
 } from '@appabbang/ui';
 import BreadCard from '@/components/BreadCard';
 import { searchBreadList, searchDeliveryList } from '@/services/apis';
@@ -40,6 +41,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formSchema } from '@/validate/formSchema';
 import type { FormSchema } from '@/validate/formSchema';
+import AlertError from '@/components/AlertError';
 
 /**********************************************************************************/
 /** Route */
@@ -56,9 +58,8 @@ function RouteComponent() {
   const [keyword, setKeyword] = useState<string>(''); // 빵 키워드
   const [totalCount, setTotalCount] = useState<number>(0); // 최종 수량
   const [totalPrice, setTotalPrice] = useState<number>(0); // 최종 금액
-  const [agreed, setAgreed] = useState<boolean>(false); // 비회원 동의
-  const [address, setAddress] = useState<string>(''); // 주소
-  const [addressDetail, setAddressDetail] = useState<string>(''); // 상세주소
+  // const [agreed, setAgreed] = useState<boolean>(false); // 비회원 동의
+
   /**********************************************************************************/
   /**
    * Function
@@ -145,47 +146,45 @@ function RouteComponent() {
 
   /** 비회원 개인정보처리방침 동의 flag 처리 */
   const onAgreed = (flag: boolean) => {
-    setAgreed(flag);
+    // setAgreed(flag);
+    form.setValue('agreed', flag); // onSubmit에서 사용하기 위해 정의함.
   };
 
   /** 주소 API로 받아온 결과값을 상태값과 form value값에 대입한다. */
   const setFormAddress = (newAddrList: string[]) => {
     const [zipcode, address, addressDetail] = newAddrList;
-
-    // 우편번호
-    if (zipcode) {
-      form.setValue('zipcode', zipcode);
-    }
-    // 주소
-    if (address) {
-      setAddress(address);
-      form.setValue('address', address);
-    }
-    // 상세주소
-    if (addressDetail) {
-      setAddressDetail(addressDetail);
-      form.setValue('addressDetail', addressDetail);
-    }
+    zipcode && form.setValue('zipcode', zipcode); // 우편번호
+    address && form.setValue('address', address); // 주소
+    addressDetail && form.setValue('addressDetail', addressDetail); // 상세주소
   };
   /**********************************************************************************/
   /**
    * 유효성 검사 로직
    */
 
+  /** Form 기본값 설정 */
+  const defaultValues = {
+    name: '',
+    mobileNumber: '',
+    recipientName: '',
+    recipientMobile: '',
+    zipcode: '',
+    deliveryMethodNo: '',
+    address: '',
+    addressDetail: '',
+    message: '',
+    orderPw: '',
+    orderItems: [], // 주문목록
+    paid: false, // 입금확인여부
+    totalPrice: 0, // 최종금액
+    discountAmount: 0, // 할인금액
+    agreed: false, // 동의여부(화면단에서만 이용)
+  };
+
   /** form과 schema 연결 */
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: '',
-      mobileNumber: '',
-      recipientName: '',
-      recipientMobile: '',
-      zipcode: '',
-      deliveryMethodNo: '',
-      address: '',
-      addressDetail: '',
-      invoiceNum: '',
-    },
+    defaultValues,
   });
 
   /**
@@ -194,11 +193,28 @@ function RouteComponent() {
    * 조건 2. 개인정보 수집 이용 동의가 되어야 함.
    */
   const onSubmit: SubmitHandler<FormSchema> = (data) => {
+    const orderItems = Array();
+
     try {
-      debugger;
+      if (!data.agreed) throw new Error('비회원인 경우, 개인정보 수집 및 이용 동의가 필요합니다.');
+      if (paymentList.length === 0)
+        throw new Error('결제목록이 1건 이상 존재해야 주문이 가능합니다.');
+
+      /** orderItems 생성 */
+      paymentList.map((bread, _) => {
+        orderItems.push({
+          breadNo: bread.no,
+          quantity: bread.count,
+        });
+      });
+
+      data.orderItems = orderItems;
+      data.totalPrice = totalPrice;
+
       console.log(data);
     } catch (e: any) {
-      console.log(`error!!`);
+      alert(e.message);
+      return false;
     }
   };
 
@@ -213,11 +229,7 @@ function RouteComponent() {
   });
 
   /** 배송방법 목록 조회 */
-  const {
-    isLoading: deliveryLoading,
-    data: deliveryData,
-    error: deliveryErr,
-  } = useQuery({
+  const { isLoading: deliveryLoading, data: deliveryData } = useQuery({
     queryKey: ['deliveryList'],
     queryFn: searchDeliveryList,
   });
@@ -238,7 +250,20 @@ function RouteComponent() {
 
     setTotalCount(count);
     setTotalPrice(price);
+
+    form.setValue(
+      'orderItems',
+      paymentList.map((bread) => ({
+        breadNo: bread.no,
+        quantity: bread.count,
+      })),
+    );
   }, [paymentList]);
+
+  /** 동의여부가 바뀌면 form에도 적용. */
+  // useEffect(() => {
+  //   form.setValue('agreed', agreed); // onSubmit에서 사용하기 위해 정의함.
+  // }, [agreed]);
 
   return isLoading ? (
     <OrderFormSkeleton />
@@ -290,7 +315,7 @@ function RouteComponent() {
             </CardTitle>
           </div>
 
-          <div className="m-5">
+          <div className="mt-20 m-5">
             <CardContent>
               <CardComment
                 title="2. 비회원 정보를 입력 해주세요."
@@ -299,239 +324,321 @@ function RouteComponent() {
             </CardContent>
 
             {/* 비회원 정보 입력 form */}
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="ml-10 mr-10">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel errorCheck={false}>
-                        <span className="text-red-700">*</span> 주문자
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          placeholder="주문자 이름 입력"
-                          {...field}
-                          {...form.register('name')}
-                          onChange={(e) => {
-                            form.setValue('recipientName', e.target.value);
-                            field.onChange(e);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="mobileNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel errorCheck={false}>
-                        <span className="text-red-700">*</span> 주문자 전화번호
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          {...field}
-                          {...form.register('mobileNumber')}
-                          onChange={(e) => {
-                            form.setValue('recipientMobile', e.target.value);
-                            field.onChange(e);
-                          }}
-                          placeholder="주문자 전화번호 입력"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="recipientName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel errorCheck={false}>
-                        <span className="text-red-700">*</span> 수령인
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          placeholder="수령인 입력"
-                          {...field}
-                          {...form.register('recipientName')}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="recipientMobile"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel errorCheck={false}>
-                        <span className="text-red-700">*</span> 수령인 전화번호
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          {...field}
-                          {...form.register('recipientMobile')}
-                          placeholder="수령인 전화번호 입력"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel errorCheck={false}>
-                        <span className="text-red-700">*</span> 배송지 주소
-                      </FormLabel>
-                      <FormControl>
-                        <div className="flex items-start relative">
+            <div className="flex justify-center w-full">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem className="mt-5 mb-5 pl-10 pr-10 w-full">
+                        <FormLabel htmlFor="name" errorCheck={false}>
+                          <span className="text-red-700">*</span> 주문자
+                        </FormLabel>
+                        <FormControl>
                           <Input
                             type="text"
-                            className="w-full"
-                            disabled
-                            placeholder="배송지 주소 입력"
+                            id="name"
+                            placeholder="주문자 이름 입력"
                             {...field}
-                            {...form.register('address')}
+                            {...form.register('name')}
+                            onChange={(e) => {
+                              form.setValue('recipientName', e.target.value);
+                              field.onChange(e);
+                            }}
                           />
-                          <DaumPostApi setAddress={setFormAddress} />
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="addressDetail"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel errorCheck={false}>
-                        <span className="text-red-700">*</span> 배송지 상세주소
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          className="w-full"
-                          placeholder="배송지 상세주소 입력"
-                          {...field}
-                          {...form.register('addressDetail')}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="mobileNumber"
+                    render={({ field }) => (
+                      <FormItem className="mt-5 mb-5 pl-10 pr-10 w-full">
+                        <FormLabel htmlFor="mobileNumber" errorCheck={false}>
+                          <span className="text-red-700">*</span> 주문자 전화번호
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            id="mobileNumber"
+                            {...field}
+                            {...form.register('mobileNumber')}
+                            onChange={(e) => {
+                              form.setValue('recipientMobile', e.target.value);
+                              field.onChange(e);
+                            }}
+                            placeholder="주문자 전화번호 입력"
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="zipcode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel hidden errorCheck={false}>
-                        <span className="text-red-700">*</span> 우편번호
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          className="w-full"
-                          hidden
-                          placeholder="우편번호 입력"
-                          {...field}
-                          {...form.register('zipcode')}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="recipientName"
+                    render={({ field }) => (
+                      <FormItem className="mt-5 mb-5 pl-10 pr-10 w-full">
+                        <FormLabel htmlFor="recipientName" errorCheck={false}>
+                          <span className="text-red-700">*</span> 수령인
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            id="recipientName"
+                            placeholder="수령인 입력"
+                            {...field}
+                            {...form.register('recipientName')}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="deliveryMethodNo"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel errorCheck={false}>
-                        <span className="text-red-700">*</span> 배송방법
-                      </FormLabel>
-                      <FormControl>
-                        {deliveryLoading ? (
-                          <Select>
-                            <SelectTrigger className="w-[250px]">
-                              <SelectValue placeholder="선택할 목록이 존재하지 않습니다..." />
-                            </SelectTrigger>
-                          </Select>
-                        ) : (
-                          <Select value={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger className="w-[180px]">
-                              <SelectValue placeholder="선택하세요." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectGroup>
-                                <SelectLabel>배송방법</SelectLabel>
-                                {deliveryData?.data.map((delivery: DeliveryProps, idx: number) => {
-                                  return (
-                                    <SelectItem
-                                      key={idx}
-                                      {...field}
-                                      {...form.register('deliveryMethodNo')}
-                                      value={delivery.no.toString()}
-                                    >
-                                      {delivery.name}
-                                    </SelectItem>
-                                  );
-                                })}
-                              </SelectGroup>
-                            </SelectContent>
-                          </Select>
-                        )}
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="recipientMobile"
+                    render={({ field }) => (
+                      <FormItem className="mt-5 mb-5 pl-10 pr-10 w-full">
+                        <FormLabel htmlFor="recipientMobile" errorCheck={false}>
+                          <span className="text-red-700">*</span> 수령인 전화번호
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            id="recipientMobile"
+                            {...field}
+                            {...form.register('recipientMobile')}
+                            placeholder="수령인 전화번호 입력"
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="invoiceNum"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel errorCheck={false}>
-                        <span className="text-red-700">*</span> 송장번호
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          className="w-full"
-                          placeholder="송장번호 입력"
-                          {...field}
-                          {...form.register('invoiceNum')}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem className="mt-5 mb-5 pl-10 pr-10 w-full">
+                        <FormLabel htmlFor="address" errorCheck={false}>
+                          <span className="text-red-700">*</span> 배송지 주소
+                        </FormLabel>
+                        <FormControl>
+                          <div className="flex items-start relative">
+                            <Input
+                              type="text"
+                              id="address"
+                              className="w-full"
+                              disabled
+                              placeholder="배송지 주소 입력"
+                              {...field}
+                              {...form.register('address')}
+                            />
+                            <DaumPostApi setAddress={setFormAddress} />
+                          </div>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
 
-                <GuestPrivacyAgreement onAgreed={onAgreed} />
+                  <FormField
+                    control={form.control}
+                    name="addressDetail"
+                    render={({ field }) => (
+                      <FormItem className="mt-5 mb-5 pl-10 pr-10 w-full">
+                        <FormLabel htmlFor="addressDetail" errorCheck={false}>
+                          <span className="text-red-700">*</span> 배송지 상세주소
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            id="addressDetail"
+                            className="w-full"
+                            placeholder="배송지 상세주소 입력"
+                            {...field}
+                            {...form.register('addressDetail')}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
 
-                <div className="m-10">
-                  <Button type="submit" className="text-2xl h-15 w-full">
-                    주문하기
-                  </Button>
-                </div>
-              </form>
-            </Form>
+                  <FormField
+                    control={form.control}
+                    name="zipcode"
+                    render={({ field }) => (
+                      <FormItem className="mt-5 mb-5 pl-10 pr-10 w-full">
+                        <FormLabel htmlFor="zipcode" hidden errorCheck={false}>
+                          <span className="text-red-700">*</span> 우편번호
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            id="zipcode"
+                            className="w-full"
+                            hidden
+                            placeholder="우편번호 입력"
+                            {...field}
+                            {...form.register('zipcode')}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="deliveryMethodNo"
+                    render={({ field }) => (
+                      <FormItem className="mt-5 mb-5 pl-10 pr-10 w-full">
+                        <FormLabel htmlFor="deliveryMethodNo" errorCheck={false}>
+                          <span className="text-red-700">*</span> 배송방법
+                        </FormLabel>
+                        <FormControl>
+                          {deliveryLoading ? (
+                            <Select>
+                              <SelectTrigger id="deliveryMethodNo" className="w-full">
+                                <SelectValue placeholder="선택할 목록이 존재하지 않습니다..." />
+                              </SelectTrigger>
+                            </Select>
+                          ) : (
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger id="deliveryMethodNo" className="w-full">
+                                <SelectValue placeholder="선택하세요." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>배송방법</SelectLabel>
+                                  {deliveryData?.data.map(
+                                    (delivery: DeliveryProps, idx: number) => {
+                                      return (
+                                        <SelectItem
+                                          key={idx}
+                                          {...field}
+                                          {...form.register('deliveryMethodNo')}
+                                          value={delivery.no.toString()}
+                                        >
+                                          {delivery.name}
+                                        </SelectItem>
+                                      );
+                                    },
+                                  )}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          )}
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="message"
+                    render={({ field }) => (
+                      <FormItem className="mt-5 mb-5 pl-10 pr-10 w-full">
+                        <FormLabel htmlFor="message" errorCheck={false}>
+                          배송 메세지
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            id="message"
+                            className="w-full"
+                            placeholder="배송 메세지 입력"
+                            {...field}
+                            {...form.register('message')}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="orderPw"
+                    render={({ field }) => (
+                      <FormItem className="mt-5 mb-5 pl-10 pr-10 w-full">
+                        <FormLabel htmlFor="orderPw" errorCheck={false}>
+                          <span className="text-red-700">*</span> 주문 비밀번호
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            id="orderPw"
+                            className="w-full"
+                            placeholder="송장번호 입력"
+                            {...field}
+                            {...form.register('orderPw')}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="paid"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel htmlFor="paid" hidden errorCheck={false}>
+                          <span className="text-red-700">*</span> 입금 확인여부
+                        </FormLabel>
+                        <FormControl>
+                          <Checkbox
+                            id="paid"
+                            className="w-full"
+                            hidden
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            {...form.register('paid')}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="agreed"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel hidden htmlFor="agreed" errorCheck={false}>
+                          <span className="text-red-700">*</span> 동의여부
+                        </FormLabel>
+                        <FormControl>
+                          <Checkbox
+                            id="agreed"
+                            className="w-full"
+                            hidden
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            {...form.register('agreed')}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <GuestPrivacyAgreement
+                    onAgreed={onAgreed}
+                    agreed={form.watch('agreed')}
+                    setAgreed={(flag: boolean) => form.setValue('agreed', flag)}
+                  />
+
+                  <div className="m-10">
+                    <Button type="submit" className="text-2xl h-15 w-full">
+                      주문하기
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </div>
           </div>
         </Card>
       </div>
