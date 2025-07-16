@@ -212,7 +212,7 @@ model Payment {
   paidConfirmedAt     DateTime?           @map("paid_confirmed_at")             // 입금확인일자
   isRefunded          Boolean             @default(false) @map("is_refunded")   // 환불여부
   refundRequestedAt   DateTime?           @map("refund_requested_at")           // 환불신청일자
-  refundCanceledAt    DateTime?           @map("refund_canceled_at")            // 환불취소일자
+  refundConfirmedAt   DateTime?           @map("refund_confirmed_at")            // 환불취소일자
   refundReason        String?             @map("refund_reason")                 // 환불사유
   bankCode            String              @map("bank_code")                     // 은행코드
   accountNumber       String              @map("account_number")                // 계좌번호
@@ -226,5 +226,7 @@ model Payment {
   customerNo          Int                 @map("customer_no")
   order               Order               @relation(fields: [orderNo], references: [no])
   customer            Customer            @relation(fields: [customerNo], references: [no])
+
+  @@map("payments")
 }
 
