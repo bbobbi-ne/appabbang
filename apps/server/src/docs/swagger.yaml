@@ -1212,23 +1212,23 @@ paths:
           #           description: 총 금액
           #           example: 25000
 
-    delete:
-      tags: [Orders]
-      summary: 주문 삭제
-      description: 특정 주문을 삭제합니다. (권한: 관리자만)
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: no
-          required: true
-          schema:
-            type: integer
-          description: 주문 번호
-          example: 1
-      responses:
-        '204':
-          description: 주문 삭제 성공
+    # delete:
+    #   tags: [Orders]
+    #   summary: 주문 삭제
+    #   description: 특정 주문을 삭제합니다. (권한: 관리자만)
+    #   security:
+    #     - bearerAuth: []
+    #   parameters:
+    #     - in: path
+    #       name: no
+    #       required: true
+    #       schema:
+    #         type: integer
+    #       description: 주문 번호
+    #       example: 1
+    #   responses:
+    #     '204':
+    #       description: 주문 삭제 성공
 
   /customers:
     get:
