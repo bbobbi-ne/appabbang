@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { Address, Customer, OrderItem, Order } from '@prisma/client';
+import { Address, Customer, OrderItem, Order, Payment } from '@prisma/client';
 import { hashPassword } from './auth.service';
 import { AppError } from '@/types';
 import { commonCodeMap } from './common-code.service';
@@ -8,7 +8,7 @@ const ORDER_STATUS_CODE = '10'; // 접수됨
 const DISCOUNT_TYPE_CODE_PERIOD = '10'; // 기간할인
 const DISCOUNT_TYPE_CODE_CUSTOMER = '20'; // 고객할인
 
-/* 비회원 주문 생성 */
+/** 비회원 주문 생성 */
 export const createNonMemberOrder = async (
   body: Pick<Customer, 'name' | 'mobileNumber'> &
     Pick<
@@ -19,7 +19,8 @@ export const createNonMemberOrder = async (
     } & Pick<
       Order,
       'deliveryMethodNo' | 'discountNo' | 'orderPw' | 'totalPrice' | 'discountAmount'
-    >,
+    > &
+    Pick<Payment, 'bankCode' | 'accountNumber' | 'accountHolderName'>,
 ) => {
   const {
     name,
@@ -36,6 +37,9 @@ export const createNonMemberOrder = async (
     totalPrice,
     discountNo,
     discountAmount,
+    bankCode,
+    accountNumber,
+    accountHolderName,
   } = body;
 
   if (discountAmount && !discountNo) {
@@ -88,10 +92,20 @@ export const createNonMemberOrder = async (
         totalPrice, // 계산 검증 필요
         discountAmount: discountAmount ?? 0,
         orderPw: hashedOrderPw,
-        paid: false,
         memo: '',
         trackingNumber: '',
         canceledAt: null,
+        payment: {
+          create: {
+            isPaid: false,
+            orderedAt: new Date(),
+            isRefunded: false,
+            bankCode,
+            accountNumber,
+            accountHolderName,
+            customerNo: newCustomer.no,
+          },
+        },
       },
     });
 
@@ -197,14 +211,15 @@ export const createNonMemberOrder = async (
   return result;
 };
 
-/* 회원 주문 생성 */
+/** 회원 주문 생성 */
 export const createMemberOrder = async (
   body: {
     orderItems: Pick<OrderItem, 'breadNo' | 'quantity'>[];
   } & Pick<
     Order,
     'customerNo' | 'addressNo' | 'deliveryMethodNo' | 'discountNo' | 'totalPrice' | 'discountAmount'
-  >,
+  > &
+    Pick<Payment, 'bankCode' | 'accountNumber' | 'accountHolderName'>,
 ) => {
   const {
     customerNo,
@@ -214,6 +229,9 @@ export const createMemberOrder = async (
     totalPrice,
     orderItems,
     discountAmount,
+    bankCode,
+    accountNumber,
+    accountHolderName,
   } = body;
 
   const result = await prisma.$transaction(async (tx) => {
@@ -226,10 +244,20 @@ export const createMemberOrder = async (
         orderStatus: ORDER_STATUS_CODE,
         totalPrice, // 계산 검증 필요
         discountAmount: discountAmount ?? 0,
-        paid: false,
         memo: '',
         trackingNumber: '',
         canceledAt: null,
+        payment: {
+          create: {
+            isPaid: false,
+            orderedAt: new Date(),
+            isRefunded: false,
+            bankCode,
+            accountNumber,
+            accountHolderName,
+            customerNo,
+          },
+        },
       },
     });
 
@@ -358,7 +386,6 @@ export const getOrderList = async () => {
       orderNumber: true,
       orderStatus: true,
       totalPrice: true,
-      paid: true,
       trackingNumber: true,
       canceledAt: true,
       createdAt: true,
@@ -387,6 +414,12 @@ export const getOrderList = async () => {
           name: true,
         },
       },
+      payment: {
+        select: {
+          isPaid: true,
+          isRefunded: true,
+        },
+      },
     },
   });
 
@@ -398,6 +431,7 @@ export const getOrderList = async () => {
   return result;
 };
 
+/** 주문 상세 조회 */
 export const getOrderByNo = async (no: number) => {
   const order = await prisma.order.findUnique({
     where: { no },
@@ -407,7 +441,6 @@ export const getOrderByNo = async (no: number) => {
       orderStatus: true,
       totalPrice: true,
       discountAmount: true,
-      paid: true,
       trackingNumber: true,
       canceledAt: true,
       createdAt: true,
@@ -451,6 +484,12 @@ export const getOrderByNo = async (no: number) => {
           fee: true,
         },
       },
+      payment: {
+        select: {
+          isPaid: true,
+          isRefunded: true,
+        },
+      },
     },
   });
 
@@ -467,7 +506,6 @@ export const updateOrder = async (
   no: number,
   body: {
     orderStatus: string;
-    paid: boolean;
     trackingNumber: string;
     address: string;
     addressDetail: string;
@@ -479,7 +517,6 @@ export const updateOrder = async (
     where: { no },
     data: {
       orderStatus: body.orderStatus,
-      paid: body.paid,
       trackingNumber: body.trackingNumber,
       address: {
         update: {
@@ -505,33 +542,4 @@ export const updateOrderStatus = async (no: number, orderStatus: string) => {
   });
 
   return updated;
-};
-
-/** 주문 입금확인여부 수정  */
-export const updateOrderPaid = async (no: number, paid: boolean) => {
-  const updated = await prisma.order.update({
-    where: { no },
-    data: { paid },
-  });
-
-  return updated;
-};
-
-/** 주문 삭제  */
-export const remove = async (no: number) => {
-  // orderStatus 가 10 접수됨, 20 제조중, 30 배송중 일 경우 삭제 불가
-  const order = await prisma.order.findUnique({
-    where: { no },
-    select: { orderStatus: true },
-  });
-
-  if (order?.orderStatus === '10' || order?.orderStatus === '20' || order?.orderStatus === '30') {
-    throw AppError.badRequest('주문 상태가 접수됨, 제조중, 배송중일 경우 삭제 불가');
-  }
-
-  const removed = await prisma.order.delete({
-    where: { no },
-  });
-
-  return removed;
 };

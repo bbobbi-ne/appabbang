@@ -1,10 +1,7 @@
 import { Router } from 'express';
-// import { authenticateToken } from '@/middlewares/auth.middleware';
 import * as orderController from '@/controllers/order.controller';
 import {
   createOrderValidator,
-  deleteOrderValidator,
-  updateOrderPaidValidator,
   updateOrderStatusValidator,
   updateOrderValidator,
   validate,
@@ -42,22 +39,6 @@ router.put(
   requireAdmin,
   validate(updateOrderStatusValidator),
   asyncHandler(orderController.updateOrderStatus),
-);
-
-/** PUT /orders/{no}/paid : 주문 입금확인여부 수정 */
-router.put(
-  '/:no/paid',
-  requireAdmin,
-  validate(updateOrderPaidValidator),
-  asyncHandler(orderController.updateOrderPaid),
-);
-
-/** DELETE /orders/{no} : 주문 삭제 */
-router.delete(
-  '/:no',
-  requireAdmin,
-  validate(deleteOrderValidator),
-  asyncHandler(orderController.remove),
 );
 
 export default router;
