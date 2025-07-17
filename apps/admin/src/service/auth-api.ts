@@ -1,45 +1,47 @@
 import { toast } from 'sonner';
-import type { ApiResponse } from '@/service/common-api';
-import { withCredentialsInstance, requireAccessTokenInstance } from '@/service/instance';
+import { CustomHttpClient } from '@/service/instance';
+import { Auth } from '@/api/Auth';
+import type { ApiConfig } from '@/api/http-client';
+import { useAuthStore } from '@/stores/authStore';
+import type { LoginCreatePayload } from '@/api/data-contracts';
 
-export interface Admin {
-  id: string;
-  name: string;
-  role: '10' | '20';
+export class CustomAuth extends Auth {
+  constructor(config: ApiConfig = {}) {
+    super(config);
+    this.instance = new CustomHttpClient(config).instance;
+  }
 }
 
-const USER_TYPE = 'user';
+const authApi = new CustomAuth();
 
-// ✅ 로그인
-export async function login(req: { id: string; pw: string }): Promise<ApiResponse<string>> {
+// 로그인
+export const loginCreate = async ({ id, pw }: LoginCreatePayload) => {
   try {
-    const response = await withCredentialsInstance.post('/auth/login', {
-      ...req,
-      type: USER_TYPE,
-    });
+    const response = await authApi.loginCreate({ id, pw });
     toast.success('로그인에 성공했습니다!.');
+    useAuthStore.getState().setAccessToken(response.data.accessToken!);
     return {
       data: response.data.accessToken,
     };
   } catch (error: any) {
-    const message = error.response?.data?.message || '로그인에 실패했습니다.';
+    const message = error.data.message || '로그인에 실패했습니다.';
     toast.error('로그인에 실패했습니다.', {
       description: message,
     });
     throw new Error(message);
   }
-}
+};
 
-// ✅ 사용자 정보 조회
-export async function getMe(): Promise<ApiResponse<Admin>> {
+// 사용자 정보 조회
+export async function getMe() {
   try {
-    const response = await requireAccessTokenInstance.get('/auth/me');
+    const response = await authApi.getAuth();
     // toast.success('유저 정보를 불러오는데 성공했습니다.');
     return {
       data: response.data,
     };
   } catch (error: any) {
-    const message = error.response?.data?.message || '유저 정보를 불러오는데 실패했습니다.';
+    const message = error.data.message || '유저 정보를 불러오는데 실패했습니다.';
     toast.error('유저 정보를 불러오는데 실패했습니다.', {
       description: message,
     });
@@ -47,19 +49,25 @@ export async function getMe(): Promise<ApiResponse<Admin>> {
   }
 }
 
-// ✅ 리프레시 토큰으로 AccessToken 재발급
-export async function refresh(): Promise<ApiResponse<string>> {
+// 리프레시 토큰을 이용한 엑세스토큰 재발급
+export const refreshCreate = async () => {
   try {
-    const response = await withCredentialsInstance.post('/auth/refresh');
-    // toast.success('토큰 재발급에 성공했습니다.');
+    const response = await authApi.refreshCreate({
+      withCredentials: true,
+    });
+    const accessToken = response.data.accessToken!;
+    useAuthStore.getState().setAccessToken(accessToken);
     return {
-      data: response.data.accessToken,
+      data: accessToken,
     };
   } catch (error: any) {
-    const message = error.response?.data?.message || '토큰 재발급에 실패했습니다.';
+    console.error(error, '리프레시에러');
+    const message = error.data.message || '토큰 재발급에 실패했습니다.';
+    useAuthStore.getState().clearAccessToken();
+    useAuthStore.getState().clearAuth();
     toast.error('토큰 재발급에 실패했습니다.', {
       description: message,
     });
     throw new Error(message);
   }
-}
+};

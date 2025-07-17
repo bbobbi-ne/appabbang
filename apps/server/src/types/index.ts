@@ -5,6 +5,10 @@ export const CodeGroup = {
   ORDER_STATUS: 'order_status',
   PURCHASE_STATUS: 'purchase_status',
   DELIVERY_TYPE: 'delivery_type',
+  IMAGE_TARGET_TYPE: 'image_target_type',
+  DISCOUNT_TYPE: 'discount_type',
+  PROVIDER_TYPE: 'provider_type',
+  BANK_CODE: 'bank_code',
 } as const;
 
 export type CodeGroupType = (typeof CodeGroup)[keyof typeof CodeGroup];

@@ -347,6 +347,9 @@ export const createOrderValidator = [
     .isInt()
     .toInt()
     .withMessage('discountAmount는 정수여야 합니다'),
+  body('bankCode').trim().notEmpty().withMessage('bankCode는 필수입니다'),
+  body('accountNumber').trim().notEmpty().withMessage('accountNumber는 필수입니다'),
+  body('accountHolderName').trim().notEmpty().withMessage('accountHolderName는 필수입니다'),
 ];
 
 export const updateOrderValidator = [

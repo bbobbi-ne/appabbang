@@ -1,77 +1,45 @@
+import { HttpClient, type ApiConfig } from '@/api/http-client';
 import { useAuthStore } from '@/stores/authStore';
-import axios from 'axios';
-import { refresh } from '@/service/auth-api';
+import { refreshCreate } from '@/service/auth-api';
 
-const API_BASE_URL = `${import.meta.env.VITE_APPABBANG_API_URL}`;
+export class CustomHttpClient extends HttpClient {
+  constructor(config: ApiConfig = {}) {
+    super({
+      ...config,
+    });
 
-export const withCredentialsInstance = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-});
-export const baseInstance = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-});
+    // ✅ 요청 인터셉터
+    this.instance.interceptors.request.use((request) => {
+      const { accessToken } = useAuthStore.getState();
+      console.log(request, '요청 리퀘스트');
 
-export const requireAccessTokenInstance = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-});
-
-/** 요청 인터셉터 */
-const reqInt = (request: any) => {
-  const { accessToken } = useAuthStore.getState();
-
-  return accessToken
-    ? {
-        ...request,
-        headers: {
-          ...request.headers,
-          Authorization: `Bearer ${accessToken}`,
-        },
+      if ((request as any).secure && accessToken) {
+        request.headers?.set?.('Authorization', `Bearer ${accessToken}`);
       }
-    : request;
-};
 
-const resInt = async (error: any) => {
-  const originalRequest = error.config;
+      return request;
+    });
 
-  if (!error.response) {
-    console.error('응답이 없습니다:', error);
-    return Promise.reject(error);
+    // ✅ 응답 인터셉터
+    this.instance.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+
+        if (error.response?.status === 403 && !originalRequest._retry) {
+          originalRequest._retry = true;
+
+          try {
+            const newAccessToken = await refreshCreate();
+            originalRequest.headers.Authorization = `Bearer ${newAccessToken.data}`;
+            return this.instance(originalRequest);
+          } catch (e) {
+            throw new Error('accessToken 재발급 실패');
+          }
+        }
+
+        return Promise.reject(error);
+      },
+    );
   }
-
-  if (error.response.status === 403 && !originalRequest._retry) {
-    originalRequest._retry = true;
-
-    const newAccessToken = await refresh();
-    if (newAccessToken.data) {
-      // ✅ store에 토큰 저장
-      useAuthStore.getState().setAccessToken(newAccessToken.data!);
-
-      // ✅ 헤더 갱신
-      originalRequest.headers['Authorization'] = `Bearer ${newAccessToken.data!}`;
-
-      // ✅ 재요청
-      return requireAccessTokenInstance(originalRequest);
-    }
-  }
-
-  return Promise.reject(error);
-};
-
-requireAccessTokenInstance.interceptors.request.use(reqInt);
-requireAccessTokenInstance.interceptors.response.use((response) => response, resInt);
+}

@@ -32,6 +32,9 @@ export const create = async (req: Request, res: Response) => {
     totalPrice,
     discountNo,
     discountAmount,
+    bankCode,
+    accountNumber,
+    accountHolderName,
   } = req.body;
 
   const user = req.user;
@@ -56,6 +59,9 @@ export const create = async (req: Request, res: Response) => {
       totalPrice,
       discountNo,
       discountAmount,
+      bankCode,
+      accountNumber,
+      accountHolderName,
     });
     res.status(201).json(newOrder);
   } else {
@@ -67,6 +73,9 @@ export const create = async (req: Request, res: Response) => {
       discountNo,
       totalPrice,
       discountAmount,
+      bankCode,
+      accountNumber,
+      accountHolderName,
     });
     res.status(201).json(newOrder);
   }
@@ -75,11 +84,10 @@ export const create = async (req: Request, res: Response) => {
 /** 주문 수정 */
 export const update = async (req: Request, res: Response) => {
   const { no } = req.params;
-  const { orderStatus, paid, trackingNumber, address, addressDetail, zipcode, message } = req.body;
+  const { orderStatus, trackingNumber, address, addressDetail, zipcode, message } = req.body;
 
   const updated = await OrderService.updateOrder(Number(no), {
     orderStatus,
-    paid,
     trackingNumber,
     address,
     addressDetail,
@@ -98,22 +106,4 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
   const updated = await OrderService.updateOrderStatus(Number(no), orderStatus);
 
   res.status(200).json(updated);
-};
-
-/** 주문 입금확인여부 수정 */
-export const updateOrderPaid = async (req: Request, res: Response) => {
-  const { no } = req.params;
-  const { paid } = req.body;
-
-  const updated = await OrderService.updateOrderPaid(Number(no), paid);
-
-  res.status(200).json(updated);
-};
-
-/** 주문 삭제 */
-export const remove = async (req: Request, res: Response) => {
-  const { no } = req.params;
-  const removed = await OrderService.remove(Number(no));
-
-  res.status(204).json(removed);
 };

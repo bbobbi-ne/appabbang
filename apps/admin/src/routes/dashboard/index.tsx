@@ -1,3 +1,4 @@
+import { refreshCreate } from '@/service/auth-api';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/dashboard/')({
@@ -5,5 +6,10 @@ export const Route = createFileRoute('/dashboard/')({
 });
 
 function RouteComponent() {
-  return <>홈화면</>;
+  const test = async () => {
+    const test = await refreshCreate();
+    console.log(test, '리프레시');
+  };
+
+  return <button onClick={test}>홈화면</button>;
 }

@@ -8,11 +8,11 @@ import {
   DialogTrigger,
 } from '@appabbang/ui';
 
-import { useCreateBreadMutation } from '@/hooks/use-breads';
+import { useBreadsCreateMutation } from '@/hooks/use-breads';
 import BreadForm from './bread-form';
 
 export function BreadCreateDialog() {
-  const { CreateBreadMutation } = useCreateBreadMutation();
+  const { breadsCreateMutation } = useBreadsCreateMutation();
 
   return (
     <Dialog>
@@ -29,7 +29,7 @@ export function BreadCreateDialog() {
           <DialogTitle>메뉴등록</DialogTitle>
         </DialogHeader>
         <DialogDescription>메뉴를 등록해주세요</DialogDescription>
-        <BreadForm submitFn={CreateBreadMutation} />
+        <BreadForm submitFn={breadsCreateMutation} />
       </DialogContent>
     </Dialog>
   );

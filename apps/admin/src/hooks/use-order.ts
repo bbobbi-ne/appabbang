@@ -1,10 +1,5 @@
-import {
-  getOrderdDliveryType,
-  getOrderStatus,
-  type ApiResponse,
-  type OrderDliveryTypeResponse,
-  type OrderStatusResponse,
-} from '@/service/common-api';
+import type { CommonCodeDetailData } from '@/api/data-contracts';
+import { getOrderdDliveryType, getOrderStatus } from '@/service/common-api';
 import { useQueries } from '@tanstack/react-query';
 
 export function useOrderAndStatusAndDliveryTypeQuery() {
@@ -23,14 +18,14 @@ export function useOrderAndStatusAndDliveryTypeQuery() {
         queryFn: getOrderStatus,
         staleTime: Infinity,
         retry: 1,
-        select: (res) => (res as ApiResponse<OrderStatusResponse>).data,
+        select: (res) => (res as { data: CommonCodeDetailData }).data,
       },
       {
         queryKey: ['ordersDliveryType', 'common'],
         queryFn: getOrderdDliveryType,
         staleTime: Infinity,
         retry: 1,
-        select: (res) => (res as ApiResponse<OrderDliveryTypeResponse>).data,
+        select: (res) => (res as { data: CommonCodeDetailData }).data,
       },
     ],
   });
