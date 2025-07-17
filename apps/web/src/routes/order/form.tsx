@@ -28,19 +28,19 @@ import {
   FormMessage,
   Checkbox,
 } from '@appabbang/ui';
-import BreadCard from '@/components/BreadCard';
+import BreadCard from '@/components/bread-card';
 import { insertOrders, searchBreadList, searchDeliveryList } from '@/services/apis';
-import type { BreadProps, DeliveryProps } from '@/interface/BreadInterface';
-import OrderFormSkeleton from '@/components/OrderFormSkeleton';
-import BreadSearch from '@/components/BreadSearch';
-import CardComment from '@/components/CardComment';
+import type { BreadProps, DeliveryProps } from '@/interface/bread-interface';
+import OrderFormSkeleton from '@/components/order-form-skeleton';
+import BreadSearch from '@/components/bread-search';
+import CardComment from '@/components/card-comment';
 import Payment from '@/components/Payment';
-import GuestPrivacyAgreement from '@/components/GuestPrivacyAgreement';
-import DaumPostApi from '@/components/DaumPostApi';
+import GuestPrivacyAgreement from '@/components/guest-privacy-agreement';
+import DaumPostApi from '@/components/daum-post-api';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { formSchema } from '@/validate/formSchema';
-import type { FormSchema } from '@/validate/formSchema';
+import { formSchema } from '@/validate/form-schema';
+import type { FormSchema } from '@/validate/form-schema';
 import { toast } from 'sonner';
 
 /**********************************************************************************/
@@ -296,7 +296,7 @@ function RouteComponent() {
                   </Card>
                 ) : (
                   breadList?.map((data, i) => (
-                    <BreadCard key={i} idx={i} bread={data} onClick={handleBreadClick} />
+                    <BreadCard key={i} bread={data} onClick={handleBreadClick} />
                   ))
                 )}
               </div>

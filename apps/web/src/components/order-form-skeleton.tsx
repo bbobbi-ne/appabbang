@@ -8,9 +8,8 @@ import {
   CardContent,
   Input,
 } from '@appabbang/ui';
-import RequiredBar from './RequiredBar';
-import PageTitle from './PageTitle';
-import CardComment from './CardComment';
+import PageTitle from './page-title';
+import CardComment from './card-comment';
 
 function OrderFormSkeleton() {
   return (
@@ -31,7 +30,6 @@ function OrderFormSkeleton() {
           </div>
 
           <div className="m-5">
-            <RequiredBar />
             <CardContent>
               <CardComment
                 title="구매할 빵을 검색하고 선택하세요."

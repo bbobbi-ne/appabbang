@@ -16,7 +16,6 @@ export interface BreadProps {
 
 /** 빵 카드 */
 export interface BreadCardProps {
-  idx: number;
   bread: BreadProps;
   onClick: (bread: BreadCardProps['bread']) => void;
 }
