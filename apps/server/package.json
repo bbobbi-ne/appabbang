@@ -6,10 +6,9 @@
   "scripts": {
     "dev": "nodemon --exec \"node -r tsconfig-paths/register -r ts-node/register\" src/index.ts",
     "generate": "prisma generate",
-    "clean:migrations": "rm -rf prisma/migrations/*",
     "migrate": "prisma migrate reset && prisma migrate dev",
     "seed": "ts-node prisma/seed.ts",
-    "prisma:all": "pnpm run clean:migrations && pnpm run generate && pnpm run migrate && pnpm run seed",
+    "prisma:all": "pnpm run generate && pnpm run migrate && pnpm run seed",
     "swagger": "ts-node src/swagger/swagger.ts"
   },
   "dependencies": {

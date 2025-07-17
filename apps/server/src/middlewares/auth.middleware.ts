@@ -10,8 +10,6 @@ const verifyToken = async (req: Request): Promise<ClientPayload> => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
-  console.log(authHeader);
-
   if (!token) {
     throw AppError.unauthorized('Access token is required');
   }

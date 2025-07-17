@@ -109,6 +109,16 @@ async function main() {
       { deliveryType: '90', fee: 0, isActive: true, memo: '기타', name: '기타' },
     ],
   });
+
+  await prisma.bread.createMany({
+    data: [
+      { name: '판매빵', description: '판매빵', unitPrice: 1000, breadStatus: '10' },
+      { name: '미판매빵', description: '미판매빵', unitPrice: 2000, breadStatus: '20' },
+      { name: '임시저장빵', description: '임시저장빵', unitPrice: 3000, breadStatus: '30' },
+      { name: '재료소진빵', description: '재료소진빵', unitPrice: 4000, breadStatus: '40' },
+      { name: '출시예정빵', description: '출시예정빵', unitPrice: 5000, breadStatus: '50' },
+    ],
+  });
 }
 
 main()
