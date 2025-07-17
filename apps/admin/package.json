@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "swagger-typescript-api generate -p http://localhost:4000/swagger.json -r -o src/api --modular -d --extract-request-body --extract-response-body --extract-response-error --axios --use-type-imports --templates ./my-swagger-templates --single-http-client && vite --port 3300",
+    "dev": "gen:api && vite --port 3300",
     "start": "vite --port 3000",
     "build": "vite build && tsc",
     "serve": "vite preview",
