@@ -18,6 +18,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { formSchema } from '@/validate/form-schema';
 import NonCustomerOrderForm from '@/components/non-customer-order-form';
 import { searchBreadList } from '@/services/apis';
+import type { FormSchema } from '@/validate/form-schema';
 
 /**********************************************************************************/
 /** Route */
@@ -125,22 +126,25 @@ function RouteComponent() {
    */
 
   /** Form 기본값 설정 */
-  const defaultValues = {
-    name: '',
-    mobileNumber: '',
-    recipientName: '',
-    recipientMobile: '',
-    zipcode: '',
-    deliveryMethodNo: '',
-    address: '',
-    addressDetail: '',
-    message: '',
-    orderPw: '',
+
+  const defaultValues: FormSchema = {
+    name: '', // 주문자명
+    mobileNumber: '', // 주문자 전화번호
+    recipientName: '', // 수령인명
+    recipientMobile: '', // 수령인 전화번호
+    zipcode: '', // 우편번호
+    deliveryMethodNo: '', // 배송방법
+    address: '', // 주소
+    addressDetail: '', // 상세주소
+    message: '', // 배송메세지
+    orderPw: '', // 주문 비밀번호
     orderItems: [], // 주문목록
-    paid: false, // 입금확인여부
     totalPrice: 0, // 최종금액
     discountAmount: 0, // 할인금액
     agreed: false, // 동의여부(화면단에서만 이용)
+    bankCode: '', // 은행코드
+    accountNumber: '', // 계좌번호
+    accountHolderName: '', // 예금주
   };
 
   /** form과 schema 연결 */

@@ -42,3 +42,8 @@ export interface DeliveryProps {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface BankCodeProps {
+  code: string;
+  name: string;
+}

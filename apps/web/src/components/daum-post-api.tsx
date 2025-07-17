@@ -79,7 +79,7 @@ function DaumPostApi({ setAddress }: ParamsProp) {
 
   return (
     <>
-      <Button type="button" className="w-20 ml-2" onClick={handleClick}>
+      <Button type="button" className="mt-6 mb-5 w-20 mr-4" onClick={handleClick}>
         주소검색
       </Button>
     </>
