@@ -7,7 +7,9 @@ import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 
 interface AgreedProps {
-  onAgreed: () => void;
+  onAgreed: (flag: boolean) => void;
+  agreed: boolean;
+  setAgreed: (flag: boolean) => void;
 }
 
 const termsOfService = `
@@ -60,21 +62,26 @@ const personalInfoCollectAndUsed = `
 ※ 동의를 거부할 수 있으나 거부시 비회원 구매 서비스 이용이 불가능합니다.
 `;
 
-function GuestPrivacyAgreement({ onAgreed }: AgreedProps) {
-  const [agreedFlag, setAgreedFlag] = useState<boolean>(false);
+function GuestPrivacyAgreement({ onAgreed, agreed, setAgreed }: AgreedProps) {
   const [showBox, setShowBox] = useState<boolean>(false);
   const [color, setColor] = useState<string>('');
 
-  /** 동의가 되었다면 버튼의 멘트를 변경한다. */
-  const onSetAgreedMent = () => {
-    setShowBox(true);
-    setColor('bg-[#E8CBB1] text-[#393028]');
-  };
-
   /** 동의서 box 닫기 */
   const onChangeShow = () => {
+    if (!showBox) {
+      setShowBox(true);
+      return false;
+    }
+
     showBox ? setShowBox(false) : null;
-    setAgreedFlag(true);
+    setAgreed(true);
+    onSetAgreedMent();
+  };
+
+  /** 동의가 되었다면 버튼의 멘트를 변경한다. */
+  const onSetAgreedMent = () => {
+    setColor('bg-[#E8CBB1] text-[#393028]');
+    agreed && onAgreed(true);
   };
 
   const onClosed = () => setShowBox(false);
@@ -85,16 +92,16 @@ function GuestPrivacyAgreement({ onAgreed }: AgreedProps) {
 
   return (
     <>
-      <Card className="flex items-center justify-center relative">
+      <Card className="flex items-center justify-center relative mt-10 ml-10 mr-10">
         <CardContent className="pt-7 text-red-700">
           * 비회원일 경우, 개인정보 수집 및 이용 동의가 필요합니다.
         </CardContent>
         <Button
           type="button"
           className={clsx('cursor-pointer hover:bg-[#e5caaf]', color)}
-          onClick={onSetAgreedMent}
+          onClick={onChangeShow}
         >
-          {agreedFlag ? '확인완료' : '미확인'}
+          {agreed ? '확인완료' : '미확인'}
         </Button>
       </Card>
 

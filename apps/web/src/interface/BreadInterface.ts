@@ -30,3 +30,16 @@ export interface PaymentProp {
     onRemove?: (bread: BreadProps) => void;
   };
 }
+
+/** 배송방법 목록 타입 */
+export interface DeliveryProps {
+  no: number;
+  name: string;
+  memo: string;
+  fee: number;
+  isActive: boolean;
+  deliveryType: string;
+  deliveryTypeName: string;
+  createdAt: string;
+  updatedAt: string;
+}
