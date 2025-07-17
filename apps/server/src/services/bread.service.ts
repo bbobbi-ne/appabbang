@@ -18,13 +18,6 @@ export const getAll = async () => {
       orderBy: {
         no: 'desc',
       },
-      select: {
-        no: true,
-        name: true,
-        unitPrice: true,
-        breadStatus: true,
-        createdAt: true,
-      },
     });
 
     const images = await tx.image.findMany({
@@ -61,6 +54,7 @@ export const getAllForCustomer = async () => {
       select: {
         no: true,
         name: true,
+        description: true,
         unitPrice: true,
         breadStatus: true,
       },
