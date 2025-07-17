@@ -15,6 +15,7 @@ import OrderFormSkeleton from '@/components/OrderFormSkeleton';
 import BreadSearch from '@/components/BreadSearch';
 import CardMent from '@/components/CardComment';
 import Payment from '@/components/Payment';
+import GuestPrivacyAgreement from '@/components/GuestPrivacyAgreement';
 
 /**********************************************************************************/
 /** Route */
@@ -113,6 +114,9 @@ function RouteComponent() {
     }),
     [onCountChange, onRemove],
   );
+
+  /** 비회원 개인정보처리방침 동의 flag 처리 */
+  const onAgreed = () => {};
   /**********************************************************************************/
   /** React Hooks */
   /** 빵 목록 조회 API */
@@ -149,16 +153,9 @@ function RouteComponent() {
 
       <div className="relative flex w-6xl h-auto m-auto">
         <Button className="absolute -top-10 right-0 ml-auto">주문</Button>
-        {/* 회원 / 비회원에 따른 보여지는 카드가 달라짐 */}
-        {/* 비회원 */}
-        {/* <div>
-          <p>비회원일 경우, 개인정보처리방침 동의가 필요합니다.</p> <Button>확인 전</Button>
-          </div>
-          <Card>ㄴㅇ런이</Card> 
-        */}
-
         <Card className="w-full bg-[#fcfcfc]">
-          <div className="p-5">
+          <GuestPrivacyAgreement onAgreed={onAgreed} />
+          {/* <div className="p-5">
             <CardTitle className="pt-5">
               <span className="pr-2">김가나</span>
               <span className="text-lg">test01</span>
@@ -167,7 +164,7 @@ function RouteComponent() {
             <CardDescription className="mt-2">
               경기도 성남시 수정구 신흥1동 6729번지 1층
             </CardDescription>
-          </div>
+          </div> */}
 
           <div className="m-5">
             <RequiredBar />
