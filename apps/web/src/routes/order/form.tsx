@@ -161,7 +161,11 @@ function RouteComponent() {
 
   /** 빵 목록 조회 및 설정 */
   useEffect(() => {
-    data && setBreadList(data.data) && setOriginBreadList(data.data);
+    if (data) {
+      setBreadList(data.data);
+      setOriginBreadList(data.data);
+    }
+
     error && setErrMsg('빵 목록을 조회하는 데 문제가 발생했습니다.');
   }, [data, error]);
 
