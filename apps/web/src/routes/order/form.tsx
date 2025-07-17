@@ -296,7 +296,7 @@ function RouteComponent() {
                   </Card>
                 ) : (
                   breadList?.map((data, i) => (
-                    <BreadCard key={i} idx={i} bread={data} onClick={handleBreadClick} />
+                    <BreadCard key={i} bread={data} onClick={handleBreadClick} />
                   ))
                 )}
               </div>
