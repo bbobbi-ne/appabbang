@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 import { refreshCreate, getMe } from '@/service/auth-api';
 import { useQuery } from '@tanstack/react-query';
 
@@ -7,7 +7,6 @@ export async function InitializeAuth() {
     const { accessToken: currentToken, setAccessToken, setAuth } = useAuthStore.getState();
 
     let accessToken = currentToken;
-    console.log(currentToken, '주스탠드 저장토큰');
 
     // 1. accessToken이 없으면 refresh 시도
     if (!accessToken) {
@@ -24,8 +23,6 @@ export async function InitializeAuth() {
     const raw = sessionStorage.getItem('auth-storage');
     const parsed = raw ? JSON.parse(raw) : null;
     const cachedAuth = parsed?.state?.auth;
-
-    console.log(cachedAuth, '저장된 유저정보');
 
     if (cachedAuth) {
       setAuth(cachedAuth);

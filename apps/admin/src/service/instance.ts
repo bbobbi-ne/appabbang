@@ -1,23 +1,21 @@
 import { HttpClient, type ApiConfig } from '@/api/http-client';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 import { refreshCreate } from '@/service/auth-api';
 
 export class CustomHttpClient extends HttpClient {
   constructor(config: ApiConfig = {}) {
     super({
       ...config,
-    });
-
-    // ✅ 요청 인터셉터
-    this.instance.interceptors.request.use((request) => {
-      const { accessToken } = useAuthStore.getState();
-      console.log(request, '요청 리퀘스트');
-
-      if ((request as any).secure && accessToken) {
-        request.headers?.set?.('Authorization', `Bearer ${accessToken}`);
-      }
-
-      return request;
+      securityWorker: () => {
+        const { accessToken } = useAuthStore.getState();
+        console.log('🧪 securityWorker 실행됨, accessToken:', accessToken);
+        if (!accessToken) return;
+        return {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        };
+      },
     });
 
     // ✅ 응답 인터셉터
@@ -30,8 +28,15 @@ export class CustomHttpClient extends HttpClient {
           originalRequest._retry = true;
 
           try {
-            const newAccessToken = await refreshCreate();
-            originalRequest.headers.Authorization = `Bearer ${newAccessToken.data}`;
+            const { data: newAccessToken } = await refreshCreate();
+            useAuthStore.getState().setAccessToken(newAccessToken);
+
+            // 재요청 시 헤더 재설정
+            originalRequest.headers = {
+              ...originalRequest.headers,
+              Authorization: `Bearer ${newAccessToken}`,
+            };
+
             return this.instance(originalRequest);
           } catch (e) {
             throw new Error('accessToken 재발급 실패');

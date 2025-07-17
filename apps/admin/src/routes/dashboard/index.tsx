@@ -8,7 +8,6 @@ export const Route = createFileRoute('/dashboard/')({
 function RouteComponent() {
   const test = async () => {
     const test = await refreshCreate();
-    console.log(test, '리프레시');
   };
 
   return <button onClick={test}>홈화면</button>;

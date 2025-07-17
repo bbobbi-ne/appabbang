@@ -12,90 +12,74 @@
 
 import type {
   CommonImagesListData,
-  CommonImagesListError,
   DeleteDeleteData,
-  DeleteDeleteError,
   DeleteDeletePayload,
   UploadCreateData,
-  UploadCreateError,
   UploadCreatePayload,
-} from './data-contracts';
-import { ContentType, HttpClient, type RequestParams } from './http-client';
+} from "./data-contracts";
+import { ContentType, HttpClient, type RequestParams } from "./http-client";
 
-export class CommonImages<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class CommonImages<SecurityDataType = unknown> {
+  http: HttpClient<SecurityDataType>;
+
+  constructor(http: HttpClient<SecurityDataType>) {
+    this.http = http;
+  }
+
   /**
- * @description Cloudinary에 업로드된 모든 이미지 목록을 조회합니다.
- *
- * @tags Common Images
- * @name CommonImagesList
- * @summary 공통 이미지 목록 조회
- * @request GET:/common-images
- * @response `200` `CommonImagesListData` 이미지 목록 조회 성공
- * @response `500` `{
-  \** @example "Internal server error" *\
-    message?: string,
-
-}` 서버 오류
- */
+   * @description Cloudinary에 업로드된 모든 이미지 목록을 조회합니다. (권한: 관리자만)
+   *
+   * @tags CommonImages
+   * @name CommonImagesList
+   * @summary 공통 이미지 목록 조회
+   * @request GET:/common-images
+   * @secure
+   * @response `200` `CommonImagesListData` 이미지 목록 조회 성공
+   */
   commonImagesList = (params: RequestParams = {}) =>
-    this.request<CommonImagesListData, CommonImagesListError>({
+    this.http.request<CommonImagesListData, any>({
       path: `/common-images`,
-      method: 'GET',
-      format: 'json',
+      method: "GET",
+      secure: true,
+      format: "json",
       ...params,
     });
   /**
- * @description Cloudinary에 이미지를 업로드합니다.
- *
- * @tags Common Images
- * @name UploadCreate
- * @summary 공통 이미지 업로드
- * @request POST:/common-images/upload
- * @response `201` `UploadCreateData` 이미지 업로드 성공
- * @response `400` `{
-  \** @example "이미지를 업로드해주세요." *\
-    message?: string,
-
-}` 이미지 파일이 없음
- * @response `500` `{
-  \** @example "Internal server error" *\
-    message?: string,
-
-}` 서버 오류
- */
+   * @description Cloudinary에 이미지를 업로드합니다. (권한: 관리자만)
+   *
+   * @tags CommonImages
+   * @name UploadCreate
+   * @summary 공통 이미지 업로드
+   * @request POST:/common-images/upload
+   * @secure
+   * @response `201` `UploadCreateData` 이미지 업로드 성공
+   */
   uploadCreate = (data: UploadCreatePayload, params: RequestParams = {}) =>
-    this.request<UploadCreateData, UploadCreateError>({
+    this.http.request<UploadCreateData, any>({
       path: `/common-images/upload`,
-      method: 'POST',
+      method: "POST",
       body: data,
+      secure: true,
       type: ContentType.FormData,
-      format: 'json',
+      format: "json",
       ...params,
     });
   /**
- * @description Cloudinary에서 이미지를 삭제합니다.
- *
- * @tags Common Images
- * @name DeleteDelete
- * @summary 공통 이미지 삭제
- * @request DELETE:/common-images/delete
- * @response `204` `DeleteDeleteData` 이미지 삭제 성공
- * @response `400` `{
-  \** @example "publicIds 배열이 필요합니다." *\
-    message?: string,
-
-}` 잘못된 요청 (publicIds 배열이 없음)
- * @response `500` `{
-  \** @example "Internal server error" *\
-    message?: string,
-
-}` 서버 오류
- */
+   * @description Cloudinary에서 이미지를 삭제합니다. (권한: 관리자만)
+   *
+   * @tags CommonImages
+   * @name DeleteDelete
+   * @summary 공통 이미지 삭제
+   * @request DELETE:/common-images/delete
+   * @secure
+   * @response `204` `DeleteDeleteData` 이미지 삭제 성공
+   */
   deleteDelete = (data: DeleteDeletePayload, params: RequestParams = {}) =>
-    this.request<DeleteDeleteData, DeleteDeleteError>({
+    this.http.request<DeleteDeleteData, any>({
       path: `/common-images/delete`,
-      method: 'DELETE',
+      method: "DELETE",
       body: data,
+      secure: true,
       type: ContentType.Json,
       ...params,
     });

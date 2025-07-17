@@ -1,23 +1,14 @@
 import { toast } from 'sonner';
 import { CustomHttpClient } from '@/service/instance';
 import { Auth } from '@/api/Auth';
-import type { ApiConfig } from '@/api/http-client';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 import type { LoginCreatePayload } from '@/api/data-contracts';
 
-export class CustomAuth extends Auth {
-  constructor(config: ApiConfig = {}) {
-    super(config);
-    this.instance = new CustomHttpClient(config).instance;
-  }
-}
-
-const authApi = new CustomAuth();
-
+const authApi = new Auth(new CustomHttpClient());
 // 로그인
-export const loginCreate = async ({ id, pw }: LoginCreatePayload) => {
+export const loginCreate = async ({ id, pw, type }: LoginCreatePayload) => {
   try {
-    const response = await authApi.loginCreate({ id, pw });
+    const response = await authApi.loginCreate({ id, pw, type });
     toast.success('로그인에 성공했습니다!.');
     useAuthStore.getState().setAccessToken(response.data.accessToken!);
     return {
@@ -35,7 +26,7 @@ export const loginCreate = async ({ id, pw }: LoginCreatePayload) => {
 // 사용자 정보 조회
 export async function getMe() {
   try {
-    const response = await authApi.getAuth();
+    const response = await authApi.getAuth({ secure: true });
     // toast.success('유저 정보를 불러오는데 성공했습니다.');
     return {
       data: response.data,

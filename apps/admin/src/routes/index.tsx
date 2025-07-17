@@ -42,6 +42,7 @@ export const adminLoginSchema = z.object({
     .min(8, '비밀번호는 최소 8자 이상이어야 합니다.')
     .max(19, '비밀번호는 20자 미만이어야 합니다.')
     .regex(/[!@#$%^&*(),.?":{}|<>]/, '특수문자 하나 이상이 포함되어야 합니다.'),
+  type: z.string(),
 });
 type AdminLoginForm = z.infer<typeof adminLoginSchema>;
 
@@ -61,6 +62,7 @@ function RouteComponent() {
     defaultValues: {
       id: 'admin',
       pw: 'test1234!',
+      type: 'user',
     },
   });
 

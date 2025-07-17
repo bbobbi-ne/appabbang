@@ -2,7 +2,7 @@ import { createPortal } from 'react-dom';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useIsFetching, useIsMutating } from '@tanstack/react-query';
-import { useLoadingStore } from '@/stores/loadingStore';
+import { useLoadingStore } from '@/stores/loading-store';
 
 // ✅ 로딩 UI 컴포넌트
 export function GlobalLoading() {
