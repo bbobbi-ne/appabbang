@@ -1,24 +1,15 @@
 import type { QueryFunctionContext } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Breads } from '@/api/Breads';
-import type { ApiConfig } from '@/api/http-client';
 import { CustomHttpClient } from './instance';
 import type {
   BreadsCreatePayload,
   BreadsDeletePayload,
-  BreadsDetailData,
   ImageDeletePayload,
   StatusUpdatePayload,
 } from '@/api/data-contracts';
 
-export class CustomBreads extends Breads {
-  constructor(config: ApiConfig = {}) {
-    super(config);
-    this.instance = new CustomHttpClient(config).instance;
-  }
-}
-
-const breadsApi = new CustomBreads();
+const breadsApi = new Breads(new CustomHttpClient());
 
 // 빵 정보 조회
 export async function getBreads() {
@@ -135,9 +126,9 @@ export async function statusUpdate({ payload, no }: { no: number; payload: Statu
 }
 
 // ✅ 빵 이미지 삭제
-export async function imageDelete({ publicId, no }: ImageDeletePayload) {
+export async function imageDelete({ publicId, no }: ImageDeletePayload & { no: number }) {
   try {
-    const response = await breadsApi.imageDelete({ publicId, no });
+    const response = await breadsApi.imageDelete({ publicId });
     toast.success('빵 이미지삭제에 성공했습니다.');
 
     return {

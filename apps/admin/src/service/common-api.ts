@@ -3,14 +3,7 @@ import { CustomHttpClient } from '@/service/instance';
 import { CommonCode } from '@/api/CommonCode';
 import type { ApiConfig } from '@/api/http-client';
 
-export class CustomAuth extends CommonCode {
-  constructor(config: ApiConfig = {}) {
-    super(config);
-    this.instance = new CustomHttpClient(config).instance;
-  }
-}
-
-const commonCodeApi = new CustomAuth();
+const commonCodeApi = new CommonCode(new CustomHttpClient());
 
 // export async function getUserRole(): Promise<ApiResponse<string>> {
 //   try {
