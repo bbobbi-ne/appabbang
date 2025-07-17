@@ -108,13 +108,7 @@ export const deleteBreadValidator = [
   body('noList.*').isInt().toInt().withMessage('noList 안의 값은 정수여야 합니다.'),
 ];
 
-export const deleteImageValidator = [
-  body('no')
-    .exists()
-    .withMessage('no는 필수입니다')
-    .isInt()
-    .toInt()
-    .withMessage('no는 정수여야 합니다.'),
+export const deleteBreadImageValidator = [
   body('publicId')
     .exists()
     .withMessage('publicId는 필수입니다')

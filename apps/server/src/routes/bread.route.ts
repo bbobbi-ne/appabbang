@@ -4,7 +4,7 @@ import * as breadsController from '@/controllers/bread.controller';
 import {
   createBreadValidator,
   deleteBreadValidator,
-  deleteImageValidator,
+  deleteBreadImageValidator,
   getBreadsValidator,
   getBreadValidator,
   updateBreadStatusValidator,
@@ -62,7 +62,7 @@ router.delete(
 router.delete(
   '/image',
   requireAdmin,
-  validate(deleteImageValidator),
+  validate(deleteBreadImageValidator),
   asyncHandler(breadsController.removeImage),
 );
 
