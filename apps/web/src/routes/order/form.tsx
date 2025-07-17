@@ -6,16 +6,18 @@
 import { createFileRoute } from '@tanstack/react-router';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent } from '@appabbang/ui';
-import RequiredBar from '@/components/RequiredBar';
-import BreadCard from '@/components/BreadCard';
-import { searchBreadList } from '@/services/apis';
-import type { BreadProps } from '@/interface/BreadInterface';
-import OrderFormSkeleton from '@/components/OrderFormSkeleton';
-import BreadSearch from '@/components/BreadSearch';
-import CardMent from '@/components/CardComment';
+import { Card, CardHeader, CardTitle, CardContent } from '@appabbang/ui';
+import BreadCard from '@/components/bread-card';
+import type { BreadProps } from '@/interface/bread-interface';
+import OrderFormSkeleton from '@/components/order-form-skeleton';
+import BreadSearch from '@/components/bread-search';
+import CardComment from '@/components/card-comment';
 import Payment from '@/components/Payment';
-import GuestPrivacyAgreement from '@/components/GuestPrivacyAgreement';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { formSchema } from '@/validate/form-schema';
+import NonCustomerOrderForm from '@/components/non-customer-order-form';
+import { searchBreadList } from '@/services/apis';
 
 /**********************************************************************************/
 /** Route */
@@ -34,7 +36,9 @@ function RouteComponent() {
   const [totalPrice, setTotalPrice] = useState<number>(0); // 최종 금액
 
   /**********************************************************************************/
-  /** Function */
+  /**
+   * Function
+   */
   /** enter key 누를때 빵 검색 기능 수행 */
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     e.key === 'Enter' && breadSearch();
@@ -115,10 +119,40 @@ function RouteComponent() {
     [onCountChange, onRemove],
   );
 
-  /** 비회원 개인정보처리방침 동의 flag 처리 */
-  const onAgreed = () => {};
   /**********************************************************************************/
-  /** React Hooks */
+  /**
+   * 유효성 검사 로직
+   */
+
+  /** Form 기본값 설정 */
+  const defaultValues = {
+    name: '',
+    mobileNumber: '',
+    recipientName: '',
+    recipientMobile: '',
+    zipcode: '',
+    deliveryMethodNo: '',
+    address: '',
+    addressDetail: '',
+    message: '',
+    orderPw: '',
+    orderItems: [], // 주문목록
+    paid: false, // 입금확인여부
+    totalPrice: 0, // 최종금액
+    discountAmount: 0, // 할인금액
+    agreed: false, // 동의여부(화면단에서만 이용)
+  };
+
+  /** form과 schema 연결 */
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues,
+  });
+
+  /**********************************************************************************/
+  /**
+   * React Hooks
+   */
   /** 빵 목록 조회 API */
   const { isLoading, data, error } = useQuery({
     queryKey: ['allBreadList'],
@@ -127,7 +161,11 @@ function RouteComponent() {
 
   /** 빵 목록 조회 및 설정 */
   useEffect(() => {
-    data && setBreadList(data.data) && setOriginBreadList(data.data);
+    if (data) {
+      setBreadList(data.data);
+      setOriginBreadList(data.data);
+    }
+
     error && setErrMsg('빵 목록을 조회하는 데 문제가 발생했습니다.');
   }, [data, error]);
 
@@ -141,6 +179,14 @@ function RouteComponent() {
 
     setTotalCount(count);
     setTotalPrice(price);
+
+    form.setValue(
+      'orderItems',
+      paymentList.map((bread) => ({
+        breadNo: bread.no,
+        quantity: bread.count,
+      })),
+    );
   }, [paymentList]);
 
   return isLoading ? (
@@ -152,25 +198,11 @@ function RouteComponent() {
       </div>
 
       <div className="relative flex w-6xl h-auto m-auto">
-        <Button className="absolute -top-10 right-0 ml-auto">주문</Button>
         <Card className="w-full bg-[#fcfcfc]">
-          <GuestPrivacyAgreement onAgreed={onAgreed} />
-          {/* <div className="p-5">
-            <CardTitle className="pt-5">
-              <span className="pr-2">김가나</span>
-              <span className="text-lg">test01</span>
-            </CardTitle>
-            <CardDescription className="mt-2">010-1234-5656</CardDescription>
-            <CardDescription className="mt-2">
-              경기도 성남시 수정구 신흥1동 6729번지 1층
-            </CardDescription>
-          </div> */}
-
           <div className="m-5">
-            <RequiredBar />
             <CardContent>
-              <CardMent
-                title="구매할 빵을 검색하고 선택하세요."
+              <CardComment
+                title="1. 구매할 빵을 검색하고 선택하세요."
                 comment="최소 1건 이상 선택해야 주문서 작성이 진행됩니다."
               />
 
@@ -190,7 +222,7 @@ function RouteComponent() {
                   </Card>
                 ) : (
                   breadList?.map((data, i) => (
-                    <BreadCard key={i} idx={i} bread={data} onClick={handleBreadClick} />
+                    <BreadCard key={i} bread={data} onClick={handleBreadClick} />
                   ))
                 )}
               </div>
@@ -205,6 +237,18 @@ function RouteComponent() {
             <CardTitle>
               총 금액 : {totalPrice.toLocaleString()}원 ({totalCount}개)
             </CardTitle>
+          </div>
+
+          <div className="mt-20 m-5">
+            <CardContent>
+              <CardComment
+                title="2. 비회원 정보를 입력 해주세요."
+                comment="필수항목을 입력해야 주문이 진행됩니다."
+              />
+            </CardContent>
+
+            {/* 비회원 정보 입력 form */}
+            <NonCustomerOrderForm form={form} paymentList={paymentList} totalPrice={totalPrice} />
           </div>
         </Card>
       </div>

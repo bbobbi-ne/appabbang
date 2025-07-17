@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardContent } from '@appabbang/ui';
-import type { BreadCardProps } from '@/interface/BreadInterface';
+import type { BreadCardProps } from '@/interface/bread-interface';
 import clsx from 'clsx';
 
 /**********************************************************************************/
@@ -10,7 +10,7 @@ const hoverCard = `
 `;
 /**********************************************************************************/
 /** Main Function :: 빵 카드 클릭 시 onClick 콜백 prop 받음 */
-function Bread({ idx, bread, onClick }: BreadCardProps) {
+function BreadCard({ bread, onClick }: BreadCardProps) {
   return (
     <Card
       className={clsx('mt-4 mb-4', 'min-w-[180px] max-w-[220px]', hoverCard)}
@@ -26,4 +26,4 @@ function Bread({ idx, bread, onClick }: BreadCardProps) {
   );
 }
 
-export default Bread;
+export default BreadCard;

@@ -16,7 +16,6 @@ export interface BreadProps {
 
 /** 빵 카드 */
 export interface BreadCardProps {
-  idx: number;
   bread: BreadProps;
   onClick: (bread: BreadCardProps['bread']) => void;
 }
@@ -29,4 +28,17 @@ export interface PaymentProp {
     onCountChange: (bread: BreadProps, type: string) => void;
     onRemove?: (bread: BreadProps) => void;
   };
+}
+
+/** 배송방법 목록 타입 */
+export interface DeliveryProps {
+  no: number;
+  name: string;
+  memo: string;
+  fee: number;
+  isActive: boolean;
+  deliveryType: string;
+  deliveryTypeName: string;
+  createdAt: string;
+  updatedAt: string;
 }
