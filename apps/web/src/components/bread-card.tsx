@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardContent } from '@appabbang/ui';
-import type { BreadCardProps } from '@/interface/BreadInterface';
+import type { BreadCardProps } from '@/interface/bread-interface';
 import clsx from 'clsx';
 
 /**********************************************************************************/

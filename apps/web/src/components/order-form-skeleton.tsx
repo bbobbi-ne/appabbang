@@ -8,8 +8,8 @@ import {
   CardContent,
   Input,
 } from '@appabbang/ui';
-import PageTitle from './PageTitle';
-import CardComment from './CardComment';
+import PageTitle from './page-title';
+import CardComment from './card-comment';
 
 function OrderFormSkeleton() {
   return (
