@@ -1,4 +1,4 @@
-import { useThemeStore } from '@/stores/themeStore';
+import { useThemeStore } from '@/stores/theme-store';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@appabbang/ui';
 import { MoonIcon, SunIcon } from 'lucide-react';
 import { useEffect } from 'react';

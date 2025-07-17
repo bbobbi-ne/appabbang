@@ -6,7 +6,7 @@ import TanStackQueryLayout from '@/integrations/tanstack-query/layout.tsx';
 import type { QueryClient } from '@tanstack/react-query';
 import { Toaster } from '@appabbang/ui';
 import { GlobalLoading } from '@/components/loading.tsx';
-import { useThemeStore } from '@/stores/themeStore';
+import { useThemeStore } from '@/stores/theme-store';
 export interface MyRouterContext {
   queryClient: QueryClient;
 }
