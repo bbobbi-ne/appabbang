@@ -76,8 +76,7 @@ model Order {
   orderStatus           String            @map("order_status")
   totalPrice            Int               @map("total_price")
   discountAmount        Int               @map("discount_amount")
-  orderPw               String?           @map("order_pw")
-  paid                  Boolean       
+  orderPw               String?           @map("order_pw")      
   memo                  String?
   trackingNumber        String?           @map("tracking_number")
   canceledAt            DateTime?         @map("canceled_at")
@@ -94,6 +93,7 @@ model Order {
   deliveryMethod        DeliveryMethod    @relation(fields: [deliveryMethodNo], references: [no])
   discount              Discount?         @relation(fields: [discountNo], references: [no])
   orderItem             OrderItem[]
+  payment               Payment?
 
   @@map("orders")
 }
@@ -130,7 +130,8 @@ model Customer {
 
   order                 Order[]
   address               Address[]
-  discountCustomer      DiscountCustomer[]                                    // 연결
+  discountCustomer      DiscountCustomer[] 
+  payment               Payment[]
 
   @@map("customers")
 }
@@ -203,3 +204,29 @@ model DiscountCustomer {
   @@id([customerNo, discountNo])          // 복합 기본키
   @@map("discount_customer")
 }
+
+model Payment {
+  no                  Int                 @id @default(autoincrement())
+  isPaid              Boolean             @default(false) @map("is_paid")       // 입금확인여부
+  orderedAt           DateTime            @map("ordered_at")                    // 주문일자
+  paidConfirmedAt     DateTime?           @map("paid_confirmed_at")             // 입금확인일자
+  isRefunded          Boolean             @default(false) @map("is_refunded")   // 환불여부
+  refundRequestedAt   DateTime?           @map("refund_requested_at")           // 환불신청일자
+  refundConfirmedAt   DateTime?           @map("refund_confirmed_at")            // 환불취소일자
+  refundReason        String?             @map("refund_reason")                 // 환불사유
+  bankCode            String              @map("bank_code")                     // 은행코드
+  accountNumber       String              @map("account_number")                // 계좌번호
+  accountHolderName   String              @map("account_holder_name")           // 예금주
+  memo                String?             @map("memo")                          // 메모
+
+  createdAt           DateTime            @default(now()) @map("created_at")    // 생성일자
+  updatedAt           DateTime            @updatedAt @map("updated_at")         // 수정일자
+
+  orderNo             Int                 @unique @map("order_no") 
+  customerNo          Int                 @map("customer_no")
+  order               Order               @relation(fields: [orderNo], references: [no])
+  customer            Customer            @relation(fields: [customerNo], references: [no])
+
+  @@map("payments")
+}
+

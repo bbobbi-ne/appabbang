@@ -16,6 +16,7 @@ import commonImageRouter from './routes/common-image.route';
 import customerRouter from './routes/customer.route';
 import deliveryMethodRouter from './routes/delivery-method.route';
 import orderRouter from './routes/order.route';
+import paymentRouter from './routes/payment.route';
 
 /** utils */
 import { loadAllCommonCodes } from './services/common-code.service';
@@ -46,6 +47,7 @@ app.use('/common-images', commonImageRouter);
 app.use('/customers', customerRouter);
 app.use('/delivery-methods', deliveryMethodRouter);
 app.use('/orders', orderRouter);
+app.use('/payments', paymentRouter);
 
 // 헬스 체크용 라우터
 app.get('/', (_, res) => {

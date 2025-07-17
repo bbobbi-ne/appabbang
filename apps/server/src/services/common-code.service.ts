@@ -9,6 +9,7 @@ const purchaseStatusMap = new Map<string, string>();
 const deliveryTypeMap = new Map<string, string>();
 const imageTargetTypeMap = new Map<string, string>();
 const providerTypeMap = new Map<string, string>();
+const bankCodeMap = new Map<string, string>();
 
 export const commonCodeMap = {
   userRoleMap,
@@ -19,6 +20,7 @@ export const commonCodeMap = {
   deliveryTypeMap,
   imageTargetTypeMap,
   providerTypeMap,
+  bankCodeMap,
 };
 
 export async function loadAllCommonCodes() {
@@ -31,6 +33,7 @@ export async function loadAllCommonCodes() {
     loadDeliveryTypeCodes(),
     loadImageTargetTypeCodes(),
     loadProviderTypeCodes(),
+    loadBankCodeCodes(),
   ]);
 }
 
@@ -111,6 +114,16 @@ async function loadProviderTypeCodes() {
 
   codes.forEach((code: any) => {
     providerTypeMap.set(code.code, code.name);
+  });
+}
+
+async function loadBankCodeCodes() {
+  const codes = await prisma.commonCode.findMany({
+    where: { groupName: 'bank_code' },
+  });
+
+  codes.forEach((code: any) => {
+    bankCodeMap.set(code.code, code.name);
   });
 }
 
