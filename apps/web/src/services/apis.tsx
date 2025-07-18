@@ -22,6 +22,11 @@ export async function searchDeliveryList() {
   return client.get(`/delivery-methods/active`);
 }
 
+/** 은행코드 목록 */
+export async function searchBankList() {
+  return client.get(`/common-code/bank_code`);
+}
+
 const { addToast } = useToast();
 
 export async function insertOrders(data: any) {

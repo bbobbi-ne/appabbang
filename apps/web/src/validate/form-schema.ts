@@ -28,7 +28,7 @@ export const formSchema = z.object({
     .string({ required_error: '수령인 전화번호를 입력 바랍니다.' })
     .regex(/^01[016789]-?\d{3,4}-?\d{4}$/, { message: '유효한 휴대번호 양식이 아닙니다.' }),
   deliveryMethodNo: z // 배송타입
-    .string({ required_error: '배송타입을 선택 바랍니다.' }),
+    .string({ required_error: '배송방법을 선택 바랍니다.' }),
   address: z // 배송지 주소
     .string({ required_error: '배송지 주소를 입력 바랍니다.' })
     .min(minNum, { message: `배송지 주소는 ${minMsg}` })
@@ -56,14 +56,21 @@ export const formSchema = z.object({
     .string({ required_error: '주문 비밀번호를 입력 바랍니다.' })
     .min(4, { message: '주문 비밀번호는 최소 4자 이상이어야 합니다.' })
     .max(20, { message: '주문 비밀번호는 최대 20자입니다.' }),
-  paid: z // 입금확인여부
-    .boolean(),
   totalPrice: z // 최종금액
     .number(),
   discountAmount: z // 할인금액
     .number(),
   agreed: z // 동의여부(화면에서만 사용)
     .boolean(),
+  bankCode: z // 은행코드
+    .string({ required_error: '은행을 선택 바랍니다.' }),
+  accountNumber: z // 계좌번호
+    .string({ required_error: '계좌번호를 입력 바랍니다.' }),
+  accountHolderName: z // 예금주
+    .string({ required_error: '예금주명을 입력 바랍니다.' })
+    .min(minNum, { message: `예금주명은 ${minMsg}` })
+    .max(5, { message: `예금주명은 ${maxMsg}` })
+    .regex(/^[가-힣+$]/, { message: `예금주명은 ${regExpMsg}` }),
 });
 
 export type FormSchema = z.infer<typeof formSchema>;

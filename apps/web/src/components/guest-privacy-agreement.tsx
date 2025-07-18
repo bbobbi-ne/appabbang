@@ -2,9 +2,21 @@
  * [비회원 개인정보 수집 및 이용 동의서]
  */
 
-import { Button, Card, CardContent, CardTitle } from '@appabbang/ui';
-import React, { useEffect, useState } from 'react';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTrigger,
+  AlertDialogTitle,
+  Button,
+  Card,
+  CardContent,
+  CardTitle,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from '@appabbang/ui';
+import React from 'react';
 import clsx from 'clsx';
+import { X } from 'lucide-react';
 
 interface AgreedProps {
   onAgreed: (flag: boolean) => void;
@@ -63,112 +75,81 @@ const personalInfoCollectAndUsed = `
 `;
 
 function GuestPrivacyAgreement({ onAgreed, agreed, setAgreed }: AgreedProps) {
-  const [showBox, setShowBox] = useState<boolean>(false);
-  const [color, setColor] = useState<string>('');
-
-  /** 동의서 box 닫기 */
-  const onChangeShow = () => {
-    if (!showBox) {
-      setShowBox(true);
-      return false;
-    }
-
-    showBox ? setShowBox(false) : null;
+  // 동의 버튼 클릭 시 동의 처리
+  const handleAgree = () => {
     setAgreed(true);
-    onSetAgreedMent();
+    onAgreed(true);
+    // AlertDialog는 내부적으로 닫힘
   };
-
-  /** 동의가 되었다면 버튼의 멘트를 변경한다. */
-  const onSetAgreedMent = () => {
-    setColor('bg-[#E8CBB1] text-[#393028]');
-    agreed && onAgreed(true);
-  };
-
-  const onClosed = () => setShowBox(false);
-
-  useEffect(() => {
-    setColor('bg-[#ffe0c2] text-[#393028]');
-  }, []);
 
   return (
-    <>
-      <Card className="flex items-center justify-center relative mt-10 ml-10 mr-10">
-        <CardContent className="pt-7 text-red-700">
-          * 비회원일 경우, 개인정보 수집 및 이용 동의가 필요합니다.
-        </CardContent>
-        <Button
-          type="button"
-          className={clsx('cursor-pointer hover:bg-[#e5caaf]', color)}
-          onClick={onChangeShow}
-        >
-          {agreed ? '확인완료' : '미확인'}
-        </Button>
-      </Card>
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Card className="flex items-center justify-center relative mt-10 ml-10 mr-10">
+          <CardContent className="pt-7 text-red-700">
+            * 비회원일 경우, 개인정보 수집 및 이용 동의가 필요합니다.
+          </CardContent>
+          <Button
+            type="button"
+            className={clsx(
+              'cursor-pointer hover:bg-[#e5caaf]',
+              agreed ? 'bg-[#E8CBB1] text-[#393028]' : 'bg-[#ffe0c2] text-[#393028]',
+            )}
+          >
+            {agreed ? '확인완료' : '미확인'}
+          </Button>
+        </Card>
+      </AlertDialogTrigger>
 
-      {showBox ? (
-        // 추후, 이 부분을 컴포넌트해야 할 수도 있음.
-        <div className="fixed inset-0  bg-opacity-50 flex items-center justify-center z-50">
-          <Card className="w-3xl h-auto max-h-[90vh] overflow-y-auto relative">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="30"
-              height="30"
-              viewBox="0 0 24 24"
-              className="absolute top-2 right-2 cursor-pointer"
-              onClick={onClosed}
-            >
-              <path d="M 12 2 C 6.4889971 2 2 6.4889971 2 12 C 2 17.511003 6.4889971 22 12 22 C 17.511003 22 22 17.511003 22 12 C 22 6.4889971 17.511003 2 12 2 z M 12 4 C 16.430123 4 20 7.5698774 20 12 C 20 16.430123 16.430123 20 12 20 C 7.5698774 20 4 16.430123 4 12 C 4 7.5698774 7.5698774 4 12 4 z M 8.7070312 7.2929688 L 7.2929688 8.7070312 L 10.585938 12 L 7.2929688 15.292969 L 8.7070312 16.707031 L 12 13.414062 L 15.292969 16.707031 L 16.707031 15.292969 L 13.414062 12 L 16.707031 8.7070312 L 15.292969 7.2929688 L 12 10.585938 L 8.7070312 7.2929688 z"></path>
-            </svg>
+      <AlertDialogContent>
+        <AlertDialogCancel className="relative top-1 -right-11/12 cursor-pointer w-10">
+          <X />
+        </AlertDialogCancel>
+        <AlertDialogTitle className="flex justify-center">
+          개인정보 수집 및 이용 동의서
+        </AlertDialogTitle>
 
-            <CardTitle className="mt-10 mb-10 flex items-center justify-center">
-              개인정보 수집 및 이용 동의서
-            </CardTitle>
+        <Card className="m-5 h-60 overflow-scroll">
+          <CardTitle className="mt-5 ml-5 text-[16px]">[ 아빠빵(APPABBANG) 이용약관 ]</CardTitle>
+          <CardContent className="-mt-5">
+            {termsOfService.split('\n').map((line, idx) => (
+              <React.Fragment key={idx}>
+                {line}
+                <br />
+              </React.Fragment>
+            ))}
+          </CardContent>
+        </Card>
+        <Card className="ml-5 mr-5 h-60 overflow-scroll">
+          <CardTitle className="mt-5 ml-5 text-[16px]">
+            [ 아빠빵(APPABBANG) 개인정보 수집 및 이용 동의 ]
+          </CardTitle>
 
-            <Card className="m-5 h-60 overflow-scroll">
-              <CardTitle className="mt-5 ml-5 text-[16px]">
-                [ 아빠빵(APPABBANG) 이용약관 ]
-              </CardTitle>
-              <CardContent className="-mt-5">
-                {termsOfService.split('\n').map((line, idx) => (
-                  <React.Fragment key={idx}>
-                    {line}
-                    <br />
-                  </React.Fragment>
-                ))}
-              </CardContent>
-            </Card>
+          <CardContent className="-mt-5">
+            {personalInfoCollectAndUsed.split('\n').map((line, idx) => (
+              <React.Fragment key={idx}>
+                {line}
+                <br />
+              </React.Fragment>
+            ))}
+          </CardContent>
+        </Card>
 
-            <Card className="ml-5 mr-5 h-60 overflow-scroll">
-              <CardTitle className="mt-5 ml-5 text-[16px]">
-                [ 아빠빵(APPABBANG) 개인정보 수집 및 이용 동의 ]
-              </CardTitle>
-              <CardContent className="-mt-5">
-                {personalInfoCollectAndUsed.split('\n').map((line, idx) => (
-                  <React.Fragment key={idx}>
-                    {line}
-                    <br />
-                  </React.Fragment>
-                ))}
-              </CardContent>
-            </Card>
-
-            <div className="mt-5 mb-10 pl-5 pr-5">
-              <CardContent>
-                본인의 실명, 임시 비밀번호 등의 민감정보를 아빠빵 서비스를 이용하는 데 사용함으로써
-                동의를 포함합니다.
-              </CardContent>
-              <Button
-                type="button"
-                className="cursor-pointer relative -right-11/12"
-                onClick={onChangeShow}
-              >
-                동의
-              </Button>
-            </div>
-          </Card>
+        <div className="mt-5 mb-10 pl-5 pr-5">
+          <CardContent>
+            본인의 실명, 임시 비밀번호 등의 민감정보를 아빠빵 서비스를 이용하는 데 사용함으로써
+            동의를 포함합니다.
+          </CardContent>
+          <AlertDialogAction
+            type="button"
+            className="cursor-pointer relative -right-11/12"
+            onClick={handleAgree}
+          >
+            동의
+          </AlertDialogAction>
         </div>
-      ) : null}
-    </>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 
