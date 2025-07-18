@@ -53,8 +53,7 @@ interface ResultPostProp {
 
 function DaumPostApi({ setAddress }: ParamsProp) {
   //클릭 시 수행될 팝업 생성 함수
-  const postcodeScriptUrl = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
-  const open = useDaumPostcodePopup(postcodeScriptUrl);
+  const open = useDaumPostcodePopup();
 
   /** 핸들러 */
   const onComplete = (data: ResultPostProp) => {
