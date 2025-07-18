@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "gen:api && vite --port 3300",
+    "dev": "pnpm run gen:api && vite --port 3300",
     "start": "vite --port 3000",
     "build": "vite build && tsc",
     "serve": "vite preview",
