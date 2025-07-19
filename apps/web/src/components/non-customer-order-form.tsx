@@ -16,6 +16,7 @@ import {
   FormLabel,
   FormMessage,
   Input,
+  Label,
   Select,
   SelectContent,
   SelectGroup,
@@ -28,6 +29,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form';
 import DaumPostApi from './daum-post-api';
 import GuestPrivacyAgreement from './guest-privacy-agreement';
+import { useState } from 'react';
 
 interface NonCustomerOrderFormProp {
   form: UseFormReturn<FormSchema>;
@@ -35,8 +37,11 @@ interface NonCustomerOrderFormProp {
   totalPrice: number;
 }
 
+/** Main Function */
 function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrderFormProp) {
   const { addToast } = useToast();
+  const [deliveryMethodNo, setDeliveryMethodNo] = useState<string>('');
+  const [same, setSame] = useState<boolean>(false);
 
   /** 배송방법 목록 API */
   const { isLoading: deliveryLoading, data: deliveryData } = useQuery({
@@ -130,10 +135,14 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                       placeholder="주문자 이름 입력"
                       {...field}
                       {...form.register('name')}
-                      onChange={(e) => {
-                        form.setValue('recipientName', e.target.value);
-                        field.onChange(e);
-                      }}
+                      // onChange={(e) => {
+                      //   form.setValue('recipientName', e.target.value, {
+                      //     shouldDirty: true,
+                      //     shouldTouch: true,
+                      //     shouldValidate: true,
+                      //   });
+                      //   field.onChange(e);
+                      // }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -155,10 +164,14 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                       id="mobileNumber"
                       {...field}
                       {...form.register('mobileNumber')}
-                      onChange={(e) => {
-                        form.setValue('recipientMobile', e.target.value);
-                        field.onChange(e);
-                      }}
+                      // onChange={(e) => {
+                      //   form.setValue('recipientMobile', e.target.value, {
+                      //     shouldDirty: true,
+                      //     shouldTouch: true,
+                      //     shouldValidate: true,
+                      //   });
+                      //   field.onChange(e);
+                      // }}
                       placeholder="주문자 전화번호 입력"
                     />
                   </FormControl>
@@ -166,6 +179,25 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                 </FormItem>
               )}
             />
+          </div>
+
+          <div className="flex items-center gap-3 pl-10 pr-10">
+            <Checkbox
+              id="same"
+              onCheckedChange={(flag) => {
+                // 주문자와 수령인이 동일하면 true
+                if (flag) {
+                  setSame(true);
+                  form.setValue('recipientName', form.getValues('name')); // 수령인
+                  form.setValue('recipientMobile', form.getValues('mobileNumber')); // 수령인 전화번호
+                } else {
+                  setSame(false);
+                  form.setValue('recipientName', ''); // 수령인
+                  form.setValue('recipientMobile', ''); // 수령인 전화번호
+                }
+              }}
+            />
+            <Label htmlFor="same">주문자와 수령인 정보가 동일합니다.</Label>
           </div>
 
           <div className="flex items-start mt-5 mb-5 pl-10 pr-10">
@@ -182,6 +214,7 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                       type="text"
                       id="recipientName"
                       placeholder="수령인 입력"
+                      disabled={same ? true : false}
                       {...field}
                       {...form.register('recipientName')}
                     />
@@ -203,6 +236,7 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                     <Input
                       type="text"
                       id="recipientMobile"
+                      disabled={same ? true : false}
                       {...field}
                       {...form.register('recipientMobile')}
                       placeholder="수령인 전화번호 입력"
@@ -396,7 +430,21 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                         </SelectTrigger>
                       </Select>
                     ) : (
-                      <Select value={field.value} onValueChange={field.onChange}>
+                      <Select
+                        value={field.value}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+
+                          // 현재 select에 선택된 option value와 동일한 데이터의 deliveryType 값을 저장한다.
+                          const { deliveryType } = deliveryData?.data.find(
+                            ({ no }: DeliveryProps) => no.toString() === value,
+                          );
+
+                          setDeliveryMethodNo(deliveryType);
+                          // 배송타입이 10이 아니면 배송메세지는 공백처리
+                          deliveryType !== '10' && form.setValue('message', '');
+                        }}
+                      >
                         <SelectTrigger id="deliveryMethodNo" className="w-[150px]">
                           <SelectValue placeholder="배송방법 선택" />
                         </SelectTrigger>
@@ -438,6 +486,7 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                       type="text"
                       id="message"
                       placeholder="배송 메세지 입력"
+                      disabled={deliveryMethodNo !== '10'}
                       {...field}
                       {...form.register('message')}
                     />
@@ -461,7 +510,7 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                     type="text"
                     id="orderPw"
                     className="w-full"
-                    placeholder="송장번호 입력"
+                    placeholder="주문 비밀번호 입력"
                     {...field}
                     {...form.register('orderPw')}
                   />
