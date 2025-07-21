@@ -73,6 +73,8 @@ export const formSchema = z.object({
     .regex(/^[가-힣A-Z_(),]{1,20}$/, {
       message: `예금주명은 영문+한글+특수문자 사용이 가능합니다. (특수문자: (, ), _`,
     }),
+  same: z // 주문자-수령인 동일여부
+    .boolean(),
 });
 
 export type FormSchema = z.infer<typeof formSchema>;

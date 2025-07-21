@@ -5,15 +5,6 @@
 import type { BankCodeProps, DeliveryProps } from '@/interface/bread-interface';
 import type { FormSchema } from '@/validate/form-schema';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
   Button,
   Checkbox,
   Form,
@@ -32,15 +23,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@appabbang/ui';
-import type { UseFormReturn } from 'react-hook-form';
+import { Controller, type UseFormReturn } from 'react-hook-form';
 import DaumPostApi from './daum-post-api';
 import GuestPrivacyAgreement from './guest-privacy-agreement';
 import { useState } from 'react';
-import { useRef } from 'react';
 
 interface NonCustomerOrderFormProp {
   form: UseFormReturn<FormSchema>;
-  totalPrice: number;
   onSelectedDeliveryTp: (delivery: string) => void;
   bank: {
     bankLoading: boolean;
@@ -56,7 +45,6 @@ interface NonCustomerOrderFormProp {
 /** Main Function */
 function NonCustomerOrderForm({
   form,
-  totalPrice,
   onSelectedDeliveryTp,
   bank,
   delivery,
@@ -66,25 +54,33 @@ function NonCustomerOrderForm({
   const [same, setSame] = useState<boolean>(false);
   const { bankLoading, bankData } = bank;
   const { deliveryLoading, deliveryData } = delivery;
-  const formRef = useRef<HTMLFormElement>(null);
+  const [checked, setChecked] = useState<boolean>(false); // 주문자-수령인 동일인물 체크여부
+  const [disabledAddrDtl, setDisabledAddrDtl] = useState<boolean>(true);
 
   /** 주소 API로 받아온 결과값을 상태값과 form value값에 대입한다. */
   const setFormAddress = (newAddrList: string[]) => {
     const [zipcode, address, addressDetail] = newAddrList;
     zipcode && form.setValue('zipcode', zipcode); // 우편번호
-    address && form.setValue('address', address); // 주소
-    addressDetail && form.setValue('addressDetail', addressDetail); // 상세주소
+
+    if (address && addressDetail) {
+      form.setValue('address', `${address}(${addressDetail})`); // 주소(상세주소)
+      setDisabledAddrDtl(false);
+    }
   };
 
   /** 비회원 개인정보처리방침 동의 flag 처리 */
   const onAgreed = (flag: boolean) => form.setValue('agreed', flag); // onSubmit에서 사용하기 위해 정의함.
 
-  // const
+  /** 주문자-수령인 정보가 동일하지 않을 때 */
+  const checkedRecipient = (_: React.ChangeEvent<HTMLInputElement>) => {
+    checked && setSame(false);
+    form.setValue('same', false);
+  };
 
   return (
     <div className="flex justify-center w-full">
       <Form {...form}>
-        <form ref={formRef} onSubmit={handleOrderSubmit} className="w-2/3">
+        <form onSubmit={handleOrderSubmit} className="w-2/3">
           <div className="flex items-start mt-5 mb-5 pl-10 pr-10">
             <FormField
               control={form.control}
@@ -100,15 +96,10 @@ function NonCustomerOrderForm({
                       id="name"
                       placeholder="주문자 이름 입력"
                       {...field}
-                      {...form.register('name')}
-                      // onChange={(e) => {
-                      //   form.setValue('recipientName', e.target.value, {
-                      //     shouldDirty: true,
-                      //     shouldTouch: true,
-                      //     shouldValidate: true,
-                      //   });
-                      //   field.onChange(e);
-                      // }}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        checkedRecipient(e);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -130,14 +121,6 @@ function NonCustomerOrderForm({
                       id="mobileNumber"
                       {...field}
                       {...form.register('mobileNumber')}
-                      // onChange={(e) => {
-                      //   form.setValue('recipientMobile', e.target.value, {
-                      //     shouldDirty: true,
-                      //     shouldTouch: true,
-                      //     shouldValidate: true,
-                      //   });
-                      //   field.onChange(e);
-                      // }}
                       placeholder="주문자 전화번호 입력"
                     />
                   </FormControl>
@@ -148,22 +131,39 @@ function NonCustomerOrderForm({
           </div>
 
           <div className="flex items-center gap-3 pl-10 pr-10">
-            <Checkbox
-              id="same"
-              onCheckedChange={(flag) => {
-                // 주문자와 수령인이 동일하면 true
-                if (flag) {
-                  setSame(true);
-                  form.setValue('recipientName', form.getValues('name')); // 수령인
-                  form.setValue('recipientMobile', form.getValues('mobileNumber')); // 수령인 전화번호
-                } else {
-                  setSame(false);
-                  form.setValue('recipientName', ''); // 수령인
-                  form.setValue('recipientMobile', ''); // 수령인 전화번호
-                }
-              }}
-            />
-            <Label htmlFor="same">주문자와 수령인 정보가 동일합니다.</Label>
+            <FormField
+              control={form.control}
+              name="same"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Checkbox
+                      id="same"
+                      checked={field.value}
+                      onCheckedChange={(flag) => {
+                        // 주문자와 수령인이 동일하면 true
+                        if (flag) {
+                          setSame(true);
+                          setChecked(true);
+                          form.setValue('recipientName', form.getValues('name')); // 수령인
+                          form.setValue('recipientMobile', form.getValues('mobileNumber')); // 수령인 전화번호
+                        } else {
+                          setSame(false);
+                          setChecked(false);
+                          form.setValue('recipientName', ''); // 수령인
+                          form.setValue('recipientMobile', ''); // 수령인 전화번호
+                        }
+
+                        field.onChange(flag);
+                      }}
+                    />
+                  </FormControl>
+                  <FormLabel htmlFor="same" errorCheck={false}>
+                    <span className="text-red-700">*</span> 주문자와 수령인 정보가 동일합니다.
+                  </FormLabel>
+                </FormItem>
+              )}
+            ></FormField>
           </div>
 
           <div className="flex items-start mt-5 mb-5 pl-10 pr-10">
@@ -254,6 +254,7 @@ function NonCustomerOrderForm({
                       id="addressDetail"
                       className="w-full"
                       placeholder="배송지 상세주소 입력"
+                      disabled={disabledAddrDtl}
                       {...field}
                       {...form.register('addressDetail')}
                     />
@@ -516,26 +517,10 @@ function NonCustomerOrderForm({
             setAgreed={(flag: boolean) => form.setValue('agreed', flag)}
           />
 
-          <div className="m-10 text-2xl flex justify-end">
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="outline">주문하기</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>현재 주문을 완료하시겠습니까?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    총 금액은 {totalPrice.toLocaleString()}원 입니다.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>취소</AlertDialogCancel>
-                  <AlertDialogAction type="submit" onClick={() => formRef.current?.requestSubmit()}>
-                    완료
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+          <div className="m-10">
+            <Button type="submit" className="text-2xl h-15 w-full">
+              주문하기
+            </Button>
           </div>
         </form>
       </Form>

@@ -151,6 +151,7 @@ function RouteComponent() {
     bankCode: '', // 은행코드
     accountNumber: '', // 계좌번호
     accountHolderName: '', // 예금주
+    same: false, // 주문자-수령인 동일여부
   };
 
   /** form과 schema 연결 */
@@ -338,7 +339,6 @@ function RouteComponent() {
             {/* 비회원 정보 입력 form */}
             <NonCustomerOrderForm
               form={form}
-              totalPrice={totalPrice}
               onSelectedDeliveryTp={onSelectedDeliveryTp}
               bank={{ bankLoading, bankData: bankData?.data }}
               delivery={{ deliveryLoading, deliveryData: deliveryData?.data }}
