@@ -14,7 +14,6 @@ import {
   FormLabel,
   FormMessage,
   Input,
-  Label,
   Select,
   SelectContent,
   SelectGroup,
@@ -23,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@appabbang/ui';
-import { Controller, type UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 import DaumPostApi from './daum-post-api';
 import GuestPrivacyAgreement from './guest-privacy-agreement';
 import { useState } from 'react';
