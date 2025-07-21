@@ -5,6 +5,15 @@
 import type { BankCodeProps, DeliveryProps } from '@/interface/bread-interface';
 import type { FormSchema } from '@/validate/form-schema';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
   Button,
   Checkbox,
   Form,
@@ -27,9 +36,11 @@ import type { UseFormReturn } from 'react-hook-form';
 import DaumPostApi from './daum-post-api';
 import GuestPrivacyAgreement from './guest-privacy-agreement';
 import { useState } from 'react';
+import { useRef } from 'react';
 
 interface NonCustomerOrderFormProp {
   form: UseFormReturn<FormSchema>;
+  totalPrice: number;
   onSelectedDeliveryTp: (delivery: string) => void;
   bank: {
     bankLoading: boolean;
@@ -45,6 +56,7 @@ interface NonCustomerOrderFormProp {
 /** Main Function */
 function NonCustomerOrderForm({
   form,
+  totalPrice,
   onSelectedDeliveryTp,
   bank,
   delivery,
@@ -54,6 +66,7 @@ function NonCustomerOrderForm({
   const [same, setSame] = useState<boolean>(false);
   const { bankLoading, bankData } = bank;
   const { deliveryLoading, deliveryData } = delivery;
+  const formRef = useRef<HTMLFormElement>(null);
 
   /** 주소 API로 받아온 결과값을 상태값과 form value값에 대입한다. */
   const setFormAddress = (newAddrList: string[]) => {
@@ -66,10 +79,12 @@ function NonCustomerOrderForm({
   /** 비회원 개인정보처리방침 동의 flag 처리 */
   const onAgreed = (flag: boolean) => form.setValue('agreed', flag); // onSubmit에서 사용하기 위해 정의함.
 
+  // const
+
   return (
     <div className="flex justify-center w-full">
       <Form {...form}>
-        <form onSubmit={handleOrderSubmit} className="w-2/3">
+        <form ref={formRef} onSubmit={handleOrderSubmit} className="w-2/3">
           <div className="flex items-start mt-5 mb-5 pl-10 pr-10">
             <FormField
               control={form.control}
@@ -501,10 +516,26 @@ function NonCustomerOrderForm({
             setAgreed={(flag: boolean) => form.setValue('agreed', flag)}
           />
 
-          <div className="m-10">
-            <Button type="submit" className="text-2xl h-15 w-full">
-              주문하기
-            </Button>
+          <div className="m-10 text-2xl flex justify-end">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline">주문하기</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>현재 주문을 완료하시겠습니까?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    총 금액은 {totalPrice.toLocaleString()}원 입니다.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>취소</AlertDialogCancel>
+                  <AlertDialogAction type="submit" onClick={() => formRef.current?.requestSubmit()}>
+                    완료
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </form>
       </Form>

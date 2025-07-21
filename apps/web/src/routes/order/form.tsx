@@ -338,6 +338,7 @@ function RouteComponent() {
             {/* 비회원 정보 입력 form */}
             <NonCustomerOrderForm
               form={form}
+              totalPrice={totalPrice}
               onSelectedDeliveryTp={onSelectedDeliveryTp}
               bank={{ bankLoading, bankData: bankData?.data }}
               delivery={{ deliveryLoading, deliveryData: deliveryData?.data }}
