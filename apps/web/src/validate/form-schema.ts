@@ -69,8 +69,12 @@ export const formSchema = z.object({
   accountHolderName: z // 예금주
     .string({ required_error: '예금주명을 입력 바랍니다.' })
     .min(minNum, { message: `예금주명은 ${minMsg}` })
-    .max(5, { message: `예금주명은 ${maxMsg}` })
-    .regex(/^[가-힣+$]/, { message: `예금주명은 ${regExpMsg}` }),
+    .max(20, { message: `예금주명은 최대 20자까지 입력할 수 있습니다.` })
+    .regex(/^[가-힣A-Z_(),]{1,20}$/, {
+      message: `예금주명은 영문+한글+특수문자 사용이 가능합니다. (특수문자: (, ), _`,
+    }),
+  same: z // 주문자-수령인 동일여부
+    .boolean(),
 });
 
 export type FormSchema = z.infer<typeof formSchema>;

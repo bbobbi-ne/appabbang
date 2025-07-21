@@ -2,9 +2,7 @@
  * 비회원 주문서 폼
  */
 
-import useToast from '@/hooks/useToast';
-import type { BankCodeProps, BreadProps, DeliveryProps } from '@/interface/bread-interface';
-import { insertOrders, searchBankList, searchDeliveryList } from '@/services/apis';
+import type { BankCodeProps, DeliveryProps } from '@/interface/bread-interface';
 import type { FormSchema } from '@/validate/form-schema';
 import {
   Button,
@@ -16,6 +14,7 @@ import {
   FormLabel,
   FormMessage,
   Input,
+  Label,
   Select,
   SelectContent,
   SelectGroup,
@@ -24,91 +23,59 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@appabbang/ui';
-import { useQuery } from '@tanstack/react-query';
-import type { SubmitHandler, UseFormReturn } from 'react-hook-form';
+import { Controller, type UseFormReturn } from 'react-hook-form';
 import DaumPostApi from './daum-post-api';
 import GuestPrivacyAgreement from './guest-privacy-agreement';
+import { useState } from 'react';
 
 interface NonCustomerOrderFormProp {
   form: UseFormReturn<FormSchema>;
-  paymentList: BreadProps[];
-  totalPrice: number;
+  onSelectedDeliveryTp: (delivery: string) => void;
+  bank: {
+    bankLoading: boolean;
+    bankData: BankCodeProps[] | undefined;
+  };
+  delivery: {
+    deliveryLoading: boolean;
+    deliveryData: DeliveryProps[] | undefined;
+  };
+  handleOrderSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
-function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrderFormProp) {
-  const { addToast } = useToast();
-
-  /** 배송방법 목록 API */
-  const { isLoading: deliveryLoading, data: deliveryData } = useQuery({
-    queryKey: ['deliveryList'],
-    queryFn: searchDeliveryList,
-  });
-
-  /** 은행 목록 API */
-  const { isLoading: bankLoading, data: bankData } = useQuery({
-    queryKey: ['bankList'],
-    queryFn: searchBankList,
-  });
-
-  /** 유효성 검증 수행하기 전, 빵 결제목록 확인 */
-  const handleOrderSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (paymentList.length === 0) {
-      addToast({
-        message: '빵 결제목록이 1개 이상 선택돼야 주문이 가능합니다.',
-        type: 'error',
-      });
-
-      return;
-    }
-
-    form.handleSubmit(onSubmit)(e);
-  };
-
-  /**
-   * 유효성 검증 끝난 후 비회원 주문 건 저장
-   * 조건 1. 주문 건이 1건 이상 존재해야 함.
-   * 조건 2. 개인정보 수집 이용 동의가 되어야 함.
-   */
-  const onSubmit: SubmitHandler<FormSchema> = (data) => {
-    const orderItems = Array();
-
-    try {
-      if (!data.agreed) throw new Error('비회원인 경우, 개인정보 수집 및 이용 동의가 필요합니다.');
-      if (paymentList.length === 0)
-        throw new Error('결제목록이 1건 이상 존재해야 주문이 가능합니다.');
-
-      /** orderItems 생성 */
-      paymentList.map((bread, _) => {
-        orderItems.push({
-          breadNo: bread.no,
-          quantity: bread.count,
-        });
-      });
-
-      data.orderItems = orderItems;
-      data.totalPrice = totalPrice;
-
-      insertOrders(data); // 비회원 주문서 저장
-    } catch (e: any) {
-      addToast({
-        message: e.message,
-        type: 'error',
-      });
-    }
-  };
+/** Main Function */
+function NonCustomerOrderForm({
+  form,
+  onSelectedDeliveryTp,
+  bank,
+  delivery,
+  handleOrderSubmit,
+}: NonCustomerOrderFormProp) {
+  const [deliveryMethodNo, setDeliveryMethodNo] = useState<string>('');
+  const [same, setSame] = useState<boolean>(false);
+  const { bankLoading, bankData } = bank;
+  const { deliveryLoading, deliveryData } = delivery;
+  const [checked, setChecked] = useState<boolean>(false); // 주문자-수령인 동일인물 체크여부
+  const [disabledAddrDtl, setDisabledAddrDtl] = useState<boolean>(true);
 
   /** 주소 API로 받아온 결과값을 상태값과 form value값에 대입한다. */
   const setFormAddress = (newAddrList: string[]) => {
     const [zipcode, address, addressDetail] = newAddrList;
     zipcode && form.setValue('zipcode', zipcode); // 우편번호
-    address && form.setValue('address', address); // 주소
-    addressDetail && form.setValue('addressDetail', addressDetail); // 상세주소
+
+    if (address && addressDetail) {
+      form.setValue('address', `${address}(${addressDetail})`); // 주소(상세주소)
+      setDisabledAddrDtl(false);
+    }
   };
 
   /** 비회원 개인정보처리방침 동의 flag 처리 */
   const onAgreed = (flag: boolean) => form.setValue('agreed', flag); // onSubmit에서 사용하기 위해 정의함.
+
+  /** 주문자-수령인 정보가 동일하지 않을 때 */
+  const checkedRecipient = (_: React.ChangeEvent<HTMLInputElement>) => {
+    checked && setSame(false);
+    form.setValue('same', false);
+  };
 
   return (
     <div className="flex justify-center w-full">
@@ -129,10 +96,9 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                       id="name"
                       placeholder="주문자 이름 입력"
                       {...field}
-                      {...form.register('name')}
                       onChange={(e) => {
-                        form.setValue('recipientName', e.target.value);
                         field.onChange(e);
+                        checkedRecipient(e);
                       }}
                     />
                   </FormControl>
@@ -155,10 +121,6 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                       id="mobileNumber"
                       {...field}
                       {...form.register('mobileNumber')}
-                      onChange={(e) => {
-                        form.setValue('recipientMobile', e.target.value);
-                        field.onChange(e);
-                      }}
                       placeholder="주문자 전화번호 입력"
                     />
                   </FormControl>
@@ -166,6 +128,42 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                 </FormItem>
               )}
             />
+          </div>
+
+          <div className="flex items-center gap-3 pl-10 pr-10">
+            <FormField
+              control={form.control}
+              name="same"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Checkbox
+                      id="same"
+                      checked={field.value}
+                      onCheckedChange={(flag) => {
+                        // 주문자와 수령인이 동일하면 true
+                        if (flag) {
+                          setSame(true);
+                          setChecked(true);
+                          form.setValue('recipientName', form.getValues('name')); // 수령인
+                          form.setValue('recipientMobile', form.getValues('mobileNumber')); // 수령인 전화번호
+                        } else {
+                          setSame(false);
+                          setChecked(false);
+                          form.setValue('recipientName', ''); // 수령인
+                          form.setValue('recipientMobile', ''); // 수령인 전화번호
+                        }
+
+                        field.onChange(flag);
+                      }}
+                    />
+                  </FormControl>
+                  <FormLabel htmlFor="same" errorCheck={false}>
+                    <span className="text-red-700">*</span> 주문자와 수령인 정보가 동일합니다.
+                  </FormLabel>
+                </FormItem>
+              )}
+            ></FormField>
           </div>
 
           <div className="flex items-start mt-5 mb-5 pl-10 pr-10">
@@ -182,6 +180,7 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                       type="text"
                       id="recipientName"
                       placeholder="수령인 입력"
+                      disabled={same ? true : false}
                       {...field}
                       {...form.register('recipientName')}
                     />
@@ -203,6 +202,7 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                     <Input
                       type="text"
                       id="recipientMobile"
+                      disabled={same ? true : false}
                       {...field}
                       {...form.register('recipientMobile')}
                       placeholder="수령인 전화번호 입력"
@@ -254,6 +254,7 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                       id="addressDetail"
                       className="w-full"
                       placeholder="배송지 상세주소 입력"
+                      disabled={disabledAddrDtl}
                       {...field}
                       {...form.register('addressDetail')}
                     />
@@ -312,7 +313,7 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                         <SelectContent>
                           <SelectGroup>
                             <SelectLabel>은행</SelectLabel>
-                            {bankData?.data.map((bank: BankCodeProps, idx: number) => {
+                            {bankData?.map((bank: BankCodeProps, idx: number) => {
                               return (
                                 <SelectItem
                                   key={idx}
@@ -396,14 +397,30 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                         </SelectTrigger>
                       </Select>
                     ) : (
-                      <Select value={field.value} onValueChange={field.onChange}>
+                      <Select
+                        value={field.value}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+
+                          // 현재 select에 선택된 option value와 동일한 데이터의 deliveryType 값을 저장한다.
+                          const found = deliveryData?.find(
+                            ({ no }: DeliveryProps) => no.toString() === value,
+                          );
+                          // 배송방법이 없으면 기본값 설정(공백)
+                          const deliveryType = found?.deliveryType ?? '';
+
+                          setDeliveryMethodNo(deliveryType);
+                          onSelectedDeliveryTp(deliveryType);
+                          deliveryType !== '10' && form.setValue('message', ''); // 배송타입이 10이 아니면 배송메세지는 공백처리
+                        }}
+                      >
                         <SelectTrigger id="deliveryMethodNo" className="w-[150px]">
                           <SelectValue placeholder="배송방법 선택" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
                             <SelectLabel>배송방법</SelectLabel>
-                            {deliveryData?.data.map((delivery: DeliveryProps, idx: number) => {
+                            {deliveryData?.map((delivery: DeliveryProps, idx: number) => {
                               return (
                                 <SelectItem
                                   key={idx}
@@ -438,6 +455,7 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                       type="text"
                       id="message"
                       placeholder="배송 메세지 입력"
+                      disabled={deliveryMethodNo !== '10'}
                       {...field}
                       {...form.register('message')}
                     />
@@ -461,7 +479,7 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                     type="text"
                     id="orderPw"
                     className="w-full"
-                    placeholder="송장번호 입력"
+                    placeholder="주문 비밀번호 입력"
                     {...field}
                     {...form.register('orderPw')}
                   />
