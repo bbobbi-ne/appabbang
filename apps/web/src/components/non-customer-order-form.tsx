@@ -2,9 +2,7 @@
  * 비회원 주문서 폼
  */
 
-import useToast from '@/hooks/useToast';
-import type { BankCodeProps, BreadProps, DeliveryProps } from '@/interface/bread-interface';
-import { insertOrders, searchBankList, searchDeliveryList } from '@/services/apis';
+import type { BankCodeProps, DeliveryProps } from '@/interface/bread-interface';
 import type { FormSchema } from '@/validate/form-schema';
 import {
   Button,
@@ -25,84 +23,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@appabbang/ui';
-import { useQuery } from '@tanstack/react-query';
-import type { SubmitHandler, UseFormReturn } from 'react-hook-form';
+import type { UseFormReturn } from 'react-hook-form';
 import DaumPostApi from './daum-post-api';
 import GuestPrivacyAgreement from './guest-privacy-agreement';
 import { useState } from 'react';
 
 interface NonCustomerOrderFormProp {
   form: UseFormReturn<FormSchema>;
-  paymentList: BreadProps[];
-  totalPrice: number;
+  onSelectedDeliveryTp: (delivery: string) => void;
+  bank: {
+    bankLoading: boolean;
+    bankData: BankCodeProps[] | undefined;
+  };
+  delivery: {
+    deliveryLoading: boolean;
+    deliveryData: DeliveryProps[] | undefined;
+  };
+  handleOrderSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
 /** Main Function */
-function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrderFormProp) {
-  const { addToast } = useToast();
+function NonCustomerOrderForm({
+  form,
+  onSelectedDeliveryTp,
+  bank,
+  delivery,
+  handleOrderSubmit,
+}: NonCustomerOrderFormProp) {
   const [deliveryMethodNo, setDeliveryMethodNo] = useState<string>('');
   const [same, setSame] = useState<boolean>(false);
-
-  /** 배송방법 목록 API */
-  const { isLoading: deliveryLoading, data: deliveryData } = useQuery({
-    queryKey: ['deliveryList'],
-    queryFn: searchDeliveryList,
-  });
-
-  /** 은행 목록 API */
-  const { isLoading: bankLoading, data: bankData } = useQuery({
-    queryKey: ['bankList'],
-    queryFn: searchBankList,
-  });
-
-  /** 유효성 검증 수행하기 전, 빵 결제목록 확인 */
-  const handleOrderSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (paymentList.length === 0) {
-      addToast({
-        message: '빵 결제목록이 1개 이상 선택돼야 주문이 가능합니다.',
-        type: 'error',
-      });
-
-      return;
-    }
-
-    form.handleSubmit(onSubmit)(e);
-  };
-
-  /**
-   * 유효성 검증 끝난 후 비회원 주문 건 저장
-   * 조건 1. 주문 건이 1건 이상 존재해야 함.
-   * 조건 2. 개인정보 수집 이용 동의가 되어야 함.
-   */
-  const onSubmit: SubmitHandler<FormSchema> = (data) => {
-    const orderItems = Array();
-
-    try {
-      if (!data.agreed) throw new Error('비회원인 경우, 개인정보 수집 및 이용 동의가 필요합니다.');
-      if (paymentList.length === 0)
-        throw new Error('결제목록이 1건 이상 존재해야 주문이 가능합니다.');
-
-      /** orderItems 생성 */
-      paymentList.map((bread, _) => {
-        orderItems.push({
-          breadNo: bread.no,
-          quantity: bread.count,
-        });
-      });
-
-      data.orderItems = orderItems;
-      data.totalPrice = totalPrice;
-
-      insertOrders(data); // 비회원 주문서 저장
-    } catch (e: any) {
-      addToast({
-        message: e.message,
-        type: 'error',
-      });
-    }
-  };
+  const { bankLoading, bankData } = bank;
+  const { deliveryLoading, deliveryData } = delivery;
 
   /** 주소 API로 받아온 결과값을 상태값과 form value값에 대입한다. */
   const setFormAddress = (newAddrList: string[]) => {
@@ -346,7 +297,7 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                         <SelectContent>
                           <SelectGroup>
                             <SelectLabel>은행</SelectLabel>
-                            {bankData?.data.map((bank: BankCodeProps, idx: number) => {
+                            {bankData?.map((bank: BankCodeProps, idx: number) => {
                               return (
                                 <SelectItem
                                   key={idx}
@@ -436,13 +387,15 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                           field.onChange(value);
 
                           // 현재 select에 선택된 option value와 동일한 데이터의 deliveryType 값을 저장한다.
-                          const { deliveryType } = deliveryData?.data.find(
+                          const found = deliveryData?.find(
                             ({ no }: DeliveryProps) => no.toString() === value,
                           );
+                          // 배송방법이 없으면 기본값 설정(공백)
+                          const deliveryType = found?.deliveryType ?? '';
 
                           setDeliveryMethodNo(deliveryType);
-                          // 배송타입이 10이 아니면 배송메세지는 공백처리
-                          deliveryType !== '10' && form.setValue('message', '');
+                          onSelectedDeliveryTp(deliveryType);
+                          deliveryType !== '10' && form.setValue('message', ''); // 배송타입이 10이 아니면 배송메세지는 공백처리
                         }}
                       >
                         <SelectTrigger id="deliveryMethodNo" className="w-[150px]">
@@ -451,7 +404,7 @@ function NonCustomerOrderForm({ form, paymentList, totalPrice }: NonCustomerOrde
                         <SelectContent>
                           <SelectGroup>
                             <SelectLabel>배송방법</SelectLabel>
-                            {deliveryData?.data.map((delivery: DeliveryProps, idx: number) => {
+                            {deliveryData?.map((delivery: DeliveryProps, idx: number) => {
                               return (
                                 <SelectItem
                                   key={idx}

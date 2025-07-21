@@ -13,12 +13,13 @@ import OrderFormSkeleton from '@/components/order-form-skeleton';
 import BreadSearch from '@/components/bread-search';
 import CardComment from '@/components/card-comment';
 import Payment from '@/components/Payment';
-import { useForm } from 'react-hook-form';
+import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formSchema } from '@/validate/form-schema';
 import NonCustomerOrderForm from '@/components/non-customer-order-form';
-import { searchBreadList } from '@/services/apis';
+import { insertOrders, searchBankList, searchBreadList, searchDeliveryList } from '@/services/apis';
 import type { FormSchema } from '@/validate/form-schema';
+import useToast from '@/hooks/useToast';
 
 /**********************************************************************************/
 /** Route */
@@ -33,6 +34,7 @@ function RouteComponent() {
   const [paymentList, setPaymentList] = useState<BreadProps[]>([]); // 결제목록
   const [errMsg, setErrMsg] = useState<string>(''); // 에러메세지
   const [keyword, setKeyword] = useState<string>(''); // 빵 키워드
+  const [fee, setFee] = useState<number>(0); // 배송비
   const [totalCount, setTotalCount] = useState<number>(0); // 최종 수량
   const [totalPrice, setTotalPrice] = useState<number>(0); // 최종 금액
 
@@ -120,6 +122,10 @@ function RouteComponent() {
     [onCountChange, onRemove],
   );
 
+  /** 우체국 한정으로 배송비 3,000원 추가 */
+  const onSelectedDeliveryTp = (value: string) => {
+    value === '10' ? setFee(3000) : setFee(0);
+  };
   /**********************************************************************************/
   /**
    * 유효성 검사 로직
@@ -154,9 +160,73 @@ function RouteComponent() {
   });
 
   /**********************************************************************************/
+  /** APIs */
+  /** 배송방법 목록 API */
+  const { isLoading: deliveryLoading, data: deliveryData } = useQuery({
+    queryKey: ['deliveryList'],
+    queryFn: searchDeliveryList,
+  });
+
+  /** 은행 목록 API */
+  const { isLoading: bankLoading, data: bankData } = useQuery({
+    queryKey: ['bankList'],
+    queryFn: searchBankList,
+  });
+
+  /** form onSubmit 핸들러 */
+  const handleOrderSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (paymentList.length === 0) {
+      addToast({
+        message: '빵 결제목록이 1개 이상 선택돼야 주문이 가능합니다.',
+        type: 'error',
+      });
+
+      return;
+    }
+
+    form.handleSubmit(onSubmit)(e);
+  };
+
+  /**
+   * 유효성 검증 끝난 후 비회원 주문 건 저장
+   * 조건 1. 주문 건이 1건 이상 존재해야 함.
+   * 조건 2. 개인정보 수집 이용 동의가 되어야 함.
+   */
+  const onSubmit: SubmitHandler<FormSchema> = (data) => {
+    const orderItems = Array();
+
+    try {
+      if (!data.agreed) throw new Error('비회원인 경우, 개인정보 수집 및 이용 동의가 필요합니다.');
+      if (paymentList.length === 0)
+        throw new Error('결제목록이 1건 이상 존재해야 주문이 가능합니다.');
+
+      /** orderItems 생성 */
+      paymentList.map((bread, _) => {
+        orderItems.push({
+          breadNo: bread.no,
+          quantity: bread.count,
+        });
+      });
+
+      data.orderItems = orderItems;
+      data.totalPrice = totalPrice;
+
+      insertOrders(data); // 비회원 주문서 저장
+    } catch (e: any) {
+      addToast({
+        message: e.message,
+        type: 'error',
+      });
+    }
+  };
+  /**********************************************************************************/
   /**
    * React Hooks
    */
+  const { addToast } = useToast();
+
   /** 빵 목록 조회 API */
   const { isLoading, data, error } = useQuery({
     queryKey: ['allBreadList'],
@@ -182,7 +252,7 @@ function RouteComponent() {
     );
 
     setTotalCount(count);
-    setTotalPrice(price);
+    setTotalPrice(price + fee); // 빵 목록 금액의 합 + 배송비
 
     form.setValue(
       'orderItems',
@@ -191,7 +261,7 @@ function RouteComponent() {
         quantity: bread.count,
       })),
     );
-  }, [paymentList]);
+  }, [paymentList, fee]);
 
   return isLoading ? (
     <OrderFormSkeleton />
@@ -237,9 +307,23 @@ function RouteComponent() {
               : paymentList.map((data, i) => <Payment key={i} bread={data} handlers={handlers} />)}
           </div>
 
+          <div className="mt-5 mb-5 mr-10 text-right font-bold text-[18px]">
+            <ul className="flex justify-end text-red-700">
+              <li className="w-1/3"></li>
+              <li className="w-1/3">배송비 :</li>
+              <li className="w-xs">{fee.toLocaleString()}원</li>
+            </ul>
+          </div>
+
           <div className="mt-5 mb-5 mr-10 text-right font-bold">
             <CardTitle>
-              총 금액 : {totalPrice.toLocaleString()}원 ({totalCount}개)
+              <ul className="flex justify-end">
+                <li className="w-1/3"></li>
+                <li className="w-1/3">총 금액({totalCount}개) :</li>
+                <li className="w-xs">
+                  <CardTitle>{totalPrice.toLocaleString()}원</CardTitle>
+                </li>
+              </ul>
             </CardTitle>
           </div>
 
@@ -252,7 +336,13 @@ function RouteComponent() {
             </CardContent>
 
             {/* 비회원 정보 입력 form */}
-            <NonCustomerOrderForm form={form} paymentList={paymentList} totalPrice={totalPrice} />
+            <NonCustomerOrderForm
+              form={form}
+              onSelectedDeliveryTp={onSelectedDeliveryTp}
+              bank={{ bankLoading, bankData: bankData?.data }}
+              delivery={{ deliveryLoading, deliveryData: deliveryData?.data }}
+              handleOrderSubmit={handleOrderSubmit}
+            />
           </div>
         </Card>
       </div>
