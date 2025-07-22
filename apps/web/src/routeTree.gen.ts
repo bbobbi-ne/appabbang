@@ -11,12 +11,20 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as LoginImport } from './routes/login'
 import { Route as IndexImport } from './routes/index'
 import { Route as OrderFormImport } from './routes/order/form'
 import { Route as DemoTanstackQueryImport } from './routes/demo.tanstack-query'
 import { Route as DemoTableImport } from './routes/demo.table'
+import { Route as CallbackKakaoImport } from './routes/callback/kakao'
 
 // Create/Update Routes
+
+const LoginRoute = LoginImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -42,6 +50,12 @@ const DemoTableRoute = DemoTableImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const CallbackKakaoRoute = CallbackKakaoImport.update({
+  id: '/callback/kakao',
+  path: '/callback/kakao',
+  getParentRoute: () => rootRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -51,6 +65,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/callback/kakao': {
+      id: '/callback/kakao'
+      path: '/callback/kakao'
+      fullPath: '/callback/kakao'
+      preLoaderRoute: typeof CallbackKakaoImport
       parentRoute: typeof rootRoute
     }
     '/demo/table': {
@@ -81,6 +109,8 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/callback/kakao': typeof CallbackKakaoRoute
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/order/form': typeof OrderFormRoute
@@ -88,6 +118,8 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/callback/kakao': typeof CallbackKakaoRoute
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/order/form': typeof OrderFormRoute
@@ -96,6 +128,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/callback/kakao': typeof CallbackKakaoRoute
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/order/form': typeof OrderFormRoute
@@ -103,15 +137,36 @@ export interface FileRoutesById {
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/demo/table' | '/demo/tanstack-query' | '/order/form'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/callback/kakao'
+    | '/demo/table'
+    | '/demo/tanstack-query'
+    | '/order/form'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/demo/table' | '/demo/tanstack-query' | '/order/form'
-  id: '__root__' | '/' | '/demo/table' | '/demo/tanstack-query' | '/order/form'
+  to:
+    | '/'
+    | '/login'
+    | '/callback/kakao'
+    | '/demo/table'
+    | '/demo/tanstack-query'
+    | '/order/form'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/callback/kakao'
+    | '/demo/table'
+    | '/demo/tanstack-query'
+    | '/order/form'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
+  CallbackKakaoRoute: typeof CallbackKakaoRoute
   DemoTableRoute: typeof DemoTableRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   OrderFormRoute: typeof OrderFormRoute
@@ -119,6 +174,8 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoginRoute: LoginRoute,
+  CallbackKakaoRoute: CallbackKakaoRoute,
   DemoTableRoute: DemoTableRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   OrderFormRoute: OrderFormRoute,
@@ -135,6 +192,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/login",
+        "/callback/kakao",
         "/demo/table",
         "/demo/tanstack-query",
         "/order/form"
@@ -142,6 +201,12 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/login": {
+      "filePath": "login.tsx"
+    },
+    "/callback/kakao": {
+      "filePath": "callback/kakao.tsx"
     },
     "/demo/table": {
       "filePath": "demo.table.tsx"
