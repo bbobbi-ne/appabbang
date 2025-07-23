@@ -13,6 +13,10 @@ export default function Header() {
         </div>
 
         <div className="px-2 font-bold">
+          <Link to="/mypage">MyPage</Link>
+        </div>
+
+        <div className="px-2 font-bold">
           <Link to="/order/form">Order Form</Link>
         </div>
 
