@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as LoginImport } from './routes/login'
 import { Route as IndexImport } from './routes/index'
 import { Route as MypageIndexImport } from './routes/mypage/index'
+import { Route as JoinIndexImport } from './routes/join/index'
 import { Route as OrderFormImport } from './routes/order/form'
 import { Route as DemoTanstackQueryImport } from './routes/demo.tanstack-query'
 import { Route as DemoTableImport } from './routes/demo.table'
@@ -36,6 +37,12 @@ const IndexRoute = IndexImport.update({
 const MypageIndexRoute = MypageIndexImport.update({
   id: '/mypage/',
   path: '/mypage/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const JoinIndexRoute = JoinIndexImport.update({
+  id: '/join/',
+  path: '/join/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -109,6 +116,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrderFormImport
       parentRoute: typeof rootRoute
     }
+    '/join/': {
+      id: '/join/'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/mypage/': {
       id: '/mypage/'
       path: '/mypage'
@@ -128,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/order/form': typeof OrderFormRoute
+  '/join': typeof JoinIndexRoute
   '/mypage': typeof MypageIndexRoute
 }
 
@@ -138,6 +153,7 @@ export interface FileRoutesByTo {
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/order/form': typeof OrderFormRoute
+  '/join': typeof JoinIndexRoute
   '/mypage': typeof MypageIndexRoute
 }
 
@@ -149,6 +165,7 @@ export interface FileRoutesById {
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/order/form': typeof OrderFormRoute
+  '/join/': typeof JoinIndexRoute
   '/mypage/': typeof MypageIndexRoute
 }
 
@@ -161,6 +178,7 @@ export interface FileRouteTypes {
     | '/demo/table'
     | '/demo/tanstack-query'
     | '/order/form'
+    | '/join'
     | '/mypage'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -170,6 +188,7 @@ export interface FileRouteTypes {
     | '/demo/table'
     | '/demo/tanstack-query'
     | '/order/form'
+    | '/join'
     | '/mypage'
   id:
     | '__root__'
@@ -179,6 +198,7 @@ export interface FileRouteTypes {
     | '/demo/table'
     | '/demo/tanstack-query'
     | '/order/form'
+    | '/join/'
     | '/mypage/'
   fileRoutesById: FileRoutesById
 }
@@ -190,6 +210,7 @@ export interface RootRouteChildren {
   DemoTableRoute: typeof DemoTableRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   OrderFormRoute: typeof OrderFormRoute
+  JoinIndexRoute: typeof JoinIndexRoute
   MypageIndexRoute: typeof MypageIndexRoute
 }
 
@@ -200,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoTableRoute: DemoTableRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   OrderFormRoute: OrderFormRoute,
+  JoinIndexRoute: JoinIndexRoute,
   MypageIndexRoute: MypageIndexRoute,
 }
 
@@ -219,6 +241,7 @@ export const routeTree = rootRoute
         "/demo/table",
         "/demo/tanstack-query",
         "/order/form",
+        "/join/",
         "/mypage/"
       ]
     },
@@ -239,6 +262,9 @@ export const routeTree = rootRoute
     },
     "/order/form": {
       "filePath": "order/form.tsx"
+    },
+    "/join/": {
+      "filePath": "join/index.tsx"
     },
     "/mypage/": {
       "filePath": "mypage/index.tsx"

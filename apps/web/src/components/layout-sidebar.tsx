@@ -33,7 +33,7 @@ const orderMenu = {
 
 const mypageMenu = {
   groupNm: '마이페이지',
-  items: [{ title: '대시보드', url: '/mypage/dashboard', icon: LayoutDashboard }],
+  items: [{ title: '대시보드', url: '/mypage', icon: LayoutDashboard }],
 };
 
 const menuList = [mainMenu, orderMenu, mypageMenu];
