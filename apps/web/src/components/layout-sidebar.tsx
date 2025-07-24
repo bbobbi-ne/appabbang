@@ -19,21 +19,21 @@ import { useNavigate } from '@tanstack/react-router';
 const mainMenu = {
   groupNm: '소개',
   items: [
-    { title: '홈', url: '/', icon: Home },
-    { title: '업체소개', url: '/info/company', icon: Info },
-    { title: '빵 소개', url: '/info/bread', icon: Hamburger },
-    { title: '공지사항', url: '/info/notice', icon: ScrollText },
+    { no: 1, title: '홈', url: '/', icon: Home },
+    { no: 2, title: '업체소개', url: '/info/company', icon: Info },
+    { no: 3, title: '빵 소개', url: '/info/bread', icon: Hamburger },
+    { no: 4, title: '공지사항', url: '/info/notice', icon: ScrollText },
   ],
 };
 
 const orderMenu = {
   groupNm: '주문',
-  items: [{ title: '빵 주문', url: '/order/form', icon: Newspaper }],
+  items: [{ no: 1, title: '빵 주문', url: '/order/form', icon: Newspaper }],
 };
 
 const mypageMenu = {
   groupNm: '마이페이지',
-  items: [{ title: '대시보드', url: '/mypage', icon: LayoutDashboard }],
+  items: [{ no: 1, title: '대시보드', url: '/mypage', icon: LayoutDashboard }],
 };
 
 const menuList = [mainMenu, orderMenu, mypageMenu];
@@ -46,14 +46,14 @@ export default function LayoutSidebar({ children }: { children: React.ReactNode 
       <Sidebar side="left" variant="floating">
         <SidebarHeader className="text-center m-5">아빠빵</SidebarHeader>
         <SidebarContent>
-          <SidebarGroup>
-            {menuList.map((menu) => (
+          {menuList.map((menu, i) => (
+            <SidebarGroup key={i}>
               <>
                 <SidebarGroupLabel>{menu.groupNm}</SidebarGroupLabel>
                 <SidebarGroupContent>
                   <SidebarMenu>
                     {menu.items.map((item) => (
-                      <SidebarMenuItem key={item.title}>
+                      <SidebarMenuItem key={item.no}>
                         <SidebarMenuButton
                           asChild
                           className="cursor-pointer"
@@ -69,8 +69,8 @@ export default function LayoutSidebar({ children }: { children: React.ReactNode 
                   </SidebarMenu>
                 </SidebarGroupContent>
               </>
-            ))}
-          </SidebarGroup>
+            </SidebarGroup>
+          ))}
         </SidebarContent>
         <SidebarFooter />
       </Sidebar>
