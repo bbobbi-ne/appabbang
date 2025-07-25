@@ -1,4 +1,4 @@
-import type { BreadsListData } from '@/api/data-contracts';
+import type { BreadsListData, OrdersListData } from '@/api/data-contracts';
 import { useGetBreadsAndStatusQuery, useStatusUpdateMutation } from '@/hooks/use-breads';
 import {
   AspectRatio,
@@ -22,22 +22,7 @@ export interface MaterialColumns {
   quantity: number;
   updated_at: Date;
 }
-export interface OrdersColumns {
-  no: number;
-  customer_no: string;
-  name: string;
-  mobile_number: string;
-  address_no: number;
-  delivery_no: number;
-  order_number: string;
-  status: number;
-  total_price: string;
-  created_at: number;
-  updated_at: Date;
-  // order_pw: string;
-  // paid: boolean;
-  // memo: string;
-}
+
 export interface PurchaseColumns {
   no: number;
   title: string;
@@ -58,6 +43,7 @@ export interface CustomerColumns {
 }
 
 export type BreadListItem = BreadsListData[number];
+export type OrdersListItem = OrdersListData[number];
 
 export const BreadsColumns = () => {
   const breadStatus = useGetBreadsAndStatusQuery().breadStatus;
@@ -70,7 +56,7 @@ export const BreadsColumns = () => {
       header: ({ table }) => (
         <div className="w-fit mx-auto">
           <Checkbox
-            className=""
+            className="h-5 w-5"
             checked={
               table.getIsAllPageRowsSelected() ||
               (table.getIsSomePageRowsSelected() && 'indeterminate')
@@ -80,8 +66,9 @@ export const BreadsColumns = () => {
         </div>
       ),
       cell: ({ row }) => (
-        <div onClick={(e) => e.preventDefault()} className="w-fit mx-auto">
+        <div onClick={(e) => e.preventDefault()} className="w-full h-full text-center">
           <Checkbox
+            className="w-5 h-5"
             checked={row.getIsSelected()}
             onCheckedChange={(value) => row.toggleSelected(!!value)}
           />
@@ -92,7 +79,6 @@ export const BreadsColumns = () => {
     columnHelper.accessor('no', {
       header: ({ column }) => {
         const isSorted = column.getIsSorted() === 'asc';
-
         return (
           <Button
             className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary`}
@@ -111,7 +97,6 @@ export const BreadsColumns = () => {
     columnHelper.accessor('name', {
       header: ({ column }) => {
         const isSorted = column.getIsSorted() === 'asc';
-
         return (
           <Button
             className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary`}
@@ -341,96 +326,141 @@ export const muterialColumns = () => {
 };
 
 export const ordersColumns = () => {
-  const columnHelper = createColumnHelper<OrdersColumns>();
+  const columnHelper = createColumnHelper<OrdersListItem>();
 
-  const columns: ColumnDef<OrdersColumns, any>[] = [
+  const columns: ColumnDef<OrdersListItem, any>[] = [
     columnHelper.accessor('no', {
       header: ({ column }) => (
-        <Button className="p-0" variant="ghost">
-          No
-        </Button>
+        <div>
+          <Button className="p-0" variant="ghost">
+            No
+          </Button>
+        </div>
       ),
-      cell: (info) => {},
+      cell: (info) => {
+        return info.getValue();
+      },
     }),
-    columnHelper.accessor('order_number', {
+    columnHelper.accessor('orderNumber', {
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           주문번호
         </Button>
       ),
-      cell: (info) => {},
+      cell: (info) => {
+        return <p className="line-clamp-3 whitespace-normal break-words">{info.getValue()}</p>;
+      },
     }),
-    columnHelper.accessor('customer_no', {
-      header: ({ column }) => (
-        <Button className="p-0" variant="ghost">
-          고객아이디
-        </Button>
-      ),
-      cell: (info) => {},
-    }),
-    columnHelper.accessor('name', {
+    columnHelper.accessor('customer.name', {
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           이름
         </Button>
       ),
-      cell: (info) => {},
+      cell: (info) => {
+        return info.getValue();
+      },
     }),
-    columnHelper.accessor('mobile_number', {
+    columnHelper.accessor('customer.mobileNumber', {
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           전화번호
         </Button>
       ),
-      cell: (info) => {},
+      cell: (info) => {
+        return <p className="line-clamp-3 whitespace-normal break-words">{info.getValue()}</p>;
+      },
     }),
-    columnHelper.accessor('status', {
+    columnHelper.accessor('orderStatusName', {
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           주문상태
         </Button>
       ),
-      cell: (info) => {},
+      cell: (info) => {
+        return info.getValue();
+      },
     }),
-    columnHelper.accessor('delivery_no', {
+    columnHelper.accessor('deliveryMethod.name', {
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           배송방법
         </Button>
       ),
-      cell: (info) => {},
+      cell: (info) => {
+        return info.getValue();
+      },
     }),
-    columnHelper.accessor('address_no', {
+    columnHelper.accessor('address', {
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           배송지
         </Button>
       ),
-      cell: (info) => {},
+      cell: (info) => {
+        const { address, addressDetail } = info.getValue();
+
+        return (
+          <p className="line-clamp-3 whitespace-normal break-words">
+            {address} {addressDetail}
+          </p>
+        );
+      },
     }),
-    columnHelper.accessor('total_price', {
+    columnHelper.accessor('totalPrice', {
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           총금액
         </Button>
       ),
-      cell: (info) => {},
+      cell: (info) => {
+        return info.getValue();
+      },
     }),
-    columnHelper.accessor('created_at', {
+    columnHelper.accessor('payment.isPaid', {
+      header: ({ column }) => (
+        <Button className="p-0" variant="ghost">
+          입금확인
+        </Button>
+      ),
+      cell: (info) => {
+        const value = info.getValue() ? '완료' : '미완료';
+        return value;
+      },
+    }),
+    columnHelper.accessor('createdAt', {
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           주문시간
         </Button>
       ),
-      cell: (info) => {},
+      cell: (info) => {
+        return (
+          <div className="line-clamp-3 whitespace-normal break-words">
+            {new Intl.DateTimeFormat('ko-KR', {
+              dateStyle: 'medium',
+              timeStyle: 'short',
+            }).format(new Date(info.getValue()))}
+          </div>
+        );
+      },
     }),
-    columnHelper.accessor('updated_at', {
+    columnHelper.accessor('updatedAt', {
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           상태변경시간
         </Button>
       ),
-      cell: (info) => {},
+      cell: (info) => {
+        return (
+          <div className="line-clamp-3 whitespace-normal break-words">
+            {new Intl.DateTimeFormat('ko-KR', {
+              dateStyle: 'medium',
+              timeStyle: 'short',
+            }).format(new Date(info.getValue()))}
+          </div>
+        );
+      },
     }),
   ];
 
