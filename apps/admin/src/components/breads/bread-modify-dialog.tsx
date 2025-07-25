@@ -5,6 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  ScrollArea,
 } from '@appabbang/ui';
 import { useBreadsDetailQuery, useBreadsUpdateMutation } from '@/hooks/use-breads';
 import { useEffect, useState } from 'react';
@@ -21,12 +22,12 @@ export function BreadModifyDialog({ children, no }: breadModifyDialogProps) {
   return (
     <Dialog onOpenChange={(open) => setOpen(open)}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      {open && <DialogForm no={no} />}
+      {open && <DialogBody no={no} />}
     </Dialog>
   );
 }
 
-function DialogForm({ no }: { no: number }) {
+function DialogBody({ no }: { no: number }) {
   const { data: currentData, isSuccess: currentDataIsSuccess } = useBreadsDetailQuery(no);
   const { breadsUpdateMutation } = useBreadsUpdateMutation();
   const [currentValues, setCurrentValues] = useState<BreadsDailogForm | undefined>();
@@ -55,16 +56,18 @@ function DialogForm({ no }: { no: number }) {
       onInteractOutside={(e) => {
         e.preventDefault();
       }}
-      className="sm:max-w-xl overflow-y-auto max-h-11/12"
+      className="sm:max-w-xl h-fit p-0"
     >
-      <DialogHeader>
-        <DialogTitle>메뉴수정</DialogTitle>
-      </DialogHeader>
-      <DialogDescription>메뉴를 수정해주세요</DialogDescription>
+      <ScrollArea className="h-[700px] p-6">
+        <DialogHeader>
+          <DialogTitle>메뉴수정</DialogTitle>
+        </DialogHeader>
+        <DialogDescription>메뉴를 수정해주세요</DialogDescription>
 
-      {currentValues && (
-        <BreadForm currentValues={currentValues} submitFn={breadsUpdateMutation} no={no} />
-      )}
+        {currentValues && (
+          <BreadForm currentValues={currentValues} submitFn={breadsUpdateMutation} no={no} />
+        )}
+      </ScrollArea>
     </DialogContent>
   );
 }
