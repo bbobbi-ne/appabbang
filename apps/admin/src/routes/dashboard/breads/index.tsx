@@ -27,6 +27,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  ScrollArea,
   Table,
   TableBody,
   TableCell,
@@ -35,12 +36,12 @@ import {
   TableRow,
 } from '@appabbang/ui';
 
-import { TablePagination } from '@/components/table-pagination';
-import { BreadCreateDialog } from '@/components/bread-create-dialog';
+import { TablePagination } from '@/components/ui/table-pagination';
+import { BreadCreateDialog } from '@/components/breads/bread-create-dialog';
 import { useBreadsDeleteMutation, useGetBreadsAndStatusQuery } from '@/hooks/use-breads';
-import { BreadModifyDialog } from '@/components/bread-modify-dialog';
+import { BreadModifyDialog } from '@/components/breads/bread-modify-dialog';
 import { BreadsColumns, type BreadListItem } from '@/data/columns';
-import TableSkeleton from '@/components/table-skeletion';
+import TableSkeleton from '@/components/ui/table-skeletion';
 
 export const Route = createFileRoute('/dashboard/breads/')({
   component: RouteComponent,
@@ -83,40 +84,42 @@ function RouteComponent() {
           <CardTitle>빵관리</CardTitle>
           <BreadCreateDialog />
         </CardHeader>
-        <CardContent className="max-h-[550px] border-1 p-0 m-6 mt-0 rounded-lg overflow-auto relative">
-          <Table className="table-fixed">
-            <TableHeader className="sticky top-0 z-10 bg-background">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="p-4 text-center">
-                    빵을 등록해주세요.
-                  </TableCell>
-                </TableRow>
-              )}
-              {table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <BreadModifyDialog no={cell.row.original.no} key={cell.id}>
-                      <TableCell>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    </BreadModifyDialog>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <CardContent>
+          <ScrollArea className="h-[550px] border-1 rounded-lg ">
+            <Table className="table-fixed">
+              <TableHeader className="sticky top-0 z-10 bg-background">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id}>
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="p-4 text-center">
+                      빵을 등록해주세요.
+                    </TableCell>
+                  </TableRow>
+                )}
+                {table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <BreadModifyDialog no={cell.row.original.no} key={cell.id}>
+                        <TableCell className="border-b">
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      </BreadModifyDialog>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </ScrollArea>
         </CardContent>
         <CardFooter className="space-x-2">
           <TablePagination table={table} />
@@ -132,7 +135,12 @@ function RouteComponent() {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>취소</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => deleteBreadMutation({ noList: selectedRows })}>
+                  <AlertDialogAction
+                    onClick={() => {
+                      table.setRowSelection({});
+                      deleteBreadMutation({ noList: selectedRows });
+                    }}
+                  >
                     삭제
                   </AlertDialogAction>
                 </AlertDialogFooter>
