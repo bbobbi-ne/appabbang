@@ -1,3 +1,8 @@
+/**
+ * 유저 마이페이지의 사이드바 컴포넌트
+ * 사용안함 -- 상황봐서 삭제하기
+ */
+
 import {
   SidebarMenuButton,
   SidebarMenuItem,

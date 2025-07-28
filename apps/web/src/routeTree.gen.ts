@@ -13,12 +13,12 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as LoginImport } from './routes/login'
 import { Route as IndexImport } from './routes/index'
-import { Route as MypageIndexImport } from './routes/mypage/index'
 import { Route as JoinIndexImport } from './routes/join/index'
 import { Route as OrderFormImport } from './routes/order/form'
 import { Route as DemoTanstackQueryImport } from './routes/demo.tanstack-query'
 import { Route as DemoTableImport } from './routes/demo.table'
 import { Route as CallbackKakaoImport } from './routes/callback/kakao'
+import { Route as MypageEditIndexImport } from './routes/mypage/edit/index'
 
 // Create/Update Routes
 
@@ -31,12 +31,6 @@ const LoginRoute = LoginImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const MypageIndexRoute = MypageIndexImport.update({
-  id: '/mypage/',
-  path: '/mypage/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -67,6 +61,12 @@ const DemoTableRoute = DemoTableImport.update({
 const CallbackKakaoRoute = CallbackKakaoImport.update({
   id: '/callback/kakao',
   path: '/callback/kakao',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const MypageEditIndexRoute = MypageEditIndexImport.update({
+  id: '/mypage/edit/',
+  path: '/mypage/edit/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -123,11 +123,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JoinIndexImport
       parentRoute: typeof rootRoute
     }
-    '/mypage/': {
-      id: '/mypage/'
-      path: '/mypage'
-      fullPath: '/mypage'
-      preLoaderRoute: typeof MypageIndexImport
+    '/mypage/edit/': {
+      id: '/mypage/edit/'
+      path: '/mypage/edit'
+      fullPath: '/mypage/edit'
+      preLoaderRoute: typeof MypageEditIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -143,7 +143,7 @@ export interface FileRoutesByFullPath {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/order/form': typeof OrderFormRoute
   '/join': typeof JoinIndexRoute
-  '/mypage': typeof MypageIndexRoute
+  '/mypage/edit': typeof MypageEditIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -154,7 +154,7 @@ export interface FileRoutesByTo {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/order/form': typeof OrderFormRoute
   '/join': typeof JoinIndexRoute
-  '/mypage': typeof MypageIndexRoute
+  '/mypage/edit': typeof MypageEditIndexRoute
 }
 
 export interface FileRoutesById {
@@ -166,7 +166,7 @@ export interface FileRoutesById {
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/order/form': typeof OrderFormRoute
   '/join/': typeof JoinIndexRoute
-  '/mypage/': typeof MypageIndexRoute
+  '/mypage/edit/': typeof MypageEditIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -179,7 +179,7 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/order/form'
     | '/join'
-    | '/mypage'
+    | '/mypage/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -189,7 +189,7 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/order/form'
     | '/join'
-    | '/mypage'
+    | '/mypage/edit'
   id:
     | '__root__'
     | '/'
@@ -199,7 +199,7 @@ export interface FileRouteTypes {
     | '/demo/tanstack-query'
     | '/order/form'
     | '/join/'
-    | '/mypage/'
+    | '/mypage/edit/'
   fileRoutesById: FileRoutesById
 }
 
@@ -211,7 +211,7 @@ export interface RootRouteChildren {
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   OrderFormRoute: typeof OrderFormRoute
   JoinIndexRoute: typeof JoinIndexRoute
-  MypageIndexRoute: typeof MypageIndexRoute
+  MypageEditIndexRoute: typeof MypageEditIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -222,7 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   OrderFormRoute: OrderFormRoute,
   JoinIndexRoute: JoinIndexRoute,
-  MypageIndexRoute: MypageIndexRoute,
+  MypageEditIndexRoute: MypageEditIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -242,7 +242,7 @@ export const routeTree = rootRoute
         "/demo/tanstack-query",
         "/order/form",
         "/join/",
-        "/mypage/"
+        "/mypage/edit/"
       ]
     },
     "/": {
@@ -266,8 +266,8 @@ export const routeTree = rootRoute
     "/join/": {
       "filePath": "join/index.tsx"
     },
-    "/mypage/": {
-      "filePath": "mypage/index.tsx"
+    "/mypage/edit/": {
+      "filePath": "mypage/edit/index.tsx"
     }
   }
 }
