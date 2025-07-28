@@ -13,10 +13,13 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as LoginImport } from './routes/login'
 import { Route as IndexImport } from './routes/index'
+import { Route as LogoutIndexImport } from './routes/logout/index'
+import { Route as JoinIndexImport } from './routes/join/index'
 import { Route as OrderFormImport } from './routes/order/form'
 import { Route as DemoTanstackQueryImport } from './routes/demo.tanstack-query'
 import { Route as DemoTableImport } from './routes/demo.table'
 import { Route as CallbackKakaoImport } from './routes/callback/kakao'
+import { Route as MypageEditIndexImport } from './routes/mypage/edit/index'
 
 // Create/Update Routes
 
@@ -29,6 +32,18 @@ const LoginRoute = LoginImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LogoutIndexRoute = LogoutIndexImport.update({
+  id: '/logout/',
+  path: '/logout/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const JoinIndexRoute = JoinIndexImport.update({
+  id: '/join/',
+  path: '/join/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -53,6 +68,12 @@ const DemoTableRoute = DemoTableImport.update({
 const CallbackKakaoRoute = CallbackKakaoImport.update({
   id: '/callback/kakao',
   path: '/callback/kakao',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const MypageEditIndexRoute = MypageEditIndexImport.update({
+  id: '/mypage/edit/',
+  path: '/mypage/edit/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -102,6 +123,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrderFormImport
       parentRoute: typeof rootRoute
     }
+    '/join/': {
+      id: '/join/'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/logout/': {
+      id: '/logout/'
+      path: '/logout'
+      fullPath: '/logout'
+      preLoaderRoute: typeof LogoutIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/mypage/edit/': {
+      id: '/mypage/edit/'
+      path: '/mypage/edit'
+      fullPath: '/mypage/edit'
+      preLoaderRoute: typeof MypageEditIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -114,6 +156,9 @@ export interface FileRoutesByFullPath {
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/order/form': typeof OrderFormRoute
+  '/join': typeof JoinIndexRoute
+  '/logout': typeof LogoutIndexRoute
+  '/mypage/edit': typeof MypageEditIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -123,6 +168,9 @@ export interface FileRoutesByTo {
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/order/form': typeof OrderFormRoute
+  '/join': typeof JoinIndexRoute
+  '/logout': typeof LogoutIndexRoute
+  '/mypage/edit': typeof MypageEditIndexRoute
 }
 
 export interface FileRoutesById {
@@ -133,6 +181,9 @@ export interface FileRoutesById {
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/order/form': typeof OrderFormRoute
+  '/join/': typeof JoinIndexRoute
+  '/logout/': typeof LogoutIndexRoute
+  '/mypage/edit/': typeof MypageEditIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -144,6 +195,9 @@ export interface FileRouteTypes {
     | '/demo/table'
     | '/demo/tanstack-query'
     | '/order/form'
+    | '/join'
+    | '/logout'
+    | '/mypage/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -152,6 +206,9 @@ export interface FileRouteTypes {
     | '/demo/table'
     | '/demo/tanstack-query'
     | '/order/form'
+    | '/join'
+    | '/logout'
+    | '/mypage/edit'
   id:
     | '__root__'
     | '/'
@@ -160,6 +217,9 @@ export interface FileRouteTypes {
     | '/demo/table'
     | '/demo/tanstack-query'
     | '/order/form'
+    | '/join/'
+    | '/logout/'
+    | '/mypage/edit/'
   fileRoutesById: FileRoutesById
 }
 
@@ -170,6 +230,9 @@ export interface RootRouteChildren {
   DemoTableRoute: typeof DemoTableRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   OrderFormRoute: typeof OrderFormRoute
+  JoinIndexRoute: typeof JoinIndexRoute
+  LogoutIndexRoute: typeof LogoutIndexRoute
+  MypageEditIndexRoute: typeof MypageEditIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -179,6 +242,9 @@ const rootRouteChildren: RootRouteChildren = {
   DemoTableRoute: DemoTableRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   OrderFormRoute: OrderFormRoute,
+  JoinIndexRoute: JoinIndexRoute,
+  LogoutIndexRoute: LogoutIndexRoute,
+  MypageEditIndexRoute: MypageEditIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -196,7 +262,10 @@ export const routeTree = rootRoute
         "/callback/kakao",
         "/demo/table",
         "/demo/tanstack-query",
-        "/order/form"
+        "/order/form",
+        "/join/",
+        "/logout/",
+        "/mypage/edit/"
       ]
     },
     "/": {
@@ -216,6 +285,15 @@ export const routeTree = rootRoute
     },
     "/order/form": {
       "filePath": "order/form.tsx"
+    },
+    "/join/": {
+      "filePath": "join/index.tsx"
+    },
+    "/logout/": {
+      "filePath": "logout/index.tsx"
+    },
+    "/mypage/edit/": {
+      "filePath": "mypage/edit/index.tsx"
     }
   }
 }
