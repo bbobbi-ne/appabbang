@@ -20,8 +20,8 @@ function CustomerInfoCard({ id, name }: CustomerProp) {
         <p className="font-bold ">1,000,000원</p>
       </div>
       <div className="w-3/12 *:text-center *:m-5">
-        <p>총 보유 할인금액</p>
-        <p className="font-bold ">200,000원</p>
+        <p>총 보유 쿠폰 수</p>
+        <p className="font-bold ">2개</p>
       </div>
     </div>
   );
