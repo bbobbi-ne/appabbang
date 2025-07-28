@@ -18,11 +18,13 @@ function MenuButton() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
+  console.log(pathname);
+
   return (
     <div className="flex flex-row gap-10 mt-15 mb-5 m-auto">
       <div>
         <Button
-          className={pathname === '/edit' ? btnCssStr : ''}
+          className={pathname.includes('/edit') ? btnCssStr : ''}
           onClick={() => navigate({ to: '/mypage/edit' })}
         >
           정보수정
@@ -30,7 +32,7 @@ function MenuButton() {
       </div>
       <div>
         <Button
-          className={pathname === '/edit/pw' ? btnCssStr : ''}
+          className={pathname.includes('/edit') ? btnCssStr : ''}
           onClick={() => navigate({ to: '/mypage/edit' })}
         >
           비밀번호 수정
@@ -38,7 +40,7 @@ function MenuButton() {
       </div>
       <div>
         <Button
-          className={pathname === '/' ? btnCssStr : ''}
+          className={pathname.includes('/edit') ? btnCssStr : ''}
           onClick={() => navigate({ to: '/mypage/edit' })}
         >
           배송지 관리
@@ -46,7 +48,7 @@ function MenuButton() {
       </div>
       <div>
         <Button
-          className={pathname === '/edit/pw' ? btnCssStr : ''}
+          className={pathname.includes('/edit') ? btnCssStr : ''}
           onClick={() => navigate({ to: '/mypage/edit' })}
         >
           주문내역
