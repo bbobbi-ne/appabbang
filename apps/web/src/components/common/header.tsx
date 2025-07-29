@@ -10,7 +10,7 @@ export default function Header() {
   const flag = true; // 로그인 세션 정보
 
   return (
-    <header className="p-2 bg-white text-black flex justify-center">
+    <header className="fixed top-0 left-0 right-0 z-50 p-2 bg-white text-black flex justify-center">
       <nav
         className={clsx(
           'flex items-center w-full px-30',
