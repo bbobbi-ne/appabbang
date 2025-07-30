@@ -57,6 +57,7 @@ function RouteComponent() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
+  console.log(orders);
   if (isLoading) return <TableSkeleton />;
   if (isError) return <>에러임</>;
 
@@ -67,15 +68,22 @@ function RouteComponent() {
           <CardTitle>주문관리</CardTitle>
         </CardHeader>
         <CardContent className="max-h-[550px] border-1 p-0 m-6 mt-0 rounded-lg overflow-auto relative">
-          <Table className="table-fixed">
+          <Table>
             <TableHeader className="sticky top-0 z-10 bg-background">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead className="text-center" key={header.id}>
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  ))}
+                  {headerGroup.headers.map((header) => {
+                    const max = header.column.columnDef.maxSize;
+                    return (
+                      <TableHead
+                        style={{ width: `${max}%` }}
+                        className="text-center"
+                        key={header.id}
+                      >
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
+                    );
+                  })}
                 </TableRow>
               ))}
             </TableHeader>

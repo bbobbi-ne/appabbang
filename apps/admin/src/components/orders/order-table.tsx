@@ -1,44 +1,61 @@
 import type { OrdersDetailData } from '@/api/data-contracts';
+import { formatKR } from '@/utils/format';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@appabbang/ui';
 
 type OrderItem = OrdersDetailData['orderItem'][number];
 
 function OrderTable({ orderItem, deliveryFee }: { orderItem: OrderItem[]; deliveryFee: number }) {
-  console.log(orderItem);
   const totalPrice = orderItem.reduce((acc, item) => {
     return acc + item.totalPrice;
   }, 0);
 
   return (
     <>
-      <Table className="table-fixed">
-        <TableHeader>
-          <TableRow>
-            <TableHead>메뉴</TableHead>
-            <TableHead>수량</TableHead>
-            <TableHead>단가</TableHead>
-            <TableHead>총금액</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {orderItem.map((item) => (
+      <div
+        data-slot="table-container"
+        className="relative border  rounded-md w-full overflow-x-auto"
+      >
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell>{item.bread.name}</TableCell>
-              <TableCell>{item.quantity}</TableCell>
-              <TableCell>{item.unitPrice}</TableCell>
-              <TableCell>{item.totalPrice}</TableCell>
+              <TableHead className="w-[20%]">메뉴</TableHead>
+              <TableHead className="w-[15%]">수량</TableHead>
+              <TableHead className="w-[15%]">단가</TableHead>
+              <TableHead className="w-[15%]">총금액</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {orderItem.map((item) => (
+              <TableRow key={item.breadNo}>
+                <TableCell className="line-clamp-2 pb-0 whitespace-normal break-words">
+                  {item.bread.name}
+                </TableCell>
+                <TableCell>{item.quantity}</TableCell>
+                <TableCell>{formatKR(item.unitPrice)}</TableCell>
+                <TableCell>{formatKR(item.totalPrice)}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
       <div className="text-right">
-        <p>
-          금액 : <strong>{totalPrice}</strong>원
-        </p>
-        <p className="text-red-500">배송비 + {deliveryFee}원</p>
-        <p className="text-sky-500">할인금액 -6,500원</p>
-        <p className="text-2xl font-bold">총 금액 : {totalPrice}</p>
+        <div className="flex">
+          <label className="flex-3/4">금액 :</label>
+          <p className="flex-1/4">{totalPrice}원</p>
+        </div>
+        <div className="flex">
+          <label className="flex-3/4">배송비(+) :</label>
+          <p className="flex-1/4">{deliveryFee}원</p>
+        </div>
+        <div className="flex">
+          <label className="flex-3/4">할인금액(-) :</label>
+          <p className="flex-1/4">(할인지정 필요)원</p>
+        </div>
+        <div className="flex">
+          <label className="flex-3/4 text-red-500">총 금액 :</label>
+          <p className="flex-1/4">{totalPrice}원</p>
+        </div>
       </div>
     </>
   );

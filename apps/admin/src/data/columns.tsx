@@ -1,17 +1,8 @@
 import type { BreadsListData, OrdersListData } from '@/api/data-contracts';
-import { useGetBreadsAndStatusQuery, useStatusUpdateMutation } from '@/hooks/use-breads';
-import {
-  AspectRatio,
-  Button,
-  Checkbox,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@appabbang/ui';
+import { AspectRatio, Button, Checkbox } from '@appabbang/ui';
 import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
 import { SortAsc, SortDesc } from 'lucide-react';
+import { formatToDate, formatToDateTime } from '@/utils/format';
 
 export interface MaterialColumns {
   no: number;
@@ -46,27 +37,25 @@ export type BreadListItem = BreadsListData[number];
 export type OrdersListItem = OrdersListData[number];
 
 export const BreadsColumns = () => {
-  const breadStatus = useGetBreadsAndStatusQuery().breadStatus;
-  const { statusUpdateMutation } = useStatusUpdateMutation();
   const columnHelper = createColumnHelper<BreadListItem>();
 
+  // 알레르기 원산지정보 추가 필
   const columns: ColumnDef<BreadListItem, any>[] = [
     columnHelper.display({
       id: 'select',
+      maxSize: 0,
       header: ({ table }) => (
-        <div className="w-fit mx-auto">
-          <Checkbox
-            className="h-5 w-5"
-            checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && 'indeterminate')
-            }
-            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          />
-        </div>
+        <Checkbox
+          className="h-5 w-5"
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        />
       ),
       cell: ({ row }) => (
-        <div onClick={(e) => e.preventDefault()} className="w-full h-full text-center">
+        <div onClick={(e) => e.preventDefault()}>
           <Checkbox
             className="w-5 h-5"
             checked={row.getIsSelected()}
@@ -77,11 +66,12 @@ export const BreadsColumns = () => {
     }),
 
     columnHelper.accessor('no', {
+      maxSize: 3,
       header: ({ column }) => {
         const isSorted = column.getIsSorted() === 'asc';
         return (
           <Button
-            className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary`}
+            className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary gap-0`}
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
@@ -90,54 +80,13 @@ export const BreadsColumns = () => {
         );
       },
       cell: (info) => {
-        return info.getValue();
+        const index = info.table.getPrePaginationRowModel().rows.length - info.row.index;
+        return <p className="text-center">{index}</p>;
       },
-    }),
-
-    columnHelper.accessor('name', {
-      header: ({ column }) => {
-        const isSorted = column.getIsSorted() === 'asc';
-        return (
-          <Button
-            className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary`}
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            {isSorted ? <SortAsc /> : <SortDesc />} 메뉴명
-          </Button>
-        );
-      },
-      cell: ({ row }) => row.getValue('name'),
-    }),
-
-    columnHelper.accessor('description', {
-      header: '설명',
-      cell: (info) => (
-        <p className="line-clamp-3 whitespace-normal break-words">{info.getValue()}</p>
-      ),
-    }),
-
-    columnHelper.accessor('unitPrice', {
-      header: ({ column }) => {
-        const isSorted = column.getIsSorted() === 'asc';
-
-        return (
-          <Button
-            className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary`}
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            {isSorted ? <SortAsc /> : <SortDesc />} 단가
-          </Button>
-        );
-      },
-      cell: (info) =>
-        new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(
-          info.getValue(),
-        ),
     }),
 
     columnHelper.accessor('images', {
+      maxSize: 5,
       header: '대표이미지',
       cell: ({ row }) => {
         const url = (row.getValue('images') as { url: string }[]) || [];
@@ -157,66 +106,27 @@ export const BreadsColumns = () => {
       },
     }),
 
-    columnHelper.accessor('breadStatus', {
+    columnHelper.accessor('name', {
+      maxSize: 5,
       header: ({ column }) => {
-        const rawValue = column.getFilterValue();
-        const value = typeof rawValue === 'string' ? rawValue : 'all';
-
+        const isSorted = column.getIsSorted() === 'asc';
         return (
-          <Select
-            value={value}
-            onValueChange={(val) => {
-              column.setFilterValue(val === 'all' ? undefined : val);
-            }}
+          <Button
+            className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary`}
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">전체</SelectItem>
-              {breadStatus?.map(({ name, code }) => (
-                <SelectItem key={code} value={code}>
-                  {name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {isSorted ? <SortAsc /> : <SortDesc />} 메뉴명
+          </Button>
         );
       },
-
-      cell: (info) => {
-        const value = info.getValue();
-        const found = breadStatus?.find((item) => item.code === value);
-        const no = info.row.original.no;
-
-        return (
-          <Select
-            value={value}
-            onValueChange={(val: '10' | '20' | '30' | '40' | '50') => {
-              statusUpdateMutation({ no, payload: { breadStatus: val } });
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue>{found?.name}</SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {breadStatus?.map(({ name, code }) => (
-                <SelectItem key={code} value={code}>
-                  {name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        );
-      },
-
-      filterFn: (row, columnId, filterValue) => {
-        const columnValue = breadStatus?.find((item) => item.code === row.getValue(columnId));
-        return columnValue?.code === filterValue;
-      },
+      cell: ({ row }) => (
+        <p className="line-clamp-3 whitespace-normal break-words">{row.getValue('name')}</p>
+      ),
     }),
 
-    columnHelper.accessor('createdAt', {
+    columnHelper.accessor('unitPrice', {
+      maxSize: 5,
       header: ({ column }) => {
         const isSorted = column.getIsSorted() === 'asc';
 
@@ -226,21 +136,108 @@ export const BreadsColumns = () => {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
-            {isSorted ? <SortAsc /> : <SortDesc />} 생성일
+            {isSorted ? <SortAsc /> : <SortDesc />} 단가
           </Button>
         );
       },
       cell: (info) => (
-        <div className="line-clamp-2 whitespace-normal break-words text-center">
-          {new Intl.DateTimeFormat('ko-KR', {
-            dateStyle: 'medium',
-            timeStyle: 'short',
-          }).format(new Date(info.getValue()))}
-        </div>
+        <p className="text-right">
+          {new Intl.NumberFormat('ko-KR', { currency: 'KRW' }).format(info.getValue())}원
+        </p>
+      ),
+    }),
+
+    columnHelper.accessor('description', {
+      maxSize: 10,
+      header: '설명',
+      cell: (info) => (
+        <p className="line-clamp-3 whitespace-normal break-words">{info.getValue()}</p>
+      ),
+    }),
+
+    // columnHelper.accessor('breadStatus', {
+    //   header: ({ column }) => {
+    //     const rawValue = column.getFilterValue();
+    //     const value = typeof rawValue === 'string' ? rawValue : 'all';
+
+    //     return (
+    //       <Select
+    //         value={value}
+    //         onValueChange={(val) => {
+    //           column.setFilterValue(val === 'all' ? undefined : val);
+    //         }}
+    //       >
+    //         <SelectTrigger>
+    //           <SelectValue />
+    //         </SelectTrigger>
+    //         <SelectContent>
+    //           <SelectItem value="all">전체</SelectItem>
+    //           {breadStatus?.map(({ name, code }) => (
+    //             <SelectItem key={code} value={code}>
+    //               {name}
+    //             </SelectItem>
+    //           ))}
+    //         </SelectContent>
+    //       </Select>
+    //     );
+    //   },
+
+    //   cell: (info) => {
+    //     const value = info.getValue();
+    //     const found = breadStatus?.find((item) => item.code === value);
+    //     const no = info.row.original.no;
+
+    //     return (
+    //       <Select
+    //         value={value}
+    //         onValueChange={(val: '10' | '20' | '30' | '40' | '50') => {
+    //           statusUpdateMutation({ no, payload: { breadStatus: val } });
+    //         }}
+    //       >
+    //         <SelectTrigger>
+    //           <SelectValue>{found?.name}</SelectValue>
+    //         </SelectTrigger>
+    //         <SelectContent>
+    //           {breadStatus?.map(({ name, code }) => (
+    //             <SelectItem key={code} value={code}>
+    //               {name}
+    //             </SelectItem>
+    //           ))}
+    //         </SelectContent>
+    //       </Select>
+    //     );
+    //   },
+
+    //   filterFn: (row, columnId, filterValue) => {
+    //     const columnValue = breadStatus?.find((item) => item.code === row.getValue(columnId));
+    //     return columnValue?.code === filterValue;
+    //   },
+    // }),
+
+    columnHelper.accessor('createdAt', {
+      maxSize: 5,
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted() === 'asc';
+
+        return (
+          <Button
+            className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary`}
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            {isSorted ? <SortAsc /> : <SortDesc />} 등록일자
+          </Button>
+        );
+      },
+      cell: (info) => (
+        <p className="line-clamp-2 whitespace-normal break-words text-center">
+          {formatToDate(new Date(info.getValue()))}
+        </p>
       ),
     }),
 
     columnHelper.accessor('updatedAt', {
+      maxSize: 5,
       header: ({ column }) => {
         const isSorted = column.getIsSorted() === 'asc';
 
@@ -255,12 +252,9 @@ export const BreadsColumns = () => {
         );
       },
       cell: (info) => (
-        <div className="line-clamp-2 whitespace-normal break-words text-center">
-          {new Intl.DateTimeFormat('ko-KR', {
-            dateStyle: 'medium',
-            timeStyle: 'short',
-          }).format(new Date(info.getValue()))}
-        </div>
+        <p className="line-clamp-2 whitespace-normal break-words text-center">
+          {formatToDateTime(new Date(info.getValue()))}
+        </p>
       ),
     }),
   ];
@@ -330,18 +324,26 @@ export const ordersColumns = () => {
 
   const columns: ColumnDef<OrdersListItem, any>[] = [
     columnHelper.accessor('no', {
-      header: ({ column }) => (
-        <div>
-          <Button className="p-0" variant="ghost">
-            No
+      maxSize: 0,
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted() === 'asc';
+        return (
+          <Button
+            className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary gap-0`}
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            {isSorted ? <SortAsc /> : <SortDesc />} 번호
           </Button>
-        </div>
-      ),
+        );
+      },
       cell: (info) => {
-        return info.getValue();
+        const index = info.table.getPrePaginationRowModel().rows.length - info.row.index;
+        return <p className="text-center">{index}</p>;
       },
     }),
     columnHelper.accessor('orderNumber', {
+      maxSize: 15,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           주문번호
@@ -352,6 +354,7 @@ export const ordersColumns = () => {
       },
     }),
     columnHelper.accessor('customer.name', {
+      maxSize: 5,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           이름
@@ -362,6 +365,7 @@ export const ordersColumns = () => {
       },
     }),
     columnHelper.accessor('customer.mobileNumber', {
+      maxSize: 5,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           전화번호
@@ -371,7 +375,20 @@ export const ordersColumns = () => {
         return <p className="line-clamp-3 whitespace-normal break-words">{info.getValue()}</p>;
       },
     }),
+    columnHelper.accessor('payment.isPaid', {
+      maxSize: 5,
+      header: ({ column }) => (
+        <Button className="p-0" variant="ghost">
+          입금확인
+        </Button>
+      ),
+      cell: (info) => {
+        const value = info.getValue() ? '완료' : '미완료';
+        return value;
+      },
+    }),
     columnHelper.accessor('orderStatusName', {
+      maxSize: 5,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           주문상태
@@ -382,6 +399,7 @@ export const ordersColumns = () => {
       },
     }),
     columnHelper.accessor('deliveryMethod.name', {
+      maxSize: 5,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           배송방법
@@ -392,6 +410,7 @@ export const ordersColumns = () => {
       },
     }),
     columnHelper.accessor('address', {
+      maxSize: 20,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           배송지
@@ -408,56 +427,43 @@ export const ordersColumns = () => {
       },
     }),
     columnHelper.accessor('totalPrice', {
+      maxSize: 10,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
-          총금액
+          결제금액
         </Button>
       ),
       cell: (info) => {
-        return info.getValue();
+        return <p>{info.getValue()}원</p>;
       },
     }),
-    columnHelper.accessor('payment.isPaid', {
-      header: ({ column }) => (
-        <Button className="p-0" variant="ghost">
-          입금확인
-        </Button>
-      ),
-      cell: (info) => {
-        const value = info.getValue() ? '완료' : '미완료';
-        return value;
-      },
-    }),
+
     columnHelper.accessor('createdAt', {
+      maxSize: 5,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
-          주문시간
+          주문등록일시
         </Button>
       ),
       cell: (info) => {
         return (
           <div className="line-clamp-3 whitespace-normal break-words">
-            {new Intl.DateTimeFormat('ko-KR', {
-              dateStyle: 'medium',
-              timeStyle: 'short',
-            }).format(new Date(info.getValue()))}
+            {formatToDate(info.getValue())}
           </div>
         );
       },
     }),
     columnHelper.accessor('updatedAt', {
+      maxSize: 5,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
-          상태변경시간
+          주문수정일시
         </Button>
       ),
       cell: (info) => {
         return (
           <div className="line-clamp-3 whitespace-normal break-words">
-            {new Intl.DateTimeFormat('ko-KR', {
-              dateStyle: 'medium',
-              timeStyle: 'short',
-            }).format(new Date(info.getValue()))}
+            {formatToDateTime(info.getValue())}
           </div>
         );
       },

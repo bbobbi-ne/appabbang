@@ -55,6 +55,7 @@ function RouteComponent() {
   const { deleteBreadMutation } = useBreadsDeleteMutation();
   const columns = BreadsColumns();
 
+  // 알레르기, 원산지정보 추가 필
   const table = useReactTable<BreadListItem>({
     data: breads || [],
     columns,
@@ -86,15 +87,23 @@ function RouteComponent() {
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[550px] border-1 rounded-lg ">
-            <Table className="table-fixed">
-              <TableHeader className="sticky top-0 z-10 bg-background">
+            <Table>
+              <TableHeader className="sticky top-0 z-10 bg-background shadow border-b-0">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id}>
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    ))}
+                    {headerGroup.headers.map((header) => {
+                      const max = header.column.columnDef.maxSize;
+
+                      return (
+                        <TableHead
+                          className="text-center"
+                          style={{ width: `${max}%` }}
+                          key={header.id}
+                        >
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      );
+                    })}
                   </TableRow>
                 ))}
               </TableHeader>
@@ -108,13 +117,15 @@ function RouteComponent() {
                 )}
                 {table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id}>
-                    {row.getVisibleCells().map((cell) => (
-                      <BreadModifyDialog no={cell.row.original.no} key={cell.id}>
-                        <TableCell className="border-b">
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      </BreadModifyDialog>
-                    ))}
+                    {row.getVisibleCells().map((cell) => {
+                      return (
+                        <BreadModifyDialog no={cell.row.original.no} key={cell.id}>
+                          <TableCell>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
+                        </BreadModifyDialog>
+                      );
+                    })}
                   </TableRow>
                 ))}
               </TableBody>

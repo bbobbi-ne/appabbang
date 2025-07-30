@@ -31,6 +31,8 @@ function DialogBody({ no }: { no: number }) {
   const { data: orderData, isLoading } = useOrdersDetailQuery(no);
   const { ordersStatus } = useOrderAndStatusAndDliveryTypeQuery();
 
+  // 회원과 비회원 구분필요, orderPw를 받아오지못하고있음
+
   return (
     <DialogContent
       onInteractOutside={(e) => {
@@ -41,20 +43,19 @@ function DialogBody({ no }: { no: number }) {
       <ScrollArea className="h-[700px] p-6">
         <DialogDescription hidden>주문상세정보</DialogDescription>
         <div className="mb-10 space-y-2">
-          {isLoading ? (
-            <DialogTitle>주문번호</DialogTitle>
-          ) : (
+          {!isLoading && (
             <>
-              <DialogTitle>주문번호</DialogTitle>
-              <p>
-                <strong className="font-semibold"> {orderData?.orderNumber}</strong> [
-                {ordersStatus?.find((val) => val.code === orderData?.orderStatus)?.name}]
-              </p>
+              <DialogTitle>
+                주문번호 ({orderData?.orderNumber}){'\n'}
+                <strong className="text-sky-500">
+                  {ordersStatus?.find((val) => val.code === orderData?.orderStatus)?.name}
+                </strong>
+              </DialogTitle>
             </>
           )}
         </div>
         <div className="space-y-4 my-4">
-          <DialogTitle>주문정보</DialogTitle>
+          <DialogTitle className="text-base">주문정보</DialogTitle>
           {!isLoading && (
             <OrderTable
               deliveryFee={orderData?.deliveryMethod.fee!}
@@ -65,10 +66,7 @@ function DialogBody({ no }: { no: number }) {
 
         <div className="w-full h-1 bg-muted rounded-r-lg my-4" />
 
-        <div className="space-y-4">
-          <DialogTitle>고객정보</DialogTitle>
-          {!isLoading && <OrderForm orderData={orderData!} />}
-        </div>
+        <div className="space-y-4">{!isLoading && <OrderForm orderData={orderData!} />}</div>
       </ScrollArea>
     </DialogContent>
   );
