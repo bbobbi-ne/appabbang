@@ -10,6 +10,10 @@ export interface MyRouterContext {
   queryClient: QueryClient;
 }
 
+/*
+ !!! 가로 풀사이즈가 아닌 컨텐츠 영역은 최대 너비 max-w-screen-2xl 로 제한
+ !!! 헤더(fixed) 높이만큼 임의의 높이 100px 를 패딩으로 추가함.
+*/
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: () => (
     <>
