@@ -14,10 +14,10 @@ export default function Header() {
       <div className="container mx-auto px-2">
         {/* 1 ROW : 아이콘 메뉴 (주문서, 마이페이지, 로그인, 로그아웃) */}
         <nav className="flex items-center justify-end py-2 bg-background">
-          <Link to="/order/form" className="px-2 text-xs">
+          <Link to="/order" className="px-2 text-xs">
             <ScrollText strokeWidth={1} size={16} className="text-primary hover:text-foreground" />
           </Link>
-          <Link to="/mypage/edit" className="px-2 text-xs">
+          <Link to="/mypage/info" className="px-2 text-xs">
             <User strokeWidth={1} size={16} className="text-primary hover:text-foreground" />
           </Link>
 
@@ -47,19 +47,19 @@ export default function Header() {
           {/* 메뉴 */}
           <nav>
             <Link
-              to="/"
+              to="/brand"
               className="px-2 text-sm text-primary hover:text-foreground whitespace-nowrap"
             >
               브랜드 소개
             </Link>
             <Link
-              to="/"
+              to="/products"
               className="px-2 text-sm text-primary hover:text-foreground whitespace-nowrap"
             >
               제품 소개
             </Link>
             <Link
-              to="/"
+              to="/faq"
               className="px-2 text-sm text-primary hover:text-foreground whitespace-nowrap"
             >
               자주묻는질문
