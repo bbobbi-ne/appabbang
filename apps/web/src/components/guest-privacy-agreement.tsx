@@ -101,7 +101,7 @@ function GuestPrivacyAgreement({ onAgreed, agreed, setAgreed }: AgreedProps) {
         </Card>
       </AlertDialogTrigger>
 
-      <AlertDialogContent>
+      <AlertDialogContent className="h-[600px] max-h-[80vh] overflow-y-auto">
         <AlertDialogCancel className="relative top-1 -right-11/12 cursor-pointer w-10">
           <X />
         </AlertDialogCancel>

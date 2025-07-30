@@ -27,8 +27,8 @@ export async function searchBankList() {
   return client.get(`/common-code/bank_code`);
 }
 
+/** 주문서 등록 */
 const { addToast } = useToast();
-
 export async function insertOrders(data: any) {
   client
     .post('/orders', data)
@@ -50,4 +50,11 @@ export async function insertOrders(data: any) {
           type: 'error',
         });
     });
+}
+
+/** 카카오 인가코드 받기 */
+export async function getKakaoCode() {
+  client.get(`http://localhost:4000/auth/kakao/url`).then((response) => {
+    document.location.href = response.data.url;
+  });
 }
