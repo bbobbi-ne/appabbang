@@ -60,9 +60,9 @@ function DialogBody({ no }: { no: number }) {
     >
       <ScrollArea className="h-[700px] p-6">
         <DialogHeader>
-          <DialogTitle>메뉴수정</DialogTitle>
+          <DialogTitle>빵 수정</DialogTitle>
         </DialogHeader>
-        <DialogDescription>메뉴를 수정해주세요</DialogDescription>
+        <DialogDescription hidden>메뉴를 수정해주세요</DialogDescription>
 
         {currentValues && (
           <BreadForm currentValues={currentValues} submitFn={breadsUpdateMutation} no={no} />

@@ -28,9 +28,9 @@ export function BreadCreateDialog() {
       >
         <ScrollArea className="h-[700px] p-6">
           <DialogHeader>
-            <DialogTitle>메뉴등록</DialogTitle>
+            <DialogTitle>빵 등록</DialogTitle>
           </DialogHeader>
-          <DialogDescription>메뉴를 등록해주세요</DialogDescription>
+          <DialogDescription hidden>메뉴를 등록해주세요</DialogDescription>
           <BreadForm submitFn={breadsCreateMutation} />
         </ScrollArea>
       </DialogContent>
