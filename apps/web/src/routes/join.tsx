@@ -1,9 +1,13 @@
+/**
+ * 회원가입 화면
+ */
+
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/logout/')({
+export const Route = createFileRoute('/join')({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  return <div>작업 전입니다... "/logout/"!</div>;
+  return <div>Hello "/join/"!</div>;
 }
