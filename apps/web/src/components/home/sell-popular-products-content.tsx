@@ -1,158 +1,130 @@
-import { useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@appabbang/ui';
 import TitleContent from './title-content';
-import {
-  Box,
-  boxVars,
-  Container,
-  Row,
-  rowVariants,
-  SliderButton,
-  SliderContainer,
-} from '@/styles/home';
+import { Container } from '@/styles/home';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+import Slider from 'react-slick';
 
 export default function SellPopularProducts() {
-  const [slideIdx, setSlideIdx] = useState(0);
-  const [leaving, setLeaving] = useState<boolean>(false);
-  const [isBack, setIsBack] = useState<boolean>(false);
-
   let list = [
     {
       id: 1,
       title: '인기상품 네모식빵1',
-      image: 'https://via.placeholder.com/300x200?text=Bread1',
+      image: './../../public/images/라부부1.jpg',
     },
     {
       id: 2,
       title: '인기상품 네모식빵2',
-      image: 'https://via.placeholder.com/300x200?text=Bread2',
+      image: './../../public/images/라부부2.png',
     },
     {
       id: 3,
       title: '인기상품 네모식빵3',
-      image: 'https://via.placeholder.com/300x200?text=Bread3',
+      image: './../../public/images/라부부3.jpg',
     },
     {
       id: 4,
       title: '인기상품 네모식빵4',
-      image: 'https://via.placeholder.com/300x200?text=Bread4',
+      image: './../../public/images/라부부5.jpg',
     },
     {
       id: 5,
       title: '인기상품 네모식빵5',
-      image: 'https://via.placeholder.com/300x200?text=Bread5',
+      image: './../../public/images/굿모닝롤.jpg',
     },
     {
       id: 6,
       title: '인기상품 네모식빵6',
-      image: 'https://via.placeholder.com/300x200?text=Bread6',
+      image: './../../public/images/라부부7.jpg',
     },
     {
       id: 7,
       title: '인기상품 네모식빵7',
-      image: 'https://via.placeholder.com/300x200?text=Bread7',
+      image: './../../public/images/단팥빵.png',
     },
     {
       id: 8,
       title: '인기상품 네모식빵8',
-      image: 'https://via.placeholder.com/300x200?text=Bread8',
+      image: './../../public/images/발효버터소금빵.jpg',
     },
     {
       id: 9,
       title: '인기상품 네모식빵9',
-      image: 'https://via.placeholder.com/300x200?text=Bread9',
+      image: './../../public/images/초코마카롱.png',
     },
     {
       id: 10,
       title: '인기상품 네모식빵10',
-      image: 'https://via.placeholder.com/300x200?text=Bread10',
+      image: './../../public/images/초콜릿머핀.jpg',
     },
     {
       id: 11,
       title: '인기상품 네모식빵11',
-      image: 'https://via.placeholder.com/300x200?text=Bread11',
+      image: './../../public/images/햄에그모닝.jpg',
     },
     {
       id: 12,
       title: '인기상품 네모식빵12',
-      image: 'https://via.placeholder.com/300x200?text=Bread12',
+      image: './../../public/images/블랙올리브치즈베이글.jpg',
     },
   ];
 
-  // list = [];
-
-  const offset = 4; // 화면에 보여지는 아이템 최대건수
-
-  /**
-   * 슬라이드 기능
-   */
-  const increaseIndex = () => {
-    if (list.length > 0) {
-      if (leaving) return;
-      setIsBack(false);
-      setLeaving(true);
-      const totalItems = list.length;
-      const maxIndex = Math.floor(totalItems / offset) - 1;
-      setSlideIdx((prev) => (prev === maxIndex ? 0 : prev + 1));
-    }
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 4,
+    slidesToScroll: 4,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 3,
+        },
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 2,
+        },
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
   };
-
-  const decreaseIndex = () => {
-    if (list.length > 0) {
-      if (leaving) return;
-      setIsBack(true);
-      setLeaving(true);
-      const totalItems = list.length;
-      const maxIndex = Math.floor(totalItems / offset) - 1;
-      setSlideIdx((prev) => (prev === 0 ? maxIndex : prev - 1));
-    }
-  };
-
-  // exit 이벤트가 끝날때 실행됨. 상태값 변경
-  const toggleLeaving = () => setLeaving((prev) => !prev);
-
-  // 현재 슬라이드에 표시할 아이템들 계산
-  const currentItems = list.slice(slideIdx * offset, slideIdx * offset + offset);
 
   return (
     <Container>
       <TitleContent title="인기 판매 상품" />
-      <SliderContainer>
-        <SliderButton className="prev" onClick={decreaseIndex}>
-          ‹
-        </SliderButton>
-        <SliderButton className="next" onClick={increaseIndex}>
-          ›
-        </SliderButton>
 
-        <AnimatePresence initial={false} onExitComplete={toggleLeaving} custom={isBack}>
-          <Row
-            key={slideIdx}
-            custom={isBack}
-            variants={rowVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            transition={{ type: 'tween', duration: 0.5 }}
-          >
-            {currentItems.map((item) => (
-              <Card key={item.id}>
-                <Box
-                  className="w-50 h-50"
-                  layoutId={String(item.id)}
-                  variants={boxVars}
-                  initial="normal"
-                  whileHover="hover"
-                  transition={{ type: 'tween' }}
-                  $bgPhoto={item.image}
-                />
-                <CardContent>{item.title}</CardContent>
-              </Card>
-            ))}
-          </Row>
-        </AnimatePresence>
-      </SliderContainer>
+      <Slider {...settings} className="ml-[15%] mr-[18%]">
+        {list.map((item) => (
+          <div key={item.id} className="px-1">
+            <Card>
+              <div
+                style={{
+                  width: '100%',
+                  height: '200px',
+                  backgroundImage: `url(${item.image})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  borderRadius: '8px 8px 0 0',
+                }}
+              />
+              <CardContent>
+                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>{item.title}</h3>
+              </CardContent>
+            </Card>
+          </div>
+        ))}
+      </Slider>
     </Container>
   );
 }
