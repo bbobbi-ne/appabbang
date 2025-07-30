@@ -11,9 +11,9 @@ export default function Header() {
   return (
     <header className="w-full fixed top-0 left-0 right-0 z-50 bg-background border-b">
       {/* 헤더 전체 가운데 정렬 */}
-      <div className="w-full max-w-screen-2xl mx-auto">
+      <div className="container mx-auto px-2">
         {/* 1 ROW : 아이콘 메뉴 (주문서, 마이페이지, 로그인, 로그아웃) */}
-        <nav className="flex items-center justify-end p-2 bg-background">
+        <nav className="flex items-center justify-end py-2 bg-background">
           <Link to="/order/form" className="px-2 text-xs">
             <ScrollText strokeWidth={1} size={16} className="text-primary hover:text-foreground" />
           </Link>
@@ -33,7 +33,7 @@ export default function Header() {
         </nav>
 
         {/* 2 ROW : 로고와 메뉴 */}
-        <div className="flex items-center justify-between px-2">
+        <div className="flex items-center justify-between">
           {/* 로고 */}
           <img
             src="/images/appabbang_logo_p.png"

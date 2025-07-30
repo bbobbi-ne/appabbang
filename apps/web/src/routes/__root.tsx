@@ -11,7 +11,8 @@ export interface MyRouterContext {
 }
 
 /*
- !!! 가로 풀사이즈가 아닌 컨텐츠 영역은 최대 너비 max-w-screen-2xl 로 제한
+ !!! 가로 풀사이즈가 아닌 컨텐츠 영역은 container 클래스 로 제한
+ !!! container 사용시 mx-auto 와 px-2 (8px)를 사용함.
  !!! 헤더(fixed) 높이만큼 임의의 높이 100px 를 패딩으로 추가함.
 */
 export const Route = createRootRouteWithContext<MyRouterContext>()({
@@ -32,7 +33,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
       {/* 레이아웃과 관련 없는 컴포넌트들 */}
       <Toaster richColors position="top-center" duration={3000} />
-      <TanStackRouterDevtools />
+      {/* <TanStackRouterDevtools /> */}
       <ReactQueryDevtools />
     </>
   ),
