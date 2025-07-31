@@ -1,6 +1,6 @@
-import { MaterialCreateDialog } from '@/components/material-create-dialog';
-import { TablePagination } from '@/components/table-pagination';
-import TableSkeleton from '@/components/table-skeletion';
+import { MaterialCreateDialog } from '@/components/materials/material-create-dialog';
+import { TablePagination } from '@/components/ui/table-pagination';
+import TableSkeleton from '@/components/ui/table-skeletion';
 import { muterialColumns, type MaterialColumns } from '@/data/columns';
 import { useMaterialAndTypeQuery } from '@/hooks/use-material';
 import {

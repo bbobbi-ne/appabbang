@@ -1,7 +1,7 @@
-import { OrderDialog } from '@/components/order-dialog';
-import { TablePagination } from '@/components/table-pagination';
-import TableSkeleton from '@/components/table-skeletion';
-import { ordersColumns, type OrdersColumns } from '@/data/columns';
+import { OrderDialog } from '@/components/orders/order-dialog';
+import { TablePagination } from '@/components/ui/table-pagination';
+import TableSkeleton from '@/components/ui/table-skeletion';
+import { ordersColumns, type OrdersListItem } from '@/data/columns';
 import { useOrderAndStatusAndDliveryTypeQuery } from '@/hooks/use-order';
 import {
   Card,
@@ -40,8 +40,8 @@ function RouteComponent() {
   const columns = ordersColumns();
   const { isError, isLoading, orders } = useOrderAndStatusAndDliveryTypeQuery();
 
-  const table = useReactTable<OrdersColumns>({
-    data: [],
+  const table = useReactTable<OrdersListItem>({
+    data: orders || [],
     columns,
     state: {
       pagination,
@@ -57,6 +57,7 @@ function RouteComponent() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
+  console.log(orders);
   if (isLoading) return <TableSkeleton />;
   if (isError) return <>에러임</>;
 
@@ -65,20 +66,24 @@ function RouteComponent() {
       <Card className="shadow-none bg-background border-none">
         <CardHeader>
           <CardTitle>주문관리</CardTitle>
-          <OrderDialog>
-            <button>주문상세보기 테스트버튼</button>
-          </OrderDialog>
         </CardHeader>
         <CardContent className="max-h-[550px] border-1 p-0 m-6 mt-0 rounded-lg overflow-auto relative">
-          <Table className="table-fixed">
+          <Table>
             <TableHeader className="sticky top-0 z-10 bg-background">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  ))}
+                  {headerGroup.headers.map((header) => {
+                    const max = header.column.columnDef.maxSize;
+                    return (
+                      <TableHead
+                        style={{ width: `${max}%` }}
+                        className="text-center"
+                        key={header.id}
+                      >
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
+                    );
+                  })}
                 </TableRow>
               ))}
             </TableHeader>
@@ -94,9 +99,11 @@ function RouteComponent() {
               {table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
+                    <OrderDialog no={cell.row.original.no} key={cell.id}>
+                      <TableCell className="text-center">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    </OrderDialog>
                   ))}
                 </TableRow>
               ))}

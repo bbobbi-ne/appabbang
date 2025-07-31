@@ -12,7 +12,7 @@ import {
 } from '@appabbang/ui';
 import { useInitializeAuth } from '@/hooks/use-initialize-auth';
 import { AlertDialog } from '@appabbang/ui';
-import { Sidebar } from '@/components/sidebar';
+import { Sidebar } from '@/components/ui/sidebar';
 
 export const Route = createFileRoute('/dashboard')({
   component: DashboardLayout,

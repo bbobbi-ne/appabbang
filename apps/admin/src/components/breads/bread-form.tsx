@@ -68,7 +68,7 @@ function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
           description: '',
           image: [],
           unitPrice: '',
-          breadStatus: undefined,
+          breadStatus: '10',
         },
   });
 
@@ -107,14 +107,14 @@ function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 ">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 py-4 pr-2">
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem className="flex">
-              <FormLabel errorCheck={false} className="whitespace-nowrap px-2 py-3 flex-1/4">
-                메뉴명
+              <FormLabel errorCheck={false} className="whitespace-nowrap pr-2 py-3 flex-1/4">
+                <strong className="text-red-500">*</strong> 빵 이름
               </FormLabel>
               <div className="flex-3/4 space-y-1">
                 <FormControl>
@@ -128,32 +128,29 @@ function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
 
         <FormField
           control={form.control}
-          name="description"
+          name="image"
           render={({ field }) => (
             <FormItem className="flex">
-              <FormLabel errorCheck={false} className="whitespace-nowrap px-2 py-3 flex-1/4">
-                설명
+              <FormLabel errorCheck={false} className="whitespace-nowrap pr-2 py-3 flex-1/4">
+                <strong className="text-red-500">*</strong> 이미지
               </FormLabel>
               <div className="flex-3/4 space-y-1">
                 <FormControl>
-                  <Textarea
-                    placeholder="설명을 입력해주세요"
-                    className="resize-none w-full break-all"
-                    {...field}
-                  />
+                  <ImageUploadField field={field} no={no} />
                 </FormControl>
                 <FormMessage />
               </div>
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="unitPrice"
           render={({ field }) => (
             <FormItem className="flex">
-              <FormLabel errorCheck={false} className="whitespace-nowrap px-2 py-3 flex-1/4">
-                단가(원)
+              <FormLabel errorCheck={false} className="whitespace-nowrap pr-2 py-3 flex-1/4">
+                <strong className="text-red-500">*</strong> 단가(원)
               </FormLabel>
               <div className="flex-3/4 space-y-1">
                 <FormControl>
@@ -191,15 +188,19 @@ function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
 
         <FormField
           control={form.control}
-          name="image"
+          name="description"
           render={({ field }) => (
             <FormItem className="flex">
-              <FormLabel errorCheck={false} className="whitespace-nowrap px-2 py-3 flex-1/4">
-                이미지
+              <FormLabel errorCheck={false} className="whitespace-nowrap pr-2 py-3 flex-1/4">
+                <strong className="text-red-500">*</strong> 설명
               </FormLabel>
               <div className="flex-3/4 space-y-1">
                 <FormControl>
-                  <ImageUploadField field={field} no={no} />
+                  <Textarea
+                    placeholder="설명을 입력해주세요"
+                    className="resize-none w-full break-all"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </div>
@@ -212,9 +213,9 @@ function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
           name="breadStatus"
           render={({ field }) => {
             return (
-              <FormItem className="flex">
-                <FormLabel errorCheck={false} className="whitespace-nowrap px-2 py-3 flex-1/4">
-                  상태
+              <FormItem className="hidden">
+                <FormLabel errorCheck={false} className="whitespace-nowrap pr-2 py-3 flex-1/4">
+                  <strong className="text-red-500">*</strong> 상태
                 </FormLabel>
                 <div className="flex-3/4">
                   <FormControl>

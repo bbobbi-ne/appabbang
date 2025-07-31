@@ -1,4 +1,4 @@
-import { TablePagination } from '@/components/table-pagination';
+import { TablePagination } from '@/components/ui/table-pagination';
 import { customersColumns, type CustomerColumns } from '@/data/columns';
 import {
   Card,

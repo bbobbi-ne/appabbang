@@ -1,16 +1,16 @@
-import type { CommonCodeDetailData } from '@/api/data-contracts';
+import type { CommonCodeDetailData, OrdersListData } from '@/api/data-contracts';
 import { getOrderdDliveryType, getOrderStatus } from '@/service/common-api';
-import { useQueries } from '@tanstack/react-query';
+import { getOrdersDetail, getOrdersList } from '@/service/order-api';
+import { useQueries, useQuery } from '@tanstack/react-query';
 
 export function useOrderAndStatusAndDliveryTypeQuery() {
   const results = useQueries({
     queries: [
       {
         queryKey: ['orders'],
-        queryFn: () => {
-          return [];
-        },
+        queryFn: getOrdersList,
         staleTime: Infinity,
+        select: (res) => (res as { data: OrdersListData }).data,
         retry: 1,
       },
       {
@@ -34,11 +34,21 @@ export function useOrderAndStatusAndDliveryTypeQuery() {
 
   return {
     orders: ordersQuery.data,
-    rdersStatus: ordersStatusQuery.data,
+    ordersStatus: ordersStatusQuery.data,
     ordersDliveryType: ordersDliveryTypeQuery.data,
     isLoading:
       ordersQuery.isLoading || ordersStatusQuery.isLoading || ordersDliveryTypeQuery.isLoading,
     isError: ordersQuery.isError || ordersStatusQuery.isError || ordersDliveryTypeQuery.isError,
     error: ordersQuery.error || ordersStatusQuery.error || ordersDliveryTypeQuery.error,
   };
+}
+
+export function useOrdersDetailQuery(no: number) {
+  return useQuery({
+    queryKey: ['bread', { no }],
+    queryFn: getOrdersDetail,
+    staleTime: Infinity,
+    retry: 1,
+    select: (res) => res.data,
+  });
 }

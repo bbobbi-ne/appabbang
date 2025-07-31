@@ -8,7 +8,6 @@ export class CustomHttpClient extends HttpClient {
       ...config,
       securityWorker: () => {
         const { accessToken } = useAuthStore.getState();
-        console.log('🧪 securityWorker 실행됨, accessToken:', accessToken);
         if (!accessToken) return;
         return {
           headers: {

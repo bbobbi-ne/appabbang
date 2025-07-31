@@ -21,7 +21,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginCreate } from '@/service/auth-api';
 import { useMutation } from '@tanstack/react-query';
-import ThemeToggleBtn from '@/components/theme-toggle-btn';
+import ThemeToggleBtn from '@/components/ui/theme-toggle-btn';
 
 export const Route = createFileRoute('/')({
   beforeLoad: () => {

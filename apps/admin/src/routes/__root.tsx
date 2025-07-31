@@ -5,7 +5,7 @@ import TanStackQueryLayout from '@/integrations/tanstack-query/layout.tsx';
 
 import type { QueryClient } from '@tanstack/react-query';
 import { Toaster } from '@appabbang/ui';
-import { GlobalLoading } from '@/components/loading.tsx';
+import { GlobalLoading } from '@/components/ui/loading.tsx';
 import { useThemeStore } from '@/stores/theme-store';
 export interface MyRouterContext {
   queryClient: QueryClient;
@@ -20,7 +20,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         <GlobalLoading />
         <Toaster richColors theme={theme} />
         <Outlet />
-        <TanStackRouterDevtools />
+        {/* <TanStackRouterDevtools /> */}
         <TanStackQueryLayout />
       </>
     );
