@@ -8,7 +8,9 @@
     "build": "vite build && tsc",
     "serve": "vite preview",
     "test": "vitest run",
-    "lint": "eslint"
+    "lint": "eslint",
+    "gen:api": "swagger-typescript-api generate -p http://localhost:4000/swagger.json --additional-properties kebab-file-name=true -r -o src/api --modular -d --extract-request-body --extract-response-body --extract-response-error --axios --use-type-imports --templates ./src/api/swagger-templates --single-http-client --extract-types",
+    "gen:templates": "swagger-typescript-api generate-templates -p http://localhost:4000/swagger.json -r -o ./src/api/swagger-templates --modular -d --extract-request-body --extract-response-body --extract-response-error --axios --use-type-imports"
   },
   "dependencies": {
     "@appabbang/eslint": "workspace:*",
@@ -27,5 +29,8 @@
     "slick-carousel": "^1.8.1",
     "sonner": "^2.0.6",
     "styled-components": "^6.1.19"
+  },
+  "devDependencies": {
+    "swagger-typescript-api": "^13.2.7"
   }
 }

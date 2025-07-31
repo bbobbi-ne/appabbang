@@ -11,21 +11,37 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as LogoutImport } from './routes/logout'
 import { Route as LoginImport } from './routes/login'
+import { Route as JoinImport } from './routes/join'
 import { Route as IndexImport } from './routes/index'
-import { Route as LogoutIndexImport } from './routes/logout/index'
-import { Route as JoinIndexImport } from './routes/join/index'
-import { Route as OrderFormImport } from './routes/order/form'
-import { Route as DemoTanstackQueryImport } from './routes/demo.tanstack-query'
-import { Route as DemoTableImport } from './routes/demo.table'
-import { Route as CallbackKakaoImport } from './routes/callback/kakao'
-import { Route as MypageEditIndexImport } from './routes/mypage/edit/index'
+import { Route as CallbackKakaoImport } from './routes/callback.kakao'
+import { Route as SubPageProductsImport } from './routes/_sub-page/products'
+import { Route as SubPageOrderImport } from './routes/_sub-page/order'
+import { Route as SubPageFaqImport } from './routes/_sub-page/faq'
+import { Route as SubPageBrandImport } from './routes/_sub-page/brand'
+import { Route as SubPageMypageIndexImport } from './routes/_sub-page/mypage/index'
+import { Route as SubPageMypagePasswordIndexImport } from './routes/_sub-page/mypage/password/index'
+import { Route as SubPageMypageInfoIndexImport } from './routes/_sub-page/mypage/info/index'
+import { Route as SubPageMypageAddressIndexImport } from './routes/_sub-page/mypage/address/index'
 
 // Create/Update Routes
+
+const LogoutRoute = LogoutImport.update({
+  id: '/logout',
+  path: '/logout',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const LoginRoute = LoginImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const JoinRoute = JoinImport.update({
+  id: '/join',
+  path: '/join',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -35,45 +51,59 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const LogoutIndexRoute = LogoutIndexImport.update({
-  id: '/logout/',
-  path: '/logout/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const JoinIndexRoute = JoinIndexImport.update({
-  id: '/join/',
-  path: '/join/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const OrderFormRoute = OrderFormImport.update({
-  id: '/order/form',
-  path: '/order/form',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const DemoTanstackQueryRoute = DemoTanstackQueryImport.update({
-  id: '/demo/tanstack-query',
-  path: '/demo/tanstack-query',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const DemoTableRoute = DemoTableImport.update({
-  id: '/demo/table',
-  path: '/demo/table',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const CallbackKakaoRoute = CallbackKakaoImport.update({
   id: '/callback/kakao',
   path: '/callback/kakao',
   getParentRoute: () => rootRoute,
 } as any)
 
-const MypageEditIndexRoute = MypageEditIndexImport.update({
-  id: '/mypage/edit/',
-  path: '/mypage/edit/',
+const SubPageProductsRoute = SubPageProductsImport.update({
+  id: '/_sub-page/products',
+  path: '/products',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SubPageOrderRoute = SubPageOrderImport.update({
+  id: '/_sub-page/order',
+  path: '/order',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SubPageFaqRoute = SubPageFaqImport.update({
+  id: '/_sub-page/faq',
+  path: '/faq',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SubPageBrandRoute = SubPageBrandImport.update({
+  id: '/_sub-page/brand',
+  path: '/brand',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SubPageMypageIndexRoute = SubPageMypageIndexImport.update({
+  id: '/_sub-page/mypage/',
+  path: '/mypage/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SubPageMypagePasswordIndexRoute = SubPageMypagePasswordIndexImport.update(
+  {
+    id: '/_sub-page/mypage/password/',
+    path: '/mypage/password/',
+    getParentRoute: () => rootRoute,
+  } as any,
+)
+
+const SubPageMypageInfoIndexRoute = SubPageMypageInfoIndexImport.update({
+  id: '/_sub-page/mypage/info/',
+  path: '/mypage/info/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SubPageMypageAddressIndexRoute = SubPageMypageAddressIndexImport.update({
+  id: '/_sub-page/mypage/address/',
+  path: '/mypage/address/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -88,11 +118,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/join': {
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinImport
+      parentRoute: typeof rootRoute
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/logout': {
+      id: '/logout'
+      path: '/logout'
+      fullPath: '/logout'
+      preLoaderRoute: typeof LogoutImport
+      parentRoute: typeof rootRoute
+    }
+    '/_sub-page/brand': {
+      id: '/_sub-page/brand'
+      path: '/brand'
+      fullPath: '/brand'
+      preLoaderRoute: typeof SubPageBrandImport
+      parentRoute: typeof rootRoute
+    }
+    '/_sub-page/faq': {
+      id: '/_sub-page/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof SubPageFaqImport
+      parentRoute: typeof rootRoute
+    }
+    '/_sub-page/order': {
+      id: '/_sub-page/order'
+      path: '/order'
+      fullPath: '/order'
+      preLoaderRoute: typeof SubPageOrderImport
+      parentRoute: typeof rootRoute
+    }
+    '/_sub-page/products': {
+      id: '/_sub-page/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof SubPageProductsImport
       parentRoute: typeof rootRoute
     }
     '/callback/kakao': {
@@ -102,46 +174,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CallbackKakaoImport
       parentRoute: typeof rootRoute
     }
-    '/demo/table': {
-      id: '/demo/table'
-      path: '/demo/table'
-      fullPath: '/demo/table'
-      preLoaderRoute: typeof DemoTableImport
+    '/_sub-page/mypage/': {
+      id: '/_sub-page/mypage/'
+      path: '/mypage'
+      fullPath: '/mypage'
+      preLoaderRoute: typeof SubPageMypageIndexImport
       parentRoute: typeof rootRoute
     }
-    '/demo/tanstack-query': {
-      id: '/demo/tanstack-query'
-      path: '/demo/tanstack-query'
-      fullPath: '/demo/tanstack-query'
-      preLoaderRoute: typeof DemoTanstackQueryImport
+    '/_sub-page/mypage/address/': {
+      id: '/_sub-page/mypage/address/'
+      path: '/mypage/address'
+      fullPath: '/mypage/address'
+      preLoaderRoute: typeof SubPageMypageAddressIndexImport
       parentRoute: typeof rootRoute
     }
-    '/order/form': {
-      id: '/order/form'
-      path: '/order/form'
-      fullPath: '/order/form'
-      preLoaderRoute: typeof OrderFormImport
+    '/_sub-page/mypage/info/': {
+      id: '/_sub-page/mypage/info/'
+      path: '/mypage/info'
+      fullPath: '/mypage/info'
+      preLoaderRoute: typeof SubPageMypageInfoIndexImport
       parentRoute: typeof rootRoute
     }
-    '/join/': {
-      id: '/join/'
-      path: '/join'
-      fullPath: '/join'
-      preLoaderRoute: typeof JoinIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/logout/': {
-      id: '/logout/'
-      path: '/logout'
-      fullPath: '/logout'
-      preLoaderRoute: typeof LogoutIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/mypage/edit/': {
-      id: '/mypage/edit/'
-      path: '/mypage/edit'
-      fullPath: '/mypage/edit'
-      preLoaderRoute: typeof MypageEditIndexImport
+    '/_sub-page/mypage/password/': {
+      id: '/_sub-page/mypage/password/'
+      path: '/mypage/password'
+      fullPath: '/mypage/password'
+      preLoaderRoute: typeof SubPageMypagePasswordIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -151,100 +209,132 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/join': typeof JoinRoute
   '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
+  '/brand': typeof SubPageBrandRoute
+  '/faq': typeof SubPageFaqRoute
+  '/order': typeof SubPageOrderRoute
+  '/products': typeof SubPageProductsRoute
   '/callback/kakao': typeof CallbackKakaoRoute
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/order/form': typeof OrderFormRoute
-  '/join': typeof JoinIndexRoute
-  '/logout': typeof LogoutIndexRoute
-  '/mypage/edit': typeof MypageEditIndexRoute
+  '/mypage': typeof SubPageMypageIndexRoute
+  '/mypage/address': typeof SubPageMypageAddressIndexRoute
+  '/mypage/info': typeof SubPageMypageInfoIndexRoute
+  '/mypage/password': typeof SubPageMypagePasswordIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/join': typeof JoinRoute
   '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
+  '/brand': typeof SubPageBrandRoute
+  '/faq': typeof SubPageFaqRoute
+  '/order': typeof SubPageOrderRoute
+  '/products': typeof SubPageProductsRoute
   '/callback/kakao': typeof CallbackKakaoRoute
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/order/form': typeof OrderFormRoute
-  '/join': typeof JoinIndexRoute
-  '/logout': typeof LogoutIndexRoute
-  '/mypage/edit': typeof MypageEditIndexRoute
+  '/mypage': typeof SubPageMypageIndexRoute
+  '/mypage/address': typeof SubPageMypageAddressIndexRoute
+  '/mypage/info': typeof SubPageMypageInfoIndexRoute
+  '/mypage/password': typeof SubPageMypagePasswordIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/join': typeof JoinRoute
   '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
+  '/_sub-page/brand': typeof SubPageBrandRoute
+  '/_sub-page/faq': typeof SubPageFaqRoute
+  '/_sub-page/order': typeof SubPageOrderRoute
+  '/_sub-page/products': typeof SubPageProductsRoute
   '/callback/kakao': typeof CallbackKakaoRoute
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/order/form': typeof OrderFormRoute
-  '/join/': typeof JoinIndexRoute
-  '/logout/': typeof LogoutIndexRoute
-  '/mypage/edit/': typeof MypageEditIndexRoute
+  '/_sub-page/mypage/': typeof SubPageMypageIndexRoute
+  '/_sub-page/mypage/address/': typeof SubPageMypageAddressIndexRoute
+  '/_sub-page/mypage/info/': typeof SubPageMypageInfoIndexRoute
+  '/_sub-page/mypage/password/': typeof SubPageMypagePasswordIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/login'
-    | '/callback/kakao'
-    | '/demo/table'
-    | '/demo/tanstack-query'
-    | '/order/form'
     | '/join'
+    | '/login'
     | '/logout'
-    | '/mypage/edit'
+    | '/brand'
+    | '/faq'
+    | '/order'
+    | '/products'
+    | '/callback/kakao'
+    | '/mypage'
+    | '/mypage/address'
+    | '/mypage/info'
+    | '/mypage/password'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/login'
-    | '/callback/kakao'
-    | '/demo/table'
-    | '/demo/tanstack-query'
-    | '/order/form'
     | '/join'
+    | '/login'
     | '/logout'
-    | '/mypage/edit'
+    | '/brand'
+    | '/faq'
+    | '/order'
+    | '/products'
+    | '/callback/kakao'
+    | '/mypage'
+    | '/mypage/address'
+    | '/mypage/info'
+    | '/mypage/password'
   id:
     | '__root__'
     | '/'
+    | '/join'
     | '/login'
+    | '/logout'
+    | '/_sub-page/brand'
+    | '/_sub-page/faq'
+    | '/_sub-page/order'
+    | '/_sub-page/products'
     | '/callback/kakao'
-    | '/demo/table'
-    | '/demo/tanstack-query'
-    | '/order/form'
-    | '/join/'
-    | '/logout/'
-    | '/mypage/edit/'
+    | '/_sub-page/mypage/'
+    | '/_sub-page/mypage/address/'
+    | '/_sub-page/mypage/info/'
+    | '/_sub-page/mypage/password/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  JoinRoute: typeof JoinRoute
   LoginRoute: typeof LoginRoute
+  LogoutRoute: typeof LogoutRoute
+  SubPageBrandRoute: typeof SubPageBrandRoute
+  SubPageFaqRoute: typeof SubPageFaqRoute
+  SubPageOrderRoute: typeof SubPageOrderRoute
+  SubPageProductsRoute: typeof SubPageProductsRoute
   CallbackKakaoRoute: typeof CallbackKakaoRoute
-  DemoTableRoute: typeof DemoTableRoute
-  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
-  OrderFormRoute: typeof OrderFormRoute
-  JoinIndexRoute: typeof JoinIndexRoute
-  LogoutIndexRoute: typeof LogoutIndexRoute
-  MypageEditIndexRoute: typeof MypageEditIndexRoute
+  SubPageMypageIndexRoute: typeof SubPageMypageIndexRoute
+  SubPageMypageAddressIndexRoute: typeof SubPageMypageAddressIndexRoute
+  SubPageMypageInfoIndexRoute: typeof SubPageMypageInfoIndexRoute
+  SubPageMypagePasswordIndexRoute: typeof SubPageMypagePasswordIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  JoinRoute: JoinRoute,
   LoginRoute: LoginRoute,
+  LogoutRoute: LogoutRoute,
+  SubPageBrandRoute: SubPageBrandRoute,
+  SubPageFaqRoute: SubPageFaqRoute,
+  SubPageOrderRoute: SubPageOrderRoute,
+  SubPageProductsRoute: SubPageProductsRoute,
   CallbackKakaoRoute: CallbackKakaoRoute,
-  DemoTableRoute: DemoTableRoute,
-  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
-  OrderFormRoute: OrderFormRoute,
-  JoinIndexRoute: JoinIndexRoute,
-  LogoutIndexRoute: LogoutIndexRoute,
-  MypageEditIndexRoute: MypageEditIndexRoute,
+  SubPageMypageIndexRoute: SubPageMypageIndexRoute,
+  SubPageMypageAddressIndexRoute: SubPageMypageAddressIndexRoute,
+  SubPageMypageInfoIndexRoute: SubPageMypageInfoIndexRoute,
+  SubPageMypagePasswordIndexRoute: SubPageMypagePasswordIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -258,42 +348,58 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/join",
         "/login",
+        "/logout",
+        "/_sub-page/brand",
+        "/_sub-page/faq",
+        "/_sub-page/order",
+        "/_sub-page/products",
         "/callback/kakao",
-        "/demo/table",
-        "/demo/tanstack-query",
-        "/order/form",
-        "/join/",
-        "/logout/",
-        "/mypage/edit/"
+        "/_sub-page/mypage/",
+        "/_sub-page/mypage/address/",
+        "/_sub-page/mypage/info/",
+        "/_sub-page/mypage/password/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
+    "/join": {
+      "filePath": "join.tsx"
+    },
     "/login": {
       "filePath": "login.tsx"
     },
+    "/logout": {
+      "filePath": "logout.tsx"
+    },
+    "/_sub-page/brand": {
+      "filePath": "_sub-page/brand.tsx"
+    },
+    "/_sub-page/faq": {
+      "filePath": "_sub-page/faq.tsx"
+    },
+    "/_sub-page/order": {
+      "filePath": "_sub-page/order.tsx"
+    },
+    "/_sub-page/products": {
+      "filePath": "_sub-page/products.tsx"
+    },
     "/callback/kakao": {
-      "filePath": "callback/kakao.tsx"
+      "filePath": "callback.kakao.tsx"
     },
-    "/demo/table": {
-      "filePath": "demo.table.tsx"
+    "/_sub-page/mypage/": {
+      "filePath": "_sub-page/mypage/index.tsx"
     },
-    "/demo/tanstack-query": {
-      "filePath": "demo.tanstack-query.tsx"
+    "/_sub-page/mypage/address/": {
+      "filePath": "_sub-page/mypage/address/index.tsx"
     },
-    "/order/form": {
-      "filePath": "order/form.tsx"
+    "/_sub-page/mypage/info/": {
+      "filePath": "_sub-page/mypage/info/index.tsx"
     },
-    "/join/": {
-      "filePath": "join/index.tsx"
-    },
-    "/logout/": {
-      "filePath": "logout/index.tsx"
-    },
-    "/mypage/edit/": {
-      "filePath": "mypage/edit/index.tsx"
+    "/_sub-page/mypage/password/": {
+      "filePath": "_sub-page/mypage/password/index.tsx"
     }
   }
 }

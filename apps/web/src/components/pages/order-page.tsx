@@ -1,9 +1,3 @@
-/**
- * [ 주문서 ]
- * 로그인 세션을 서버로부터 호출하여 세션 존재유무에 따라 보여지는 화면.
- */
-
-import { createFileRoute } from '@tanstack/react-router';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle, CardContent } from '@appabbang/ui';
@@ -21,14 +15,8 @@ import { insertOrders, searchBankList, searchBreadList, searchDeliveryList } fro
 import type { FormSchema } from '@/validate/form-schema';
 import useToast from '@/hooks/useToast';
 
-/**********************************************************************************/
-/** Route */
-export const Route = createFileRoute('/order/form')({
-  component: RouteComponent,
-});
-
 /** Main Function */
-function RouteComponent() {
+export default function OrderPage() {
   const [breadList, setBreadList] = useState<BreadProps[]>([]); // 빵 목록
   const [originBreadList, setOriginBreadList] = useState<BreadProps[]>([]); // 빵 목록(origin)
   const [paymentList, setPaymentList] = useState<BreadProps[]>([]); // 결제목록
@@ -268,11 +256,7 @@ function RouteComponent() {
     <OrderFormSkeleton />
   ) : (
     <div>
-      <div className="flex flex-col items-center justify-center m-14">
-        <span className="text-4xl">주문서</span>
-      </div>
-
-      <div className="relative flex w-6xl h-auto m-auto">
+      <div className="relative flex h-auto m-auto">
         <Card className="w-full bg-[#fcfcfc]">
           <div className="m-5">
             <CardContent>
