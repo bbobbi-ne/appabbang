@@ -85,7 +85,8 @@ export class CommonCode<SecurityDataType = unknown> {
       | "delivery_type"
       | "image_target_type"
       | "discount_type"
-      | "provider_type",
+      | "provider_type"
+      | "bank_code",
     params: RequestParams = {},
   ) =>
     this.http.request<CommonCodeDetailData, any>({

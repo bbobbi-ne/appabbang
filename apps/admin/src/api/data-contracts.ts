@@ -307,11 +307,6 @@ export type OrdersListData = {
    */
   totalPrice: number;
   /**
-   * 결제 여부
-   * @example false
-   */
-  paid: boolean;
-  /**
    * 운송장 번호
    * @example "123456789"
    */
@@ -403,12 +398,24 @@ export type OrdersListData = {
      */
     name: string;
   };
+  payment: {
+    /**
+     * 결제 완료 여부
+     * @example false
+     */
+    isPaid: boolean;
+    /**
+     * 환불 여부
+     * @example false
+     */
+    isRefunded: boolean;
+  };
 }[];
 
 /**
  * [필수값 안내]
- * - 비회원 주문: name, mobileNumber, address, addressDetail, zipcode, recipientName, recipientMobile, orderItems, deliveryMethodNo, orderPw, totalPrice, discountAmount
- * - 회원 주문: orderItems, addressNo, deliveryMethodNo, totalPrice, discountAmount
+ * - 비회원 주문: name, mobileNumber, address, addressDetail, zipcode, message, recipientName, recipientMobile, orderItems, deliveryMethodNo, orderPw, totalPrice, discountAmount, bankCode, accountNumber, accountHolderName
+ * - 회원 주문: orderItems, addressNo, deliveryMethodNo, totalPrice, discountAmount, bankCode, accountNumber, accountHolderName
  * - 할인 적용 시: discountNo
  * (상세 예시는 아래 examples 참고)
  */
@@ -449,6 +456,21 @@ export interface OrdersCreatePayload {
   customerNo?: number;
   /** 회원 주소 번호 */
   addressNo?: number;
+  /**
+   * 은행 코드
+   * @example "004"
+   */
+  bankCode?: string;
+  /**
+   * 계좌번호
+   * @example "123-456-7890"
+   */
+  accountNumber?: string;
+  /**
+   * 예금주명
+   * @example "홍길동"
+   */
+  accountHolderName?: string;
 }
 
 export type OrdersCreateData = any;
@@ -475,10 +497,10 @@ export interface OrdersDetailData {
    */
   totalPrice: number;
   /**
-   * 결제 여부
-   * @example false
+   * 할인 금액
+   * @example 0
    */
-  paid: boolean;
+  discountAmount: number;
   /**
    * 운송장 번호
    * @example "123456789"
@@ -616,6 +638,18 @@ export interface OrdersDetailData {
      */
     fee: number;
   };
+  payment: {
+    /**
+     * 결제 완료 여부
+     * @example false
+     */
+    isPaid: boolean;
+    /**
+     * 환불 여부
+     * @example false
+     */
+    isRefunded: boolean;
+  };
 }
 
 export interface OrdersUpdatePayload {
@@ -643,8 +677,6 @@ export interface OrdersUpdatePayload {
 }
 
 export type OrdersUpdateData = any;
-
-export type OrdersDeleteData = any;
 
 export type CustomersListData = any;
 
@@ -1254,3 +1286,191 @@ export interface DeleteDeletePayload {
 }
 
 export type DeleteDeleteData = any;
+
+export type PaymentsListData = {
+  /**
+   * 결제 no
+   * @example 1
+   */
+  no: number;
+  /**
+   * 주문 no
+   * @example 1
+   */
+  orderNo: number;
+  /**
+   * 결제 완료 여부
+   * @example false
+   */
+  isPaid: boolean;
+  /**
+   * 결제 생성일시
+   * @format date-time
+   * @example "2024-06-22T12:34:56.000Z"
+   */
+  orderedAt: string;
+  /**
+   * 입금 확인 일시
+   * @format date-time
+   * @example "2024-06-22T12:34:56.000Z"
+   */
+  paidConfirmedAt?: string;
+  /**
+   * 환불 여부
+   * @example false
+   */
+  isRefunded: boolean;
+  /**
+   * 환불 요청 일시
+   * @format date-time
+   * @example "2024-06-22T12:34:56.000Z"
+   */
+  refundRequestedAt?: string;
+  /**
+   * 환불 확인 일시
+   * @format date-time
+   * @example "2024-06-22T12:34:56.000Z"
+   */
+  refundConfirmedAt?: string;
+  /**
+   * 은행 코드
+   * @example "004"
+   */
+  bankCode: string;
+  /**
+   * 계좌번호
+   * @example "123-456-7890"
+   */
+  accountNumber: string;
+  /**
+   * 예금주명
+   * @example "홍길동"
+   */
+  accountHolderName: string;
+  /**
+   * 은행 코드명
+   * @example "빵은행"
+   */
+  bankCodeName: string;
+  /**
+   * 결제 생성일시
+   * @format date-time
+   * @example "2024-06-22T12:34:56.000Z"
+   */
+  createdAt: string;
+  /**
+   * 결제 수정일시
+   * @format date-time
+   * @example "2024-06-22T12:34:56.000Z"
+   */
+  updatedAt: string;
+}[];
+
+export interface PaymentsDetailData {
+  /**
+   * 결제 no
+   * @example 1
+   */
+  no: number;
+  /**
+   * 주문 no
+   * @example 1
+   */
+  orderNo: number;
+  /**
+   * 결제 완료 여부
+   * @example false
+   */
+  isPaid: boolean;
+  /**
+   * 결제 생성일시
+   * @format date-time
+   * @example "2024-06-22T12:34:56.000Z"
+   */
+  orderedAt: string;
+  /**
+   * 입금 확인 일시
+   * @format date-time
+   * @example "2024-06-22T12:34:56.000Z"
+   */
+  paidConfirmedAt?: string;
+  /**
+   * 환불 여부
+   * @example false
+   */
+  isRefunded: boolean;
+  /**
+   * 환불 요청 일시
+   * @format date-time
+   * @example "2024-06-22T12:34:56.000Z"
+   */
+  refundRequestedAt?: string;
+  /**
+   * 환불 확인 일시
+   * @format date-time
+   * @example "2024-06-22T12:34:56.000Z"
+   */
+  refundConfirmedAt?: string;
+  /**
+   * 은행 코드
+   * @example "004"
+   */
+  bankCode: string;
+  /**
+   * 계좌번호
+   * @example "123-456-7890"
+   */
+  accountNumber: string;
+  /**
+   * 예금주명
+   * @example "홍길동"
+   */
+  accountHolderName: string;
+  /**
+   * 은행 코드명
+   * @example "빵은행"
+   */
+  bankCodeName: string;
+  /**
+   * 결제 생성일시
+   * @format date-time
+   * @example "2024-06-22T12:34:56.000Z"
+   */
+  createdAt: string;
+  /**
+   * 결제 수정일시
+   * @format date-time
+   * @example "2024-06-22T12:34:56.000Z"
+   */
+  updatedAt: string;
+}
+
+export interface PaidUpdatePayload {
+  /**
+   * 입금 확인 여부
+   * @example true
+   */
+  isPaid: boolean;
+  /**
+   * 주문 번호
+   * @example 1
+   */
+  orderNo: number;
+}
+
+export type PaidUpdateData = any;
+
+export interface RefundUpdatePayload {
+  /**
+   * 환불 확인 여부
+   * @example true
+   */
+  isRefunded: boolean;
+  /**
+   * 주문 번호
+   * @example 1
+   */
+  orderNo: number;
+}
+
+export type RefundUpdateData = any;
