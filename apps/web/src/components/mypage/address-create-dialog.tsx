@@ -39,7 +39,7 @@ export default function AddressCreateDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="ml-auto">배송지 추가하기</Button>
+        <Button className="ml-auto">배송지 추가</Button>
       </DialogTrigger>
       <DialogContent
         onInteractOutside={(e) => {

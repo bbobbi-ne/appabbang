@@ -2,6 +2,15 @@ import { useForm } from 'react-hook-form';
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
   Button,
   Checkbox,
   Form,
@@ -14,6 +23,9 @@ import {
   Label,
 } from '@appabbang/ui';
 import DaumPostApi from '@/components/daum-post-api';
+import type { AddressListData } from '../pages/address-page';
+import { toast } from 'sonner';
+import { getFormattedMobile } from '@/utils';
 
 export const addressSchema = z.object({
   recipientName: z
@@ -49,10 +61,18 @@ const labelMinWidth = 'min-w-[120px]';
 type Props = {
   onSubmit: (data: addresssDailogForm) => Promise<void>;
   isLoading: boolean;
-  currentValues?: addresssDailogForm;
+  currentValues?: AddressListData[number];
+  deleteAddress?: (no: number) => Promise<void>;
+  deleteLoading?: boolean;
 };
 
-export default function AddressForm({ currentValues, onSubmit, isLoading }: Props) {
+export default function AddressForm({
+  currentValues,
+  onSubmit,
+  isLoading,
+  deleteAddress,
+  deleteLoading,
+}: Props) {
   // 폼 선언
   const form = useForm<addresssDailogForm>({
     resolver: zodResolver(addressSchema),
@@ -69,28 +89,13 @@ export default function AddressForm({ currentValues, onSubmit, isLoading }: Prop
         },
   });
 
-  /** 연락처 하이픈 추가 - TODO: Utils 폴더로 이동 필요 */
-  const getFormattedMobile = (value: string) => {
-    // 입력값에서 숫자만 추출
-    const onlyNumbers = value.replace(/\D/g, '');
-
-    // 숫자 길이에 따라 전화번호 형식으로 변환
-    let formattedValue = onlyNumbers;
-    if (onlyNumbers.length === 10) {
-      // 예: 000-000-0000
-      formattedValue = onlyNumbers.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
-    } else if (onlyNumbers.length === 11) {
-      // 예: 000-0000-0000
-      formattedValue = onlyNumbers.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
-    }
-
-    // 변환된 값
-    return formattedValue;
-  };
-
   // 배송지 등록
   const handleSubmit = async (data: addresssDailogForm) => {
-    console.log(onSubmit);
+    if (currentValues?.isDefault && !data.isDefault) {
+      toast.error('다른 배송지를 기본 배송지로 추가해주세요.');
+      return;
+    }
+
     await onSubmit(data);
   };
 
@@ -237,28 +242,63 @@ export default function AddressForm({ currentValues, onSubmit, isLoading }: Prop
           )}
         />
 
-        {/* 기본배송지 여부 체크박스 추가 필요  */}
-        <FormField
-          control={form.control}
-          name="isDefault"
-          render={({ field }) => (
-            <FormItem className="flex items-center gap-2">
-              <FormControl>
-                <Checkbox {...field} value={field.value ? 'true' : 'false'} className="mb-0" />
-              </FormControl>
-              <FormLabel
-                errorCheck={false}
-                className={`${labelMinWidth} whitespace-nowrap cursor-pointer`}
-              >
-                기본배송지 여부
-              </FormLabel>
-            </FormItem>
-          )}
-        />
+        {/* 기본 배송지 여부  */}
+        {!currentValues?.isDefault && (
+          <FormField
+            control={form.control}
+            name="isDefault"
+            render={({ field }) => (
+              <FormItem className="flex items-center gap-2">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    className="mb-0"
+                  />
+                </FormControl>
+                <FormLabel
+                  errorCheck={false}
+                  className={`${labelMinWidth} whitespace-nowrap cursor-pointer`}
+                >
+                  기본배송지 여부
+                </FormLabel>
+              </FormItem>
+            )}
+          />
+        )}
 
-        <Button type="submit" className="mt-8 w-full" disabled={isLoading}>
-          등록
-        </Button>
+        <div className="mt-8 flex gap-2">
+          {!currentValues?.isDefault && (
+            <>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" className="w-full">
+                    삭제
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent onClick={(e) => e.preventDefault()}>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>배송지를 삭제하시겠습니까?</AlertDialogTitle>
+                    <AlertDialogDescription></AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>취소</AlertDialogCancel>
+                    <AlertDialogAction
+                      disabled={deleteLoading}
+                      className="bg-destructive"
+                      onClick={() => deleteAddress?.(currentValues?.no ?? 0)}
+                    >
+                      삭제
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
+          )}
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            저장하기
+          </Button>
+        </div>
       </form>
     </Form>
   );
