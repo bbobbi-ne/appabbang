@@ -5,6 +5,7 @@ import { Router } from 'express';
 import * as orderRoundController from '@/controllers/order-round.controller';
 import {
   createOrderRoundValidator,
+  deleteOrderRoundImageValidator,
   updateOrderRoundValidator,
   validate,
 } from '@/middlewares/validators/validate';
@@ -33,6 +34,14 @@ router.put(
   requireAdmin,
   validate(updateOrderRoundValidator),
   asyncHandler(orderRoundController.update),
+);
+
+/** DELETE /order-round/image : 주문차수 이미지 삭제 */
+router.delete(
+  '/image',
+  requireAdmin,
+  validate(deleteOrderRoundImageValidator),
+  asyncHandler(orderRoundController.removeImage),
 );
 
 export default router;

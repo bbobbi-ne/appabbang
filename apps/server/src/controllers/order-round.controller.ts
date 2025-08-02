@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import * as OrderRoundService from '@/services/order-round.service';
 import { UploadedFile } from 'express-fileupload';
 import { AppError } from '@/types';
+import * as ImageService from '@/services/image.service';
 
 /**
  * 주문차수 목록 조회
@@ -41,7 +42,8 @@ export async function create(req: Request, res: Response) {
 /**
  * 주문차수 수정
  * 1) '주문차수' 항목은 수정할 수 없음.
- * 2) 프로세스는 삭제 -> 신규등록하는 로직
+ * 2) 주문차수-빵 테이블의 수정 프로세스는 삭제 -> 신규등록하는 로직
+ * 3) 이미지 삭제는 별도의 API로 수행
  */
 export async function update(req: Request, res: Response) {
   const { no, seq, name, breadNoList, startedAt, endedAt } = req.body;
@@ -66,4 +68,14 @@ export async function update(req: Request, res: Response) {
   'code' in result
     ? res.status(500).json(result) // error
     : res.status(200).json(result); // success
+}
+
+/**
+ * 주문차수 내 이미지 별도 삭제 (완전삭제)
+ */
+export async function removeImage(req: Request, res: Response) {
+  const { publicId } = req.body;
+
+  await ImageService.remove([publicId]);
+  res.sendStatus(204);
 }

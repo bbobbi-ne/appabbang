@@ -423,8 +423,18 @@ export const createOrderRoundValidator = [
     .toInt()
     .withMessage('주문차수는 정수로 입력해야 합니다.'),
   body('name').trim().notEmpty().withMessage('주문차수명은 필수 입력항목입니다.'),
-  body('startedAt').trim().notEmpty().withMessage('시작일자는 필수 입력항목입니다.'),
-  body('endedAt').trim().notEmpty().withMessage('종료일자는 필수 입력항목입니다.'),
+  body('startedAt')
+    .trim()
+    .notEmpty()
+    .withMessage('시작일자는 필수 입력항목입니다.')
+    .isDate()
+    .withMessage('시작일자는 날짜 형식이어야 합니다.'),
+  body('endedAt')
+    .trim()
+    .notEmpty()
+    .withMessage('종료일자는 필수 입력항목입니다.')
+    .isDate()
+    .withMessage('종료일자는 날짜 형식이어야 합니다.'),
 ];
 
 /**
@@ -437,20 +447,29 @@ export const updateOrderRoundValidator = [
     .isInt()
     .toInt()
     .withMessage('no 를 올바르게 입력해주세요.'),
-  body('orderStatus')
+  body('name').trim().notEmpty().withMessage('주문차수명은 필수 입력항목입니다.'),
+  body('startedAt')
     .trim()
     .notEmpty()
-    .withMessage('orderStatus는 필수입니다')
-    .isIn(['10', '20', '30', '40', '50'])
-    .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
-  body('paid')
+    .withMessage('시작일자는 필수 입력항목입니다.')
+    .isDate()
+    .withMessage('시작일자는 날짜 형식이어야 합니다.'),
+  body('endedAt')
     .trim()
     .notEmpty()
-    .withMessage('paid는 필수입니다')
-    .isBoolean()
-    .toBoolean()
-    .withMessage('boolean 타입이어야 합니다.'),
-  body('address').trim().notEmpty().withMessage('address는 필수입니다'),
-  body('addressDetail').trim().notEmpty().withMessage('addressDetail는 필수입니다'),
-  body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
+    .withMessage('종료일자는 필수 입력항목입니다.')
+    .isDate()
+    .withMessage('종료일자는 날짜 형식이어야 합니다.'),
+];
+
+/**
+ * 주문차수 삭제 validate
+ */
+export const deleteOrderRoundImageValidator = [
+  body('publicId')
+    .exists()
+    .withMessage('이미지 ID값이 누락되었습니다. (publicId)')
+    .trim()
+    .notEmpty()
+    .withMessage('이미지 ID는 비어있을 수 없습니다.'),
 ];

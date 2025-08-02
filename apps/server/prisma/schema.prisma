@@ -236,7 +236,7 @@ model Payment {
 */
 model OrderRound {
   no                  Int                 @id @default(autoincrement())
-  seq                 Int                 @unique            
+  seq                 Int                 @unique @map("seq")
   name                String
   startedAt           DateTime            @map("started_at")
   endedAt             DateTime            @map("ended_at")
