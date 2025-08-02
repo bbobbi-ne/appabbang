@@ -15,15 +15,15 @@ import { optionalAuth, requireAdmin } from '@/middlewares/auth.middleware';
 const router = Router();
 
 /** GET /order-round : 주문차수 목록 조회 */
-router.get('/', requireAdmin, asyncHandler(orderRoundController.getList));
+router.get('/', optionalAuth, asyncHandler(orderRoundController.getList));
 
 /** GET /order-round/{no} : 주문차수 상세 조회 */
-router.get('/:no', requireAdmin, asyncHandler(orderRoundController.getOne));
+router.get('/:no', optionalAuth, asyncHandler(orderRoundController.getOne));
 
 /** POST /order-round : 주문차수 생성 */
 router.post(
   '/',
-  optionalAuth,
+  requireAdmin,
   validate(createOrderRoundValidator),
   asyncHandler(orderRoundController.create),
 );

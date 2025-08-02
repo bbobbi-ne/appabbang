@@ -11,6 +11,7 @@ interface IOrderRound {
   no: number;
   seq: number;
   name: string;
+  public_id?: string;
   breadNoList: number[];
   startedAt: string;
   endedAt: string;
@@ -206,26 +207,26 @@ export const createWithImage = async (
 
     // 3. 이미지 등록
     const imgResult = await ImageService.createCloudinary(image);
+    const { url, public_id: publicId } = imgResult[0] as { url: string; public_id: string };
 
     // 4. 이미지 정보를 데이터베이스에 저장
-    const imageTargetTypeCode = await getImageTargetTypeCode();
-    if (imgResult[0]) {
+    const imageTargetType = await getImageTargetTypeCode(); // return code
+
+    if (url && publicId) {
       await prisma.image.create({
         data: {
-          url: imgResult[0].url,
-          publicId: imgResult[0].publicId,
-          imageTargetType: imageTargetTypeCode,
+          url,
+          publicId,
+          imageTargetType,
           imageTargetNo: orResult.no,
           order: 1,
         },
       });
     }
 
-    // 결과체크
-    console.log({ ...orResult, breadNoList, image: imgResult[0] });
-
     return { ...orResult, breadNoList, image: imgResult[0] };
   } catch (e) {
+    console.log(e);
     return {
       code: 500,
       message: '주문차수 등록 과정에서 문제가 발생했습니다. \n관리자 확인이 필요합니다.',
@@ -273,6 +274,9 @@ export const updateWithoutImage = async (
       where: { seq },
     });
 
+    // ************ Postman 테스트를 위해서 일단 강제로 number로 변환
+    body.breadNoList = body.breadNoList.map((breadNo) => Number(breadNo));
+
     // 2-2. 주문차수에 맞는 빵 목록 등록 :: orderRoundBread
     const breadNoList = await Promise.all(
       body.breadNoList.map(async (breadNo) => {
@@ -287,6 +291,8 @@ export const updateWithoutImage = async (
 
     return { ...orResult, breadNoList, image: [] };
   } catch (e) {
+    console.log(e);
+
     return {
       code: 500,
       message: '주문차수 수정 과정에서 문제가 발생했습니다. \n관리자 확인이 필요합니다.',
@@ -298,74 +304,92 @@ export const updateWithoutImage = async (
  * 주문차수 수정 (이미지 있음)
  */
 export const updateWithImage = async (
-  body: Pick<IOrderRound, 'no' | 'seq' | 'name' | 'breadNoList' | 'startedAt' | 'endedAt'>,
+  body: Pick<
+    IOrderRound,
+    'no' | 'seq' | 'name' | 'public_id' | 'breadNoList' | 'startedAt' | 'endedAt'
+  >,
   image: UploadedFile[] | UploadedFile,
 ) => {
   const { no, seq, name, startedAt, endedAt } = body;
 
   try {
-    // 1. 주문차수 수정 :: orderRound
-    const orResult = await prisma.orderRound.update({
-      where: { no },
-      data: {
-        seq,
-        name,
-        startedAt: new Date(startedAt),
-        endedAt: new Date(endedAt),
-      },
-    });
-
-    // 2. 주문차수 - 빵  매핑 테이블 수정
-    // 2-1. 기존 빵을 조회하고 다시 수정하는 건 효율이 없으므로 특정 주문차수에 포함된 행은 완전삭제하고 다시 새롭게 등록한다.
-    await prisma.orderRoundBread.deleteMany({
-      where: { seq },
-    });
-
-    // 2-2. 주문차수에 맞는 빵 목록 등록 :: orderRoundBread
-    const breadNoList = await Promise.all(
-      body.breadNoList.map(async (breadNo) => {
-        const { breadNo: resultBreadNo } = await createOrderRoundBread({
-          seq: body.seq,
-          breadNo,
-        });
-
-        return resultBreadNo;
-      }),
-    );
-
-    // 이미지도 삭제하고 재등록해야 함.
-    const imageTargetTypeCode = await getImageTargetTypeCode();
-    await prisma.$transaction(async (tx) => {
-      // 기존 이미지 삭제
-      await tx.image.deleteMany({
-        where: {
-          imageTargetType: imageTargetTypeCode,
-          imageTargetNo: no,
-        },
-      });
-    });
-
-    // 3. 이미지 등록
-    const imgResult = await ImageService.createCloudinary(image);
-
-    // 4. 이미지 정보를 데이터베이스에 저장
-    if (imgResult[0]) {
-      await prisma.image.create({
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. 주문차수 수정 :: orderRound
+      const orResult = await prisma.orderRound.update({
+        where: { no },
         data: {
-          url: imgResult[0].url,
-          publicId: imgResult[0].publicId,
-          imageTargetType: imageTargetTypeCode,
-          imageTargetNo: orResult.no,
-          order: 1,
+          seq,
+          name,
+          startedAt: new Date(startedAt),
+          endedAt: new Date(endedAt),
         },
       });
-    }
 
-    // 5. 결과 확인
-    console.log({ ...orResult, breadNoList, image: imgResult[0] });
+      // 2. 주문차수 - 빵  매핑 테이블 수정
+      // 2-1. 기존 빵을 조회하고 다시 수정하는 건 효율이 없으므로 특정 주문차수에 포함된 행은 완전삭제하고 다시 새롭게 등록한다.
+      await prisma.orderRoundBread.deleteMany({
+        where: { seq },
+      });
 
-    return { ...orResult, breadNoList, image: imgResult[0] };
+      // ************ Postman 테스트를 위해서 일단 강제로 number로 변환
+      body.breadNoList = body.breadNoList.map((breadNo) => Number(breadNo));
+
+      // 2-2. 주문차수에 맞는 빵 목록 등록 :: orderRoundBread
+      const breadNoList = await Promise.all(
+        body.breadNoList.map(async (breadNo) => {
+          const { breadNo: resultBreadNo } = await createOrderRoundBread({
+            seq: body.seq,
+            breadNo,
+          });
+
+          return resultBreadNo;
+        }),
+      );
+
+      const imageTargetType = await getImageTargetTypeCode(); // return code
+
+      // 3. 이미지 수정
+      // 기존 이미지의 마지막 순서 조회하여 클라우디너리 이미지 업로드
+      const findImg = await prisma.image.findFirst({
+        where: { imageTargetNo: no, imageTargetType },
+        orderBy: { order: 'asc' },
+        select: { order: true, publicId: true, url: true, name: true },
+      });
+
+      // 클라우디너리에 재업로드
+      const lastOrder = findImg?.order || 0;
+      const uploadResult = await ImageService.updateCloudinary(lastOrder, image); // update image cloud
+      let returnImg = null;
+
+      /* 삭제 */
+      if (findImg) {
+        await prisma.image.deleteMany({
+          where: { publicId: findImg.publicId },
+        });
+      }
+
+      /* 등록 */
+      if (uploadResult[0]) {
+        returnImg = await prisma.image.create({
+          data: {
+            publicId: uploadResult[0].public_id,
+            url: uploadResult[0].secure_url,
+            name: uploadResult[0].original_filename,
+            imageTargetNo: no,
+            imageTargetType,
+            order: 1,
+          },
+        });
+      }
+
+      return { ...orResult, breadNoList, image: returnImg };
+    });
+
+    console.log(result);
+    return result;
   } catch (e) {
+    console.log(e);
+
     return {
       code: 500,
       message: '주문차수 수정 과정에서 문제가 발생했습니다. \n관리자 확인이 필요합니다.',

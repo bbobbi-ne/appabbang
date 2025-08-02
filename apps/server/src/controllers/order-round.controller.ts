@@ -46,13 +46,13 @@ export async function create(req: Request, res: Response) {
  * 3) 이미지 삭제는 별도의 API로 수행
  */
 export async function update(req: Request, res: Response) {
-  const { no, seq, name, breadNoList, startedAt, endedAt } = req.body;
-  const model = { no, seq, name, breadNoList, startedAt, endedAt };
+  const { no, seq, name, public_id, breadNoList, startedAt, endedAt } = req.body;
+  const model = { no: Number(no), seq, name, public_id, breadNoList, startedAt, endedAt };
   const image = req.files?.image as UploadedFile[] | UploadedFile | undefined;
   let result;
 
   // 주문차수가 현재 존재하는지 확인
-  const findRound = await OrderRoundService.getOrderRound(no);
+  const findRound = await OrderRoundService.getOrderRound(Number(no));
   if (!findRound)
     throw AppError.notFound('주문차수 정보를 찾을 수 없습니다. \n관리자 확인이 필요합니다.', {
       no,
