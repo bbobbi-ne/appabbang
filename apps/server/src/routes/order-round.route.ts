@@ -14,13 +14,13 @@ import { optionalAuth, requireAdmin } from '@/middlewares/auth.middleware';
 
 const router = Router();
 
-/** GET /order-rounds : 주문차수 목록 조회 */
+/** GET /order-round : 주문차수 목록 조회 */
 router.get('/', requireAdmin, asyncHandler(orderRoundController.getList));
 
-/** GET /order-rounds/{no} : 주문차수 상세 조회 */
+/** GET /order-round/{no} : 주문차수 상세 조회 */
 router.get('/:no', requireAdmin, asyncHandler(orderRoundController.getOne));
 
-/** POST /order-rounds : 주문차수 생성 */
+/** POST /order-round : 주문차수 생성 */
 router.post(
   '/',
   optionalAuth,
@@ -28,7 +28,7 @@ router.post(
   asyncHandler(orderRoundController.create),
 );
 
-/** PUT /orders/{no} : 주문 수정 */
+/** PUT /order-round/{no} : 주문차수 수정 */
 router.put(
   '/:no',
   requireAdmin,

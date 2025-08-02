@@ -69,7 +69,7 @@ export const getOrderRoundList = async () => {
         imageTargetType,
         order: 1,
       },
-      orderBy: [{ no: 'desc', order: 'asc' }],
+      orderBy: [{ no: 'desc' }, { order: 'asc' }],
     });
 
     const imageMap = new Map<number, string>();
@@ -143,30 +143,20 @@ export const createWithoutImage = async (
   body: Pick<IOrderRound, 'seq' | 'name' | 'breadNoList' | 'startedAt' | 'endedAt'>,
 ) => {
   try {
-    // 0. 주문차수 가장 높은 값 조회
-    const round = await prisma.orderRound.findFirst({
-      orderBy: {
-        seq: 'desc',
-      },
-      select: {
-        seq: true,
-      },
-    });
-
-    // 주문차수 자동증가
-    const seq = round ? round.seq : 1;
-    body.seq = seq;
-
     // 1. 주문차수 등록 :: orderRound
     const orResult = await prisma.orderRound.create({
-      data: body,
+      data: {
+        name: body.name,
+        startedAt: body.startedAt,
+        endedAt: body.endedAt,
+      },
     });
 
     // 2. 주문차수에 맞는 빵 목록 등록 :: orderRoundBread
     const breadNoList = await Promise.all(
       body.breadNoList.map(async (breadNo) => {
         const { breadNo: resultBreadNo } = await createOrderRoundBread({
-          seq: body.seq,
+          seq: orResult.seq,
           breadNo,
         });
 
@@ -177,6 +167,7 @@ export const createWithoutImage = async (
     // 3. return model 생성 :: 주문차수 + (주문차수 + 빵) 목록
     return { ...orResult, breadNoList, image: [] };
   } catch (e) {
+    console.log(e);
     return {
       code: 500,
       message: '주문차수 등록 과정에서 문제가 발생했습니다. \n관리자 확인이 필요합니다.',
@@ -195,7 +186,6 @@ export const createWithImage = async (
     // 1. 주문차수 등록 :: orderRound
     const orResult = await prisma.orderRound.create({
       data: {
-        seq: body.seq,
         name: body.name,
         startedAt: new Date(body.startedAt),
         endedAt: new Date(body.endedAt),
@@ -206,7 +196,7 @@ export const createWithImage = async (
     const breadNoList = await Promise.all(
       body.breadNoList.map(async (breadNo) => {
         const { breadNo: resultBreadNo } = await createOrderRoundBread({
-          seq: body.seq,
+          seq: orResult.seq,
           breadNo,
         });
 
@@ -272,8 +262,8 @@ export const updateWithoutImage = async (
       data: {
         seq,
         name,
-        startedAt: new Date(startedAt),
-        endedAt: new Date(endedAt),
+        startedAt,
+        endedAt,
       },
     });
 
@@ -294,9 +284,6 @@ export const updateWithoutImage = async (
         return resultBreadNo;
       }),
     );
-
-    // 3. 결과 확인
-    console.log({ ...orResult, breadNoList, image: [] });
 
     return { ...orResult, breadNoList, image: [] };
   } catch (e) {
