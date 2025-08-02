@@ -410,3 +410,47 @@ export const deleteOrderValidator = [
     .toInt()
     .withMessage('no 를 올바르게 입력해주세요.'),
 ];
+
+/**
+ * 주문차수 등록 validate
+ */
+export const createOrderRoundValidator = [
+  body('seq')
+    .trim()
+    .notEmpty()
+    .withMessage('주문차수는 필수 입력항목입니다.')
+    .isInt({ min: 1 })
+    .toInt()
+    .withMessage('주문차수는 정수로 입력해야 합니다.'),
+  body('name').trim().notEmpty().withMessage('주문차수명은 필수 입력항목입니다.'),
+  body('startedAt').trim().notEmpty().withMessage('시작일자는 필수 입력항목입니다.'),
+  body('endedAt').trim().notEmpty().withMessage('종료일자는 필수 입력항목입니다.'),
+];
+
+/**
+ * 주문차수 수정 validate
+ */
+export const updateOrderRoundValidator = [
+  param('no')
+    .exists()
+    .withMessage('주문차수No는 필수 입력항목입니다.')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  body('orderStatus')
+    .trim()
+    .notEmpty()
+    .withMessage('orderStatus는 필수입니다')
+    .isIn(['10', '20', '30', '40', '50'])
+    .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
+  body('paid')
+    .trim()
+    .notEmpty()
+    .withMessage('paid는 필수입니다')
+    .isBoolean()
+    .toBoolean()
+    .withMessage('boolean 타입이어야 합니다.'),
+  body('address').trim().notEmpty().withMessage('address는 필수입니다'),
+  body('addressDetail').trim().notEmpty().withMessage('addressDetail는 필수입니다'),
+  body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
+];
