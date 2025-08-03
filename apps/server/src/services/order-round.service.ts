@@ -81,7 +81,7 @@ export const getOrderRoundList = async () => {
     // 3. 데이터 정렬 (or: orderRound)
     const data = list.map((or: any) => ({
       ...or,
-      images: [...(imageMap.get(or.no) ? [{ url: imageMap.get(or.no) }] : [])],
+      image: [...(imageMap.get(or.no) ? [{ url: imageMap.get(or.no) }] : [])],
     }));
 
     return data;
