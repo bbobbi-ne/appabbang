@@ -405,3 +405,51 @@ export const updateWithImage = async (
     };
   }
 };
+
+/**
+ * 최신 주문차수 조회
+ */
+export const getLatest = async () => {
+  const result = await prisma.$transaction(async (tx) => {
+    const or = await prisma.orderRound.findFirst({
+      select: {
+        no: true,
+        seq: true,
+        name: true,
+        startedAt: true,
+        endedAt: true,
+        orderRoundBreads: {
+          select: {
+            breadNo: true,
+          },
+        },
+      },
+      orderBy: {
+        seq: 'desc',
+      },
+    });
+
+    const imageTargetType = await getImageTargetTypeCode();
+    let image;
+
+    if (or) {
+      image = await tx.image.findFirst({
+        where: {
+          imageTargetType,
+          imageTargetNo: or.no,
+          order: 1,
+        },
+        select: {
+          publicId: true,
+          url: true,
+          name: true,
+          order: true,
+        },
+      });
+    }
+
+    return { ...or, image };
+  });
+
+  return result;
+};

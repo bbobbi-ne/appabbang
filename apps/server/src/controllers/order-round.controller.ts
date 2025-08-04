@@ -85,3 +85,11 @@ export async function removeImage(req: Request, res: Response) {
   await ImageService.remove([publicId]);
   res.sendStatus(204);
 }
+
+/**
+ * 최신 주문차수 조회
+ */
+export async function getLatest(_: Request, res: Response) {
+  const list = await OrderRoundService.getLatest();
+  res.status(200).json(list);
+}
