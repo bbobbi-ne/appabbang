@@ -2,20 +2,23 @@ import { prisma } from '@/lib/prisma';
 import { UploadedFile } from 'express-fileupload';
 import * as ImageService from './image.service';
 import { AppError } from '@/types';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma, OrderRound, OrderRoundBread } from '@prisma/client';
 
 // 1. 주문차수 이미지 공통코드 조회 - 전역 변수로 저장
 let IMAGE_TARGET_TYPE_CODE: string | null = null;
 
-/** 주문차수 prop interface */
-interface IOrderRound {
-  no: number;
-  name: string;
-  public_id?: string;
+// OrderRound 등록 타입
+type CreateOrderRoundInput = Pick<OrderRound, 'name' | 'startedAt' | 'endedAt'> & {
   breadNoList: number[];
-  startedAt: string;
-  endedAt: string;
-}
+};
+
+// OrderRound 수정 타입
+type UpdateOrderRoundInput = Pick<OrderRound, 'no' | 'name' | 'startedAt' | 'endedAt'> & {
+  breadNoList: number[];
+};
+
+// OrderRouncBread 등록 타입
+type CreatOrderRoundBreadInput = Pick<OrderRoundBread, 'no' | 'breadNo'>;
 
 /**
  * 공통코드 주문차수 전용 code 조회
@@ -142,9 +145,7 @@ export const getOrderRound = async (no: number) => {
  *  or: orderRound
  *  orb: orderRoundBread
  */
-export const createWithoutImage = async (
-  body: Pick<IOrderRound, 'name' | 'breadNoList' | 'startedAt' | 'endedAt'>,
-) => {
+export const createWithoutImage = async (body: CreateOrderRoundInput) => {
   try {
     const result = await prisma.$transaction(async (tx) => {
       // 1. 주문차수 등록 :: orderRound
@@ -185,7 +186,7 @@ export const createWithoutImage = async (
  * 주문차수 등록(이미지 O)
  */
 export const createWithImage = async (
-  body: Pick<IOrderRound, 'name' | 'breadNoList' | 'startedAt' | 'endedAt'>,
+  body: CreateOrderRoundInput,
   image: UploadedFile[] | UploadedFile,
 ) => {
   try {
@@ -252,7 +253,7 @@ export const createWithImage = async (
  */
 const createOrderRoundBread = async (
   tx: PrismaClient | Prisma.TransactionClient,
-  { no, breadNo }: { no: number; breadNo: number },
+  { no, breadNo }: CreatOrderRoundBreadInput,
 ) => {
   const result = await tx.orderRoundBread.create({
     data: {
@@ -267,9 +268,7 @@ const createOrderRoundBread = async (
 /**
  * 주문차수 수정 (이미지 X)
  */
-export const updateWithoutImage = async (
-  body: Pick<IOrderRound, 'no' | 'name' | 'breadNoList' | 'startedAt' | 'endedAt'>,
-) => {
+export const updateWithoutImage = async (body: UpdateOrderRoundInput) => {
   const { no, name, startedAt, endedAt } = body;
 
   try {
@@ -321,7 +320,7 @@ export const updateWithoutImage = async (
  * 주문차수 수정 (이미지 O)
  */
 export const updateWithImage = async (
-  body: Pick<IOrderRound, 'no' | 'name' | 'public_id' | 'breadNoList' | 'startedAt' | 'endedAt'>,
+  body: UpdateOrderRoundInput,
   image: UploadedFile[] | UploadedFile,
 ) => {
   const { no, name, startedAt, endedAt } = body;
