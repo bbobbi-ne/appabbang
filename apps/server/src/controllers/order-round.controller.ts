@@ -25,7 +25,10 @@ export async function getOne(req: Request, res: Response) {
  * 주문차수 등록
  */
 export async function create(req: Request, res: Response) {
-  const { no, seq, name, breadNoList, startedAt, endedAt } = req.body;
+  const { no, seq, name, breadNoList: breadNoListStr, startedAt, endedAt } = req.body;
+  const breadNoListJson = JSON.parse(breadNoListStr); // json parsing
+  // breadNoList에서 breadNo 값만 추출
+  const breadNoList = breadNoListJson.map((bread: { breadNo: number }) => bread.breadNo);
   const model = { no, seq, name, breadNoList, startedAt, endedAt };
   const image = req.files?.image as UploadedFile[] | UploadedFile | undefined;
   let orderRound;
@@ -46,7 +49,10 @@ export async function create(req: Request, res: Response) {
  * 3) 이미지 삭제는 별도의 API로 수행
  */
 export async function update(req: Request, res: Response) {
-  const { no, seq, name, public_id, breadNoList, startedAt, endedAt } = req.body;
+  const { no, seq, name, public_id, breadNoList: breadNoListStr, startedAt, endedAt } = req.body;
+  const breadNoListJson = JSON.parse(breadNoListStr); // json parsing
+  // breadNoList에서 breadNo 값만 추출
+  const breadNoList = breadNoListJson.map((bread: { breadNo: number }) => bread.breadNo);
   const model = { no: Number(no), seq, name, public_id, breadNoList, startedAt, endedAt };
   const image = req.files?.image as UploadedFile[] | UploadedFile | undefined;
   let result;

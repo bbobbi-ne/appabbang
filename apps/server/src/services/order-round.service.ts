@@ -92,10 +92,12 @@ export const getOrderRoundList = async () => {
 
 /**
  * 주문차수 상세 조회
+ * @params no 주문차수 테이블 번호
+ * @params seq 주문차수
  */
 export const getOrderRound = async (no: number) => {
   const result = await prisma.$transaction(async (tx) => {
-    const or = await prisma.orderRound.findUnique({
+    const or = await prisma.orderRound.findFirst({
       where: { no },
       select: {
         no: true,
@@ -112,7 +114,9 @@ export const getOrderRound = async (no: number) => {
     });
 
     if (!or)
-      throw AppError.notFound('주문차수를 찾을 수 없습니다. \n관리자에게 문의 바랍니다.', { no });
+      throw AppError.notFound('주문차수를 찾을 수 없습니다. \n관리자에게 문의 바랍니다.', {
+        no,
+      });
 
     const imageTargetType = await getImageTargetTypeCode();
     const image = await tx.image.findFirst({
@@ -207,7 +211,11 @@ export const createWithImage = async (
 
     // 3. 이미지 등록
     const imgResult = await ImageService.createCloudinary(image);
-    const { url, public_id: publicId } = imgResult[0] as { url: string; public_id: string };
+    const {
+      url,
+      public_id: publicId,
+      original_filename: name,
+    } = imgResult[0] as { url: string; public_id: string; original_filename: string };
 
     // 4. 이미지 정보를 데이터베이스에 저장
     const imageTargetType = await getImageTargetTypeCode(); // return code
@@ -217,6 +225,7 @@ export const createWithImage = async (
         data: {
           url,
           publicId,
+          name,
           imageTargetType,
           imageTargetNo: orResult.no,
           order: 1,
