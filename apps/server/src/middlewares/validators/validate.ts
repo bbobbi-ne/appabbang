@@ -410,3 +410,71 @@ export const deleteOrderValidator = [
     .toInt()
     .withMessage('no 를 올바르게 입력해주세요.'),
 ];
+
+/**
+ * 주문차수 등록 validate
+ */
+export const createOrderRoundValidator = [
+  body('name').trim().notEmpty().withMessage('주문차수명은 필수 입력항목입니다.'),
+  body('breadNoList').exists().withMessage('빵 목록은 필수 입력항목입니다.'),
+  // .isArray({ min: 1 })
+  // .withMessage('빵 목록은 하나 이상의 요소를 가진 배열이어야 합니다.'),
+  body('breadNoList.*').isInt().toInt().withMessage('빵 목록 안의 값은 정수여야 합니다.'),
+  body('startedAt')
+    .trim()
+    .notEmpty()
+    .withMessage('시작일자는 필수 입력항목입니다.')
+    .isISO8601()
+    .withMessage('시작일자는 ISO8601 날짜 형식이어야 합니다.'),
+  body('endedAt')
+    .trim()
+    .notEmpty()
+    .withMessage('종료일자는 필수 입력항목입니다.')
+    .isISO8601()
+    .withMessage('종료일자는 ISO8601 날짜 형식이어야 합니다.'),
+];
+
+/**
+ * 주문차수 수정 validate
+ */
+export const updateOrderRoundValidator = [
+  param('no')
+    .exists()
+    .withMessage('주문차수No는 필수 입력항목입니다.')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  body('seq')
+    .exists()
+    .withMessage('주문차수는 필수 입력항목입니다.')
+    .isInt()
+    .toInt()
+    .withMessage('주문차수를 올바르게 입력해주세요.'),
+  body('name').trim().notEmpty().withMessage('주문차수명은 필수 입력항목입니다.'),
+  body('startedAt')
+    .trim()
+    .notEmpty()
+    .withMessage('시작일자는 필수 입력항목입니다.')
+    .isISO8601()
+    .withMessage('시작일자는 ISO8601 날짜 형식이어야 합니다.'),
+  body('endedAt')
+    .trim()
+    .notEmpty()
+    .withMessage('종료일자는 필수 입력항목입니다.')
+    .isISO8601()
+    .withMessage('종료일자는 ISO8601 날짜 형식이어야 합니다.'),
+  body('breadNoList').exists().withMessage('빵 목록은 필수 입력항목입니다.'),
+  body('breadNoList.*').isInt().toInt().withMessage('빵 목록 안의 값은 정수여야 합니다.'),
+];
+
+/**
+ * 주문차수 삭제 validate
+ */
+export const deleteOrderRoundImageValidator = [
+  body('publicId')
+    .exists()
+    .withMessage('이미지 ID값이 누락되었습니다. (publicId)')
+    .trim()
+    .notEmpty()
+    .withMessage('이미지 ID는 비어있을 수 없습니다.'),
+];
