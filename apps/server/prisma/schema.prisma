@@ -236,7 +236,6 @@ model Payment {
 */
 model OrderRound {
   no                  Int                 @id @default(autoincrement())
-  seq                 Int                 @unique @default(autoincrement()) @map("seq")
   name                String
   startedAt           DateTime            @map("started_at")
   endedAt             DateTime            @map("ended_at")
@@ -251,13 +250,13 @@ model OrderRound {
 
 model OrderRoundBread {
   no                  Int                 @id @default(autoincrement())
-  seq                 Int                 @map("order_seq")
+  seq                 Int                 @map("seq")
   breadNo             Int                 @map("bread_no")
   
   createdAt           DateTime            @default(now()) @map("created_at")
   updatedAt           DateTime            @updatedAt @map("updated_at")
 
-  orderRound          OrderRound          @relation(fields: [seq], references: [seq])
+  orderRound          OrderRound          @relation(fields: [seq], references: [no])
   bread               Bread               @relation(fields: [breadNo], references: [no])
 
   @@unique([seq, breadNo])

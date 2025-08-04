@@ -1317,7 +1317,6 @@ paths:
                 - startedAt
                 - endedAt
                 - breadNoList
-                - image
               properties:
                 name:
                   type: string
@@ -1449,12 +1448,21 @@ paths:
             schema:
               type: object
               required:
+                - no
+                - seq
                 - name
                 - startedAt
                 - endedAt
                 - breadNoList
-                - image
               properties:
+                no:
+                  type: integer
+                  description: 주문차수 번호
+                  example: 1
+                seq:
+                  type: integer
+                  description: 주문차수
+                  example: 1
                 name:
                   type: string
                   description: 주문차수명
