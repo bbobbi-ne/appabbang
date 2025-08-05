@@ -52,8 +52,8 @@ function OrderTable({ orderItem, deliveryFee }: { orderItem: OrderItem[]; delive
           <label className="flex-3/4">할인금액(-) :</label>
           <p className="flex-1/4">(할인지정 필요)원</p>
         </div>
-        <div className="flex">
-          <label className="flex-3/4 text-red-500">총 금액 :</label>
+        <div className="flex text-red-500">
+          <label className="flex-3/4">총 금액 :</label>
           <p className="flex-1/4">{totalPrice}원</p>
         </div>
       </div>
