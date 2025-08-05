@@ -178,7 +178,7 @@ export const getByNo = async (type: ClientType | undefined, no: number) => {
 
 /** 빵 생성 (이미지 없음) */
 export const createWithoutImages = async (
-  body: Pick<Bread, 'name' | 'description' | 'unitPrice' | 'breadStatus'>,
+  body: Pick<Bread, 'name' | 'description' | 'unitPrice' | 'breadStatus' | 'countryOfOrigin'>,
 ) => {
   const result = await prisma.bread.create({
     data: body,
@@ -189,7 +189,7 @@ export const createWithoutImages = async (
 
 /** 빵 생성 (이미지 있음) */
 export const createWithImages = async (
-  body: Pick<Bread, 'name' | 'description' | 'unitPrice' | 'breadStatus'>,
+  body: Pick<Bread, 'name' | 'description' | 'unitPrice' | 'breadStatus' | 'countryOfOrigin'>,
   images: UploadedFile[] | UploadedFile,
 ) => {
   const result = await prisma.$transaction(async (tx) => {
@@ -230,7 +230,9 @@ export const createWithImages = async (
 /** 빵 수정 (이미지 없음) */
 export const updateWithoutImages = async (
   no: number,
-  body: Partial<Pick<Bread, 'name' | 'description' | 'unitPrice' | 'breadStatus'>>,
+  body: Partial<
+    Pick<Bread, 'name' | 'description' | 'unitPrice' | 'breadStatus' | 'countryOfOrigin'>
+  >,
 ) => {
   const result = await prisma.$transaction(async (tx) => {
     const bread = await tx.bread.update({
@@ -257,7 +259,9 @@ export const updateWithoutImages = async (
 /** 빵 수정 (이미지 있음) */
 export const updateWithImages = async (
   no: number,
-  body: Partial<Pick<Bread, 'name' | 'description' | 'unitPrice' | 'breadStatus'>>,
+  body: Partial<
+    Pick<Bread, 'name' | 'description' | 'unitPrice' | 'breadStatus' | 'countryOfOrigin'>
+  >,
   images: UploadedFile[] | UploadedFile,
 ) => {
   const result = await prisma.$transaction(async (tx) => {
