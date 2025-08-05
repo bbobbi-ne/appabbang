@@ -57,6 +57,7 @@ async function getClientForLogin(id: string, type: ClientType) {
       throw AppError.unauthorized('아이디 또는 비밀번호를 확인해주세요.');
     }
     return {
+      no: customer.no,
       name: customer.name,
       id: customer.id,
       pw: customer.pw,

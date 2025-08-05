@@ -2,6 +2,8 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '@/types';
 import { ClientPayload } from '@/types/client-payload';
+import { getOne as getAdminUserOne } from '@/services/user.service';
+import { getOne as getCustomerUserOne } from '@/services/customer.service';
 
 /** JWT 토큰 검증 공통 함수 */
 const verifyToken = async (req: Request): Promise<ClientPayload> => {
@@ -101,30 +103,78 @@ export const requireCustomer = async (req: Request, _: Response, next: NextFunct
   }
 };
 
-/** 고객 본인 검증 - 고객은 본인만, 관리자는 모든 접근 */
-export const requireCustomerOwner = (resourceOwnerIdGetter: (req: Request) => Promise<any>) => {
-  return async (req: Request, _: Response, next: NextFunction) => {
-    try {
-      const user = await verifyToken(req);
-      const resourceOwnerId = await Promise.resolve(resourceOwnerIdGetter(req));
+/** 본인 검증 (고객이나 관리자) */
+export const requireOwner = async (req: Request, _: Response, next: NextFunction) => {
+  try {
+    const user = await verifyToken(req);
 
-      // 관리자는 모든 리소스에 접근 가능
-      if (user.type === 'user') {
+    if (user.type === 'user') {
+      // 관리자
+      const adminUser = await getAdminUserOne(user.id);
+      if (user.id !== adminUser.id) {
+        throw AppError.forbidden('Access denied: 본인 소유 리소스가 아닙니다.');
+      } else {
         req.user = user;
         return next();
       }
-
-      // 고객인 경우에만 본인 검증
-      if (user.type === 'customer') {
-        if (user.id !== resourceOwnerId.toString()) {
-          throw AppError.forbidden('Access denied: You can only access your own resources');
-        }
+    } else if (user.type === 'customer') {
+      // 고객
+      const customerUser = await getCustomerUserOne(user.id);
+      if (user.id !== customerUser.id) {
+        throw AppError.forbidden('Access denied: 본인 소유 리소스가 아닙니다.');
+      } else {
+        req.user = user;
+        return next();
       }
-
-      req.user = user;
-      next();
-    } catch (error) {
-      next(error);
+    } else {
+      throw AppError.forbidden('Access denied: 관리자 또는 고객만 접근 가능합니다.');
     }
-  };
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** 본인 검증 ----> 관리자만 체크  */
+export const requireAdminOwner = async (req: Request, _: Response, next: NextFunction) => {
+  try {
+    const user = await verifyToken(req);
+
+    if (user.type !== 'user') {
+      throw AppError.forbidden('Access denied: Customer access required');
+    }
+
+    // 관리자
+    const adminUser = await getAdminUserOne(user.id);
+
+    if (user.id !== adminUser.id) {
+      throw AppError.forbidden('Access denied: 본인 소유 리소스가 아닙니다.');
+    } else {
+      req.user = user;
+      return next();
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** 본인 검증 ----> 고객만 체크  */
+export const requireCustomerOwner = async (req: Request, _: Response, next: NextFunction) => {
+  try {
+    const user = await verifyToken(req);
+
+    if (user.type !== 'customer') {
+      throw AppError.forbidden('Access denied: Customer access required');
+    }
+
+    // 고객
+    const customerUser = await getCustomerUserOne(user.id);
+    if (customerUser.id && user.id !== customerUser.id) {
+      throw AppError.forbidden('Access denied: 본인 소유 리소스가 아닙니다.');
+    } else {
+      req.user = user;
+      return next();
+    }
+  } catch (error) {
+    next(error);
+  }
 };
