@@ -63,3 +63,8 @@ export async function getKakaoCode() {
 export async function getLatest() {
   return client.get(`/order-round/latest`);
 }
+
+/** 특정 주문차수 조회 */
+export async function getOrderRound(no: number) {
+  return client.get(`/order-round/${no}`);
+}
