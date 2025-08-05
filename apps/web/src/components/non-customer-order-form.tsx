@@ -237,7 +237,7 @@ function NonCustomerOrderForm({
                 </FormItem>
               )}
             />
-            <DaumPostApi setAddress={setFormAddress} />
+            <DaumPostApi setAddress={setFormAddress} className="mt-6 mb-5 w-20 mr-4" />
 
             <FormField
               control={form.control}
