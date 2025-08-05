@@ -18,6 +18,7 @@ import deliveryMethodRouter from './routes/delivery-method.route';
 import orderRouter from './routes/order.route';
 import orderRoundRouter from './routes/order-round.route';
 import paymentRouter from './routes/payment.route';
+import myRouter from './routes/my.route';
 
 /** utils */
 import { loadAllCommonCodes } from './services/common-code.service';
@@ -50,6 +51,7 @@ app.use('/delivery-methods', deliveryMethodRouter);
 app.use('/orders', orderRouter);
 app.use('/order-round', orderRoundRouter);
 app.use('/payments', paymentRouter);
+app.use('/my', myRouter);
 
 // 헬스 체크용 라우터
 app.get('/', (_, res) => {

@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { AppError } from '@/types';
 import { Customer } from '@prisma/client';
 
 export const getByIdForLogin = async (id: string) => {
@@ -37,4 +38,17 @@ export const updateDefaultAddressNo = async (customerNo: number, addressNo: numb
     },
   });
   return updatedCustomer;
+};
+
+/** 고객 조회 */
+export const getOne = async (id: string) => {
+  const customer = await prisma.customer.findUnique({
+    where: { id },
+  });
+
+  if (!customer) {
+    throw AppError.notFound('Customer not found');
+  }
+
+  return customer;
 };

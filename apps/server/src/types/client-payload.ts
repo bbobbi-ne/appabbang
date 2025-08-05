@@ -5,6 +5,7 @@ export const ClientType = {
 export type ClientType = (typeof ClientType)[keyof typeof ClientType];
 
 export interface ClientPayload {
+  no: number;
   id: string;
   name: string;
   type: ClientType;
