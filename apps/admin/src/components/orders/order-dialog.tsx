@@ -31,8 +31,6 @@ function DialogBody({ no }: { no: number }) {
   const { data: orderData, isLoading } = useOrdersDetailQuery(no);
   const { ordersStatus } = useOrderAndStatusAndDliveryTypeQuery();
 
-  // 회원과 비회원 구분필요, orderPw를 받아오지못하고있음
-
   return (
     <DialogContent
       onInteractOutside={(e) => {

@@ -61,6 +61,8 @@ model Bread {
   description           String?
   unitPrice             Int
   breadStatus           String            @map("bread_status")
+  countryOfOrigin       String            @map("country_of_origin") 
+  allergyInfo           String           @map("allergy_info")     
 
   createdAt             DateTime          @default(now()) @map("created_at")
   updatedAt             DateTime          @updatedAt @map("updated_at")

@@ -191,6 +191,8 @@ paths:
                     - breadStatus
                     - breadStatusName
                     - images
+                    - countryOfOrigin
+                    - allergyInfo
                   properties:
                     no:
                       type: integer
@@ -200,6 +202,14 @@ paths:
                       type: string
                       description: 빵 이름
                       example: '크로아상'
+                    countryOfOrigin:
+                      type: string
+                      description: 원산지
+                      example: '빵류[밀가루(밀:미국,캐나다산),영양강화밀가루(프랑스산)],가공유크림(독일산)'
+                    allergyInfo:
+                      type: string
+                      description: 알레르기 정보
+                      example: '밀, 우유, 대두, 계란 함유'
                     description:
                       type: string
                       description: 빵 설명
@@ -253,6 +263,8 @@ paths:
                 - name
                 - unitPrice
                 - breadStatus
+                - countryOfOrigin
+                - allergyInfo
               properties:
                 name:
                   type: string
@@ -271,6 +283,14 @@ paths:
                   enum: ['10', '20', '30', '40', '50']
                   description: '빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)'
                   example: '10'
+                countryOfOrigin:
+                  type: string
+                  description: 원산지
+                  example: '빵류[밀가루(밀:미국,캐나다산),영양강화밀가루(프랑스산)],가공유크림(독일산)'
+                allergyInfo:
+                  type: string
+                  description: 알레르기 정보
+                  example: '밀, 우유, 대두, 계란 함유'
                 image:
                   type: array
                   items:
@@ -356,10 +376,11 @@ paths:
                 required:
                   - no
                   - name
-                  - description
                   - unitPrice
                   - breadStatus
                   - images
+                  - countryOfOrigin
+                  - allergyInfo
                 properties:
                   no:
                     type: integer
@@ -382,6 +403,14 @@ paths:
                     enum: ['10', '20', '30', '40', '50']
                     description: '빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)'
                     example: '10'
+                  countryOfOrigin:
+                    type: string
+                    description: 원산지
+                    example: '빵류[밀가루(밀:미국,캐나다산),영양강화밀가루(프랑스산)],가공유크림(독일산)'
+                  allergyInfo:
+                    type: string
+                    description: 알레르기 정보
+                    example: '밀, 우유, 대두, 계란 함유'
                   createdAt:
                     type: string
                     format: date-time
@@ -1118,6 +1147,10 @@ paths:
                     required:
                       - isPaid
                       - isRefunded
+                      - accountHolderName
+                      - accountNumber
+                      - bankCode
+                      - bankCodeName
                     properties:
                       isPaid:
                         type: boolean
@@ -1127,6 +1160,22 @@ paths:
                         type: boolean
                         description: 환불 여부
                         example: false         
+                      accountHolderName:
+                        type: string
+                        description: 예금주
+                        example: 김빵만
+                      accountNumber:
+                        type: string
+                        description: 계좌번호
+                        example: 123-456-7890
+                      bankCode:
+                        type: string
+                        description: 은행코드
+                        example: 004
+                      bankCodeName:
+                        type: string
+                        description: 은행코드 이름
+                        example: 우리은행
 
     put:
       tags: [Orders]
@@ -1213,6 +1262,55 @@ paths:
           #           type: number
           #           description: 총 금액
           #           example: 25000
+
+
+  /orders/{no}/status:
+    put:
+      tags: [Orders]
+      summary: 주문 상태 수정
+      description: 주문의 상태만 수정합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 주문 번호
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - orderStatus
+              properties:
+                orderStatus:
+                  type: string
+                  enum: ['10', '20', '30', '40', '50']
+                  description: '변경할 주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소됨)'
+                  example: '10'
+      responses:
+        '200':
+          description: 주문 상태 수정 성공
+          # content:
+          #   application/json:
+          #     schema:
+          #       type: object
+          #       properties:
+          #         no:
+          #           type: integer
+          #           description: 주문 번호
+          #           example: 1
+          #         orderStatus:
+          #           type: string
+          #           description: '변경된 주문 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)'
+          #           example: '10'
+
+
 
     # delete:
     #   tags: [Orders]

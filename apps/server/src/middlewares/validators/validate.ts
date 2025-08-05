@@ -54,6 +54,8 @@ export const getBreadValidator = [
 
 export const createBreadValidator = [
   body('name').trim().notEmpty().withMessage('이름은 필수입니다'),
+  body('allergyInfo').trim().notEmpty().withMessage('알레르기 정보는 필수입니다'),
+  body('countryOfOrigin').trim().notEmpty().withMessage('원산지 정보는 필수입니다'),
   body('unitPrice')
     .trim()
     .notEmpty()
@@ -76,6 +78,8 @@ export const updateBreadValidator = [
     .toInt()
     .withMessage('no 를 올바르게 입력해주세요.'),
   body('name').trim().notEmpty().withMessage('이름은 필수입니다'),
+  body('allergyInfo').trim().notEmpty().withMessage('알레르기 정보는 필수입니다'),
+  body('countryOfOrigin').trim().notEmpty().withMessage('원산지 정보는 필수입니다'),
   body('unitPrice')
     .trim()
     .notEmpty()
@@ -382,8 +386,8 @@ export const updateOrderStatusValidator = [
     .trim()
     .notEmpty()
     .withMessage('orderStatus는 필수입니다')
-    .isIn(['10', '20', '30', '40', '50'])
-    .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
+    .isIn(['10', '11', '20', '30', '31', '40', '50', '51', '52'])
+    .withMessage('유효한 상태여야 합니다 (10, 11, 20, 30, 31, 40, 50, 51,52)'),
 ];
 
 export const updateOrderPaidValidator = [

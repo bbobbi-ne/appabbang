@@ -12,6 +12,7 @@ import {
   RadioGroupItem,
   Textarea,
   Form,
+  ScrollArea,
 } from '@appabbang/ui';
 
 import { useForm } from 'react-hook-form';
@@ -25,6 +26,8 @@ import { formatKR } from '@/utils/format';
 export const breadSchema = z.object({
   name: z.string().trim().min(1, '메뉴명을 입력해주세요'),
   description: z.string().trim().min(1, '설명을 입력해주세요'),
+  countryOfOrigin: z.string().trim().min(1, '원산지정보를 입력해주세요'),
+  allergyInfo: z.string().trim().min(1, '알레르기정보를 입력해주세요'),
   unitPrice: z
     .string()
     .trim()
@@ -69,6 +72,8 @@ function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
           image: [],
           unitPrice: '',
           breadStatus: '10',
+          allergyInfo: '',
+          countryOfOrigin: '',
         },
   });
 
@@ -79,6 +84,8 @@ function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
     formData.append('description', data.description);
     formData.append('unitPrice', data.unitPrice);
     formData.append('breadStatus', data.breadStatus);
+    formData.append('allergyInfo', data.allergyInfo);
+    formData.append('countryOfOrigin', data.countryOfOrigin);
 
     data.image.forEach((file) => {
       if (file instanceof File) {
@@ -196,11 +203,61 @@ function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
               </FormLabel>
               <div className="flex-3/4 space-y-1">
                 <FormControl>
-                  <Textarea
-                    placeholder="설명을 입력해주세요"
-                    className="resize-none w-full break-all"
-                    {...field}
-                  />
+                  <ScrollArea className="h-[150px]">
+                    <Textarea
+                      placeholder="설명을 입력해주세요"
+                      className="resize-none h-[150px]"
+                      {...field}
+                    />
+                  </ScrollArea>
+                </FormControl>
+                <FormMessage />
+              </div>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="countryOfOrigin"
+          render={({ field }) => (
+            <FormItem className="flex">
+              <FormLabel errorCheck={false} className="whitespace-nowrap pr-2 py-3 flex-1/4">
+                <strong className="text-red-500">*</strong> 원산지 정보
+              </FormLabel>
+              <div className="flex-3/4 space-y-1">
+                <FormControl>
+                  <ScrollArea className="h-[100px]">
+                    <Textarea
+                      placeholder="원산지 정보를 입력해주세요"
+                      className="resize-none h-[100px]"
+                      {...field}
+                    />
+                  </ScrollArea>
+                </FormControl>
+                <FormMessage />
+              </div>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="allergyInfo"
+          render={({ field }) => (
+            <FormItem className="flex">
+              <FormLabel errorCheck={false} className="whitespace-nowrap pr-2 py-3 flex-1/4">
+                <strong className="text-red-500">*</strong> 알레르기 정보
+              </FormLabel>
+              <div className="flex-3/4 space-y-1">
+                <FormControl>
+                  <ScrollArea className="h-[80px]">
+                    <Textarea
+                      placeholder="알레르기 정보를 입력해주세요"
+                      className="resize-none h-[80px]"
+                      {...field}
+                    />
+                  </ScrollArea>
                 </FormControl>
                 <FormMessage />
               </div>

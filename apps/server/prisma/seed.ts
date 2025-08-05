@@ -61,6 +61,12 @@ async function main() {
         name: '취소완료',
         remarkTxt: '관리자가 취소를 완료한 상태',
       },
+      {
+        code: '52',
+        groupName: 'order_status',
+        name: '취소완료(환불)',
+        remarkTxt: '관리자가 취소 및 환불을 완료한 상태',
+      },
       { code: '10', groupName: 'purchase_status', name: '발주요청', remarkTxt: '발주요청' },
       { code: '20', groupName: 'purchase_status', name: '발주중', remarkTxt: '발주중' },
       { code: '30', groupName: 'purchase_status', name: '발주완료', remarkTxt: '발주완료' },
@@ -109,8 +115,8 @@ async function main() {
   // 배송방법 생성
   await prisma.deliveryMethod.createMany({
     data: [
-      { deliveryType: '10', fee: 3000, isActive: true, memo: '우체국', name: '우체국' },
-      { deliveryType: '10', fee: 3000, isActive: false, memo: 'CJ대한통운', name: 'CJ대한통운' },
+      { deliveryType: '10', fee: 4000, isActive: true, memo: '우체국', name: '우체국' },
+      { deliveryType: '10', fee: 4000, isActive: false, memo: 'CJ대한통운', name: 'CJ대한통운' },
       { deliveryType: '20', fee: 0, isActive: true, memo: '직접수령', name: '직접수령' },
       { deliveryType: '90', fee: 0, isActive: true, memo: '기타', name: '기타' },
     ],
@@ -118,11 +124,51 @@ async function main() {
 
   await prisma.bread.createMany({
     data: [
-      { name: '판매빵', description: '판매빵', unitPrice: 1000, breadStatus: '10' },
-      { name: '미판매빵', description: '미판매빵', unitPrice: 2000, breadStatus: '20' },
-      { name: '임시저장빵', description: '임시저장빵', unitPrice: 3000, breadStatus: '30' },
-      { name: '재료소진빵', description: '재료소진빵', unitPrice: 4000, breadStatus: '40' },
-      { name: '출시예정빵', description: '출시예정빵', unitPrice: 5000, breadStatus: '50' },
+      {
+        name: '판매빵',
+        description: '판매빵',
+        unitPrice: 1000,
+        breadStatus: '10',
+        countryOfOrigin:
+          '빵류[밀가루(밀:미국,캐나다산),영양강화밀가루(프랑스산)], 가공유크림(독일산), 과자[밀가루(밀:미국산,호주산),쇼트닝(팜유:말레이시아)',
+        allergyInfo: '밀, 우유, 대두, 계란 함유',
+      },
+      {
+        name: '미판매빵',
+        description: '미판매빵',
+        unitPrice: 2000,
+        breadStatus: '20',
+        countryOfOrigin:
+          '빵류[밀가루(밀:미국,캐나다산),영양강화밀가루(프랑스산)], 가공유크림(독일산), 과자[밀가루(밀:미국산,호주산),쇼트닝(팜유:말레이시아)',
+        allergyInfo: '밀, 우유, 대두, 계란 함유',
+      },
+      {
+        name: '임시저장빵',
+        description: '임시저장빵',
+        unitPrice: 3000,
+        breadStatus: '30',
+        countryOfOrigin:
+          '빵류[밀가루(밀:미국,캐나다산),영양강화밀가루(프랑스산)], 가공유크림(독일산), 과자[밀가루(밀:미국산,호주산),쇼트닝(팜유:말레이시아)',
+        allergyInfo: '밀, 우유, 대두, 계란 함유',
+      },
+      {
+        name: '재료소진빵',
+        description: '재료소진빵',
+        unitPrice: 4000,
+        breadStatus: '40',
+        countryOfOrigin:
+          '빵류[밀가루(밀:미국,캐나다산),영양강화밀가루(프랑스산)], 가공유크림(독일산), 과자[밀가루(밀:미국산,호주산),쇼트닝(팜유:말레이시아)',
+        allergyInfo: '밀, 우유, 대두, 계란 함유',
+      },
+      {
+        name: '출시예정빵',
+        description: '출시예정빵',
+        unitPrice: 5000,
+        breadStatus: '50',
+        countryOfOrigin:
+          '빵류[밀가루(밀:미국,캐나다산),영양강화밀가루(프랑스산)], 가공유크림(독일산), 과자[밀가루(밀:미국산,호주산),쇼트닝(팜유:말레이시아)',
+        allergyInfo: '밀, 우유, 대두, 계란 함유',
+      },
     ],
   });
 }
