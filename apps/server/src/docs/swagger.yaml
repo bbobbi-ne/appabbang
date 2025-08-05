@@ -1250,7 +1250,6 @@ paths:
                   type: object
                   required:
                     - no
-                    - seq
                     - name
                     - startedAt
                     - endedAt
@@ -1260,10 +1259,6 @@ paths:
                     no:
                       type: integer
                       description: 주문차수 번호
-                      example: 1
-                    seq:
-                      type: integer
-                      description: 주문차수
                       example: 1
                     name:
                       type: string
@@ -1352,6 +1347,91 @@ paths:
       responses:
         '201':
           description: 주문차수 등록 성공
+        '500':
+          description: 주문차수 등록 실패(등록과정 중 오류가 발생할 경우)
+
+  /order-round/latest:
+    get:
+      tags: [OrderRound]
+      summary: 최신 주문차수 조회
+      description: 최신 주문차수의 상세 정보를 조회합니다. 권한(선택적 로그인)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 최신 주문차수 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - no
+                  - seq
+                  - name
+                  - startedAt
+                  - endedAt
+                  - orderRoundBread
+                  - image
+                properties:
+                  no:
+                    type: integer
+                    description: 주문차수 번호
+                    example: 1
+                  name:
+                    type: string
+                    description: 주문차수명
+                    example: 주문 1차
+                  startedAt:
+                    type: string
+                    format: date-time
+                    description: 시작일시
+                    example: 2025-07-01T11:00:00.000Z
+                  endedAt:
+                    type: string
+                    format: date-time
+                    description: 종료일시
+                    example: 2025-07-31T11:00:00.000Z
+                  orderRoundBread:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - no
+                        - name
+                        - description
+                        - breadStatus
+                        - unitPrice
+                      properties:
+                        no:
+                          type: integer
+                          description: 빵 번호
+                          example: 1
+                        name:
+                          type: string
+                          description: 빵 이름
+                          example: 단팥빵
+                        description:
+                          type: string
+                          description: 빵 설명
+                          example: 부드러운 단팥이 들어간 빵
+                        breadStatus:
+                          type: string
+                          description: 빵 상태
+                          example: 10
+                        unitPrice:
+                          type: integer
+                          description: 가격
+                          example: 1000
+                  image:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        url: 
+                          type: string
+                          description: 이미지 URL
+                          example: 'https://example.com/image.jpg'
+
 
   /order-round/{no}:
     get: 
@@ -1377,20 +1457,15 @@ paths:
                 type: object
                 required:
                   - no
-                  - seq
                   - name
                   - startedAt
                   - endedAt
-                  - breadNoList
+                  - orderRoundBread
                   - image
                 properties:
                   no:
                     type: integer
                     description: 주문차수 번호
-                    example: 1
-                  seq:
-                    type: integer
-                    description: 주문차수
                     example: 1
                   name:
                     type: string
@@ -1406,17 +1481,37 @@ paths:
                     format: date-time
                     description: 종료일시
                     example: 2025-07-31T11:00:00.000Z
-                  breadNoList:
+                  orderRoundBread:
                     type: array
                     items:
                       type: object
                       required:
-                        - breadNo
+                        - no
+                        - name
+                        - description
+                        - breadStatus
+                        - unitPrice
                       properties:
-                        breadNo:
+                        no:
                           type: integer
                           description: 빵 번호
                           example: 1
+                        name:
+                          type: string
+                          description: 빵 이름
+                          example: 단팥빵
+                        description:
+                          type: string
+                          description: 빵 설명
+                          example: 부드러운 단팥이 들어간 빵
+                        breadStatus:
+                          type: string
+                          description: 빵 상태
+                          example: 10
+                        unitPrice:
+                          type: integer
+                          description: 가격
+                          example: 1000
                   image:
                     type: array
                     items:
@@ -1488,6 +1583,8 @@ paths:
       responses:
         '200':
           description: 주문차수 수정 성공
+        '500':
+          description: 주문차수 수정 실패(수정과정 중 오류가 발생함)
 
   /order-round/image:
     delete:

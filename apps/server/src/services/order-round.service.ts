@@ -108,7 +108,15 @@ export const getOrderRound = async (no: number) => {
         endedAt: true,
         orderRoundBreads: {
           select: {
-            breadNo: true,
+            bread: {
+              select: {
+                no: true,
+                name: true,
+                description: true,
+                unitPrice: true,
+                breadStatus: true,
+              },
+            },
           },
         },
       },
@@ -419,7 +427,15 @@ export const getLatest = async () => {
         endedAt: true,
         orderRoundBreads: {
           select: {
-            breadNo: true,
+            bread: {
+              select: {
+                no: true,
+                name: true,
+                description: true,
+                unitPrice: true,
+                breadStatus: true,
+              },
+            },
           },
         },
       },
