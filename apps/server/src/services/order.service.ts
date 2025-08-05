@@ -379,8 +379,10 @@ export const generateOrderNumber = () => {
   return `ORD-${date}-${time}${random}`;
 };
 
+/** 주문조회 */
 export const getOrderList = async () => {
   const orders = await prisma.order.findMany({
+    orderBy: { no: 'desc' },
     select: {
       no: true,
       orderNumber: true,
@@ -430,6 +432,11 @@ export const getOrderList = async () => {
 
   return result;
 };
+
+/** 뱅크코드 이름 조회 */
+export function getBankCodeName(code: string): string {
+  return commonCodeMap.bankCodeMap.get(code) || '-';
+}
 
 /** 주문 상세 조회 */
 export const getOrderByNo = async (no: number) => {
@@ -488,12 +495,25 @@ export const getOrderByNo = async (no: number) => {
         select: {
           isPaid: true,
           isRefunded: true,
+          accountHolderName: true,
+          accountNumber: true,
+          bankCode: true,
         },
       },
     },
   });
 
-  return order;
+  const bankCodeName = getBankCodeName(order?.payment?.bankCode || '-');
+
+  const result = {
+    ...order,
+    payment: {
+      ...order?.payment,
+      bankCodeName,
+    },
+  };
+
+  return result;
 };
 
 /** 주문 이름 조회 */
@@ -534,10 +554,20 @@ export const updateOrder = async (
 
 /** 주문 상태 수정 */
 export const updateOrderStatus = async (no: number, orderStatus: string) => {
+  if (orderStatus === '50') {
+  }
+
   const updated = await prisma.order.update({
     where: { no },
     data: {
       orderStatus,
+      ...(orderStatus === '50' && {
+        payment: {
+          update: {
+            isRefunded: false,
+          },
+        },
+      }),
     },
   });
 
