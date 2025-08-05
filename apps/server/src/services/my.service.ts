@@ -6,15 +6,50 @@ import { Address } from '@prisma/client';
 export const getAddressList = async (customerNo: number) => {
   const list = await prisma.address.findMany({
     where: { customerNo },
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
 
-  return list;
+  const customer = await prisma.customer.findUnique({
+    where: { no: customerNo },
+    select: {
+      defaultAddressNo: true,
+    },
+  });
+
+  // 배송지 정렬: 기본배송지 먼저
+  const sorted = list.sort((a, b) => {
+    if (a.no === customer?.defaultAddressNo) return -1;
+    if (b.no === customer?.defaultAddressNo) return 1;
+    return a.no - b.no;
+  });
+
+  const result = sorted.map((item) => ({
+    ...item,
+    isDefault: item.no === customer?.defaultAddressNo,
+  }));
+
+  return result;
 };
 
 /** 배송지 상세 조회 */
 export const getAddressOne = async (no: number, customerNo: number) => {
   const one = await prisma.address.findUnique({ where: { no, customerNo } });
-  return one;
+
+  const customer = await prisma.customer.findUnique({
+    where: { no: customerNo },
+    select: {
+      defaultAddressNo: true,
+    },
+  });
+
+  const result = {
+    ...one,
+    isDefault: one?.no === customer?.defaultAddressNo,
+  };
+
+  return result;
 };
 
 /** 배송지 등록 */
