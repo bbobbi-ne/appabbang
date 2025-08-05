@@ -134,6 +134,7 @@ async function main() {
         breadStatus: '20',
         countryOfOrigin:
           '빵류[밀가루(밀:미국,캐나다산),영양강화밀가루(프랑스산)], 가공유크림(독일산), 과자[밀가루(밀:미국산,호주산),쇼트닝(팜유:말레이시아)',
+        allergyInfo: '밀, 우유, 대두, 계란 함유',
       },
       {
         name: '임시저장빵',
@@ -151,6 +152,7 @@ async function main() {
         breadStatus: '40',
         countryOfOrigin:
           '빵류[밀가루(밀:미국,캐나다산),영양강화밀가루(프랑스산)], 가공유크림(독일산), 과자[밀가루(밀:미국산,호주산),쇼트닝(팜유:말레이시아)',
+        allergyInfo: '밀, 우유, 대두, 계란 함유',
       },
       {
         name: '출시예정빵',
