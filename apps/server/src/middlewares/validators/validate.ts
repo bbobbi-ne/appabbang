@@ -382,8 +382,8 @@ export const updateOrderStatusValidator = [
     .trim()
     .notEmpty()
     .withMessage('orderStatus는 필수입니다')
-    .isIn(['10', '20', '30', '40', '50'])
-    .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
+    .isIn(['10', '11', '20', '30', '31', '40', '50', '51', '52'])
+    .withMessage('유효한 상태여야 합니다 (10, 11, 20, 30, 31, 40, 50, 51,52)'),
 ];
 
 export const updateOrderPaidValidator = [
