@@ -1370,7 +1370,7 @@ paths:
                   - name
                   - startedAt
                   - endedAt
-                  - breadNoList
+                  - orderRoundBread
                   - image
                 properties:
                   no:
@@ -1391,17 +1391,37 @@ paths:
                     format: date-time
                     description: 종료일시
                     example: 2025-07-31T11:00:00.000Z
-                  breadNoList:
+                  orderRoundBread:
                     type: array
                     items:
                       type: object
                       required:
-                        - breadNo
+                        - no
+                        - name
+                        - description
+                        - breadStatus
+                        - unitPrice
                       properties:
-                        breadNo:
+                        no:
                           type: integer
                           description: 빵 번호
                           example: 1
+                        name:
+                          type: string
+                          description: 빵 이름
+                          example: 단팥빵
+                        description:
+                          type: string
+                          description: 빵 설명
+                          example: 부드러운 단팥이 들어간 빵
+                        breadStatus:
+                          type: string
+                          description: 빵 상태
+                          example: 10
+                        unitPrice:
+                          type: integer
+                          description: 가격
+                          example: 1000
                   image:
                     type: array
                     items:
@@ -1440,7 +1460,7 @@ paths:
                   - name
                   - startedAt
                   - endedAt
-                  - breadNoList
+                  - orderRoundBread
                   - image
                 properties:
                   no:
@@ -1461,17 +1481,37 @@ paths:
                     format: date-time
                     description: 종료일시
                     example: 2025-07-31T11:00:00.000Z
-                  breadNoList:
+                  orderRoundBread:
                     type: array
                     items:
                       type: object
                       required:
-                        - breadNo
+                        - no
+                        - name
+                        - description
+                        - breadStatus
+                        - unitPrice
                       properties:
-                        breadNo:
+                        no:
                           type: integer
                           description: 빵 번호
                           example: 1
+                        name:
+                          type: string
+                          description: 빵 이름
+                          example: 단팥빵
+                        description:
+                          type: string
+                          description: 빵 설명
+                          example: 부드러운 단팥이 들어간 빵
+                        breadStatus:
+                          type: string
+                          description: 빵 상태
+                          example: 10
+                        unitPrice:
+                          type: integer
+                          description: 가격
+                          example: 1000
                   image:
                     type: array
                     items:
