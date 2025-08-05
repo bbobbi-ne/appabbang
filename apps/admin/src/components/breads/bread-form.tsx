@@ -26,8 +26,8 @@ import { formatKR } from '@/utils/format';
 export const breadSchema = z.object({
   name: z.string().trim().min(1, '메뉴명을 입력해주세요'),
   description: z.string().trim().min(1, '설명을 입력해주세요'),
-  countryOfOrigin: z.string().trim().min(1, '원산지를 입력해주세요'),
-  allergyInfo: z.string(),
+  countryOfOrigin: z.string().trim().min(1, '원산지정보를 입력해주세요'),
+  allergyInfo: z.string().trim().min(1, '알레르기정보를 입력해주세요'),
   unitPrice: z
     .string()
     .trim()
@@ -247,7 +247,7 @@ function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
           render={({ field }) => (
             <FormItem className="flex">
               <FormLabel errorCheck={false} className="whitespace-nowrap pr-2 py-3 flex-1/4">
-                알레르기 정보
+                <strong className="text-red-500">*</strong> 알레르기 정보
               </FormLabel>
               <div className="flex-3/4 space-y-1">
                 <FormControl>
