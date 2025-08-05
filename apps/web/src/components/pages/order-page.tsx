@@ -74,7 +74,7 @@ export default function OrderPage() {
 
   /** 우체국 한정으로 배송비 3,000원 추가 */
   const onSelectedDeliveryTp = (value: string) => {
-    value === '10' ? setFee(3000) : setFee(0);
+    value === '10' ? setFee(4000) : setFee(0);
   };
   /**********************************************************************************/
   /** APIs */
@@ -223,14 +223,6 @@ export default function OrderPage() {
                 title="1. 이번 주문서에 포함된 빵을 확인하세요!"
                 comment="현재 주문서에 포함된 빵 목록은 다음과 같습니다."
               />
-
-              {/* 검색창 */}
-              {/* <BreadSearch
-                keyword={keyword}
-                onKeyDown={handleKeyDown}
-                onChange={keywordSetting}
-                onClick={breadSearch}
-              /> */}
 
               {/* 주문차수 빵 목록 */}
               <div className="flex flex-row flex-wrap gap-5 justify-start">
