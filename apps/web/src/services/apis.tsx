@@ -58,3 +58,8 @@ export async function getKakaoCode() {
     document.location.href = response.data.url;
   });
 }
+
+/** 최신 주문차수 조회 */
+export async function getLatest() {
+  return client.get(`/order-round/latest`);
+}
