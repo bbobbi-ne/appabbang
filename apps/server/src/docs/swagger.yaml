@@ -190,6 +190,7 @@ paths:
                     - breadStatusName
                     - images
                     - countryOfOrigin
+                    - allergyInfo
                   properties:
                     no:
                       type: integer
@@ -260,6 +261,8 @@ paths:
                 - name
                 - unitPrice
                 - breadStatus
+                - countryOfOrigin
+                - allergyInfo
               properties:
                 name:
                   type: string
@@ -278,6 +281,14 @@ paths:
                   enum: ['10', '20', '30', '40', '50']
                   description: '빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)'
                   example: '10'
+                countryOfOrigin:
+                  type: string
+                  description: 원산지
+                  example: '빵류[밀가루(밀:미국,캐나다산),영양강화밀가루(프랑스산)],가공유크림(독일산)'
+                allergyInfo:
+                  type: string
+                  description: 알레르기 정보
+                  example: '밀, 우유, 대두, 계란 함유'
                 image:
                   type: array
                   items:
@@ -363,11 +374,11 @@ paths:
                 required:
                   - no
                   - name
-                  - description
                   - unitPrice
                   - breadStatus
                   - images
                   - countryOfOrigin
+                  - allergyInfo
                 properties:
                   no:
                     type: integer
