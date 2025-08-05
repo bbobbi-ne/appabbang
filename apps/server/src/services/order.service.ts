@@ -554,9 +554,6 @@ export const updateOrder = async (
 
 /** 주문 상태 수정 */
 export const updateOrderStatus = async (no: number, orderStatus: string) => {
-  if (orderStatus === '50') {
-  }
-
   const updated = await prisma.order.update({
     where: { no },
     data: {
