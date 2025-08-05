@@ -118,7 +118,7 @@ model OrderItem {
 
 model Customer {
   no                    Int               @id @default(autoincrement())
-  id                    String?           
+  id                    String?           @unique           
   pw                    String?           
   name                  String            
   mobileNumber          String            @map("mobile_number")               // 전화번호 (not null)
