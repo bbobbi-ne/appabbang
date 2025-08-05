@@ -14,6 +14,10 @@ export interface BreadProps {
   price: number;
 }
 
+export interface IOrderRoundBreads {
+  bread: BreadProps;
+}
+
 /** 빵 카드 */
 export interface BreadCardProps {
   bread: BreadProps;
