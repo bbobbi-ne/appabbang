@@ -52,8 +52,8 @@ export async function getByNo(req: Request, res: Response) {
 
 /** 빵 등록 */
 export async function create(req: Request, res: Response) {
-  const { name, description, unitPrice, breadStatus } = req.body;
-  const payload = { name, description, unitPrice, breadStatus };
+  const { name, description, unitPrice, breadStatus, countryOfOrigin } = req.body;
+  const payload = { name, description, unitPrice, breadStatus, countryOfOrigin };
 
   const images = req.files?.image as UploadedFile[] | UploadedFile | undefined;
 
