@@ -21,6 +21,7 @@ import { Route as SubPageOrderImport } from './routes/_sub-page/order'
 import { Route as SubPageFaqImport } from './routes/_sub-page/faq'
 import { Route as SubPageBrandImport } from './routes/_sub-page/brand'
 import { Route as SubPageMypageIndexImport } from './routes/_sub-page/mypage/index'
+import { Route as SubPageOrderOrderRoundNoImport } from './routes/_sub-page/order/$orderRoundNo'
 import { Route as SubPageMypagePasswordIndexImport } from './routes/_sub-page/mypage/password/index'
 import { Route as SubPageMypageInfoIndexImport } from './routes/_sub-page/mypage/info/index'
 import { Route as SubPageMypageAddressIndexImport } from './routes/_sub-page/mypage/address/index'
@@ -85,6 +86,12 @@ const SubPageMypageIndexRoute = SubPageMypageIndexImport.update({
   id: '/_sub-page/mypage/',
   path: '/mypage/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const SubPageOrderOrderRoundNoRoute = SubPageOrderOrderRoundNoImport.update({
+  id: '/$orderRoundNo',
+  path: '/$orderRoundNo',
+  getParentRoute: () => SubPageOrderRoute,
 } as any)
 
 const SubPageMypagePasswordIndexRoute = SubPageMypagePasswordIndexImport.update(
@@ -174,6 +181,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CallbackKakaoImport
       parentRoute: typeof rootRoute
     }
+    '/_sub-page/order/$orderRoundNo': {
+      id: '/_sub-page/order/$orderRoundNo'
+      path: '/$orderRoundNo'
+      fullPath: '/order/$orderRoundNo'
+      preLoaderRoute: typeof SubPageOrderOrderRoundNoImport
+      parentRoute: typeof SubPageOrderImport
+    }
     '/_sub-page/mypage/': {
       id: '/_sub-page/mypage/'
       path: '/mypage'
@@ -207,6 +221,18 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
+interface SubPageOrderRouteChildren {
+  SubPageOrderOrderRoundNoRoute: typeof SubPageOrderOrderRoundNoRoute
+}
+
+const SubPageOrderRouteChildren: SubPageOrderRouteChildren = {
+  SubPageOrderOrderRoundNoRoute: SubPageOrderOrderRoundNoRoute,
+}
+
+const SubPageOrderRouteWithChildren = SubPageOrderRoute._addFileChildren(
+  SubPageOrderRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/join': typeof JoinRoute
@@ -214,9 +240,10 @@ export interface FileRoutesByFullPath {
   '/logout': typeof LogoutRoute
   '/brand': typeof SubPageBrandRoute
   '/faq': typeof SubPageFaqRoute
-  '/order': typeof SubPageOrderRoute
+  '/order': typeof SubPageOrderRouteWithChildren
   '/products': typeof SubPageProductsRoute
   '/callback/kakao': typeof CallbackKakaoRoute
+  '/order/$orderRoundNo': typeof SubPageOrderOrderRoundNoRoute
   '/mypage': typeof SubPageMypageIndexRoute
   '/mypage/address': typeof SubPageMypageAddressIndexRoute
   '/mypage/info': typeof SubPageMypageInfoIndexRoute
@@ -230,9 +257,10 @@ export interface FileRoutesByTo {
   '/logout': typeof LogoutRoute
   '/brand': typeof SubPageBrandRoute
   '/faq': typeof SubPageFaqRoute
-  '/order': typeof SubPageOrderRoute
+  '/order': typeof SubPageOrderRouteWithChildren
   '/products': typeof SubPageProductsRoute
   '/callback/kakao': typeof CallbackKakaoRoute
+  '/order/$orderRoundNo': typeof SubPageOrderOrderRoundNoRoute
   '/mypage': typeof SubPageMypageIndexRoute
   '/mypage/address': typeof SubPageMypageAddressIndexRoute
   '/mypage/info': typeof SubPageMypageInfoIndexRoute
@@ -247,9 +275,10 @@ export interface FileRoutesById {
   '/logout': typeof LogoutRoute
   '/_sub-page/brand': typeof SubPageBrandRoute
   '/_sub-page/faq': typeof SubPageFaqRoute
-  '/_sub-page/order': typeof SubPageOrderRoute
+  '/_sub-page/order': typeof SubPageOrderRouteWithChildren
   '/_sub-page/products': typeof SubPageProductsRoute
   '/callback/kakao': typeof CallbackKakaoRoute
+  '/_sub-page/order/$orderRoundNo': typeof SubPageOrderOrderRoundNoRoute
   '/_sub-page/mypage/': typeof SubPageMypageIndexRoute
   '/_sub-page/mypage/address/': typeof SubPageMypageAddressIndexRoute
   '/_sub-page/mypage/info/': typeof SubPageMypageInfoIndexRoute
@@ -268,6 +297,7 @@ export interface FileRouteTypes {
     | '/order'
     | '/products'
     | '/callback/kakao'
+    | '/order/$orderRoundNo'
     | '/mypage'
     | '/mypage/address'
     | '/mypage/info'
@@ -283,6 +313,7 @@ export interface FileRouteTypes {
     | '/order'
     | '/products'
     | '/callback/kakao'
+    | '/order/$orderRoundNo'
     | '/mypage'
     | '/mypage/address'
     | '/mypage/info'
@@ -298,6 +329,7 @@ export interface FileRouteTypes {
     | '/_sub-page/order'
     | '/_sub-page/products'
     | '/callback/kakao'
+    | '/_sub-page/order/$orderRoundNo'
     | '/_sub-page/mypage/'
     | '/_sub-page/mypage/address/'
     | '/_sub-page/mypage/info/'
@@ -312,7 +344,7 @@ export interface RootRouteChildren {
   LogoutRoute: typeof LogoutRoute
   SubPageBrandRoute: typeof SubPageBrandRoute
   SubPageFaqRoute: typeof SubPageFaqRoute
-  SubPageOrderRoute: typeof SubPageOrderRoute
+  SubPageOrderRoute: typeof SubPageOrderRouteWithChildren
   SubPageProductsRoute: typeof SubPageProductsRoute
   CallbackKakaoRoute: typeof CallbackKakaoRoute
   SubPageMypageIndexRoute: typeof SubPageMypageIndexRoute
@@ -328,7 +360,7 @@ const rootRouteChildren: RootRouteChildren = {
   LogoutRoute: LogoutRoute,
   SubPageBrandRoute: SubPageBrandRoute,
   SubPageFaqRoute: SubPageFaqRoute,
-  SubPageOrderRoute: SubPageOrderRoute,
+  SubPageOrderRoute: SubPageOrderRouteWithChildren,
   SubPageProductsRoute: SubPageProductsRoute,
   CallbackKakaoRoute: CallbackKakaoRoute,
   SubPageMypageIndexRoute: SubPageMypageIndexRoute,
@@ -381,13 +413,20 @@ export const routeTree = rootRoute
       "filePath": "_sub-page/faq.tsx"
     },
     "/_sub-page/order": {
-      "filePath": "_sub-page/order.tsx"
+      "filePath": "_sub-page/order.tsx",
+      "children": [
+        "/_sub-page/order/$orderRoundNo"
+      ]
     },
     "/_sub-page/products": {
       "filePath": "_sub-page/products.tsx"
     },
     "/callback/kakao": {
       "filePath": "callback.kakao.tsx"
+    },
+    "/_sub-page/order/$orderRoundNo": {
+      "filePath": "_sub-page/order/$orderRoundNo.tsx",
+      "parent": "/_sub-page/order"
     },
     "/_sub-page/mypage/": {
       "filePath": "_sub-page/mypage/index.tsx"
