@@ -34,18 +34,21 @@ function DialogBody({ no }: { no: number }) {
 
   useEffect(() => {
     if (currentDataIsSuccess) {
-      const { breadStatus, description, images, name, unitPrice } = currentData;
+      const { breadStatus, description, images, name, unitPrice, countryOfOrigin } = currentData;
 
       const mappedImages = images?.map((img) => ({
         url: img.url,
         publicId: img.publicId,
       }));
 
+      const allergyInfo = currentData.allergyInfo ? currentData.allergyInfo : '';
       setCurrentValues({
         breadStatus,
         description,
         image: mappedImages,
         name,
+        countryOfOrigin,
+        allergyInfo,
         unitPrice: String(unitPrice),
       });
     }
