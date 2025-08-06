@@ -110,7 +110,12 @@ export default function OrderContent({ data }: IOrderRoundProps) {
         <div className="border w-2/5 h-72 overflow-hidden">
           {img ? (
             <img className="w-full h-full object-contain" src={img.url} alt={img.name} />
-          ) : null}
+          ) : (
+            <img
+              className="w-full h-full object-contain"
+              src="../../../../public/images/no_image.jpg"
+            />
+          )}
         </div>
       ) : (
         <div className="border w-2/5 h-72 overflow-hidden"></div>
