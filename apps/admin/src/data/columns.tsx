@@ -1,4 +1,4 @@
-import type { BreadsListData, OrdersListData } from '@/api/data-contracts';
+import type { BreadsListData, OrderRoundListData, OrdersListData } from '@/api/data-contracts';
 import {
   AspectRatio,
   Button,
@@ -46,6 +46,7 @@ export interface CustomerColumns {
   created_at: Date;
 }
 
+export type OrderRoundListItem = OrderRoundListData[number];
 export type BreadListItem = BreadsListData[number];
 export type OrdersListItem = OrdersListData[number];
 
@@ -546,6 +547,84 @@ export const ordersColumns = () => {
           </div>
         );
       },
+    }),
+  ];
+
+  return columns;
+};
+
+export const orderRoundColumns = () => {
+  const columnHelper = createColumnHelper<OrderRoundListItem>();
+
+  const columns: ColumnDef<OrderRoundListItem, any>[] = [
+    columnHelper.display({
+      id: 'cell-no',
+      maxSize: 3,
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted() === 'asc';
+        return (
+          <Button
+            className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary gap-0`}
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            {isSorted ? <SortAsc /> : <SortDesc />} 번호
+          </Button>
+        );
+      },
+      cell: (info) => {
+        const index = info.table.getPrePaginationRowModel().rows.length - info.row.index;
+        return <p className="text-center">{index}</p>;
+      },
+    }),
+    columnHelper.accessor('image', {
+      maxSize: 5,
+      header: ({ column }) => <p>주문차수 이미지</p>,
+      cell: (info) => {},
+    }),
+    columnHelper.accessor('no', {
+      maxSize: 3,
+      header: ({ column }) => (
+        <Button className="p-0" variant="ghost">
+          주문차수
+        </Button>
+      ),
+      cell: (info) => {},
+    }),
+    columnHelper.accessor('name', {
+      maxSize: 3,
+
+      header: ({ column }) => (
+        <Button className="p-0" variant="ghost">
+          이름
+        </Button>
+      ),
+      cell: (info) => {},
+    }),
+
+    columnHelper.accessor('breadNoList', {
+      header: ({ column }) => (
+        <Button className="p-0" variant="ghost">
+          기본배송지
+        </Button>
+      ),
+      cell: (info) => {},
+    }),
+    columnHelper.accessor('startedAt', {
+      header: ({ column }) => (
+        <Button className="p-0" variant="ghost">
+          가입일
+        </Button>
+      ),
+      cell: (info) => {},
+    }),
+    columnHelper.accessor('endedAt', {
+      header: ({ column }) => (
+        <Button className="p-0" variant="ghost">
+          가입일
+        </Button>
+      ),
+      cell: (info) => {},
     }),
   ];
 
