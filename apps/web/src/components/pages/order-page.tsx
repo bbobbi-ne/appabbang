@@ -2,77 +2,32 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle, CardContent } from '@appabbang/ui';
 import BreadCard from '@/components/bread-card';
-import type { BreadProps } from '@/interface/bread-interface';
+import type { BreadProps, IOrderRoundBreads } from '@/interface/bread-interface';
 import OrderFormSkeleton from '@/components/order-form-skeleton';
-import BreadSearch from '@/components/bread-search';
 import CardComment from '@/components/card-comment';
 import Payment from '@/components/Payment';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formSchema } from '@/validate/form-schema';
 import NonCustomerOrderForm from '@/components/non-customer-order-form';
-import { insertOrders, searchBankList, searchBreadList, searchDeliveryList } from '@/services/apis';
+import { getOrderRound, insertOrders, searchBankList, searchDeliveryList } from '@/services/apis';
 import type { FormSchema } from '@/validate/form-schema';
 import useToast from '@/hooks/useToast';
+import { useParams } from '@tanstack/react-router';
 
 /** Main Function */
 export default function OrderPage() {
-  const [breadList, setBreadList] = useState<BreadProps[]>([]); // 빵 목록
-  const [originBreadList, setOriginBreadList] = useState<BreadProps[]>([]); // 빵 목록(origin)
+  const [orderRoundBreads, setOrderRoundBreads] = useState<IOrderRoundBreads[]>([]); // 빵 목록
   const [paymentList, setPaymentList] = useState<BreadProps[]>([]); // 결제목록
   const [errMsg, setErrMsg] = useState<string>(''); // 에러메세지
-  const [keyword, setKeyword] = useState<string>(''); // 빵 키워드
   const [fee, setFee] = useState<number>(0); // 배송비
   const [totalCount, setTotalCount] = useState<number>(0); // 최종 수량
   const [totalPrice, setTotalPrice] = useState<number>(0); // 최종 금액
+  // 메인페이지에서 넘어온 주문차수 파라미터
+  const { orderRoundNo } = useParams({ from: '/_sub-page/order/$orderRoundNo' });
 
   /**********************************************************************************/
-  /**
-   * Function
-   */
-  /** enter key 누를때 빵 검색 기능 수행 */
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    e.key === 'Enter' && breadSearch();
-  };
-
-  /** 키워드 저장 */
-  const keywordSetting = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setKeyword(e.target.value);
-  };
-
-  /** 키워드 검색 onChange 함수 */
-  const breadSearch = () => {
-    const regExp = /^[가-힣+$]/g; // 한글 + 1글자 이상 입력된 경우
-    const tmpList = Array<BreadProps>();
-    let tmpCount = 0;
-
-    // 빈 값으로 검색할 경우 모든 리스트 보여주기
-    if (keyword.length === 0) {
-      setBreadList(originBreadList);
-      return false;
-    }
-
-    if (regExp.test(keyword)) {
-      // 정규표현식에 올바르다면, 텍스트에 포함되는 빵 목록을 보여준다.
-      breadList?.map((data, _) => {
-        const breadNm = data.name;
-
-        if (breadNm.includes(keyword)) {
-          tmpList.length === 0 && tmpList.push(data); // 데이터 0건이면 하나는 삽입
-
-          tmpList?.map((tmpBread, _) => {
-            tmpBread.no === tmpBread.no ? tmpCount++ : null;
-          });
-
-          tmpCount === 0 ? tmpList.push(data) : null;
-        }
-      });
-
-      // 임시 빵 목록 삽입
-      setBreadList(tmpList);
-    } else return false;
-  };
-
+  /** Functions */
   /** 빵 카드 click시 하단 결제목록 컴포넌트에 추가될 빵 list를 삽입함. */
   const handleBreadClick = (bread: BreadProps) => {
     if (paymentList.length === 0) {
@@ -112,15 +67,36 @@ export default function OrderPage() {
 
   /** 우체국 한정으로 배송비 3,000원 추가 */
   const onSelectedDeliveryTp = (value: string) => {
-    value === '10' ? setFee(3000) : setFee(0);
+    value === '10' ? setFee(4000) : setFee(0);
   };
   /**********************************************************************************/
-  /**
-   * 유효성 검사 로직
-   */
+  /** APIs */
+  /** 배송방법 목록 API */
+  const { isLoading: deliveryLoading, data: deliveryData } = useQuery({
+    queryKey: ['deliveryList'],
+    queryFn: searchDeliveryList,
+  });
+
+  /** 은행 목록 API */
+  const { isLoading: bankLoading, data: bankData } = useQuery({
+    queryKey: ['bankList'],
+    queryFn: searchBankList,
+  });
+
+  /** 주문차수 상세 조회 API */
+  const {
+    isLoading: orderRoundLoading,
+    data: orderRoundData,
+    error: orderRoundErr,
+  } = useQuery({
+    queryKey: ['getOrderRound'],
+    queryFn: () => getOrderRound(Number(orderRoundNo)),
+  });
+
+  /**********************************************************************************/
+  /** form submit */
 
   /** Form 기본값 설정 */
-
   const defaultValues: FormSchema = {
     name: '', // 주문자명
     mobileNumber: '', // 주문자 전화번호
@@ -146,20 +122,6 @@ export default function OrderPage() {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues,
-  });
-
-  /**********************************************************************************/
-  /** APIs */
-  /** 배송방법 목록 API */
-  const { isLoading: deliveryLoading, data: deliveryData } = useQuery({
-    queryKey: ['deliveryList'],
-    queryFn: searchDeliveryList,
-  });
-
-  /** 은행 목록 API */
-  const { isLoading: bankLoading, data: bankData } = useQuery({
-    queryKey: ['bankList'],
-    queryFn: searchBankList,
   });
 
   /** form onSubmit 핸들러 */
@@ -211,26 +173,14 @@ export default function OrderPage() {
     }
   };
   /**********************************************************************************/
-  /**
-   * React Hooks
-   */
+  /** React Hooks */
   const { addToast } = useToast();
 
-  /** 빵 목록 조회 API */
-  const { isLoading, data, error } = useQuery({
-    queryKey: ['allBreadList'],
-    queryFn: searchBreadList,
-  });
-
-  /** 빵 목록 조회 및 설정 */
+  /** 주문차수 빵 목록 조회 및 설정 */
   useEffect(() => {
-    if (data) {
-      setBreadList(data.data);
-      setOriginBreadList(data.data);
-    }
-
-    error && setErrMsg('빵 목록을 조회하는 데 문제가 발생했습니다.');
-  }, [data, error]);
+    orderRoundData && setOrderRoundBreads(orderRoundData.data.orderRoundBreads);
+    orderRoundErr && setErrMsg('빵 목록을 조회하는 데 문제가 발생했습니다.');
+  }, [orderRoundData, orderRoundErr]);
 
   /** 빵 결제목록의 총 개수, 총 금액 계산 */
   useEffect(() => {
@@ -252,7 +202,9 @@ export default function OrderPage() {
     );
   }, [paymentList, fee]);
 
-  return isLoading ? (
+  /**********************************************************************************/
+
+  return orderRoundLoading ? (
     <OrderFormSkeleton />
   ) : (
     <div>
@@ -261,27 +213,19 @@ export default function OrderPage() {
           <div className="m-5">
             <CardContent>
               <CardComment
-                title="1. 구매할 빵을 검색하고 선택하세요."
-                comment="최소 1건 이상 선택해야 주문서 작성이 진행됩니다."
+                title="1. 이번 주문서에 포함된 빵을 확인하세요!"
+                comment="현재 주문서에 포함된 빵 목록은 다음과 같습니다."
               />
 
-              {/* 검색창 */}
-              <BreadSearch
-                keyword={keyword}
-                onKeyDown={handleKeyDown}
-                onChange={keywordSetting}
-                onClick={breadSearch}
-              />
-
-              {/* 빵 목록 */}
+              {/* 주문차수 빵 목록 */}
               <div className="flex flex-row flex-wrap gap-5 justify-start">
-                {isLoading ? (
+                {orderRoundLoading ? (
                   <Card>
                     <CardHeader className="text-red-600">{errMsg}</CardHeader>
                   </Card>
                 ) : (
-                  breadList?.map((data, i) => (
-                    <BreadCard key={i} bread={data} onClick={handleBreadClick} />
+                  orderRoundBreads?.map((data, i) => (
+                    <BreadCard key={i} bread={data.bread} onClick={handleBreadClick} />
                   ))
                 )}
               </div>

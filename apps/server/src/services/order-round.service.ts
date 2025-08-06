@@ -6,6 +6,7 @@ import { PrismaClient, Prisma, OrderRound, OrderRoundBread } from '@prisma/clien
 
 // 1. 주문차수 이미지 공통코드 조회 - 전역 변수로 저장
 let IMAGE_TARGET_TYPE_CODE: string | null = null;
+const IMAGE_TARGET_TYPE_NAME = 'orderRound';
 
 // OrderRound 등록 타입
 type CreateOrderRoundInput = Pick<OrderRound, 'name' | 'startedAt' | 'endedAt'> & {
@@ -23,9 +24,10 @@ type CreatOrderRoundBreadInput = Pick<OrderRoundBread, 'no' | 'breadNo'>;
 /**
  * 공통코드 주문차수 전용 code 조회
  */
-const getImageTargetTypeCode = async () => {
+const getImageTargetTypeCode = async (nameParam: string) => {
   if (IMAGE_TARGET_TYPE_CODE === null) {
-    const [groupName, name, code] = ['image_target_type', 'orderRound', true];
+    const [groupName, code] = ['image_target_type', true];
+    let name = nameParam.includes('orderRound') ? IMAGE_TARGET_TYPE_NAME : 'breads';
 
     const result = await prisma.commonCode.findFirst({
       where: {
@@ -65,7 +67,7 @@ export const getOrderRoundList = async () => {
     });
 
     // 2. 주문차수 이미지 조회
-    const imageTargetType = await getImageTargetTypeCode(); // return code
+    const imageTargetType = await getImageTargetTypeCode(IMAGE_TARGET_TYPE_NAME); // return code
 
     const images = await tx.image.findMany({
       where: {
@@ -127,7 +129,8 @@ export const getOrderRound = async (no: number) => {
         no,
       });
 
-    const imageTargetType = await getImageTargetTypeCode();
+    // 주문차수의 이미지 조회
+    const imageTargetType = await getImageTargetTypeCode(IMAGE_TARGET_TYPE_NAME);
     const image = await tx.image.findFirst({
       where: {
         imageTargetType,
@@ -141,6 +144,39 @@ export const getOrderRound = async (no: number) => {
         order: true,
       },
     });
+
+    /******/
+    // 주문차수-빵 매핑된 빵의 이미지 조회
+    const breadImageTargetType = await getImageTargetTypeCode('breads');
+    const breadImages = await tx.image.findMany({
+      take: 10000,
+      orderBy: [{ no: 'desc' }, { order: 'asc' }],
+      where: {
+        imageTargetType: breadImageTargetType,
+        order: 1,
+      },
+    });
+
+    const imageMap = new Map<number, string>();
+    breadImages.forEach((img: any) => {
+      imageMap.set(img.imageTargetNo, img.url);
+    });
+
+    /******/
+    // 주문차수에 매핑된 빵 정보에 이미지 정보 삽입
+    const newBreads = or.orderRoundBreads.map(({ bread }) => ({
+      ...bread,
+      images: [...(imageMap.get(bread.no) ? [{ url: imageMap.get(bread.no) }] : [])],
+    }));
+
+    const list = Array();
+
+    newBreads.map((bread) => {
+      const obj = { bread };
+      list.push(obj);
+    });
+
+    or.orderRoundBreads = list; // 이미지가 들어간 빵 목록을 재삽입
 
     return { ...or, image };
   });
@@ -229,7 +265,7 @@ export const createWithImage = async (
       } = imgResult[0] as { url: string; public_id: string; original_filename: string };
 
       // 4. 이미지 정보를 데이터베이스에 저장
-      const imageTargetType = await getImageTargetTypeCode(); // return code
+      const imageTargetType = await getImageTargetTypeCode(IMAGE_TARGET_TYPE_NAME); // return code
 
       if (url && publicId) {
         await tx.image.create({
@@ -366,7 +402,7 @@ export const updateWithImage = async (
         }),
       );
 
-      const imageTargetType = await getImageTargetTypeCode(); // return code
+      const imageTargetType = await getImageTargetTypeCode(IMAGE_TARGET_TYPE_NAME); // return code
 
       // 3. 이미지 수정
       // 기존 이미지의 마지막 순서 조회하여 클라우디너리 이미지 업로드
@@ -444,7 +480,7 @@ export const getLatest = async () => {
       },
     });
 
-    const imageTargetType = await getImageTargetTypeCode();
+    const imageTargetType = await getImageTargetTypeCode(IMAGE_TARGET_TYPE_NAME);
     let image;
 
     if (or) {

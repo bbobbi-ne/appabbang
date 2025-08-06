@@ -171,6 +171,33 @@ async function main() {
       },
     ],
   });
+
+  // 주문차수 테이블 초기화
+  await prisma.orderRound.deleteMany();
+
+  // 주문차수 생성
+  await prisma.orderRound.createMany({
+    data: [
+      {
+        name: '주문 1차',
+        startedAt: '2025-08-01T09:36:15.992Z',
+        endedAt: '2025-08-31T20:36:15.992Z',
+      },
+    ],
+  });
+
+  // 주문차수-빵 매핑 테이블 초기화
+  await prisma.orderRoundBread.deleteMany();
+
+  // 주문차수-빵 매핑 테이블 생성
+  await prisma.orderRoundBread.createMany({
+    data: [
+      {
+        seq: 1,
+        breadNo: 1,
+      },
+    ],
+  });
 }
 
 main()
