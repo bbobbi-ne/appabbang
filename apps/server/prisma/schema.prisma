@@ -61,6 +61,8 @@ model Bread {
   description           String?
   unitPrice             Int
   breadStatus           String            @map("bread_status")
+  countryOfOrigin       String            @map("country_of_origin") 
+  allergyInfo           String           @map("allergy_info")     
 
   originInfo            String?           @map("origin_info")  // 원산지 정보
   allergyInfo           String?           @map("allergy_info") // 알레르기 정보
@@ -121,7 +123,7 @@ model OrderItem {
 
 model Customer {
   no                    Int               @id @default(autoincrement())
-  id                    String?           
+  id                    String?           @unique           
   pw                    String?           
   name                  String            
   mobileNumber          String            @map("mobile_number")               // 전화번호 (not null)
@@ -145,7 +147,7 @@ model Address {
   address               String            
   addressDetail         String            @map("address_detail")
   zipcode               String
-  message               String?
+  message               String
   recipientName         String            @map("recipient_name")       // 수령인 이름
   recipientMobile       String            @map("recipient_mobile")     // 수령인 전화번호
 

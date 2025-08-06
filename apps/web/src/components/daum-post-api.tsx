@@ -2,10 +2,11 @@
  * 다음 주소 API
  */
 
-import { Button } from '@appabbang/ui';
+import { Button, type ButtonProps } from '@appabbang/ui';
 import { useDaumPostcodePopup } from 'react-daum-postcode';
 
 interface ParamsProp {
+  title?: string;
   setAddress: (address: string[]) => void;
 }
 
@@ -51,7 +52,11 @@ interface ResultPostProp {
   zonecode: string;
 }
 
-function DaumPostApi({ setAddress }: ParamsProp) {
+function DaumPostApi({
+  title = '주소검색',
+  setAddress,
+  ...props
+}: ParamsProp & Omit<ButtonProps, 'onClick'>) {
   //클릭 시 수행될 팝업 생성 함수
   const open = useDaumPostcodePopup();
 
@@ -78,8 +83,8 @@ function DaumPostApi({ setAddress }: ParamsProp) {
 
   return (
     <>
-      <Button type="button" className="mt-6 mb-5 w-20 mr-4" onClick={handleClick}>
-        주소검색
+      <Button type="button" onClick={handleClick} {...props}>
+        {title}
       </Button>
     </>
   );

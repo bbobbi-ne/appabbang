@@ -13,7 +13,6 @@
 import type {
   OrdersCreateData,
   OrdersCreatePayload,
-  OrdersDeleteData,
   OrdersDetailData,
   OrdersListData,
   OrdersUpdateData,
@@ -102,23 +101,6 @@ export class Orders<SecurityDataType = unknown> {
       body: data,
       secure: true,
       type: ContentType.Json,
-      ...params,
-    });
-  /**
-   * @description 특정 주문을 삭제합니다. (권한: 관리자만)
-   *
-   * @tags Orders
-   * @name OrdersDelete
-   * @summary 주문 삭제
-   * @request DELETE:/orders/{no}
-   * @secure
-   * @response `204` `OrdersDeleteData` 주문 삭제 성공
-   */
-  ordersDelete = (no: number, params: RequestParams = {}) =>
-    this.http.request<OrdersDeleteData, any>({
-      path: `/orders/${no}`,
-      method: "DELETE",
-      secure: true,
       ...params,
     });
 }

@@ -1,8 +1,21 @@
 import type { BreadsListData, OrdersListData } from '@/api/data-contracts';
-import { AspectRatio, Button, Checkbox } from '@appabbang/ui';
+import {
+  AspectRatio,
+  Button,
+  Checkbox,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@appabbang/ui';
 import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
 import { SortAsc, SortDesc } from 'lucide-react';
-import { formatToDate, formatToDateTime } from '@/utils/format';
+import { formatKR, formatToDate, formatToDateTime } from '@/utils/format';
+import {
+  useOrderAndStatusAndDliveryTypeQuery,
+  useOrderStatusUpdateMutation,
+} from '@/hooks/use-order';
 
 export interface MaterialColumns {
   no: number;
@@ -39,7 +52,6 @@ export type OrdersListItem = OrdersListData[number];
 export const BreadsColumns = () => {
   const columnHelper = createColumnHelper<BreadListItem>();
 
-  // 알레르기 원산지정보 추가 필
   const columns: ColumnDef<BreadListItem, any>[] = [
     columnHelper.display({
       id: 'select',
@@ -120,8 +132,8 @@ export const BreadsColumns = () => {
           </Button>
         );
       },
-      cell: ({ row }) => (
-        <p className="line-clamp-3 whitespace-normal break-words">{row.getValue('name')}</p>
+      cell: (info) => (
+        <p className="line-clamp-3 whitespace-normal break-words">{info.getValue()}</p>
       ),
     }),
 
@@ -144,6 +156,22 @@ export const BreadsColumns = () => {
         <p className="text-right">
           {new Intl.NumberFormat('ko-KR', { currency: 'KRW' }).format(info.getValue())}원
         </p>
+      ),
+    }),
+
+    columnHelper.accessor('countryOfOrigin', {
+      maxSize: 10,
+      header: ({ column }) => '원산지정보',
+      cell: (info) => (
+        <p className="line-clamp-3 whitespace-normal break-words">{info.getValue()}</p>
+      ),
+    }),
+
+    columnHelper.accessor('allergyInfo', {
+      maxSize: 10,
+      header: ({ column }) => '알레르기 정보',
+      cell: (info) => (
+        <p className="line-clamp-3 whitespace-normal break-words">{info.getValue() || '없음'}</p>
       ),
     }),
 
@@ -321,6 +349,8 @@ export const muterialColumns = () => {
 
 export const ordersColumns = () => {
   const columnHelper = createColumnHelper<OrdersListItem>();
+  const { ordersStatus } = useOrderAndStatusAndDliveryTypeQuery();
+  const { orderStatusUpdateMutation } = useOrderStatusUpdateMutation();
 
   const columns: ColumnDef<OrdersListItem, any>[] = [
     columnHelper.accessor('no', {
@@ -365,7 +395,7 @@ export const ordersColumns = () => {
       },
     }),
     columnHelper.accessor('customer.mobileNumber', {
-      maxSize: 5,
+      maxSize: 10,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           전화번호
@@ -384,18 +414,67 @@ export const ordersColumns = () => {
       ),
       cell: (info) => {
         const value = info.getValue() ? '완료' : '미완료';
-        return value;
+        return <p className={`${info.getValue() ? '' : 'text-red-500'} font-semibold`}>{value}</p>;
       },
     }),
-    columnHelper.accessor('orderStatusName', {
+    columnHelper.accessor('orderStatus', {
       maxSize: 5,
-      header: ({ column }) => (
-        <Button className="p-0" variant="ghost">
-          주문상태
-        </Button>
-      ),
+      header: ({ column }) => {
+        const rawValue = column.getFilterValue();
+        const value = typeof rawValue === 'string' ? rawValue : 'all';
+
+        return (
+          <Select
+            value={value}
+            onValueChange={(val) => {
+              column.setFilterValue(val === 'all' ? undefined : val);
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">전체</SelectItem>
+              {ordersStatus?.map(({ name, code }) => (
+                <SelectItem key={code} value={code}>
+                  {name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      },
+
       cell: (info) => {
-        return info.getValue();
+        const value = info.getValue();
+        const found = ordersStatus?.find((item) => item.code === value);
+        const no = info.row.original.no;
+
+        return (
+          <Select
+            value={value}
+            onValueChange={(val: '10' | '20' | '30' | '40' | '50') => {
+              console.log(val);
+              orderStatusUpdateMutation({ no, orderStatus: { orderStatus: val } });
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue>{found?.name}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {ordersStatus?.map(({ name, code }) => (
+                <SelectItem key={code} value={code}>
+                  {name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      },
+
+      filterFn: (row, columnId, filterValue) => {
+        const columnValue = ordersStatus?.find((item) => item.code === row.getValue(columnId));
+        return columnValue?.code === filterValue;
       },
     }),
     columnHelper.accessor('deliveryMethod.name', {
@@ -417,11 +496,11 @@ export const ordersColumns = () => {
         </Button>
       ),
       cell: (info) => {
-        const { address, addressDetail } = info.getValue();
+        const { address, addressDetail, zipcode } = info.getValue();
 
         return (
           <p className="line-clamp-3 whitespace-normal break-words">
-            {address} {addressDetail}
+            {address} {addressDetail} ({zipcode})
           </p>
         );
       },
@@ -434,7 +513,7 @@ export const ordersColumns = () => {
         </Button>
       ),
       cell: (info) => {
-        return <p>{info.getValue()}원</p>;
+        return <p>{formatKR(info.getValue())}원</p>;
       },
     }),
 

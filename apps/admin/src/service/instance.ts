@@ -6,6 +6,7 @@ export class CustomHttpClient extends HttpClient {
   constructor(config: ApiConfig = {}) {
     super({
       ...config,
+      withCredentials: true,
       securityWorker: () => {
         const { accessToken } = useAuthStore.getState();
         if (!accessToken) return;

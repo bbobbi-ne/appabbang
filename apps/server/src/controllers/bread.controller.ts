@@ -52,8 +52,8 @@ export async function getByNo(req: Request, res: Response) {
 
 /** 빵 등록 */
 export async function create(req: Request, res: Response) {
-  const { name, description, unitPrice, breadStatus } = req.body;
-  const payload = { name, description, unitPrice, breadStatus };
+  const { name, description, unitPrice, breadStatus, countryOfOrigin, allergyInfo } = req.body;
+  const payload = { name, description, unitPrice, breadStatus, countryOfOrigin, allergyInfo };
 
   const images = req.files?.image as UploadedFile[] | UploadedFile | undefined;
 
@@ -78,8 +78,8 @@ export async function update(req: Request, res: Response) {
     throw AppError.notFound('빵을 찾을 수 없습니다.', { breadNo: no });
   }
 
-  const { name, description, unitPrice, breadStatus } = req.body;
-  const payload = { name, description, unitPrice, breadStatus };
+  const { name, description, unitPrice, breadStatus, countryOfOrigin, allergyInfo } = req.body;
+  const payload = { name, description, unitPrice, breadStatus, countryOfOrigin, allergyInfo };
 
   const images = req.files?.image as UploadedFile[] | UploadedFile | undefined;
 

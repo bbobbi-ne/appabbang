@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { AppError } from '@/types';
 
 export const getByIdForLogin = async (id: string) => {
   const user = await prisma.user.findUnique({
@@ -21,6 +22,19 @@ export const updateRefreshToken = async (id: string, refreshToken: string) => {
     where: { id },
     data: { refreshToken },
   });
+
+  return user;
+};
+
+/** 유저 조회 */
+export const getOne = async (id: string) => {
+  const user = await prisma.user.findUnique({
+    where: { id },
+  });
+
+  if (!user) {
+    throw AppError.notFound('User not found');
+  }
 
   return user;
 };

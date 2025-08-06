@@ -28,6 +28,7 @@ import {
   CardHeader,
   CardTitle,
   ScrollArea,
+  ScrollBar,
   Table,
   TableBody,
   TableCell,
@@ -86,50 +87,53 @@ function RouteComponent() {
           <BreadCreateDialog />
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[550px] border-1 rounded-lg ">
-            <Table>
-              <TableHeader className="sticky top-0 z-10 bg-background shadow border-b-0">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      const max = header.column.columnDef.maxSize;
+          <ScrollArea className="h-[550px] w-full border-1 rounded-lg ">
+            <div className="min-w-[1000px]">
+              <Table>
+                <TableHeader className="sticky top-0 z-10 bg-background shadow border-b-0">
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => {
+                        const max = header.column.columnDef.maxSize;
 
-                      return (
-                        <TableHead
-                          className="text-center"
-                          style={{ width: `${max}%` }}
-                          key={header.id}
-                        >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                        </TableHead>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="p-4 text-center">
-                      빵을 등록해주세요.
-                    </TableCell>
-                  </TableRow>
-                )}
-                {table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id}>
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <BreadModifyDialog no={cell.row.original.no} key={cell.id}>
-                          <TableCell>
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                          </TableCell>
-                        </BreadModifyDialog>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                        return (
+                          <TableHead
+                            className="text-center"
+                            style={{ width: `${max}%` }}
+                            key={header.id}
+                          >
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                          </TableHead>
+                        );
+                      })}
+                    </TableRow>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={columns.length} className="p-4 text-center">
+                        빵을 등록해주세요.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id}>
+                      {row.getVisibleCells().map((cell) => {
+                        return (
+                          <BreadModifyDialog no={cell.row.original.no} key={cell.id}>
+                            <TableCell>
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </TableCell>
+                          </BreadModifyDialog>
+                        );
+                      })}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            <ScrollBar orientation="horizontal" />
           </ScrollArea>
         </CardContent>
         <CardFooter className="space-x-2">

@@ -32,3 +32,4 @@ export * from './src/components/ui/textarea';
 export * from './src/components/ui/scroll-area';
 export * from './src/components/ui/radio-group';
 export * from './src/components/ui/sonner';
+export * from './src/components/badge';
