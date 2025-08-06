@@ -111,10 +111,7 @@ export default function OrderContent({ data }: IOrderRoundProps) {
           {img ? (
             <img className="w-full h-full object-contain" src={img.url} alt={img.name} />
           ) : (
-            <img
-              className="w-full h-full object-contain"
-              src="../../../../public/images/no_image.jpg"
-            />
+            <img className="w-full h-full object-contain" src="/images/no_image.jpg" />
           )}
         </div>
       ) : (
