@@ -118,7 +118,15 @@ async function main() {
 
   await prisma.bread.createMany({
     data: [
-      { name: '판매빵', description: '판매빵', unitPrice: 1000, breadStatus: '10' },
+      {
+        name: '판매빵',
+        description: '판매빵',
+        unitPrice: 1000,
+        breadStatus: '10',
+        allergyInfo: '밀, 계란, 우유, 대두',
+        originInfo:
+          '빵류[밀가루(밀: 미국, 캐나다산), 영양강화밀가루(프랑스산)], 밀가루[밀(미국산)]',
+      },
       { name: '미판매빵', description: '미판매빵', unitPrice: 2000, breadStatus: '20' },
       { name: '임시저장빵', description: '임시저장빵', unitPrice: 3000, breadStatus: '30' },
       { name: '재료소진빵', description: '재료소진빵', unitPrice: 4000, breadStatus: '40' },
@@ -133,7 +141,6 @@ async function main() {
   await prisma.orderRound.createMany({
     data: [
       {
-        no: 1,
         name: '주문 1차',
         startedAt: '2025-08-01T09:36:15.992Z',
         endedAt: '2025-08-31T20:36:15.992Z',
@@ -148,7 +155,6 @@ async function main() {
   await prisma.orderRoundBread.createMany({
     data: [
       {
-        no: 1,
         seq: 1,
         breadNo: 1,
       },
