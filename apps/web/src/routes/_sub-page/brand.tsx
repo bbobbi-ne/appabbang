@@ -8,7 +8,7 @@ export const Route = createFileRoute('/_sub-page/brand')({
 
 function RouteComponent() {
   return (
-    <SubLayout title="브랜드 소개">
+    <SubLayout title="아빠빵" subTitle="appabbang">
       <BrandPage />
     </SubLayout>
   );
