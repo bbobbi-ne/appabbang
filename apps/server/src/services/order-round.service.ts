@@ -3,6 +3,8 @@ import { UploadedFile } from 'express-fileupload';
 import * as ImageService from './image.service';
 import { AppError } from '@/types';
 import { PrismaClient, Prisma, OrderRound, OrderRoundBread } from '@prisma/client';
+import * as BreadService from '@/services/bread.service';
+import { ClientType } from '@/types/client-payload';
 
 // 1. 주문차수 이미지 공통코드 조회 - 전역 변수로 저장
 let IMAGE_TARGET_TYPE_CODE: string | null = null;
@@ -503,4 +505,20 @@ export const getLatest = async () => {
   });
 
   return result;
+};
+
+/**
+ * 주문차수에 매핑시킬 빵이 판매중(10)인지 확인하는 함수.
+ * 빵이 1건이라도 판매중이 아니면 false를 리턴한다.
+ */
+export const findBreadStatus = async (breadNoList: number[]) => {
+  for (const breadNo of breadNoList) {
+    const findBread = await BreadService.getBread(ClientType.USER, breadNo);
+
+    if (findBread.breadStatus.includes('10') || findBread.breadStatus.includes('50')) continue;
+    else
+      return { code: 500, message: '판매중, 출시예정이 아닌 빵은 주문차수에 등록할 수 없습니다.' };
+  }
+
+  return { message: 'success' };
 };

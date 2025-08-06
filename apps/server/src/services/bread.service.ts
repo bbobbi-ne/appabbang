@@ -8,6 +8,7 @@ import { ClientType } from '@/types/client-payload';
 
 const IMAGE_TARGET_TYPE = '10'; // 빵 이미지 코드
 const CUSTOMER_AVALIABLE_BREAD_STATUS = ['10', '40', '50']; // 고객은 판매, 재료소진, 출시예정 만 조회 가능
+const USER_AVALIABLE_BREAD_STATUS = ['10', '50']; // 관리자는 판매, 출시예정만 조회한다. (주문차수 전용)
 
 /** 빵 목록 전체 조회 */
 export const getAll = async () => {
@@ -343,4 +344,30 @@ export const remove = async (noList: number[]) => {
       where: { publicId: { in: publicIdList } },
     });
   });
+};
+
+/** 빵 상세 조회 - 관리자 전용
+ * 주문차수에 등록할 빵 목록을 조회한다.
+ * 단, 빵 상태가 판매중(10), 출시예정(50)인 빵만 등록할 수 있다.
+ */
+export const getBread = async (type: ClientType | undefined, no: number) => {
+  const result = await prisma.$transaction(async (tx) => {
+    const bread = await tx.bread.findUnique({
+      where: { no },
+    });
+
+    if (!bread) throw AppError.notFound('빵을 찾을 수 없습니다.', { breadNo: no });
+
+    // 관리자는 판매, 출시예정 만 조회 가능
+    if (type !== ClientType.USER && !USER_AVALIABLE_BREAD_STATUS.includes(bread.breadStatus)) {
+      throw AppError.badRequest(
+        '관리자는 주문차수에 등록할 빵 상태가 판매중, 출시예정인 경우에만 조회 가능합니다.',
+        { type, breadStatus: bread.breadStatus },
+      );
+    }
+
+    return { ...bread };
+  });
+
+  return result;
 };

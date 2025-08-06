@@ -26,12 +26,17 @@ export async function getOne(req: Request, res: Response) {
  */
 export async function create(req: Request, res: Response) {
   const { no, seq, name, breadNoList: breadNoListStr, startedAt, endedAt } = req.body;
-  const breadNoListJson = JSON.parse(breadNoListStr); // json parsing
+  let breadNoListJson = JSON.parse(breadNoListStr); // json parsing
   // breadNoList에서 breadNo 값만 추출
   const breadNoList = breadNoListJson.map((bread: { breadNo: number }) => bread.breadNo);
   const model = { no, seq, name, breadNoList, startedAt, endedAt };
   const image = req.files?.image as UploadedFile[] | UploadedFile | undefined;
   let orderRound;
+
+  // 주문차수로 등록하기 전, 현재 등록하려는 빵의 상태가 판매중(10), 출시예정(50)인지 검토하기
+  const findResult = await OrderRoundService.findBreadStatus(breadNoList);
+  if ('code' in findResult) return res.status(500).json(findResult);
+  else null;
 
   !image
     ? (orderRound = await OrderRoundService.createWithoutImage(model)) // 이미지 없는 주문차수 등록
@@ -50,7 +55,7 @@ export async function create(req: Request, res: Response) {
  */
 export async function update(req: Request, res: Response) {
   const { no, seq, name, public_id, breadNoList: breadNoListStr, startedAt, endedAt } = req.body;
-  const breadNoListJson = JSON.parse(breadNoListStr); // json parsing
+  let breadNoListJson = JSON.parse(breadNoListStr); // json parsing
   // breadNoList에서 breadNo 값만 추출
   const breadNoList = breadNoListJson.map((bread: { breadNo: number }) => bread.breadNo);
   const model = { no: Number(no), seq, name, public_id, breadNoList, startedAt, endedAt };
@@ -65,6 +70,11 @@ export async function update(req: Request, res: Response) {
       seq,
       name,
     });
+
+  // 주문차수로 등록하기 전, 현재 등록하려는 빵의 상태가 판매중(10), 출시예정(50)인지 검토하기
+  const findResult = await OrderRoundService.findBreadStatus(breadNoList);
+  if ('code' in findResult) return res.status(500).json(findResult);
+  else null;
 
   // 이미지 유무에 따른 주문차수 수정
   !image
