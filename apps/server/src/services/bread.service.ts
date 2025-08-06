@@ -58,7 +58,7 @@ export const getAllForCustomer = async () => {
         unitPrice: true,
         breadStatus: true,
         allergyInfo: true,
-        originInfo: true,
+        countryOfOrigin: true,
       },
     });
 
