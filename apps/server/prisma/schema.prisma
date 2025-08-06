@@ -62,10 +62,7 @@ model Bread {
   unitPrice             Int
   breadStatus           String            @map("bread_status")
   countryOfOrigin       String            @map("country_of_origin") 
-  allergyInfo           String           @map("allergy_info")     
-
-  originInfo            String?           @map("origin_info")  // 원산지 정보
-  allergyInfo           String?           @map("allergy_info") // 알레르기 정보
+  allergyInfo           String           @map("allergy_info")
 
   createdAt             DateTime          @default(now()) @map("created_at")
   updatedAt             DateTime          @updatedAt @map("updated_at")

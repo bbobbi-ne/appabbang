@@ -57,8 +57,6 @@ export const getAllForCustomer = async () => {
         description: true,
         unitPrice: true,
         breadStatus: true,
-        allergyInfo: true,
-        originInfo: true,
       },
     });
 
