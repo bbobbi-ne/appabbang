@@ -125,6 +125,35 @@ async function main() {
       { name: '출시예정빵', description: '출시예정빵', unitPrice: 5000, breadStatus: '50' },
     ],
   });
+
+  // 주문차수 테이블 초기화
+  await prisma.orderRound.deleteMany();
+
+  // 주문차수 생성
+  await prisma.orderRound.createMany({
+    data: [
+      {
+        no: 1,
+        name: '주문 1차',
+        startedAt: '2025-08-01T09:36:15.992Z',
+        endedAt: '2025-08-31T20:36:15.992Z',
+      },
+    ],
+  });
+
+  // 주문차수-빵 매핑 테이블 초기화
+  await prisma.orderRoundBread.deleteMany();
+
+  // 주문차수-빵 매핑 테이블 생성
+  await prisma.orderRoundBread.createMany({
+    data: [
+      {
+        no: 1,
+        seq: 1,
+        breadNo: 1,
+      },
+    ],
+  });
 }
 
 main()
