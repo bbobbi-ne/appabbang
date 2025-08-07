@@ -33,11 +33,6 @@ export async function create(req: Request, res: Response) {
   const image = req.files?.image as UploadedFile[] | UploadedFile | undefined;
   let orderRound;
 
-  // 주문차수로 등록하기 전, 현재 등록하려는 빵의 상태가 판매중(10), 출시예정(50)인지 검토하기
-  const findResult = await OrderRoundService.findBreadStatus(breadNoList);
-  if ('code' in findResult) return res.status(500).json(findResult);
-  else null;
-
   !image
     ? (orderRound = await OrderRoundService.createWithoutImage(model)) // 이미지 없는 주문차수 등록
     : (orderRound = await OrderRoundService.createWithImage(model, image)); // 이미지 있는 주문차수 등록
@@ -70,11 +65,6 @@ export async function update(req: Request, res: Response) {
       seq,
       name,
     });
-
-  // 주문차수로 등록하기 전, 현재 등록하려는 빵의 상태가 판매중(10), 출시예정(50)인지 검토하기
-  const findResult = await OrderRoundService.findBreadStatus(breadNoList);
-  if ('code' in findResult) return res.status(500).json(findResult);
-  else null;
 
   // 이미지 유무에 따른 주문차수 수정
   !image
