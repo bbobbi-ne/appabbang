@@ -17,35 +17,54 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 function BreadCardDetail({ bread, onClick }: { bread: BreadProps; onClick: () => void }) {
-  const settings = {
-    dots: true,
-    infinite: bread.images.length > 1,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-  };
-
   return (
     <>
       <AlertDialogTrigger asChild>
         <ProductsBreadCard bread={bread} onClick={onClick} />
       </AlertDialogTrigger>
 
-      <AlertDialogContent className=" overflow-y-auto">
-        <AlertDialogTitle className="m-5 flex justify-start">{bread.name}</AlertDialogTitle>
+      <AlertDialogContent className="w-full max-w-3xl overflow-y-auto max-h-[90vh] p-6">
+        <AlertDialogTitle className="m-5 flex justify-center">{bread.name}</AlertDialogTitle>
 
         <AlertDialogCancel className="absolute top-1 right-1 cursor-pointer w-10">
           <X />
         </AlertDialogCancel>
 
         {/* 이미지 슬라이더 */}
-        <Slider {...settings}>
-          {bread.images.map((image, i) => (
-            <div key={i} className="w-full">
-              <img src={image.url} alt={`이미지`} className="w-full h-auto object-cover rounded" />
-            </div>
-          ))}
-        </Slider>
+        {bread.images?.length > 0 && (
+          <div className="w-full max-w-[500px] mx-auto mb-4">
+            {bread.images.length > 1 ? (
+              <Slider
+                {...{
+                  dots: true,
+                  infinite: true,
+                  speed: 500,
+                  slidesToShow: 1,
+                  slidesToScroll: 1,
+                }}
+                className="mr-10"
+              >
+                {bread.images.map((image, i) => (
+                  <div key={i} className="flex justify-start items-center w-full">
+                    <img
+                      src={image.url}
+                      alt={`빵 이미지 ${i + 1}`}
+                      className="object-contain rounded-2xl"
+                    />
+                  </div>
+                ))}
+              </Slider>
+            ) : (
+              <div className="w-full flex justify-center items-center">
+                <img
+                  src={bread.images[0].url}
+                  alt="단일 이미지"
+                  className="h-[300px] object-contain rounded"
+                />
+              </div>
+            )}
+          </div>
+        )}
 
         <AlertDialogDescription className="mb-10">{bread.description}</AlertDialogDescription>
 

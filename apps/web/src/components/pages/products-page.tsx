@@ -53,8 +53,6 @@ export default function ProductsPage() {
     setKeyword(e.target.value);
   };
 
-  const onBreadCardClick = () => {};
-
   const onClick = () => {};
 
   return isLoading ? (

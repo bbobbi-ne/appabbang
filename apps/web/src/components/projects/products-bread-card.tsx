@@ -10,8 +10,8 @@ function ProductsBreadCard({ bread, onClick }: BreadCardProps) {
       onClick={() => onClick(bread)}
     >
       <div>
-        <CardHeader className="ml-2 p-2 text-left">{bread.name}</CardHeader>
-        {bread.images[0] ? (
+        {/* <CardHeader className="ml-2 p-2 text-left">{bread.name}</CardHeader> */}
+        {bread.images && bread.images[0] && bread.images.length > 0 ? (
           <img className="rounded-2xl m-4 w-40 h-40" src={bread.images[0].url} alt={bread.name} />
         ) : (
           <img className="rounded-2xl m-4 w-40 h-40" src="/images/no_image.jpg" alt={bread.name} />
