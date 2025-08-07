@@ -12,6 +12,8 @@ export interface BreadProps {
   ];
   count: number;
   price: number;
+  allergyInfo: string;
+  countryOfOrigin: string;
 }
 
 export interface IOrderRoundBreads {
