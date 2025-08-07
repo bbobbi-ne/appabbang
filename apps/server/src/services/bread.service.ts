@@ -82,7 +82,7 @@ export const getAllForCustomer = async () => {
 
     return data;
   });
-  console.log(result);
+
   return result;
 };
 

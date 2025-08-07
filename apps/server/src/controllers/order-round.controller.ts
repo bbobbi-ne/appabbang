@@ -26,7 +26,7 @@ export async function getOne(req: Request, res: Response) {
  */
 export async function create(req: Request, res: Response) {
   const { no, seq, name, breadNoList: breadNoListStr, startedAt, endedAt } = req.body;
-  const breadNoListJson = JSON.parse(breadNoListStr); // json parsing
+  let breadNoListJson = JSON.parse(breadNoListStr); // json parsing
   // breadNoList에서 breadNo 값만 추출
   const breadNoList = breadNoListJson.map((bread: { breadNo: number }) => bread.breadNo);
   const model = { no, seq, name, breadNoList, startedAt, endedAt };
@@ -50,7 +50,7 @@ export async function create(req: Request, res: Response) {
  */
 export async function update(req: Request, res: Response) {
   const { no, seq, name, public_id, breadNoList: breadNoListStr, startedAt, endedAt } = req.body;
-  const breadNoListJson = JSON.parse(breadNoListStr); // json parsing
+  let breadNoListJson = JSON.parse(breadNoListStr); // json parsing
   // breadNoList에서 breadNo 값만 추출
   const breadNoList = breadNoListJson.map((bread: { breadNo: number }) => bread.breadNo);
   const model = { no: Number(no), seq, name, public_id, breadNoList, startedAt, endedAt };
