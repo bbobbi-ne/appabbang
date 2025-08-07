@@ -4,20 +4,8 @@ import type { BreadProps } from '@/interface/bread-interface';
 import { useQuery } from '@tanstack/react-query';
 import { searchBreadList } from '@/services/apis';
 import ProductsLoading from '../projects/products-loading';
-import ProductsBreadCard from '../projects/products-bread-card';
 import BreadCardDetail from '../projects/bread-card-detail';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-  Card,
-  CardContent,
-  CardTitle,
-} from '@appabbang/ui';
-import { X } from 'lucide-react';
+import { AlertDialog } from '@appabbang/ui';
 
 export default function ProductsPage() {
   const [keyword, setKeyword] = useState<string>('');
@@ -45,8 +33,6 @@ export default function ProductsPage() {
 
   const breadSearch = () => {
     const regExp = /^[가-힣+$]/g; // 한글 + 1글자 이상 입력된 경우
-    const tmpList = Array<BreadProps>();
-    let tmpCount = 0;
 
     // 빈 값으로 검색할 경우 모든 리스트 보여주기
     if (keyword.length === 0) {
@@ -56,20 +42,7 @@ export default function ProductsPage() {
 
     if (regExp.test(keyword)) {
       // 정규표현식에 올바르다면, 텍스트에 포함되는 빵 목록을 보여준다.
-      breadList?.map((data, _) => {
-        const breadNm = data.name;
-
-        if (breadNm.includes(keyword)) {
-          tmpList.length === 0 && tmpList.push(data); // 데이터 0건이면 하나는 삽입
-
-          tmpList?.map((tmpBread, _) => {
-            tmpBread.no === tmpBread.no ? tmpCount++ : null;
-          });
-
-          tmpCount === 0 ? tmpList.push(data) : null;
-        }
-      });
-
+      const tmpList = breadList.filter((bread) => bread.name.includes(keyword));
       // 임시 빵 목록 삽입
       setBreadList(tmpList);
     } else return false;
