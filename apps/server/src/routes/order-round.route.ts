@@ -20,6 +20,9 @@ router.get('/', optionalAuth, asyncHandler(orderRoundController.getList));
 /** GET /order-round/latest : 최신 주문차수 조회 */
 router.get('/latest', optionalAuth, asyncHandler(orderRoundController.getLatest));
 
+/** GET /order-round/now : 현재일자에 진행중인 주문차수 조회 */
+router.get('/now', optionalAuth, asyncHandler(orderRoundController.getNow));
+
 /** GET /order-round/{no} : 주문차수 상세 조회 */
 router.get('/:no', optionalAuth, asyncHandler(orderRoundController.getOne));
 
