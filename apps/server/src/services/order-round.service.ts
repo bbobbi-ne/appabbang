@@ -57,7 +57,7 @@ export const getOrderRoundList = async () => {
         name: true,
         startedAt: true,
         endedAt: true,
-        orderRoundBreads: {
+        breadNoList: {
           select: {
             breadNo: true,
           },
@@ -109,7 +109,7 @@ export const getOrderRound = async (no: number) => {
         name: true,
         startedAt: true,
         endedAt: true,
-        orderRoundBreads: {
+        breadNoList: {
           select: {
             bread: {
               select: {
@@ -165,7 +165,7 @@ export const getOrderRound = async (no: number) => {
 
     /******/
     // 주문차수에 매핑된 빵 정보에 이미지 정보 삽입
-    const newBreads = or.orderRoundBreads.map(({ bread }) => ({
+    const newBreads = or.breadNoList.map(({ bread }) => ({
       ...bread,
       images: [...(imageMap.get(bread.no) ? [{ url: imageMap.get(bread.no) }] : [])],
     }));
@@ -177,7 +177,7 @@ export const getOrderRound = async (no: number) => {
       list.push(obj);
     });
 
-    or.orderRoundBreads = list; // 이미지가 들어간 빵 목록을 재삽입
+    or.breadNoList = list; // 이미지가 들어간 빵 목록을 재삽입
 
     return { ...or, image };
   });
@@ -462,7 +462,7 @@ export const getLatest = async () => {
         name: true,
         startedAt: true,
         endedAt: true,
-        orderRoundBreads: {
+        breadNoList: {
           select: {
             bread: {
               select: {
@@ -523,7 +523,7 @@ export const getNow = async () => {
         name: true,
         startedAt: true,
         endedAt: true,
-        orderRoundBreads: {
+        breadNoList: {
           select: {
             seq: true,
             breadNo: true,
