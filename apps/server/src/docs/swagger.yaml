@@ -1353,7 +1353,7 @@ paths:
                     - name
                     - startedAt
                     - endedAt
-                    - breadNoList
+                    - orderRoundBreads
                     - image
                   properties:
                     no:
@@ -1374,17 +1374,22 @@ paths:
                       format: date-time
                       description: 종료일시
                       example: 2025-07-31T11:00:00.000Z
-                    breadNoList:
+                    orderRoundBreads:
                       type: array
                       items:
                         type: object
                         required:
-                          - breadNo
+                          - no
+                          - name
                         properties:
-                          breadNo:
+                          no:
                             type: integer
                             description: 빵 번호
                             example: 1
+                          name:
+                            type: string
+                            description: 빵 이름
+                            example: 판매빵
                     image:
                       type: array
                       items:
@@ -1411,7 +1416,7 @@ paths:
                 - name
                 - startedAt
                 - endedAt
-                - breadNoList
+                - orderRoundBreads
               properties:
                 name:
                   type: string
@@ -1427,7 +1432,7 @@ paths:
                   format: date-time
                   description: 종료일시
                   example: 2025-07-31T11:00:00.000Z
-                breadNoList:
+                orderRoundBreads:
                   type: array
                   description: 빵 번호 목록 (JSON 문자열 형태로 전송)
                   example: '[{"breadNo": 1}, {"breadNo": 2}, {"breadNo": 3}]'
@@ -1466,7 +1471,7 @@ paths:
                 type: object
                 required:
                   - no
-                  - seq
+                  - orderRoundNo
                   - name
                   - startedAt
                   - endedAt
@@ -1496,14 +1501,14 @@ paths:
                       type: object
                       required:
                         - no
-                        - seq
+                        - orderRoundNo
                         - breadNo
                       properties:
                         no:
                           type: integer
                           description: 빵 번호
                           example: 1
-                        seq:
+                        orderRoundNo:
                           type: string
                           description: 주문차수
                           example: 1
@@ -1528,7 +1533,7 @@ paths:
                 type: object
                 required:
                   - no
-                  - seq
+                  - orderRoundNo
                   - name
                   - startedAt
                   - endedAt
@@ -1706,17 +1711,17 @@ paths:
               type: object
               required:
                 - no
-                - seq
+                - orderRoundNo
                 - name
                 - startedAt
                 - endedAt
-                - breadNoList
+                - orderRoundBreads
               properties:
                 no:
                   type: integer
                   description: 주문차수 번호
                   example: 1
-                seq:
+                orderRoundNo:
                   type: integer
                   description: 주문차수
                   example: 1
@@ -1734,7 +1739,7 @@ paths:
                   format: date-time
                   description: 종료일시
                   example: 2025-07-31T11:00:00.000Z
-                breadNoList:
+                orderRoundBreads:
                   type: string
                   description: 빵 번호 목록 (JSON 문자열 형태로 전송)
                   example: '[{"breadNo": 1}, {"breadNo": 2}, {"breadNo": 3}]'

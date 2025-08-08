@@ -193,7 +193,7 @@ async function main() {
   await prisma.orderRoundBread.createMany({
     data: [
       {
-        seq: 1,
+        orderRoundNo: 1,
         breadNo: 1,
       },
     ],
