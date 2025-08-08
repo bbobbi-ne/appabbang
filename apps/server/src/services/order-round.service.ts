@@ -101,6 +101,7 @@ export const getOrderRoundList = async () => {
  */
 export const getOrderRound = async (no: number) => {
   const result = await prisma.$transaction(async (tx) => {
+    console.log('이게 왜 에러? :' + no);
     const or = await prisma.orderRound.findFirst({
       where: { no },
       select: {
@@ -500,6 +501,38 @@ export const getLatest = async () => {
     }
 
     return { ...or, image };
+  });
+
+  return result;
+};
+
+/**
+ * 현재일자에 진행중인 주문차수 조회
+ */
+export const getNow = async () => {
+  const now = new Date();
+
+  const result = await prisma.$transaction(async (tx) => {
+    const data = tx.orderRound.findFirst({
+      where: {
+        startedAt: { lte: now },
+        endedAt: { gte: now },
+      },
+      select: {
+        no: true,
+        name: true,
+        startedAt: true,
+        endedAt: true,
+        orderRoundBreads: {
+          select: {
+            seq: true,
+            breadNo: true,
+          },
+        },
+      },
+    });
+
+    return data;
   });
 
   return result;

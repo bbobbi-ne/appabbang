@@ -93,3 +93,11 @@ export async function getLatest(_: Request, res: Response) {
   const list = await OrderRoundService.getLatest();
   res.status(200).json(list);
 }
+
+/**
+ * 현재일자에 진행중인 주문차수 조회
+ */
+export async function getNow(_: Request, res: Response) {
+  const list = await OrderRoundService.getNow();
+  res.status(200).json(list);
+}
