@@ -22,7 +22,7 @@ import {
   Input,
   Label,
 } from '@appabbang/ui';
-import DaumPostApi from '@/components/daum-post-api';
+import DaumPostApi from '@/components/common/daum-post-api';
 import type { AddressListData } from '../pages/address-page';
 import { toast } from 'sonner';
 import { getFormattedMobile } from '@/utils';
