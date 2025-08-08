@@ -13,7 +13,7 @@ function ProductsBreadCard({ bread, openBread, onClick }: BreadCardProps) {
         {openBread && openBread.length > 0 ? (
           <CardHeader className="ml-2 p-2 text-left">주문오픈🔥</CardHeader>
         ) : (
-          <CardHeader className="ml-2 p-2 text-left"></CardHeader>
+          <CardHeader className="ml-2 p-2 text-left mb-10"></CardHeader>
         )}
         {bread.images && bread.images[0] && bread.images.length > 0 ? (
           <img
