@@ -245,7 +245,7 @@ model OrderRound {
   createdAt           DateTime            @default(now()) @map("created_at")
   updatedAt           DateTime            @updatedAt @map("updated_at")
 
-  orderRoundBreads    OrderRoundBread[]
+  breadNoList    OrderRoundBread[]   
 
   @@map("order_rounds")
 }
