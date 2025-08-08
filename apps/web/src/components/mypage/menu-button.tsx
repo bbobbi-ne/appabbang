@@ -18,8 +18,6 @@ function MenuButton() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  console.log(pathname);
-
   return (
     <div className="flex flex-row gap-10 mt-15 mb-5 m-auto">
       <div>
