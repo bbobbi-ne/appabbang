@@ -24,8 +24,6 @@ export default function FaqPage() {
     }
   }, [activeMenu]);
 
-  console.log(list);
-
   // 카테고리 명칭 변경
   const onChangeActiveMenu = (category: string) => setActiveMenu(category);
 
