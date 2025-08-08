@@ -2,8 +2,6 @@ import type { IFaqAccordionProps } from '@/interface/faq-interface';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@appabbang/ui';
 
 function FaqAccordion({ list }: IFaqAccordionProps) {
-  console.log(list);
-
   return (
     <div className="flex items-center- justify-center">
       <Accordion type="single" collapsible className="lg:w-[60%] mt-10" defaultValue="item-1">
