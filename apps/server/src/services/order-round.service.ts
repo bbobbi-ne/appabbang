@@ -57,9 +57,14 @@ export const getOrderRoundList = async () => {
         name: true,
         startedAt: true,
         endedAt: true,
-        breadNoList: {
+        orderRoundBreads: {
           select: {
-            breadNo: true,
+            bread: {
+              select: {
+                no: true,
+                name: true,
+              },
+            },
           },
         },
       },
@@ -83,10 +88,15 @@ export const getOrderRoundList = async () => {
     });
 
     // 3. 데이터 정렬 (or: orderRound)
-    const data = list.map((or: any) => ({
-      ...or,
-      image: [...(imageMap.get(or.no) ? [{ url: imageMap.get(or.no) }] : [])],
-    }));
+    const data = list.map((or) => {
+      const orderRoundBreads = or.orderRoundBreads.map(({ bread }) => bread);
+
+      return {
+        ...or,
+        orderRoundBreads,
+        image: [...(imageMap.get(or.no) ? [{ url: imageMap.get(or.no) }] : [])],
+      };
+    });
 
     return data;
   });
@@ -101,7 +111,6 @@ export const getOrderRoundList = async () => {
  */
 export const getOrderRound = async (no: number) => {
   const result = await prisma.$transaction(async (tx) => {
-    console.log('이게 왜 에러? :' + no);
     const or = await prisma.orderRound.findFirst({
       where: { no },
       select: {
@@ -109,7 +118,7 @@ export const getOrderRound = async (no: number) => {
         name: true,
         startedAt: true,
         endedAt: true,
-        breadNoList: {
+        orderRoundBreads: {
           select: {
             bread: {
               select: {
@@ -165,7 +174,7 @@ export const getOrderRound = async (no: number) => {
 
     /******/
     // 주문차수에 매핑된 빵 정보에 이미지 정보 삽입
-    const newBreads = or.breadNoList.map(({ bread }) => ({
+    const newBreads = or.orderRoundBreads.map(({ bread }) => ({
       ...bread,
       images: [...(imageMap.get(bread.no) ? [{ url: imageMap.get(bread.no) }] : [])],
     }));
@@ -177,9 +186,11 @@ export const getOrderRound = async (no: number) => {
       list.push(obj);
     });
 
-    or.breadNoList = list; // 이미지가 들어간 빵 목록을 재삽입
+    or.orderRoundBreads = list; // 이미지가 들어간 빵 목록을 재삽입
 
-    return { ...or, image };
+    // 데이터 정렬 (or: orderRound)
+    const orderRoundBreads = or?.orderRoundBreads.map(({ bread }) => bread);
+    return { ...or, orderRoundBreads, image };
   });
 
   return result;
@@ -302,7 +313,7 @@ const createOrderRoundBread = async (
 ) => {
   const result = await tx.orderRoundBread.create({
     data: {
-      seq: no,
+      orderRoundNo: no,
       breadNo,
     },
   });
@@ -331,7 +342,7 @@ export const updateWithoutImage = async (body: UpdateOrderRoundInput) => {
       // 2. 주문차수 - 빵  매핑 테이블 수정
       // 2-1. 기존 빵을 조회하고 다시 수정하는 건 효율이 없으므로 특정 주문차수에 포함된 행은 완전삭제하고 다시 새롭게 등록한다.
       await tx.orderRoundBread.deleteMany({
-        where: { seq: no },
+        where: { orderRoundNo: no },
       });
 
       // ************ Postman 테스트를 위해서 일단 강제로 number로 변환
@@ -385,7 +396,7 @@ export const updateWithImage = async (
       // 2. 주문차수 - 빵  매핑 테이블 수정
       // 2-1. 기존 빵을 조회하고 다시 수정하는 건 효율이 없으므로 특정 주문차수에 포함된 행은 완전삭제하고 다시 새롭게 등록한다.
       await prisma.orderRoundBread.deleteMany({
-        where: { seq: orResult.no },
+        where: { orderRoundNo: orResult.no },
       });
 
       // ************ Postman 테스트를 위해서 일단 강제로 number로 변환
@@ -462,7 +473,7 @@ export const getLatest = async () => {
         name: true,
         startedAt: true,
         endedAt: true,
-        breadNoList: {
+        orderRoundBreads: {
           select: {
             bread: {
               select: {
@@ -500,7 +511,10 @@ export const getLatest = async () => {
       });
     }
 
-    return { ...or, image };
+    // 데이터 정렬 (or: orderRound)
+    const orderRoundBreads = or?.orderRoundBreads.map(({ bread }) => bread);
+
+    return { ...or, orderRoundBreads, image };
   });
 
   return result;
@@ -523,9 +537,9 @@ export const getNow = async () => {
         name: true,
         startedAt: true,
         endedAt: true,
-        breadNoList: {
+        orderRoundBreads: {
           select: {
-            seq: true,
+            orderRoundNo: true,
             breadNo: true,
           },
         },
