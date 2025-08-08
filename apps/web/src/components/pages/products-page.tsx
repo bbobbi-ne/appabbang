@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import BreadSearch from '../projects/bread-search';
-import type { BreadProps } from '@/interface/bread-interface';
+import type { BreadProps, OrderRoundBreads } from '@/interface/bread-interface';
 import { useQuery } from '@tanstack/react-query';
-import { searchBreadList } from '@/services/apis';
+import { getOrderRoundNow, searchBreadList } from '@/services/apis';
 import ProductsLoading from '../projects/products-loading';
 import BreadCardDetail from '../projects/bread-card-detail';
 import { AlertDialog } from '@appabbang/ui';
@@ -11,11 +11,21 @@ export default function ProductsPage() {
   const [keyword, setKeyword] = useState<string>('');
   const [breadList, setBreadList] = useState<BreadProps[]>([]);
   const [originBreadList, setOriginBreadList] = useState<BreadProps[]>([]);
+  const [orderRoundBreads, setOrderRoundBreads] = useState<OrderRoundBreads[]>([]);
 
   /** 빵 목록 조회 API */
   const { isLoading, data, error } = useQuery({
     queryKey: ['allBreadList'],
     queryFn: searchBreadList,
+  });
+
+  const {
+    isLoading: nowLoading,
+    data: nowData,
+    error: nowErr,
+  } = useQuery({
+    queryKey: ['getNowDateOrderRound'],
+    queryFn: getOrderRoundNow,
   });
 
   /** 주문차수 빵 목록 조회 및 설정 */
@@ -24,7 +34,9 @@ export default function ProductsPage() {
       setBreadList(data.data);
       setOriginBreadList(data.data);
     }
-  }, [data, error]);
+
+    nowData && setOrderRoundBreads(nowData.data.orderRoundBreads);
+  }, [data, error, nowData, nowErr]);
 
   /** enter key 누를때 빵 검색 기능 수행 */
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -55,7 +67,7 @@ export default function ProductsPage() {
 
   const onClick = () => {};
 
-  return isLoading ? (
+  return isLoading && nowLoading ? (
     <ProductsLoading />
   ) : (
     <div className="flex flex-col items-center justify-center">
@@ -70,7 +82,7 @@ export default function ProductsPage() {
       <div className="flex flex-row flex-wrap gap-10 justify-center">
         {breadList.map((bread, i) => (
           <AlertDialog key={i}>
-            <BreadCardDetail bread={bread} onClick={onClick} />
+            <BreadCardDetail bread={bread} orderRoundBreads={orderRoundBreads} onClick={onClick} />
           </AlertDialog>
         ))}
       </div>

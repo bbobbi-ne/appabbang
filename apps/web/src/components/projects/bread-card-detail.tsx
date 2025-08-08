@@ -2,7 +2,7 @@
  * [비회원 개인정보 수집 및 이용 동의서]
  */
 
-import type { BreadProps } from '@/interface/bread-interface';
+import type { BreadProps, OrderRoundBreads } from '@/interface/bread-interface';
 import {
   AlertDialogContent,
   AlertDialogTrigger,
@@ -15,12 +15,27 @@ import ProductsBreadCard from './products-bread-card';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import { useEffect, useState } from 'react';
 
-function BreadCardDetail({ bread, onClick }: { bread: BreadProps; onClick: () => void }) {
+function BreadCardDetail({
+  bread,
+  orderRoundBreads,
+  onClick,
+}: {
+  bread: BreadProps;
+  orderRoundBreads: OrderRoundBreads[];
+  onClick: () => void;
+}) {
+  const [openBread, setOpenBread] = useState<OrderRoundBreads[]>([]);
+
+  useEffect(() => {
+    setOpenBread(orderRoundBreads.filter((data) => data.breadNo === bread.no));
+  }, []);
+
   return (
     <>
       <AlertDialogTrigger asChild>
-        <ProductsBreadCard bread={bread} onClick={onClick} />
+        <ProductsBreadCard bread={bread} openBread={openBread} onClick={onClick} />
       </AlertDialogTrigger>
 
       <AlertDialogContent className="w-full max-w-3xl overflow-y-auto max-h-[90vh] p-6">

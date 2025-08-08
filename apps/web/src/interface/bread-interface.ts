@@ -23,6 +23,7 @@ export interface IOrderRoundBreads {
 /** 빵 카드 */
 export interface BreadCardProps {
   bread: BreadProps;
+  openBread?: OrderRoundBreads[];
   onClick: (bread: BreadCardProps['bread']) => void;
 }
 
@@ -52,4 +53,14 @@ export interface DeliveryProps {
 export interface BankCodeProps {
   code: string;
   name: string;
+}
+
+export interface OrderRoundBreads {
+  // endedAt: string;
+  // name: string;
+  // no: number;
+  // orderRoundBreads: { seq: number; breadNo: number };
+  seq: number;
+  breadNo: number;
+  // startedAt: string;
 }
