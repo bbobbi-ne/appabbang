@@ -78,15 +78,11 @@ function MainLoading() {
         <div className="grid grid-cols-3 grid-rows-1 h-40 ml-[16%] mr-[16%] gap-10">
           <Card className="p-5">
             <Skeleton className="h-6 w-40 mb-4" />
-            <CardDescription>
-              <Skeleton className="h-6 w-50 mb-4" />
-            </CardDescription>
+            <Skeleton className="h-16 w-40 mb-4" />
           </Card>
           <Card className="p-5">
             <Skeleton className="h-6 w-40 mb-4" />
-            <CardDescription>
-              <Skeleton className="h-6 w-50 mb-4" />
-            </CardDescription>
+            <Skeleton className="h-16 w-40 mb-4" />
           </Card>
         </div>
       </Container>
