@@ -57,7 +57,6 @@ function RouteComponent() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  console.log(orders);
   if (isLoading) return <TableSkeleton />;
   if (isError) return <>에러임</>;
 
