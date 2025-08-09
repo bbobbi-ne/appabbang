@@ -127,6 +127,8 @@ export const getOrderRound = async (no: number) => {
                 description: true,
                 unitPrice: true,
                 breadStatus: true,
+                allergyInfo: true,
+                countryOfOrigin: true,
               },
             },
           },
