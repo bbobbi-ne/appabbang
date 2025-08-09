@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardHeader, CardTitle, CardContent } from '@appabbang/ui';
+import { Card, CardHeader, CardTitle, CardContent, AlertDialog } from '@appabbang/ui';
 import BreadCard from '@/components/common/bread-card';
 import type { BreadProps, IOrderRoundBreads } from '@/interface/bread-interface';
 import OrderFormSkeleton from '@/components/order/order-form-skeleton';
@@ -17,7 +17,7 @@ import { useParams } from '@tanstack/react-router';
 
 /** Main Function */
 export default function OrderPage() {
-  const [orderRoundBreads, setOrderRoundBreads] = useState<IOrderRoundBreads[]>([]); // 빵 목록
+  const [orderRoundBreads, setOrderRoundBreads] = useState<BreadProps[]>([]); // 빵 목록
   const [paymentList, setPaymentList] = useState<BreadProps[]>([]); // 결제목록
   const [errMsg, setErrMsg] = useState<string>(''); // 에러메세지
   const [fee, setFee] = useState<number>(0); // 배송비
@@ -210,7 +210,7 @@ export default function OrderPage() {
     <div>
       <div className="relative flex h-auto m-auto">
         <Card className="w-full bg-[#fcfcfc]">
-          <div className="m-5">
+          <div className="m-5 mt-10">
             <CardContent>
               <CardComment
                 title="1. 이번 주문서에 포함된 빵을 확인하세요!"
@@ -225,7 +225,9 @@ export default function OrderPage() {
                   </Card>
                 ) : (
                   orderRoundBreads?.map((data, i) => (
-                    <BreadCard key={i} bread={data.bread} onClick={handleBreadClick} />
+                    <AlertDialog key={i}>
+                      <BreadCard bread={data} onClick={handleBreadClick} />
+                    </AlertDialog>
                   ))
                 )}
               </div>
