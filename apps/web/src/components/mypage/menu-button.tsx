@@ -22,7 +22,7 @@ function MenuButton() {
     <div className="flex flex-row gap-10 mt-15 mb-5 m-auto">
       <div>
         <Button
-          className={pathname.includes('/info') ? btnCssStr : ''}
+          className={pathname.includes('/info') ? '' : btnCssStr}
           onClick={() => navigate({ to: '/mypage/info' })}
         >
           정보수정
@@ -30,7 +30,7 @@ function MenuButton() {
       </div>
       <div>
         <Button
-          className={pathname.includes('/password') ? btnCssStr : ''}
+          className={pathname.includes('/password') ? '' : btnCssStr}
           onClick={() => navigate({ to: '/mypage/password' })}
         >
           비밀번호 수정
@@ -38,7 +38,7 @@ function MenuButton() {
       </div>
       <div>
         <Button
-          className={pathname.includes('/address') ? btnCssStr : ''}
+          className={pathname.includes('/address') ? '' : btnCssStr}
           onClick={() => navigate({ to: '/mypage/address' })}
         >
           배송지 관리
@@ -46,7 +46,7 @@ function MenuButton() {
       </div>
       <div>
         <Button
-          className={pathname.includes('/order') ? btnCssStr : ''}
+          className={pathname.includes('/order') ? '' : btnCssStr}
           onClick={() => navigate({ to: '/mypage' })}
         >
           주문내역

@@ -28,7 +28,7 @@ export default function FaqPage() {
   const onChangeActiveMenu = (category: string) => setActiveMenu(category);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col mb-30">
       <FaqMenuButton activeMenu={activeMenu} onChangeActiveMenu={onChangeActiveMenu} />
       <FaqAccordion list={list} />
     </div>
