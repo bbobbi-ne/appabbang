@@ -11,6 +11,7 @@
  */
 
 import type {
+  GetOrderRoundData,
   ImageDeleteBody,
   LatestListData,
   OrderRoundCreateData,
@@ -83,6 +84,24 @@ export class OrderRound<SecurityDataType = unknown> {
   latestList = (params: RequestParams = {}) =>
     this.http.request<LatestListData, any>({
       path: `/order-round/latest`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 현재일시에 진행되는 상세 정보를 조회합니다. 권한(선택적 로그인)
+   *
+   * @tags OrderRound
+   * @name GetOrderRound
+   * @summary 현재일시에 진행되는 주문차수 조회
+   * @request GET:/order-round/now
+   * @secure
+   * @response `200` `GetOrderRoundData` 현재일시에 진행되는 주문차수 상세 조회 성공
+   */
+  getOrderRound = (params: RequestParams = {}) =>
+    this.http.request<GetOrderRoundData, any>({
+      path: `/order-round/now`,
       method: "GET",
       secure: true,
       format: "json",

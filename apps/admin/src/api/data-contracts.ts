@@ -766,7 +766,12 @@ export type OrderRoundListData = {
      * 빵 번호
      * @example 1
      */
-    breadNo: number;
+    no: number;
+    /**
+     * 빵 이름
+     * @example "판매빵"
+     */
+    name: string;
   }[];
   image: {
     /**
@@ -799,7 +804,7 @@ export interface OrderRoundCreatePayload {
    * 빵 번호 목록 (JSON 문자열 형태로 전송)
    * @example "[{"breadNo": 1}, {"breadNo": 2}, {"breadNo": 3}]"
    */
-  breadNoList: {
+  orderRoundBreads: {
     /**
      * 빵 번호
      * @example 1
@@ -816,6 +821,48 @@ export interface OrderRoundCreatePayload {
 export type OrderRoundCreateData = any;
 
 export interface LatestListData {
+  /**
+   * 주문차수 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 주문차수명
+   * @example "주문 1차"
+   */
+  name: string;
+  /**
+   * 시작일시
+   * @format date-time
+   * @example "2025-07-01T11:00:00.000Z"
+   */
+  startedAt: string;
+  /**
+   * 종료일시
+   * @format date-time
+   * @example "2025-07-31T11:00:00.000Z"
+   */
+  endedAt: string;
+  orderRoundBread: {
+    /**
+     * 빵 번호
+     * @example 1
+     */
+    no: number;
+    /**
+     * 주문차수
+     * @example 1
+     */
+    orderRoundNo: string;
+    /**
+     * 빵 번호
+     * @example 1
+     */
+    breadNo: string;
+  }[];
+}
+
+export interface GetOrderRoundData {
   /**
    * 주문차수 번호
    * @example 1
@@ -897,7 +944,7 @@ export interface OrderRoundDetailData {
    * @example "2025-07-31T11:00:00.000Z"
    */
   endedAt: string;
-  orderRoundBread: {
+  orderRoundBreads: {
     /**
      * 빵 번호
      * @example 1
@@ -943,7 +990,7 @@ export interface OrderRoundUpdatePayload {
    * 주문차수
    * @example 1
    */
-  seq: number;
+  orderRoundNo: number;
   /**
    * 주문차수명
    * @example "주문 1차"
@@ -965,7 +1012,7 @@ export interface OrderRoundUpdatePayload {
    * 빵 번호 목록 (JSON 문자열 형태로 전송)
    * @example "[{"breadNo": 1}, {"breadNo": 2}, {"breadNo": 3}]"
    */
-  breadNoList: string;
+  orderRoundBreads: string;
   /**
    * 주문차수 이미지(선택사항)
    * @format binary
