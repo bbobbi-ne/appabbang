@@ -26,7 +26,7 @@ export async function getOne(req: Request, res: Response) {
  */
 export async function create(req: Request, res: Response) {
   const { no, seq, name, breadNoList: breadNoListStr, startedAt, endedAt } = req.body;
-  const breadNoListJson = JSON.parse(breadNoListStr); // json parsing
+  let breadNoListJson = JSON.parse(breadNoListStr); // json parsing
   // breadNoList에서 breadNo 값만 추출
   const breadNoList = breadNoListJson.map((bread: { breadNo: number }) => bread.breadNo);
   const model = { no, seq, name, breadNoList, startedAt, endedAt };
@@ -50,7 +50,7 @@ export async function create(req: Request, res: Response) {
  */
 export async function update(req: Request, res: Response) {
   const { no, seq, name, public_id, breadNoList: breadNoListStr, startedAt, endedAt } = req.body;
-  const breadNoListJson = JSON.parse(breadNoListStr); // json parsing
+  let breadNoListJson = JSON.parse(breadNoListStr); // json parsing
   // breadNoList에서 breadNo 값만 추출
   const breadNoList = breadNoListJson.map((bread: { breadNo: number }) => bread.breadNo);
   const model = { no: Number(no), seq, name, public_id, breadNoList, startedAt, endedAt };
@@ -91,5 +91,13 @@ export async function removeImage(req: Request, res: Response) {
  */
 export async function getLatest(_: Request, res: Response) {
   const list = await OrderRoundService.getLatest();
+  res.status(200).json(list);
+}
+
+/**
+ * 현재일자에 진행중인 주문차수 조회
+ */
+export async function getNow(_: Request, res: Response) {
+  const list = await OrderRoundService.getNow();
   res.status(200).json(list);
 }

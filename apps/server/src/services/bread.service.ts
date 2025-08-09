@@ -82,7 +82,7 @@ export const getAllForCustomer = async () => {
 
     return data;
   });
-  console.log(result);
+
   return result;
 };
 
@@ -112,17 +112,19 @@ export const getByStatus = async (breadStatus: string) => {
       },
     });
 
-    const imageMap = new Map<number, string>();
-    images.forEach((img: Partial<Image>) => {
-      if (img.imageTargetNo) {
-        imageMap.set(img.imageTargetNo, img.url || '');
+    const imageMap = new Map<number, { url: string }[]>();
+    images.forEach(({ imageTargetNo, url }: Partial<Image>) => {
+      if (imageTargetNo && url) {
+        // Map에 없으면 추가함 1: [{url: ___}] 형태
+        !imageMap.has(imageTargetNo) && imageMap.set(imageTargetNo, []);
+        imageMap.get(imageTargetNo)!.push({ url });
       }
     });
 
     const data = breads.map((bread: any) => ({
       ...bread,
       breadStatusName: getBreadStatusName(bread.breadStatus),
-      images: [{ url: imageMap.get(bread.no) }],
+      images: imageMap.get(bread.no),
     }));
 
     return data;

@@ -2,17 +2,14 @@ import { useForm } from 'react-hook-form';
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
   Button,
   Checkbox,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
   Form,
   FormControl,
   FormField,
@@ -21,19 +18,20 @@ import {
   FormMessage,
   Input,
   Label,
+  ScrollArea,
 } from '@appabbang/ui';
 import DaumPostApi from '@/components/common/daum-post-api';
-import type { AddressListData } from '../pages/address-page';
-import { toast } from 'sonner';
 import { getFormattedMobile } from '@/utils';
 
-export const addressSchema = z.object({
-  recipientName: z
+export const joinSchema = z.object({
+  id: z
     .string()
     .trim()
     .min(1, '받으실 분의 성함을 입력해주세요')
     .max(10, '최대 10자 이내로 입력해주세요'),
-  recipientMobile: z
+  pw: z.string().trim().min(1, '비밀번호를 입력해주세요'),
+  pwchk: z.string().trim().min(1, '비밀번호를 입력해주세요'),
+  mobileNumber: z
     .string()
     .trim()
     .min(1, '받으실 분의 연락처를 입력해주세요')
@@ -52,50 +50,35 @@ export const addressSchema = z.object({
     .trim()
     .min(1, '배송메세지를 입력해주세요')
     .max(30, '최대 30자 이내로 입력해주세요'),
-  isDefault: z.boolean().optional(),
+  isAgree: z.boolean(),
 });
-export type addresssDailogForm = z.infer<typeof addressSchema>;
+export type JoinSchemaType = z.infer<typeof joinSchema>;
 
 const labelMinWidth = 'min-w-[120px]';
 
 type Props = {
-  onSubmit: (data: addresssDailogForm) => Promise<void>;
+  onSubmit: (data: JoinSchemaType) => Promise<void>;
   isLoading: boolean;
-  currentValues?: AddressListData[number];
-  deleteAddress?: (no: number) => Promise<void>;
-  deleteLoading?: boolean;
 };
 
-export default function AddressForm({
-  currentValues,
-  onSubmit,
-  isLoading,
-  deleteAddress,
-  deleteLoading,
-}: Props) {
+export default function JoinForm({ onSubmit, isLoading }: Props) {
   // 폼 선언
-  const form = useForm<addresssDailogForm>({
-    resolver: zodResolver(addressSchema),
-    defaultValues: currentValues
-      ? currentValues
-      : {
-          recipientName: '',
-          recipientMobile: '',
-          address: '',
-          addressDetail: '',
-          zipcode: '',
-          message: '',
-          isDefault: false,
-        },
+  const form = useForm<JoinSchemaType>({
+    resolver: zodResolver(joinSchema),
+    defaultValues: {
+      id: '',
+      pw: '',
+      pwchk: '',
+      mobileNumber: '',
+      address: '',
+      addressDetail: '',
+      zipcode: '',
+      message: '',
+      isAgree: false,
+    },
   });
 
-  // 배송지 등록
-  const handleSubmit = async (data: addresssDailogForm) => {
-    if (currentValues?.isDefault && !data.isDefault) {
-      toast.error('다른 배송지를 기본 배송지로 추가해주세요.');
-      return;
-    }
-
+  const handleSubmit = async (data: JoinSchemaType) => {
     await onSubmit(data);
   };
 
@@ -105,16 +88,55 @@ export default function AddressForm({
         {/* 받으실 분 */}
         <FormField
           control={form.control}
-          name="recipientName"
+          name="id"
           render={({ field }) => (
             <FormItem className="flex items-center">
               <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
-                <span className="text-red-700">*</span> 받으실 분
+                <span className="text-red-700">*</span> 아이디
               </FormLabel>
 
               <div className="w-full space-y-1">
                 <FormControl>
-                  <Input {...field} placeholder="받으실분의 성함을 입력해주세요" maxLength={10} />
+                  <Input {...field} placeholder="아이디를 입력해주세요" maxLength={10} />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </div>
+            </FormItem>
+          )}
+        />
+
+        {/* 비밀번호 */}
+        <FormField
+          control={form.control}
+          name="pw"
+          render={({ field }) => (
+            <FormItem className="flex items-center">
+              <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
+                <span className="text-red-700">*</span> 비밀번호
+              </FormLabel>
+
+              <div className="w-full space-y-1">
+                <FormControl>
+                  <Input {...field} placeholder="비밀번호를 입력해주세요" maxLength={10} />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </div>
+            </FormItem>
+          )}
+        />
+
+        {/* 비밀번호 확인 */}
+        <FormField
+          control={form.control}
+          name="pwchk"
+          render={({ field }) => (
+            <FormItem className="flex items-center">
+              <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
+                <span className="text-red-700">*</span> 비밀번호 확인
+              </FormLabel>
+              <div className="w-full space-y-1">
+                <FormControl>
+                  <Input {...field} placeholder="비밀번호를 재입력해주세요" maxLength={10} />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>
@@ -125,7 +147,7 @@ export default function AddressForm({
         {/* 연락처 */}
         <FormField
           control={form.control}
-          name="recipientMobile"
+          name="mobileNumber"
           render={({ field }) => (
             <FormItem className="flex items-center">
               <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
@@ -135,7 +157,7 @@ export default function AddressForm({
                 <FormControl>
                   <Input
                     {...field}
-                    placeholder="받으실분의 연락처를 입력해주세요"
+                    placeholder="연락처를 입력해주세요"
                     onChange={(e) => {
                       const formattedValue = getFormattedMobile(e.target.value);
                       field.onChange(formattedValue);
@@ -152,7 +174,7 @@ export default function AddressForm({
         {/* 주소 */}
         <div className="flex items-center">
           <Label className={`${labelMinWidth} whitespace-nowrap`}>
-            <span className="text-red-700">*</span> 배송지 주소
+            <span className="text-red-700">*</span> 주소
           </Label>
 
           {/* 우편번호 + 주소 검색 */}
@@ -190,7 +212,7 @@ export default function AddressForm({
                   <div className="w-full space-y-1">
                     <div className="flex items-center gap-2">
                       <FormControl>
-                        <Input {...field} placeholder="배송지 주소" disabled />
+                        <Input {...field} placeholder="주소" disabled />
                       </FormControl>
                     </div>
                   </div>
@@ -209,7 +231,7 @@ export default function AddressForm({
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="배송지 상세 주소"
+                          placeholder="상세 주소"
                           disabled={!form.watch('zipcode')}
                         />
                       </FormControl>
@@ -242,64 +264,96 @@ export default function AddressForm({
           )}
         />
 
-        {/* 기본 배송지 여부  */}
-        {!currentValues?.isDefault && (
-          <FormField
-            control={form.control}
-            name="isDefault"
-            render={({ field }) => (
-              <FormItem className="flex items-center gap-2">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    className="mb-0"
-                  />
-                </FormControl>
-                <FormLabel
-                  errorCheck={false}
-                  className={`${labelMinWidth} whitespace-nowrap cursor-pointer`}
-                >
-                  기본배송지 여부
-                </FormLabel>
-              </FormItem>
-            )}
-          />
-        )}
+        {/* 동의 여부 */}
+        <FormField
+          control={form.control}
+          name="isAgree"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex justify-between items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      className="mb-0"
+                    />
+                  </FormControl>
 
-        <div className="mt-8 flex gap-2">
-          {!currentValues?.isDefault && (
-            <>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" className="w-full">
-                    삭제
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent onClick={(e) => e.preventDefault()}>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>배송지를 삭제하시겠습니까?</AlertDialogTitle>
-                    <AlertDialogDescription></AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>취소</AlertDialogCancel>
-                    <AlertDialogAction
-                      disabled={deleteLoading}
-                      className="bg-destructive"
-                      onClick={() => deleteAddress?.(currentValues?.no ?? 0)}
-                    >
-                      삭제
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </>
+                  <FormLabel
+                    errorCheck={false}
+                    className={`${labelMinWidth} whitespace-nowrap cursor-pointer text-xs`}
+                  >
+                    아빠빵 이용약관 및 개인정보 처리방침에 동의합니다.
+                  </FormLabel>
+                </div>
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="link" className="text-xs p-0" type="button">
+                      약관 보기
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent
+                    onInteractOutside={(e) => {
+                      e.preventDefault();
+                    }}
+                    className="overflow-y-auto max-h-11/12 p-0"
+                  >
+                    <ScrollArea className="h-[600px] p-8">
+                      <DialogHeader>
+                        <DialogTitle hidden>약관</DialogTitle>
+                      </DialogHeader>
+                      <DialogDescription hidden>약관</DialogDescription>
+                      <JoinAgreeDialog />
+                    </ScrollArea>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </FormItem>
           )}
+        />
+
+        <div className="mt-8 flex gap-2 pb-10">
           <Button type="submit" className="w-full" disabled={isLoading}>
-            저장하기
+            가입하기
           </Button>
         </div>
       </form>
     </Form>
   );
 }
+
+const JoinAgreeDialog = () => {
+  return (
+    <div>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+      <p>이곳은 약관입니다.</p>
+    </div>
+  );
+};

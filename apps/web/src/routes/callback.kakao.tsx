@@ -5,7 +5,7 @@
  * 인가 코드가 있어야 토큰 발급을 받을 수 있고 토큰이 있어야 사용자의 정보를 확인할 수 있다.
  */
 
-import Loading from '@/components/loading';
+import Loading from '@/components/common/loading';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect } from 'react';
 

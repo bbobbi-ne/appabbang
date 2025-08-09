@@ -11,8 +11,6 @@ interface CustomerProp {
 }
 
 function CustomerInfoCard({ id, name }: CustomerProp) {
-  console.log(id, name);
-
   return (
     <div className="flex flex-col">
       <Card className="w-full h-full ml-auto mr-auto">

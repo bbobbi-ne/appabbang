@@ -4,6 +4,7 @@ import InstagramContent from '../home/instagram-content';
 import OrderContent from '../home/order-content';
 import SellPopularProducts from '../home/sell-popular-products-content';
 import { getLatest } from '@/services/apis';
+import MainLoading from '../home/loading';
 
 function MainPage() {
   /************************************************************************/
@@ -14,7 +15,7 @@ function MainPage() {
     queryFn: getLatest,
   });
   /************************************************************************/
-  if (isLoading) return <div>로딩중입니다...</div>;
+  if (isLoading) return <MainLoading />;
   if (error || !data?.data) return <div>주문 정보를 불러오지 못했습니다.</div>;
 
   return (

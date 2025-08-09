@@ -9,7 +9,7 @@ import {
   Input,
 } from '@appabbang/ui';
 import PageTitle from './page-title';
-import CardComment from './card-comment';
+import CardComment from '../common/card-comment';
 
 function OrderFormSkeleton() {
   return (
