@@ -17,7 +17,9 @@ export {
 export { cn } from './src/lib/utils';
 export { useIsMobile } from './src/hook/use-mobile';
 export * from './src//components/ui/tooltip';
+export * from './src//components/ui/calendar';
 export * from './src/components/ui/sidebar';
+export * from './src/components/ui/popover';
 export * from './src/components/ui/skeleton';
 export * from './src/components/ui/sheet';
 export * from './src/components/ui/table';
@@ -32,4 +34,5 @@ export * from './src/components/ui/textarea';
 export * from './src/components/ui/scroll-area';
 export * from './src/components/ui/radio-group';
 export * from './src/components/ui/sonner';
+export * from './src/components/ui/command';
 export * from './src/components/badge';
