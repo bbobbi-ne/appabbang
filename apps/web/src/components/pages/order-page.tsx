@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle, CardContent, AlertDialog } from '@appabbang/ui';
 import BreadCard from '@/components/common/bread-card';
-import type { BreadProps, IOrderRoundBreads } from '@/interface/bread-interface';
+import type { BreadProps } from '@/interface/bread-interface';
 import OrderFormSkeleton from '@/components/order/order-form-skeleton';
 import CardComment from '@/components/common/card-comment';
 import Payment from '@/components/order/Payment';
