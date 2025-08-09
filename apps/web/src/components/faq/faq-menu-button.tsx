@@ -2,7 +2,7 @@ import type { IFacMenuButtonProps } from '@/interface/faq-interface';
 import { Button } from '@appabbang/ui';
 
 // Custom CSS
-const btnCssStr = `bg-[#ffffff] text-[#202020] hover:bg-[#644a40] hover:text-[#ffffff]`;
+export const btnCssStr = `bg-[#ffffff] text-[#202020] hover:bg-[#644a40] hover:text-[#ffffff]`;
 
 function FaqMenuButton({ activeMenu, onChangeActiveMenu }: IFacMenuButtonProps) {
   return (

@@ -80,7 +80,7 @@ export const faqList = [
       },
       {
         question: '회원 탈퇴는 어떻게 하나요?',
-        answer: '회원 탈퇴는 “https://아빠빵.com” 에서 탈퇴 가능합니다.',
+        answer: '회원 탈퇴는 “여기” 를 눌러주세요.',
       },
     ],
   },
