@@ -27,7 +27,7 @@ import {
   Badge,
 } from '@appabbang/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState, type Dispatch, type SetStateAction } from 'react';
+import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { CalendarIcon, Check } from 'lucide-react';
@@ -36,9 +36,7 @@ import { ko } from 'date-fns/locale';
 import { useGetBreadsAndStatusQuery } from '@/hooks/use-breads';
 import BreadPreview from './bread-preview';
 import { ImageUpload } from './image-upload';
-import { useOrderRoundCreateMutation } from '@/hooks/use-order-round';
 import { formatToDateTimeIso } from '@/utils/format';
-import type { OrderRoundDetailData } from '@/api/data-contracts';
 
 export const orderRoundSchema = z.object({
   name: z.string().trim().min(1, '메뉴명을 입력해주세요'),
@@ -51,7 +49,7 @@ export const orderRoundSchema = z.object({
     time: z.string().min(1, '종료 시간을 입력해주세요'),
   }),
 
-  breadNoList: z
+  orderRoundBreads: z
     .array(
       z.object({
         no: z.number(),
@@ -61,7 +59,7 @@ export const orderRoundSchema = z.object({
     .refine((arr) => arr.length > 0, {
       message: '하나 이상의 항목을 선택해주세요.',
     }),
-  image: z.instanceof(File).nullable().optional(),
+  image: z.union([z.instanceof(File), z.string(), z.null()]).optional(),
 });
 export type OrderRoundDailogForm = z.infer<typeof orderRoundSchema>;
 
@@ -80,14 +78,17 @@ function OrderRoundForm({ currentValues, no, setOpen, submitFn }: OrderRoundForm
       : {
           name: '',
           image: undefined,
-          breadNoList: [],
+          orderRoundBreads: [],
           startedAt: { date: undefined, time: '00:00:00' },
           endedAt: { date: undefined, time: '00:00:00' },
         },
   });
-  const { breads, isError, isLoading } = useGetBreadsAndStatusQuery();
 
-  const { orderRoundCreateMutation } = useOrderRoundCreateMutation();
+  useEffect(() => {
+    setSelectedBreads(currentValues!.orderRoundBreads);
+  }, [currentValues]);
+
+  const { breads, isError, isLoading } = useGetBreadsAndStatusQuery();
 
   const [selectedBreads, setSelectedBreads] = useState<{ no: number; name: string }[] | []>([]);
 
@@ -97,7 +98,7 @@ function OrderRoundForm({ currentValues, no, setOpen, submitFn }: OrderRoundForm
     const startedAt = formatToDateTimeIso(data.startedAt.date, data.startedAt.time);
     const endedAt = formatToDateTimeIso(data.endedAt.date, data.endedAt.time);
     const breadNoList = JSON.stringify(
-      data.breadNoList.map((item) => {
+      data.orderRoundBreads.map((item) => {
         return { breadNo: item.no };
       }),
     );
@@ -156,7 +157,7 @@ function OrderRoundForm({ currentValues, no, setOpen, submitFn }: OrderRoundForm
 
         <FormField
           control={form.control}
-          name="breadNoList"
+          name="orderRoundBreads"
           render={({ field }) => (
             <FormItem className="flex">
               <FormLabel errorCheck={false} className="whitespace-nowrap pr-2 py-3 flex-1/4">
@@ -219,9 +220,9 @@ function OrderRoundForm({ currentValues, no, setOpen, submitFn }: OrderRoundForm
                     className="cursor-pointer"
                     onClick={() => {
                       const updatedList = form
-                        .getValues('breadNoList')
+                        .getValues('orderRoundBreads')
                         .filter((b) => b.no !== item.no);
-                      form.setValue('breadNoList', updatedList);
+                      form.setValue('orderRoundBreads', updatedList);
                       setSelectedBreads(updatedList);
                       onMouseEnterBread(undefined);
                     }}

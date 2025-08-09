@@ -33,7 +33,7 @@ function OrderRoundModifyDialogBody({
   const { data, isLoading } = useOrderRoundDetailQuery(no);
   const { orderRoundUpdateMutation } = useOrderRoundUpdateMutation();
 
-  if (isLoading) return;
+  if (isLoading && !data) return;
 
   function splitIsoToDateTime(isoString: string) {
     const dateObj = new Date(isoString);
@@ -44,8 +44,14 @@ function OrderRoundModifyDialogBody({
     };
   }
 
+  const orderRoundBreads = data!.orderRoundBreads.map((item) => {
+    return { no: item.no, name: item.name };
+  });
+
   const currentValues = {
-    ...data,
+    ...data!,
+    orderRoundBreads,
+    image: data?.image ? data?.image[0]!.url : undefined,
     startedAt: splitIsoToDateTime(data?.startedAt!),
     endedAt: splitIsoToDateTime(data?.endedAt!),
   };
