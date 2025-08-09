@@ -11,7 +11,7 @@ import {
 } from '@appabbang/ui';
 import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
 import { SortAsc, SortDesc } from 'lucide-react';
-import { formatKR, formatToDate, formatToDateTime } from '@/utils/format';
+import { formatIsoWithoutSeconds, formatKR, formatToDate, formatToDateTime } from '@/utils/format';
 import {
   useOrderAndStatusAndDliveryTypeQuery,
   useOrderStatusUpdateMutation,
@@ -580,7 +580,21 @@ export const orderRoundColumns = () => {
     columnHelper.accessor('image', {
       maxSize: 5,
       header: ({ column }) => <p>주문차수 이미지</p>,
-      cell: (info) => {},
+      cell: (info) => {
+        const src = info.getValue()[0]
+          ? info.getValue()[0].url
+          : 'https://cdn.imweb.me/upload/S202206178ecd8851ac794/cd0f057a7035b.jpg';
+
+        return (
+          <AspectRatio ratio={9 / 5}>
+            <img
+              src={src}
+              alt={info.row.original.name}
+              className="h-full w-full rounded-lg object-fill"
+            />
+          </AspectRatio>
+        );
+      },
     }),
     columnHelper.accessor('no', {
       maxSize: 3,
@@ -589,7 +603,9 @@ export const orderRoundColumns = () => {
           주문차수
         </Button>
       ),
-      cell: (info) => {},
+      cell: (info) => {
+        return <>{info.getValue()}</>;
+      },
     }),
     columnHelper.accessor('name', {
       maxSize: 3,
@@ -599,32 +615,44 @@ export const orderRoundColumns = () => {
           이름
         </Button>
       ),
-      cell: (info) => {},
+      cell: (info) => {
+        return <p>{info.getValue()}</p>;
+      },
     }),
 
     columnHelper.accessor('breadNoList', {
+      maxSize: 10,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
-          기본배송지
+          판매리스트
         </Button>
       ),
-      cell: (info) => {},
+      cell: (info) => {
+        console.log(info.getValue());
+        return <p>{info.getValue()}</p>;
+      },
     }),
     columnHelper.accessor('startedAt', {
+      maxSize: 5,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
-          가입일
+          시작일자
         </Button>
       ),
-      cell: (info) => {},
+      cell: (info) => {
+        return <p>{formatIsoWithoutSeconds(info.getValue())}</p>;
+      },
     }),
     columnHelper.accessor('endedAt', {
+      maxSize: 5,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
-          가입일
+          종료일자
         </Button>
       ),
-      cell: (info) => {},
+      cell: (info) => {
+        return <p>{formatIsoWithoutSeconds(info.getValue())}</p>;
+      },
     }),
   ];
 
