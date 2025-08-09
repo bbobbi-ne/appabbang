@@ -1627,7 +1627,7 @@ paths:
                   - name
                   - startedAt
                   - endedAt
-                  - orderRoundBread
+                  - orderRoundBreads
                   - image
                 properties:
                   no:
@@ -1648,7 +1648,7 @@ paths:
                     format: date-time
                     description: 종료일시
                     example: 2025-07-31T11:00:00.000Z
-                  orderRoundBread:
+                  orderRoundBreads:
                     type: array
                     items:
                       type: object
