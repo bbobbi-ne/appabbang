@@ -85,7 +85,9 @@ function OrderRoundForm({ currentValues, no, setOpen, submitFn }: OrderRoundForm
   });
 
   useEffect(() => {
-    setSelectedBreads(currentValues!.orderRoundBreads);
+    if (currentValues) {
+      setSelectedBreads(currentValues.orderRoundBreads);
+    }
   }, [currentValues]);
 
   const { breads, isError, isLoading } = useGetBreadsAndStatusQuery();
