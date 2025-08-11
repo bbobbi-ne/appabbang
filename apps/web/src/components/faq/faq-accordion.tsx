@@ -20,7 +20,7 @@ function FaqAccordion({ list }: IFaqAccordionProps) {
                     <p>
                       {data.answer.split(/(여기)/).map((part, index) =>
                         part === '여기' ? (
-                          <FaqUnregisterDialog>
+                          <FaqUnregisterDialog key={index}>
                             <span
                               key={index}
                               onClick={onClick}
