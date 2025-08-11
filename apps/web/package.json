@@ -18,6 +18,7 @@
     "@appabbang/typescript": "workspace:*",
     "@appabbang/ui": "workspace:*",
     "@faker-js/faker": "^9.6.0",
+    "@ramonak/react-progress-bar": "^5.4.0",
     "@types/react-slick": "^0.23.13",
     "axios": "^1.9.0",
     "basic-loading": "^2.1.3",
