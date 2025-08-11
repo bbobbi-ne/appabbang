@@ -96,7 +96,7 @@ model Order {
   coupon                       Coupon?           @relation(fields: [couponNo], references: [no])      // 쿠폰 테이블 참조
 
   orderItem                    OrderItem[]                                                            // 주문 목록 테이블
-  payment                      Payment                                                                // 결제 테이블
+  payment                      Payment?                                                               // 결제 테이블
 
   @@map("orders")
 }
@@ -116,11 +116,9 @@ model OrderItem {
   updatedAt             DateTime          @updatedAt @map("updated_at")                                      // 수정 시간
 
   orderNo               Int               @map("order_no")                                                   // 주문 번호
-  customerNo            Int?              @map("customer_no")                                                // 고객 번호
-  breadNo               Int?              @map("bread_no")                                                   // 빵 번호
+  breadNo               Int?              @unique @map("bread_no")                                                   // 빵 번호
   order                 Order             @relation(fields: [orderNo], references: [no], onDelete: Cascade)  // 주문 테이블 참조
-  customer              Customer?         @relation(fields: [customerNo], references: [no] onDelete: SetNull) // 고객 테이블 참조
-  bread                 Bread?            @relation(fields: [breadNo], references: [no] onDelete: SetNull)   // 빵 테이블 참조
+  bread                 Bread?            @relation(fields: [breadNo], references: [no], onDelete: SetNull)   // 빵 테이블 참조
   
   review                Review?                                                                              // 리뷰 테이블
 
@@ -139,10 +137,8 @@ model Review {
   createdAt             DateTime          @default(now()) @map("created_at")                                   // 등록 시간
   updatedAt             DateTime          @updatedAt @map("updated_at")                                        // 수정 시간
                             
-  orderItemNo           Int               @map("order_item_no")                                                // 주문아이템 번호
-  customerNo            Int?              @map("customer_no")                                                  // 고객 번호
+  orderItemNo           Int               @unique @map("order_item_no")                                        // 주문아이템 번호
   orderItem             OrderItem         @relation(fields: [orderItemNo], references: [no])                   // 주문아이템 테이블 참조
-  customer              Customer?         @relation(fields: [customerNo], references: [no], onDelete: SetNull) // 고객 테이블 참조
 
   @@map("reviews")
 }
@@ -154,7 +150,7 @@ model Customer {
   pw                    String            @db.VarChar(300)                        // 비밀번호
   name                  String            @db.VarChar(30)                         // 이름
   mobileNumber          String            @db.VarChar(20) @map("mobile_number")   // 전화번호
-  refreshToken          String?           @db.VarChar(300) @map("refresh_token)   // 리프레시 토큰
+  refreshToken          String?           @db.VarChar(300) @map("refresh_token")  // 리프레시 토큰
   providerType          String?           @db.VarChar(30) @map("provider_type")   // 소셜 로그인 타입 코드
   providerId            String?           @db.VarChar(100) @map("provider_id")    // 소셜 로그인 식별자
   defaultAddressNo      Int?              @map("default_address_no")              // 기본 배송지
@@ -166,7 +162,7 @@ model Customer {
   updatedAt             DateTime          @updatedAt @map("updated_at")           // 수정시간
 
   address               Address[]                                                 // 주소 테이블
-  customerCoupon        DiscountCustomer[]                                        // 고객에게 발급 된 쿠폰 테이블
+  customerCoupon        CustomerCoupon[]                                          // 고객에게 발급 된 쿠폰 테이블
   order                 Order[]                                                   // 주문 테이블
 
   @@map("customers")
@@ -223,7 +219,6 @@ model CustomerCoupon {
   customer              Customer?         @relation(fields: [customerNo], references: [no], onDelete: SetNull) // 고객 테이블 참조
   coupon                Coupon            @relation(fields: [couponNo], references: [no])                      // 쿠폰 테이블 참조
 
-  @@id([customerNo, couponNo])          // 복합 기본키
   @@map("customer_coupon")
 }
 
@@ -246,7 +241,7 @@ model Payment {
   createdAt           DateTime            @default(now()) @map("created_at")      // 등록시간
   updatedAt           DateTime            @updatedAt @map("updated_at")           // 수정시간
 
-  orderNo             Int                 @map("order_no") 
+  orderNo             Int                 @unique @map("order_no") 
   order               Order               @relation(fields: [orderNo], references: [no])
 
   @@map("payments")
