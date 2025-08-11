@@ -155,6 +155,36 @@ const FormMessage = React.forwardRef<
 });
 FormMessage.displayName = 'FormMessage';
 
+const CustomFormMessage = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement> & { name: string }
+>(({ className, children, name, ...props }, ref) => {
+  const { error, formMessageId } = useFormField();
+
+  if (error) {
+    console.log((error as any)[name]);
+  }
+
+  const body = error ? (error as any)[name].message : children;
+
+  if (!body) {
+    return null;
+  }
+
+  return (
+    <p
+      ref={ref}
+      id={formMessageId}
+      className={cn('text-sm font-medium text-destructive', className)}
+      {...props}
+    >
+      {body}
+    </p>
+  );
+});
+
+FormMessage.displayName = 'FormMessage';
+
 export {
   useFormField,
   Form,
@@ -164,4 +194,5 @@ export {
   FormDescription,
   FormMessage,
   FormField,
+  CustomFormMessage,
 };

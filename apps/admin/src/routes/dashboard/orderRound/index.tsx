@@ -38,13 +38,13 @@ import {
 } from '@appabbang/ui';
 
 import { TablePagination } from '@/components/ui/table-pagination';
-import { BreadCreateDialog } from '@/components/breads/bread-create-dialog';
-import { useBreadsDeleteMutation, useGetBreadsAndStatusQuery } from '@/hooks/use-breads';
-import { BreadModifyDialog } from '@/components/breads/bread-modify-dialog';
-import { BreadsColumns, type BreadListItem } from '@/data/columns';
-import TableSkeleton from '@/components/ui/table-skeletion';
 
-export const Route = createFileRoute('/dashboard/breads/')({
+import { orderRoundColumns, type OrderRoundListItem } from '@/data/columns';
+import { useOrderRoundsQuery } from '@/hooks/use-order-round';
+import OrderRoundCreateDialog from '@/components/order-round/order-round-create-dialog';
+import OrderRoundModifyDialog from '@/components/order-round/order-round-modify-dialog';
+
+export const Route = createFileRoute('/dashboard/orderRound/')({
   component: RouteComponent,
 });
 
@@ -52,12 +52,11 @@ function RouteComponent() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
-  const { breads, isError, isLoading } = useGetBreadsAndStatusQuery();
-  const { deleteBreadMutation } = useBreadsDeleteMutation();
-  const columns = BreadsColumns();
+  const columns = orderRoundColumns();
+  const { data: orderRounds, isLoading } = useOrderRoundsQuery();
 
-  const table = useReactTable<BreadListItem>({
-    data: breads || [],
+  const table = useReactTable<OrderRoundListItem>({
+    data: orderRounds || [],
     columns,
     state: {
       pagination,
@@ -73,17 +72,14 @@ function RouteComponent() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  if (isLoading) return <TableSkeleton />;
-  if (isError) return <>에러</>;
-
-  const selectedRows = table.getSelectedRowModel().rows.map((row) => row.original.no);
+  if (isLoading) return <>로딩중</>;
 
   return (
     <>
       <Card className="shadow-none bg-background border-none">
         <CardHeader>
-          <CardTitle>빵관리</CardTitle>
-          <BreadCreateDialog />
+          <CardTitle>주문차수</CardTitle>
+          <OrderRoundCreateDialog />
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[550px] w-full border-1 rounded-lg ">
@@ -112,7 +108,7 @@ function RouteComponent() {
                   {table.getRowModel().rows.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={columns.length} className="p-4 text-center">
-                        빵을 등록해주세요.
+                        주문차수를 등록해주세요.
                       </TableCell>
                     </TableRow>
                   )}
@@ -120,11 +116,11 @@ function RouteComponent() {
                     <TableRow key={row.id}>
                       {row.getVisibleCells().map((cell) => {
                         return (
-                          <BreadModifyDialog no={cell.row.original.no} key={cell.id}>
+                          <OrderRoundModifyDialog no={cell.row.original.no} key={cell.id}>
                             <TableCell>
                               {flexRender(cell.column.columnDef.cell, cell.getContext())}
                             </TableCell>
-                          </BreadModifyDialog>
+                          </OrderRoundModifyDialog>
                         );
                       })}
                     </TableRow>
@@ -137,7 +133,7 @@ function RouteComponent() {
         </CardContent>
         <CardFooter className="space-x-2">
           <TablePagination table={table} />
-          {selectedRows.length > 0 && (
+          {/* {selectedRows.length > 0 && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive">선택항목 삭제</Button>
@@ -160,7 +156,7 @@ function RouteComponent() {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-          )}
+          )} */}
         </CardFooter>
       </Card>
     </>
