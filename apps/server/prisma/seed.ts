@@ -115,10 +115,16 @@ async function main() {
   // 배송방법 생성
   await prisma.deliveryMethod.createMany({
     data: [
-      { deliveryType: '10', fee: 4000, isActive: true, memo: '우체국', name: '우체국' },
-      { deliveryType: '10', fee: 4000, isActive: false, memo: 'CJ대한통운', name: 'CJ대한통운' },
-      { deliveryType: '20', fee: 0, isActive: true, memo: '직접수령', name: '직접수령' },
-      { deliveryType: '90', fee: 0, isActive: true, memo: '기타', name: '기타' },
+      { deliveryTypeCode: '10', fee: 4000, isActive: true, memo: '우체국', name: '우체국' },
+      {
+        deliveryTypeCode: '10',
+        fee: 4000,
+        isActive: false,
+        memo: 'CJ대한통운',
+        name: 'CJ대한통운',
+      },
+      { deliveryTypeCode: '20', fee: 0, isActive: true, memo: '직접수령', name: '직접수령' },
+      { deliveryTypeCode: '90', fee: 0, isActive: true, memo: '기타', name: '기타' },
     ],
   });
 
