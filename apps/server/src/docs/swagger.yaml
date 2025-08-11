@@ -1353,7 +1353,7 @@ paths:
                     - name
                     - startedAt
                     - endedAt
-                    - breadNoList
+                    - orderRoundBreads
                     - image
                   properties:
                     no:
@@ -1374,17 +1374,22 @@ paths:
                       format: date-time
                       description: 종료일시
                       example: 2025-07-31T11:00:00.000Z
-                    breadNoList:
+                    orderRoundBreads:
                       type: array
                       items:
                         type: object
                         required:
-                          - breadNo
+                          - no
+                          - name
                         properties:
-                          breadNo:
+                          no:
                             type: integer
                             description: 빵 번호
                             example: 1
+                          name:
+                            type: string
+                            description: 빵 이름
+                            example: 판매빵
                     image:
                       type: array
                       items:
@@ -1411,7 +1416,7 @@ paths:
                 - name
                 - startedAt
                 - endedAt
-                - breadNoList
+                - orderRoundBreads
               properties:
                 name:
                   type: string
@@ -1427,7 +1432,7 @@ paths:
                   format: date-time
                   description: 종료일시
                   example: 2025-07-31T11:00:00.000Z
-                breadNoList:
+                orderRoundBreads:
                   type: array
                   description: 빵 번호 목록 (JSON 문자열 형태로 전송)
                   example: '[{"breadNo": 1}, {"breadNo": 2}, {"breadNo": 3}]'
@@ -1466,7 +1471,69 @@ paths:
                 type: object
                 required:
                   - no
-                  - seq
+                  - orderRoundNo
+                  - name
+                  - startedAt
+                  - endedAt
+                  - orderRoundBread
+                properties:
+                  no:
+                    type: integer
+                    description: 주문차수 번호
+                    example: 1
+                  name:
+                    type: string
+                    description: 주문차수명
+                    example: 주문 1차
+                  startedAt:
+                    type: string
+                    format: date-time
+                    description: 시작일시
+                    example: 2025-07-01T11:00:00.000Z
+                  endedAt:
+                    type: string
+                    format: date-time
+                    description: 종료일시
+                    example: 2025-07-31T11:00:00.000Z
+                  orderRoundBread:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - no
+                        - orderRoundNo
+                        - breadNo
+                      properties:
+                        no:
+                          type: integer
+                          description: 빵 번호
+                          example: 1
+                        orderRoundNo:
+                          type: string
+                          description: 주문차수
+                          example: 1
+                        breadNo:
+                          type: string
+                          description: 빵 번호
+                          example: 1
+
+  /order-round/now:
+    get:
+      tags: [OrderRound]
+      summary: 현재일시에 진행되는 주문차수 조회
+      description: 현재일시에 진행되는 상세 정보를 조회합니다. 권한(선택적 로그인)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 현재일시에 진행되는 주문차수 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - no
+                  - orderRoundNo
                   - name
                   - startedAt
                   - endedAt
@@ -1530,7 +1597,7 @@ paths:
                         url: 
                           type: string
                           description: 이미지 URL
-                          example: 'https://example.com/image.jpg'
+                          example: 'https://example.com/image.jpg'                  
 
 
   /order-round/{no}:
@@ -1560,7 +1627,7 @@ paths:
                   - name
                   - startedAt
                   - endedAt
-                  - orderRoundBread
+                  - orderRoundBreads
                   - image
                 properties:
                   no:
@@ -1581,7 +1648,7 @@ paths:
                     format: date-time
                     description: 종료일시
                     example: 2025-07-31T11:00:00.000Z
-                  orderRoundBread:
+                  orderRoundBreads:
                     type: array
                     items:
                       type: object
@@ -1644,17 +1711,17 @@ paths:
               type: object
               required:
                 - no
-                - seq
+                - orderRoundNo
                 - name
                 - startedAt
                 - endedAt
-                - breadNoList
+                - orderRoundBreads
               properties:
                 no:
                   type: integer
                   description: 주문차수 번호
                   example: 1
-                seq:
+                orderRoundNo:
                   type: integer
                   description: 주문차수
                   example: 1
@@ -1672,7 +1739,7 @@ paths:
                   format: date-time
                   description: 종료일시
                   example: 2025-07-31T11:00:00.000Z
-                breadNoList:
+                orderRoundBreads:
                   type: string
                   description: 빵 번호 목록 (JSON 문자열 형태로 전송)
                   example: '[{"breadNo": 1}, {"breadNo": 2}, {"breadNo": 3}]'

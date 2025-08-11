@@ -56,7 +56,6 @@ function RouteComponent() {
   const { deleteBreadMutation } = useBreadsDeleteMutation();
   const columns = BreadsColumns();
 
-  // 알레르기, 원산지정보 추가 필
   const table = useReactTable<BreadListItem>({
     data: breads || [],
     columns,

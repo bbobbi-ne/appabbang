@@ -1,4 +1,4 @@
-import type { BreadsListData, OrdersListData } from '@/api/data-contracts';
+import type { BreadsListData, OrderRoundListData, OrdersListData } from '@/api/data-contracts';
 import {
   AspectRatio,
   Button,
@@ -11,7 +11,7 @@ import {
 } from '@appabbang/ui';
 import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
 import { SortAsc, SortDesc } from 'lucide-react';
-import { formatKR, formatToDate, formatToDateTime } from '@/utils/format';
+import { formatIsoWithoutSeconds, formatKR, formatToDate, formatToDateTime } from '@/utils/format';
 import {
   useOrderAndStatusAndDliveryTypeQuery,
   useOrderStatusUpdateMutation,
@@ -46,6 +46,7 @@ export interface CustomerColumns {
   created_at: Date;
 }
 
+export type OrderRoundListItem = OrderRoundListData[number];
 export type BreadListItem = BreadsListData[number];
 export type OrdersListItem = OrdersListData[number];
 
@@ -55,7 +56,7 @@ export const BreadsColumns = () => {
   const columns: ColumnDef<BreadListItem, any>[] = [
     columnHelper.display({
       id: 'select',
-      maxSize: 0,
+      maxSize: 1,
       header: ({ table }) => (
         <Checkbox
           className="h-5 w-5"
@@ -78,7 +79,7 @@ export const BreadsColumns = () => {
     }),
 
     columnHelper.accessor('no', {
-      maxSize: 3,
+      maxSize: 1,
       header: ({ column }) => {
         const isSorted = column.getIsSorted() === 'asc';
         return (
@@ -98,7 +99,7 @@ export const BreadsColumns = () => {
     }),
 
     columnHelper.accessor('images', {
-      maxSize: 5,
+      maxSize: 3,
       header: '대표이미지',
       cell: ({ row }) => {
         const url = (row.getValue('images') as { url: string }[]) || [];
@@ -119,7 +120,7 @@ export const BreadsColumns = () => {
     }),
 
     columnHelper.accessor('name', {
-      maxSize: 5,
+      maxSize: 3,
       header: ({ column }) => {
         const isSorted = column.getIsSorted() === 'asc';
         return (
@@ -138,7 +139,7 @@ export const BreadsColumns = () => {
     }),
 
     columnHelper.accessor('unitPrice', {
-      maxSize: 5,
+      maxSize: 3,
       header: ({ column }) => {
         const isSorted = column.getIsSorted() === 'asc';
 
@@ -160,7 +161,7 @@ export const BreadsColumns = () => {
     }),
 
     columnHelper.accessor('countryOfOrigin', {
-      maxSize: 10,
+      maxSize: 5,
       header: ({ column }) => '원산지정보',
       cell: (info) => (
         <p className="line-clamp-3 whitespace-normal break-words">{info.getValue()}</p>
@@ -168,7 +169,7 @@ export const BreadsColumns = () => {
     }),
 
     columnHelper.accessor('allergyInfo', {
-      maxSize: 10,
+      maxSize: 5,
       header: ({ column }) => '알레르기 정보',
       cell: (info) => (
         <p className="line-clamp-3 whitespace-normal break-words">{info.getValue() || '없음'}</p>
@@ -176,7 +177,7 @@ export const BreadsColumns = () => {
     }),
 
     columnHelper.accessor('description', {
-      maxSize: 10,
+      maxSize: 5,
       header: '설명',
       cell: (info) => (
         <p className="line-clamp-3 whitespace-normal break-words">{info.getValue()}</p>
@@ -243,7 +244,7 @@ export const BreadsColumns = () => {
     // }),
 
     columnHelper.accessor('createdAt', {
-      maxSize: 5,
+      maxSize: 3,
       header: ({ column }) => {
         const isSorted = column.getIsSorted() === 'asc';
 
@@ -265,7 +266,7 @@ export const BreadsColumns = () => {
     }),
 
     columnHelper.accessor('updatedAt', {
-      maxSize: 5,
+      maxSize: 3,
       header: ({ column }) => {
         const isSorted = column.getIsSorted() === 'asc';
 
@@ -454,7 +455,6 @@ export const ordersColumns = () => {
           <Select
             value={value}
             onValueChange={(val: '10' | '20' | '30' | '40' | '50') => {
-              console.log(val);
               orderStatusUpdateMutation({ no, orderStatus: { orderStatus: val } });
             }}
           >
@@ -545,6 +545,115 @@ export const ordersColumns = () => {
             {formatToDateTime(info.getValue())}
           </div>
         );
+      },
+    }),
+  ];
+
+  return columns;
+};
+
+export const orderRoundColumns = () => {
+  const columnHelper = createColumnHelper<OrderRoundListItem>();
+
+  const columns: ColumnDef<OrderRoundListItem, any>[] = [
+    columnHelper.display({
+      id: 'cell-no',
+      maxSize: 1,
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted() === 'asc';
+        return (
+          <Button
+            className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary gap-0`}
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            {isSorted ? <SortAsc /> : <SortDesc />} 번호
+          </Button>
+        );
+      },
+      cell: (info) => {
+        const index = info.table.getPrePaginationRowModel().rows.length - info.row.index;
+        return <p className="text-center">{index}</p>;
+      },
+    }),
+    columnHelper.accessor('image', {
+      maxSize: 2,
+      header: ({ column }) => <p>주문차수 이미지</p>,
+      cell: (info) => {
+        const src = info.getValue()[0]
+          ? info.getValue()[0].url
+          : 'https://cdn.imweb.me/upload/S202206178ecd8851ac794/cd0f057a7035b.jpg';
+
+        return (
+          <AspectRatio ratio={9 / 5}>
+            <img
+              src={src}
+              alt={info.row.original.name}
+              className="h-full w-full rounded-lg object-fill"
+            />
+          </AspectRatio>
+        );
+      },
+    }),
+    columnHelper.accessor('no', {
+      maxSize: 1,
+      header: ({ column }) => (
+        <Button className="p-0" variant="ghost">
+          주문차수
+        </Button>
+      ),
+      cell: (info) => {
+        return <p className="text-center">{info.getValue()}</p>;
+      },
+    }),
+    columnHelper.accessor('name', {
+      maxSize: 3,
+
+      header: ({ column }) => (
+        <Button className="p-0" variant="ghost">
+          이름
+        </Button>
+      ),
+      cell: (info) => {
+        return <p>{info.getValue()}</p>;
+      },
+    }),
+
+    columnHelper.accessor('orderRoundBreads', {
+      maxSize: 6,
+      header: ({ column }) => (
+        <Button className="p-0" variant="ghost">
+          판매리스트
+        </Button>
+      ),
+      cell: (info) => {
+        const names = info
+          .getValue()
+          .map((item: any) => item.name)
+          .join(', ');
+        return <p className="line-clamp-2 whitespace-normal break-words">{names}</p>;
+      },
+    }),
+    columnHelper.accessor('startedAt', {
+      maxSize: 3,
+      header: ({ column }) => (
+        <Button className="p-0" variant="ghost">
+          시작일자
+        </Button>
+      ),
+      cell: (info) => {
+        return <p className="text-center">{formatIsoWithoutSeconds(info.getValue())}</p>;
+      },
+    }),
+    columnHelper.accessor('endedAt', {
+      maxSize: 3,
+      header: ({ column }) => (
+        <Button className="p-0" variant="ghost">
+          종료일자
+        </Button>
+      ),
+      cell: (info) => {
+        return <p className="text-center">{formatIsoWithoutSeconds(info.getValue())}</p>;
       },
     }),
   ];

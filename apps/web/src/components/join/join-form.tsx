@@ -20,7 +20,7 @@ import {
   Label,
   ScrollArea,
 } from '@appabbang/ui';
-import DaumPostApi from '@/components/daum-post-api';
+import DaumPostApi from '@/components/common/daum-post-api';
 import { getFormattedMobile } from '@/utils';
 
 export const joinSchema = z.object({

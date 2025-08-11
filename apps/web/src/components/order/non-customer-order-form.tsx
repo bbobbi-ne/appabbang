@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from '@appabbang/ui';
 import { type UseFormReturn } from 'react-hook-form';
-import DaumPostApi from './daum-post-api';
+import DaumPostApi from '../common/daum-post-api';
 import GuestPrivacyAgreement from './guest-privacy-agreement';
 import { useState } from 'react';
 

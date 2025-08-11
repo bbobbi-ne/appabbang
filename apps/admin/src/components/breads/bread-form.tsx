@@ -20,7 +20,7 @@ import { ImageUploadField } from './Image-upload-field';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useGetBreadsAndStatusQuery } from '@/hooks/use-breads';
-import { useRef } from 'react';
+import { type Dispatch, type SetStateAction } from 'react';
 import { formatKR } from '@/utils/format';
 
 export const breadSchema = z.object({
@@ -56,11 +56,11 @@ interface BreadFormProps {
   submitFn: (arg: any) => Promise<any>;
   currentValues?: BreadsDailogForm;
   no?: number;
+  setOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
+function BreadForm({ submitFn, currentValues, no, setOpen }: BreadFormProps) {
   const breadStatus = useGetBreadsAndStatusQuery().breadStatus;
-  const closeRef = useRef<HTMLButtonElement>(null);
 
   const form = useForm<BreadsDailogForm>({
     resolver: zodResolver(breadSchema),
@@ -101,7 +101,7 @@ function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
       await submitFn({ formData: formData, no: no || {} });
 
       form.reset();
-      closeRef.current?.click();
+      setOpen(false);
     } catch (error: any) {
       const message = error.message ?? '알 수 없는 에러가 발생했습니다. 잠시 후 다시 시도해주세요.';
 
@@ -304,7 +304,7 @@ function BreadForm({ submitFn, currentValues, no }: BreadFormProps) {
               {form.formState.errors.root.message}
             </p>
           )}
-          <DialogClose ref={closeRef} asChild>
+          <DialogClose asChild>
             <Button type="button" variant="outline">
               취소
             </Button>

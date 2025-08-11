@@ -143,6 +143,8 @@ model Review {
   customerNo            Int?              @map("customer_no")                                                  // 고객 번호
   orderItem             OrderItem         @relation(fields: [orderItemNo], references: [no])                   // 주문아이템 테이블 참조
   customer              Customer?         @relation(fields: [customerNo], references: [no], onDelete: SetNull) // 고객 테이블 참조
+
+  @@map("reviews")
 }
 
 /** 고객 */
@@ -292,7 +294,7 @@ model CommonCode {
   createdAt             DateTime          @default(now()) @map("created_at")      // 등록시간
   updatedAt             DateTime          @updatedAt @map("updated_at")           // 수정시간
 
-  @@map("common_code")
+  @@map("common_codes")
 }
 
 /** 이미지 */

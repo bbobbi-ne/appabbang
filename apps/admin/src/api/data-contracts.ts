@@ -94,6 +94,16 @@ export type BreadsListData = {
    */
   name: string;
   /**
+   * 원산지
+   * @example "빵류[밀가루(밀:미국,캐나다산),영양강화밀가루(프랑스산)],가공유크림(독일산)"
+   */
+  countryOfOrigin: string;
+  /**
+   * 알레르기 정보
+   * @example "밀, 우유, 대두, 계란 함유"
+   */
+  allergyInfo: string;
+  /**
    * 빵 설명
    * @example "바삭한 크로아상"
    */
@@ -155,6 +165,16 @@ export interface BreadsCreatePayload {
    * @example "10"
    */
   breadStatus: "10" | "20" | "30" | "40" | "50";
+  /**
+   * 원산지
+   * @example "빵류[밀가루(밀:미국,캐나다산),영양강화밀가루(프랑스산)],가공유크림(독일산)"
+   */
+  countryOfOrigin: string;
+  /**
+   * 알레르기 정보
+   * @example "밀, 우유, 대두, 계란 함유"
+   */
+  allergyInfo: string;
   /** 빵 이미지 (선택사항) */
   image?: File[];
 }
@@ -186,7 +206,7 @@ export interface BreadsDetailData {
    * 빵 설명
    * @example "바삭한 크로아상"
    */
-  description: string;
+  description?: string;
   /**
    * 단가
    * @example 3000
@@ -197,6 +217,16 @@ export interface BreadsDetailData {
    * @example "10"
    */
   breadStatus: "10" | "20" | "30" | "40" | "50";
+  /**
+   * 원산지
+   * @example "빵류[밀가루(밀:미국,캐나다산),영양강화밀가루(프랑스산)],가공유크림(독일산)"
+   */
+  countryOfOrigin: string;
+  /**
+   * 알레르기 정보
+   * @example "밀, 우유, 대두, 계란 함유"
+   */
+  allergyInfo: string;
   /**
    * 생성일시
    * @format date-time
@@ -649,6 +679,26 @@ export interface OrdersDetailData {
      * @example false
      */
     isRefunded: boolean;
+    /**
+     * 예금주
+     * @example "김빵만"
+     */
+    accountHolderName: string;
+    /**
+     * 계좌번호
+     * @example "123-456-7890"
+     */
+    accountNumber: string;
+    /**
+     * 은행코드
+     * @example 4
+     */
+    bankCode: string;
+    /**
+     * 은행코드 이름
+     * @example "우리은행"
+     */
+    bankCodeName: string;
   };
 }
 
@@ -677,6 +727,308 @@ export interface OrdersUpdatePayload {
 }
 
 export type OrdersUpdateData = any;
+
+export interface StatusUpdateBody {
+  /**
+   * 변경할 주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소됨)
+   * @example "10"
+   */
+  orderStatus: "10" | "20" | "30" | "40" | "50";
+}
+
+export type StatusUpdateResult = any;
+
+export type OrderRoundListData = {
+  /**
+   * 주문차수 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 주문차수명
+   * @example "주문 1차"
+   */
+  name: string;
+  /**
+   * 시작일시
+   * @format date-time
+   * @example "2025-07-01T11:00:00.000Z"
+   */
+  startedAt: string;
+  /**
+   * 종료일시
+   * @format date-time
+   * @example "2025-07-31T11:00:00.000Z"
+   */
+  endedAt: string;
+  orderRoundBreads: {
+    /**
+     * 빵 번호
+     * @example 1
+     */
+    no: number;
+    /**
+     * 빵 이름
+     * @example "판매빵"
+     */
+    name: string;
+  }[];
+  image: {
+    /**
+     * 이미지 URL
+     * @example "https://example.com/image.jpg"
+     */
+    url?: string;
+  }[];
+}[];
+
+export interface OrderRoundCreatePayload {
+  /**
+   * 주문차수명
+   * @example "주문 1차"
+   */
+  name: string;
+  /**
+   * 시작일시
+   * @format date-time
+   * @example "2025-07-01T11:00:00.000Z"
+   */
+  startedAt: string;
+  /**
+   * 종료일시
+   * @format date-time
+   * @example "2025-07-31T11:00:00.000Z"
+   */
+  endedAt: string;
+  /**
+   * 빵 번호 목록 (JSON 문자열 형태로 전송)
+   * @example "[{"breadNo": 1}, {"breadNo": 2}, {"breadNo": 3}]"
+   */
+  orderRoundBreads: {
+    /**
+     * 빵 번호
+     * @example 1
+     */
+    breadNo: number;
+  }[];
+  /**
+   * 주문차수 이미지(선택사항)
+   * @format binary
+   */
+  image?: File;
+}
+
+export type OrderRoundCreateData = any;
+
+export interface LatestListData {
+  /**
+   * 주문차수 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 주문차수명
+   * @example "주문 1차"
+   */
+  name: string;
+  /**
+   * 시작일시
+   * @format date-time
+   * @example "2025-07-01T11:00:00.000Z"
+   */
+  startedAt: string;
+  /**
+   * 종료일시
+   * @format date-time
+   * @example "2025-07-31T11:00:00.000Z"
+   */
+  endedAt: string;
+  orderRoundBread: {
+    /**
+     * 빵 번호
+     * @example 1
+     */
+    no: number;
+    /**
+     * 주문차수
+     * @example 1
+     */
+    orderRoundNo: string;
+    /**
+     * 빵 번호
+     * @example 1
+     */
+    breadNo: string;
+  }[];
+}
+
+export interface GetOrderRoundData {
+  /**
+   * 주문차수 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 주문차수명
+   * @example "주문 1차"
+   */
+  name: string;
+  /**
+   * 시작일시
+   * @format date-time
+   * @example "2025-07-01T11:00:00.000Z"
+   */
+  startedAt: string;
+  /**
+   * 종료일시
+   * @format date-time
+   * @example "2025-07-31T11:00:00.000Z"
+   */
+  endedAt: string;
+  orderRoundBread: {
+    /**
+     * 빵 번호
+     * @example 1
+     */
+    no: number;
+    /**
+     * 빵 이름
+     * @example "단팥빵"
+     */
+    name: string;
+    /**
+     * 빵 설명
+     * @example "부드러운 단팥이 들어간 빵"
+     */
+    description: string;
+    /**
+     * 빵 상태
+     * @example 10
+     */
+    breadStatus: string;
+    /**
+     * 가격
+     * @example 1000
+     */
+    unitPrice: number;
+  }[];
+  image: {
+    /**
+     * 이미지 URL
+     * @example "https://example.com/image.jpg"
+     */
+    url?: string;
+  }[];
+}
+
+export interface OrderRoundDetailData {
+  /**
+   * 주문차수 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 주문차수명
+   * @example "주문 1차"
+   */
+  name: string;
+  /**
+   * 시작일시
+   * @format date-time
+   * @example "2025-07-01T11:00:00.000Z"
+   */
+  startedAt: string;
+  /**
+   * 종료일시
+   * @format date-time
+   * @example "2025-07-31T11:00:00.000Z"
+   */
+  endedAt: string;
+  orderRoundBreads: {
+    /**
+     * 빵 번호
+     * @example 1
+     */
+    no: number;
+    /**
+     * 빵 이름
+     * @example "단팥빵"
+     */
+    name: string;
+    /**
+     * 빵 설명
+     * @example "부드러운 단팥이 들어간 빵"
+     */
+    description: string;
+    /**
+     * 빵 상태
+     * @example 10
+     */
+    breadStatus: string;
+    /**
+     * 가격
+     * @example 1000
+     */
+    unitPrice: number;
+  }[];
+  image: {
+    /**
+     * 이미지 URL
+     * @example "https://example.com/image.jpg"
+     */
+    url?: string;
+  }[];
+}
+
+export interface OrderRoundUpdatePayload {
+  /**
+   * 주문차수 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 주문차수
+   * @example 1
+   */
+  orderRoundNo: number;
+  /**
+   * 주문차수명
+   * @example "주문 1차"
+   */
+  name: string;
+  /**
+   * 시작일시
+   * @format date-time
+   * @example "2025-07-01T11:00:00.000Z"
+   */
+  startedAt: string;
+  /**
+   * 종료일시
+   * @format date-time
+   * @example "2025-07-31T11:00:00.000Z"
+   */
+  endedAt: string;
+  /**
+   * 빵 번호 목록 (JSON 문자열 형태로 전송)
+   * @example "[{"breadNo": 1}, {"breadNo": 2}, {"breadNo": 3}]"
+   */
+  orderRoundBreads: string;
+  /**
+   * 주문차수 이미지(선택사항)
+   * @format binary
+   */
+  image?: File;
+}
+
+export type OrderRoundUpdateData = any;
+
+export interface ImageDeleteBody {
+  /**
+   * 삭제할 이미지의 공개 ID
+   * @example "breads/image123"
+   */
+  publicId: string;
+}
 
 export type CustomersListData = any;
 
@@ -1474,3 +1826,118 @@ export interface RefundUpdatePayload {
 }
 
 export type RefundUpdateData = any;
+
+export type AddressesListData = {
+  /**
+   * 배송지 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 주소
+   * @example "서울시 강남구 역삼동 123-456"
+   */
+  address: string;
+  /**
+   * 상세 주소
+   * @example "101동 101호"
+   */
+  addressDetail: string;
+  /**
+   * 우편번호
+   * @example "12345"
+   */
+  zipcode: string;
+  /**
+   * 메시지
+   * @example "문 앞에 놓아주세요."
+   */
+  message: string;
+  /**
+   * 수령인 이름
+   * @example "홍길동"
+   */
+  recipientName: string;
+  /**
+   * 수령인 전화번호
+   * @example "010-1234-5678"
+   */
+  recipientMobile: string;
+  /**
+   * 생성일시
+   * @format date-time
+   * @example "2024-01-01T00:00:00.000Z"
+   */
+  createdAt: string;
+  /**
+   * 수정일시
+   * @format date-time
+   * @example "2024-01-01T00:00:00.000Z"
+   */
+  updatedAt: string;
+}[];
+
+export type AddressesCreatePayload = object;
+
+export type AddressesCreateData = any;
+
+export interface AddressesDetailData {
+  /**
+   * 배송지 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 주소
+   * @example "서울시 강남구 역삼동 123-456"
+   */
+  address: string;
+  /**
+   * 상세 주소
+   * @example "101동 101호"
+   */
+  addressDetail: string;
+  /**
+   * 우편번호
+   * @example "12345"
+   */
+  zipcode: string;
+  /**
+   * 메시지
+   * @example "문 앞에 놓아주세요."
+   */
+  message: string;
+  /**
+   * 수령인 이름
+   * @example "홍길동"
+   */
+  recipientName: string;
+  /**
+   * 수령인 전화번호
+   * @example "010-1234-5678"
+   */
+  recipientMobile: string;
+  /**
+   * 기본 배송지 여부
+   * @example true
+   */
+  isDefault: boolean;
+  /**
+   * 생성일시
+   * @format date-time
+   * @example "2024-01-01T00:00:00.000Z"
+   */
+  createdAt: string;
+  /**
+   * 수정일시
+   * @format date-time
+   * @example "2024-01-01T00:00:00.000Z"
+   */
+  updatedAt: string;
+}
+
+export type AddressesUpdatePayload = object;
+
+export type AddressesUpdateData = any;
+
+export type AddressesDeleteData = any;
