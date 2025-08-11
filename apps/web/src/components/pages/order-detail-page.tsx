@@ -2,14 +2,13 @@
  * 마이페이지 - 주문내역에서 [주문상세보기] 클릭시 들어오는 주문상세내역 페이지.
  */
 
-import { AlertDialog, Button, Card, CardContent } from '@appabbang/ui';
+import { Button, Card, CardContent } from '@appabbang/ui';
 import { orders } from '../mypage/meta-data';
 import { useEffect, useState } from 'react';
 import type { IOrderItem } from '../mypage/order-item';
 import OrderItem from '../mypage/order-item';
 import { ArrowRight } from 'lucide-react';
 import AddressModifyDialog from '../mypage/address-modify-dialog';
-import { useFormStatus } from 'react-dom';
 
 interface IDataProps {
   no: number;
