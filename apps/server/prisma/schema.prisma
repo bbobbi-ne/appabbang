@@ -49,16 +49,16 @@ model OrderRound {
 
 /** 주문차수 - 빵 매핑테이블 */
 model OrderRoundBread {
-  breadNo             Int                 @map("bread_no")                                     // 빵 번호
-  orderRoundNo        Int                 @map("order_round_no")                               // 주문차수 번호
+  no                  Int                 @id @default(autoincrement())                        // 매핑 번호 
   
   createdAt           DateTime            @default(now()) @map("created_at")                   // 등록 시간
   updatedAt           DateTime            @updatedAt @map("updated_at")                        // 수정 시간 
 
-  bread               Bread               @relation(fields: [breadNo], references: [no])       // 빵 테이블 참조
-  orderRound          OrderRound          @relation(fields: [orderRoundNo], references: [no])  // 주문차수 테이블 참조
+  breadNo             Int?                @map("bread_no")                                     // 빵 번호
+  orderRoundNo        Int?                @map("order_round_no")                               // 주문차수 번호
+  bread               Bread?              @relation(fields: [breadNo], references: [no], onDelete: SetNull)       // 빵 테이블 참조
+  orderRound          OrderRound?         @relation(fields: [orderRoundNo], references: [no], onDelete: SetNull)  // 주문차수 테이블 참조
 
-  @@id([breadNo, orderRoundNo])                                                                // 복합 기본키
   @@map("order_round_bread")
 }
 
