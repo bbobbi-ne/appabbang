@@ -17,7 +17,7 @@ function OrderListPage() {
             </div>
             <div>{data.orderNumber}</div>
             <div className="text-blue-600 font-bold">
-              [{data.orderStatus === '10' && '입금대기'}]
+              [{data.orderStatus === '10' ? '입금대기' : data.orderStatus === '40' ? '완료' : ''}]
             </div>
           </CardContent>
 
@@ -43,7 +43,9 @@ function OrderListPage() {
               <div className="flex flex-col justify-center gap-2 ml-[45%]">
                 <Button className={clsx(btnCssStr)}>주문상세보기</Button>
                 <Button className={clsx(btnCssStr)}>배송(수령)현황</Button>
-                <Button className={clsx(btnCssStr)}>주문취소</Button>
+                {Number(data.orderStatus) < 30 ? (
+                  <Button className={clsx(btnCssStr)}>주문취소</Button>
+                ) : null}
               </div>
             </div>
           </CardContent>
