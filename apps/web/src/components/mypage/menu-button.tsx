@@ -47,7 +47,7 @@ function MenuButton() {
       <div>
         <Button
           className={pathname.includes('/order') ? '' : btnCssStr}
-          onClick={() => navigate({ to: '/mypage' })}
+          onClick={() => navigate({ to: '/mypage/order-list' })}
         >
           주문내역
         </Button>
