@@ -26,6 +26,7 @@ import { Route as SubPageMypagePasswordIndexImport } from './routes/_sub-page/my
 import { Route as SubPageMypageOrderListIndexImport } from './routes/_sub-page/mypage/order-list/index'
 import { Route as SubPageMypageInfoIndexImport } from './routes/_sub-page/mypage/info/index'
 import { Route as SubPageMypageAddressIndexImport } from './routes/_sub-page/mypage/address/index'
+import { Route as SubPageMypageOrderListOrderNoImport } from './routes/_sub-page/mypage/order-list/$orderNo'
 
 // Create/Update Routes
 
@@ -122,6 +123,13 @@ const SubPageMypageAddressIndexRoute = SubPageMypageAddressIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const SubPageMypageOrderListOrderNoRoute =
+  SubPageMypageOrderListOrderNoImport.update({
+    id: '/_sub-page/mypage/order-list/$orderNo',
+    path: '/mypage/order-list/$orderNo',
+    getParentRoute: () => rootRoute,
+  } as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -203,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SubPageMypageIndexImport
       parentRoute: typeof rootRoute
     }
+    '/_sub-page/mypage/order-list/$orderNo': {
+      id: '/_sub-page/mypage/order-list/$orderNo'
+      path: '/mypage/order-list/$orderNo'
+      fullPath: '/mypage/order-list/$orderNo'
+      preLoaderRoute: typeof SubPageMypageOrderListOrderNoImport
+      parentRoute: typeof rootRoute
+    }
     '/_sub-page/mypage/address/': {
       id: '/_sub-page/mypage/address/'
       path: '/mypage/address'
@@ -260,6 +275,7 @@ export interface FileRoutesByFullPath {
   '/callback/kakao': typeof CallbackKakaoRoute
   '/order/$orderRoundNo': typeof SubPageOrderOrderRoundNoRoute
   '/mypage': typeof SubPageMypageIndexRoute
+  '/mypage/order-list/$orderNo': typeof SubPageMypageOrderListOrderNoRoute
   '/mypage/address': typeof SubPageMypageAddressIndexRoute
   '/mypage/info': typeof SubPageMypageInfoIndexRoute
   '/mypage/order-list': typeof SubPageMypageOrderListIndexRoute
@@ -278,6 +294,7 @@ export interface FileRoutesByTo {
   '/callback/kakao': typeof CallbackKakaoRoute
   '/order/$orderRoundNo': typeof SubPageOrderOrderRoundNoRoute
   '/mypage': typeof SubPageMypageIndexRoute
+  '/mypage/order-list/$orderNo': typeof SubPageMypageOrderListOrderNoRoute
   '/mypage/address': typeof SubPageMypageAddressIndexRoute
   '/mypage/info': typeof SubPageMypageInfoIndexRoute
   '/mypage/order-list': typeof SubPageMypageOrderListIndexRoute
@@ -297,6 +314,7 @@ export interface FileRoutesById {
   '/callback/kakao': typeof CallbackKakaoRoute
   '/_sub-page/order/$orderRoundNo': typeof SubPageOrderOrderRoundNoRoute
   '/_sub-page/mypage/': typeof SubPageMypageIndexRoute
+  '/_sub-page/mypage/order-list/$orderNo': typeof SubPageMypageOrderListOrderNoRoute
   '/_sub-page/mypage/address/': typeof SubPageMypageAddressIndexRoute
   '/_sub-page/mypage/info/': typeof SubPageMypageInfoIndexRoute
   '/_sub-page/mypage/order-list/': typeof SubPageMypageOrderListIndexRoute
@@ -317,6 +335,7 @@ export interface FileRouteTypes {
     | '/callback/kakao'
     | '/order/$orderRoundNo'
     | '/mypage'
+    | '/mypage/order-list/$orderNo'
     | '/mypage/address'
     | '/mypage/info'
     | '/mypage/order-list'
@@ -334,6 +353,7 @@ export interface FileRouteTypes {
     | '/callback/kakao'
     | '/order/$orderRoundNo'
     | '/mypage'
+    | '/mypage/order-list/$orderNo'
     | '/mypage/address'
     | '/mypage/info'
     | '/mypage/order-list'
@@ -351,6 +371,7 @@ export interface FileRouteTypes {
     | '/callback/kakao'
     | '/_sub-page/order/$orderRoundNo'
     | '/_sub-page/mypage/'
+    | '/_sub-page/mypage/order-list/$orderNo'
     | '/_sub-page/mypage/address/'
     | '/_sub-page/mypage/info/'
     | '/_sub-page/mypage/order-list/'
@@ -369,6 +390,7 @@ export interface RootRouteChildren {
   SubPageProductsRoute: typeof SubPageProductsRoute
   CallbackKakaoRoute: typeof CallbackKakaoRoute
   SubPageMypageIndexRoute: typeof SubPageMypageIndexRoute
+  SubPageMypageOrderListOrderNoRoute: typeof SubPageMypageOrderListOrderNoRoute
   SubPageMypageAddressIndexRoute: typeof SubPageMypageAddressIndexRoute
   SubPageMypageInfoIndexRoute: typeof SubPageMypageInfoIndexRoute
   SubPageMypageOrderListIndexRoute: typeof SubPageMypageOrderListIndexRoute
@@ -386,6 +408,7 @@ const rootRouteChildren: RootRouteChildren = {
   SubPageProductsRoute: SubPageProductsRoute,
   CallbackKakaoRoute: CallbackKakaoRoute,
   SubPageMypageIndexRoute: SubPageMypageIndexRoute,
+  SubPageMypageOrderListOrderNoRoute: SubPageMypageOrderListOrderNoRoute,
   SubPageMypageAddressIndexRoute: SubPageMypageAddressIndexRoute,
   SubPageMypageInfoIndexRoute: SubPageMypageInfoIndexRoute,
   SubPageMypageOrderListIndexRoute: SubPageMypageOrderListIndexRoute,
@@ -412,6 +435,7 @@ export const routeTree = rootRoute
         "/_sub-page/products",
         "/callback/kakao",
         "/_sub-page/mypage/",
+        "/_sub-page/mypage/order-list/$orderNo",
         "/_sub-page/mypage/address/",
         "/_sub-page/mypage/info/",
         "/_sub-page/mypage/order-list/",
@@ -454,6 +478,9 @@ export const routeTree = rootRoute
     },
     "/_sub-page/mypage/": {
       "filePath": "_sub-page/mypage/index.tsx"
+    },
+    "/_sub-page/mypage/order-list/$orderNo": {
+      "filePath": "_sub-page/mypage/order-list/$orderNo.tsx"
     },
     "/_sub-page/mypage/address/": {
       "filePath": "_sub-page/mypage/address/index.tsx"

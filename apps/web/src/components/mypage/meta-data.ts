@@ -69,7 +69,7 @@ export const orders = [
   {
     no: 2, // 주문번호
     orderNumber: 'ORD-20250723-0000103', // 주문번호(채번)
-    orderStatus: '40', // 주문상태(완료)
+    orderStatus: '30', // 주문상태(배송중)
     totalPrice: 68000, // 총 금액
     orderPw: '1234', // 주문 비밀번호(비회원)
     memo: '주문 메모입니다.', // 메모
