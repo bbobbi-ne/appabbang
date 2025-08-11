@@ -3,6 +3,7 @@ import { orders } from '../mypage/meta-data';
 import clsx from 'clsx';
 import { useNavigate } from '@tanstack/react-router';
 import OrderItem from '../mypage/order-item';
+import OrderCalcenDialog from '../mypage/order-cancel-dialog';
 
 // Custom CSS
 const btnCssStr = `w-30 bg-[#ffffff] text-[#202020] hover:bg-[#644a40] hover:text-[#ffffff]`;
@@ -53,7 +54,9 @@ function OrderListPage() {
                   배송(수령)현황
                 </Button>
                 {Number(data.orderStatus) < 30 ? (
-                  <Button className={clsx(btnCssStr)}>주문취소</Button>
+                  <OrderCalcenDialog>
+                    <Button className={clsx(btnCssStr)}>주문취소</Button>
+                  </OrderCalcenDialog>
                 ) : null}
               </div>
             </div>
