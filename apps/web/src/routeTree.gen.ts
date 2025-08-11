@@ -23,6 +23,7 @@ import { Route as SubPageBrandImport } from './routes/_sub-page/brand'
 import { Route as SubPageMypageIndexImport } from './routes/_sub-page/mypage/index'
 import { Route as SubPageOrderOrderRoundNoImport } from './routes/_sub-page/order/$orderRoundNo'
 import { Route as SubPageMypagePasswordIndexImport } from './routes/_sub-page/mypage/password/index'
+import { Route as SubPageMypageOrderListIndexImport } from './routes/_sub-page/mypage/order-list/index'
 import { Route as SubPageMypageInfoIndexImport } from './routes/_sub-page/mypage/info/index'
 import { Route as SubPageMypageAddressIndexImport } from './routes/_sub-page/mypage/address/index'
 
@@ -101,6 +102,13 @@ const SubPageMypagePasswordIndexRoute = SubPageMypagePasswordIndexImport.update(
     getParentRoute: () => rootRoute,
   } as any,
 )
+
+const SubPageMypageOrderListIndexRoute =
+  SubPageMypageOrderListIndexImport.update({
+    id: '/_sub-page/mypage/order-list/',
+    path: '/mypage/order-list/',
+    getParentRoute: () => rootRoute,
+  } as any)
 
 const SubPageMypageInfoIndexRoute = SubPageMypageInfoIndexImport.update({
   id: '/_sub-page/mypage/info/',
@@ -209,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SubPageMypageInfoIndexImport
       parentRoute: typeof rootRoute
     }
+    '/_sub-page/mypage/order-list/': {
+      id: '/_sub-page/mypage/order-list/'
+      path: '/mypage/order-list'
+      fullPath: '/mypage/order-list'
+      preLoaderRoute: typeof SubPageMypageOrderListIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/_sub-page/mypage/password/': {
       id: '/_sub-page/mypage/password/'
       path: '/mypage/password'
@@ -247,6 +262,7 @@ export interface FileRoutesByFullPath {
   '/mypage': typeof SubPageMypageIndexRoute
   '/mypage/address': typeof SubPageMypageAddressIndexRoute
   '/mypage/info': typeof SubPageMypageInfoIndexRoute
+  '/mypage/order-list': typeof SubPageMypageOrderListIndexRoute
   '/mypage/password': typeof SubPageMypagePasswordIndexRoute
 }
 
@@ -264,6 +280,7 @@ export interface FileRoutesByTo {
   '/mypage': typeof SubPageMypageIndexRoute
   '/mypage/address': typeof SubPageMypageAddressIndexRoute
   '/mypage/info': typeof SubPageMypageInfoIndexRoute
+  '/mypage/order-list': typeof SubPageMypageOrderListIndexRoute
   '/mypage/password': typeof SubPageMypagePasswordIndexRoute
 }
 
@@ -282,6 +299,7 @@ export interface FileRoutesById {
   '/_sub-page/mypage/': typeof SubPageMypageIndexRoute
   '/_sub-page/mypage/address/': typeof SubPageMypageAddressIndexRoute
   '/_sub-page/mypage/info/': typeof SubPageMypageInfoIndexRoute
+  '/_sub-page/mypage/order-list/': typeof SubPageMypageOrderListIndexRoute
   '/_sub-page/mypage/password/': typeof SubPageMypagePasswordIndexRoute
 }
 
@@ -301,6 +319,7 @@ export interface FileRouteTypes {
     | '/mypage'
     | '/mypage/address'
     | '/mypage/info'
+    | '/mypage/order-list'
     | '/mypage/password'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -317,6 +336,7 @@ export interface FileRouteTypes {
     | '/mypage'
     | '/mypage/address'
     | '/mypage/info'
+    | '/mypage/order-list'
     | '/mypage/password'
   id:
     | '__root__'
@@ -333,6 +353,7 @@ export interface FileRouteTypes {
     | '/_sub-page/mypage/'
     | '/_sub-page/mypage/address/'
     | '/_sub-page/mypage/info/'
+    | '/_sub-page/mypage/order-list/'
     | '/_sub-page/mypage/password/'
   fileRoutesById: FileRoutesById
 }
@@ -350,6 +371,7 @@ export interface RootRouteChildren {
   SubPageMypageIndexRoute: typeof SubPageMypageIndexRoute
   SubPageMypageAddressIndexRoute: typeof SubPageMypageAddressIndexRoute
   SubPageMypageInfoIndexRoute: typeof SubPageMypageInfoIndexRoute
+  SubPageMypageOrderListIndexRoute: typeof SubPageMypageOrderListIndexRoute
   SubPageMypagePasswordIndexRoute: typeof SubPageMypagePasswordIndexRoute
 }
 
@@ -366,6 +388,7 @@ const rootRouteChildren: RootRouteChildren = {
   SubPageMypageIndexRoute: SubPageMypageIndexRoute,
   SubPageMypageAddressIndexRoute: SubPageMypageAddressIndexRoute,
   SubPageMypageInfoIndexRoute: SubPageMypageInfoIndexRoute,
+  SubPageMypageOrderListIndexRoute: SubPageMypageOrderListIndexRoute,
   SubPageMypagePasswordIndexRoute: SubPageMypagePasswordIndexRoute,
 }
 
@@ -391,6 +414,7 @@ export const routeTree = rootRoute
         "/_sub-page/mypage/",
         "/_sub-page/mypage/address/",
         "/_sub-page/mypage/info/",
+        "/_sub-page/mypage/order-list/",
         "/_sub-page/mypage/password/"
       ]
     },
@@ -436,6 +460,9 @@ export const routeTree = rootRoute
     },
     "/_sub-page/mypage/info/": {
       "filePath": "_sub-page/mypage/info/index.tsx"
+    },
+    "/_sub-page/mypage/order-list/": {
+      "filePath": "_sub-page/mypage/order-list/index.tsx"
     },
     "/_sub-page/mypage/password/": {
       "filePath": "_sub-page/mypage/password/index.tsx"
