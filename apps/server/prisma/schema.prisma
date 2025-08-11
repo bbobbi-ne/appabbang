@@ -13,254 +13,297 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model CommonCode {
-  no                    Int               @id @default(autoincrement())
-  groupName             String            @map("group_name") @db.VarChar(20)
-  code                  String            @db.VarChar(5)
-  name                  String            @db.VarChar(30)
-  remarkTxt             String?           @map("remark_txt") @db.VarChar(500)
-
-  createdAt             DateTime          @default(now()) @map("created_at")
-  updatedAt             DateTime          @updatedAt @map("updated_at")
-
-  @@map("common_code")
-}
-
-model User {
-  no                    Int               @id @default(autoincrement()) 
-  id                    String            @unique                   
-  pw                    String                                    
-  name                  String                                     
-  userRole              String            @db.VarChar(5) @map("user_role") 
-  refreshToken          String?           @map("refresh_token") 
-
-  createdAt             DateTime          @default(now())
-  updatedAt             DateTime          @updatedAt @map("updated_at")           
-
-  @@map("users")
-}
-
-model Image {
-  no                    Int               @id @default(autoincrement())     // Images.no
-  url                   String                                              // 이미지 URL
-  publicId              String            @map("public_id")                 // 퍼블릭 아이디 (Cloudinary 등)
-  imageTargetType       String?           @map("image_target_type")         // 이미지 타입 (enum으로 관리 가능)
-  imageTargetNo         Int?              @map("image_target_no")           // 참조 대상 No
-  order                 Int?                                                // 이미지 정렬 순서
-  name                  String?                                             // 원본 파일명
-
-  createdAt             DateTime          @default(now()) @map("created_at") // 등록 시간
-  updatedAt             DateTime          @updatedAt @map("updated_at")     // 수정 시간
-
-  @@map("images")
-}
-
+/** 빵 */
 model Bread {
-  no                    Int               @id @default(autoincrement())
-  name                  String
-  description           String?
-  unitPrice             Int
-  breadStatus           String            @map("bread_status")
-  countryOfOrigin       String            @map("country_of_origin") 
-  allergyInfo           String           @map("allergy_info")
+  no                    Int               @id @default(autoincrement())               // 빵 번호
+  name                  String            @db.VarChar(30)                             // 빵 이름
+  description           String?           @db.VarChar(300)                            // 빵 설명
+  unitPrice             Int                                                           // 가격(원가)
+  breadStatus           String            @db.VarChar(3) @map("bread_status")         // 상태 (--필요여부 확인필요)
+  countryOfOrigin       String            @db.VarChar(300) @map("country_of_origin")  // 원산지 정보
+  allergyInfo           String            @db.VarChar(300) @map("allergy_info")       // 알러지 정보
 
-  createdAt             DateTime          @default(now()) @map("created_at")
-  updatedAt             DateTime          @updatedAt @map("updated_at")
+  createdAt             DateTime          @default(now()) @map("created_at")          // 등록시간
+  updatedAt             DateTime          @updatedAt @map("updated_at")               // 수정시간
 
-  orderItem             OrderItem[]
-  orderRoundBreads      OrderRoundBread[]
+  orderRoundBreads      OrderRoundBread[]                                             // 빵 - 주문차수 매핑 테이블
+  orderItem             OrderItem?
 
   @@map("breads")
 }
 
-model Order {
-  no                    Int               @id @default(autoincrement())
-  orderNumber           String            @unique @map("orders_number")
-  orderStatus           String            @map("order_status")
-  totalPrice            Int               @map("total_price")
-  discountAmount        Int               @map("discount_amount")
-  orderPw               String?           @map("order_pw")      
-  memo                  String?
-  trackingNumber        String?           @map("tracking_number")
-  canceledAt            DateTime?         @map("canceled_at")
-
-  createdAt             DateTime          @default(now()) @map("created_at")
-  updatedAt             DateTime          @updatedAt @map("updated_at")
-
-  customerNo            Int               @map("customer_no")
-  addressNo             Int?              @map("address_no")
-  deliveryMethodNo      Int               @map("delivery_no")
-  discountNo            Int?              @map("discount_no")
-  customer              Customer          @relation(fields: [customerNo], references: [no])
-  address               Address?          @relation(fields: [addressNo], references: [no])
-  deliveryMethod        DeliveryMethod    @relation(fields: [deliveryMethodNo], references: [no])
-  discount              Discount?         @relation(fields: [discountNo], references: [no])
-  orderItem             OrderItem[]
-  payment               Payment?
-
-  @@map("orders")
-}
-
-model OrderItem {
-  no                    Int               @id @default(autoincrement())
-  quantity              Int     
-  unitPrice             Int               @map("unit_price")
-  totalPrice            Int               @map("total_price")
-
-  createdAt             DateTime          @default(now()) @map("created_at")
-  updatedAt             DateTime          @updatedAt @map("updated_at")
-
-  orderNo               Int               @map("order_no")
-  breadNo               Int               @map("bread_no")
-  order                 Order             @relation(fields: [orderNo], references: [no], onDelete: Cascade)
-  bread                 Bread             @relation(fields: [breadNo], references: [no])
-
-  @@map("order_items")
-}
-
-model Customer {
-  no                    Int               @id @default(autoincrement())
-  id                    String?           @unique           
-  pw                    String?           
-  name                  String            
-  mobileNumber          String            @map("mobile_number")               // 전화번호 (not null)
-  defaultAddressNo      Int?              @map("default_address_no") 
-  providerType          String?           @map("provider_type")               // 소셜 로그인 타입 코드 (nullable)
-  socialId              String?           @map("social_id")                   // 소셜 로그인 식별자 (nullable)
-
-  createdAt             DateTime          @default(now()) @map("created_at")  // 가입일 (not null)
-  updatedAt             DateTime          @updatedAt @map("updated_at")
-
-  order                 Order[]
-  address               Address[]
-  discountCustomer      DiscountCustomer[] 
-  payment               Payment[]
-
-  @@map("customers")
-}
-
-model Address {
-  no                    Int               @id @default(autoincrement())
-  address               String            
-  addressDetail         String            @map("address_detail")
-  zipcode               String
-  message               String
-  recipientName         String            @map("recipient_name")       // 수령인 이름
-  recipientMobile       String            @map("recipient_mobile")     // 수령인 전화번호
-
-  createdAt             DateTime          @default(now()) @map("created_at") 
-  updatedAt             DateTime          @updatedAt @map("updated_at")
-
-  customerNo            Int               @map("customer_no")
-  customer              Customer          @relation(fields: [customerNo], references: [no], onDelete: Cascade)
-  order                 Order[]
-
-  @@map("addresses")
-}
-
-model DeliveryMethod {
-  no                    Int               @id @default(autoincrement())
-  name                  String
-  memo                  String?
-  fee                   Int
-  isActive              Boolean           @map("is_active")
-  deliveryType          String            @map("delivery_type")
-
-  createdAt             DateTime          @default(now()) @map("created_at") 
-  updatedAt             DateTime          @updatedAt @map("updated_at")
-
-  order                 Order[]
-
-  @@map("delivery_methods")
-}
-
-model Discount {
-  no                    Int               @id @default(autoincrement()) // PK
-  name                  String                                          // 할인정보명
-  fromDt                DateTime                                        // 시작일
-  toDt                  DateTime                                        // 종료일
-  amount                Int?                                            // 할인금액 (정액 할인)
-  percentage            Float?                                          // 할인률 (10%)
-  discountType          String            @map("discount_type")
-  memo                  String?                                         // 메모
-
-  createdAt             DateTime @default(now())                        // 등록 시간
-  updatedAt             DateTime @updatedAt                             // 수정 시간
-
-  discountCustomer      DiscountCustomer[]
-  order                 Order[]
-
-  @@map("discounts")
-}
-
-model DiscountCustomer {
-  customerNo            Int
-  discountNo            Int
-  isUsed                Boolean           @default(false)
-  
-  createdAt             DateTime          @default(now())               // 등록 시간
-  updatedAt             DateTime          @updatedAt                    // 수정 시간 
-
-  customer              Customer          @relation(fields: [customerNo], references: [no])
-  discount              Discount          @relation(fields: [discountNo], references: [no])
-
-  @@id([customerNo, discountNo])          // 복합 기본키
-  @@map("discount_customer")
-}
-
-model Payment {
-  no                  Int                 @id @default(autoincrement())
-  isPaid              Boolean             @default(false) @map("is_paid")       // 입금확인여부
-  orderedAt           DateTime            @map("ordered_at")                    // 주문일자
-  paidConfirmedAt     DateTime?           @map("paid_confirmed_at")             // 입금확인일자
-  isRefunded          Boolean             @default(false) @map("is_refunded")   // 환불여부
-  refundRequestedAt   DateTime?           @map("refund_requested_at")           // 환불신청일자
-  refundConfirmedAt   DateTime?           @map("refund_confirmed_at")            // 환불취소일자
-  refundReason        String?             @map("refund_reason")                 // 환불사유
-  bankCode            String              @map("bank_code")                     // 은행코드
-  accountNumber       String              @map("account_number")                // 계좌번호
-  accountHolderName   String              @map("account_holder_name")           // 예금주
-  memo                String?             @map("memo")                          // 메모
-
-  createdAt           DateTime            @default(now()) @map("created_at")    // 생성일자
-  updatedAt           DateTime            @updatedAt @map("updated_at")         // 수정일자
-
-  orderNo             Int                 @unique @map("order_no") 
-  customerNo          Int                 @map("customer_no")
-  order               Order               @relation(fields: [orderNo], references: [no])
-  customer            Customer            @relation(fields: [customerNo], references: [no])
-
-  @@map("payments")
-}
-
-/**
-  주문차수
-*/
+/** 주문차수 */
 model OrderRound {
-  no                  Int                 @id @default(autoincrement())
-  name                String
-  startedAt           DateTime            @map("started_at")
-  endedAt             DateTime            @map("ended_at")
+  no                  Int                 @id @default(autoincrement())               // 주문차수 번호
+  name                String              @db.VarChar(30)                             // 주문차수명
+  startedAt           DateTime            @map("started_at")                          // 주문 시작 시간
+  endedAt             DateTime            @map("ended_at")                            // 주문 마감 시간
   
-  createdAt           DateTime            @default(now()) @map("created_at")
-  updatedAt           DateTime            @updatedAt @map("updated_at")
+  createdAt           DateTime            @default(now()) @map("created_at")          // 등록 시간
+  updatedAt           DateTime            @updatedAt @map("updated_at")               // 수정 시간
 
-  orderRoundBreads    OrderRoundBread[]   
+  orderRoundBreads    OrderRoundBread[]                                               // 빵 - 주문차수 매핑 테이블
 
   @@map("order_rounds")
 }
 
+/** 주문차수 - 빵 매핑테이블 */
 model OrderRoundBread {
-  no                  Int                 @id @default(autoincrement())
-  orderRoundNo        Int                 @map("order_round_no")
-  breadNo             Int                 @map("bread_no")
+  no                  Int                 @id @default(autoincrement())                        // 매핑 번호 
   
-  createdAt           DateTime            @default(now()) @map("created_at")
-  updatedAt           DateTime            @updatedAt @map("updated_at")
+  createdAt           DateTime            @default(now()) @map("created_at")                   // 등록 시간
+  updatedAt           DateTime            @updatedAt @map("updated_at")                        // 수정 시간 
 
-  orderRound          OrderRound          @relation(fields: [orderRoundNo], references: [no])
-  bread               Bread               @relation(fields: [breadNo], references: [no])
+  breadNo             Int?                @map("bread_no")                                     // 빵 번호
+  orderRoundNo        Int?                @map("order_round_no")                               // 주문차수 번호
+  bread               Bread?              @relation(fields: [breadNo], references: [no], onDelete: SetNull)       // 빵 테이블 참조
+  orderRound          OrderRound?         @relation(fields: [orderRoundNo], references: [no], onDelete: SetNull)  // 주문차수 테이블 참조
 
-  @@unique([orderRoundNo, breadNo])
-  @@map("order_round_breads")
+  @@map("order_round_bread")
 }
+
+/** 주문 */
+model Order {
+  no                           Int               @id @default(autoincrement())                        // 주문 번호
+  orderNumber                  String            @db.VarChar(30) @unique @map("orders_number")        // 주문 번호 (채번)
+  orderStatus                  String            @db.VarChar(3) @map("order_status")                  // 주문 상태
+  ordererName                  String            @db.VarChar(30) @map("orderer_name")                 // 주문인
+  ordererMobile                String            @db.VarChar(20) @map("orderer_mobile")               // 주문인 전화번호
+  recipientName                String            @db.VarChar(30) @map("recipient_name")               // 수령인 
+  recipientMobile              String            @db.VarChar(20) @map("recipient_mobile")             // 수령인 전화번호 
+  address                      String            @db.VarChar(300) @map("address")                     // 주소
+  addressDetail                String            @db.VarChar(200) @map("address_detail")              // 상세주소
+  zipcode                      String            @db.VarChar(10) @map("zipcode")                      // 우편번호
+  message                      String            @db.VarChar(30) @map("message")                      // 배송메세지
+  deliveryMethodName           String            @db.VarChar(30) @map("delivery_method_name")         // 배송타입명
+  deliveryMethodFee            Int               @map("delivery_method_fee")                          // 배송비
+  discountAmount               Int               @map("discount_amount")                              // 할인 금액
+  orderRoundNo                 Int               @map("order_round_no")                               // 주문차수 번호
+  totalPrice                   Int               @map("total_price")                                  // 총 금액
+  trackingNumber               String            @db.VarChar(50) @map("tracking_number")              // 송장번호
+  isPaymentRefundTermsAgreed   Boolean           @map("is_payment_refund_terms_agreed")               // 결제, 환불 약관 동의여부
+  orderPw                      String            @db.VarChar(300) @map("order_pw")                    // [비회원] 주문서 비밀번호
+  isServiceTermsAgreed         Boolean           @map("is_service_terms_agreed")                      // [비회원] 서비스 이용약관 동의여부
+  isPrivacyTermsAgreed         Boolean           @map("is_privacy_terms_agreed")                      // [비회원] 개인정보 수집, 이용 동의여부
+  memo                         String            @db.VarChar(50) @map("memo")
+
+  createdAt                    DateTime          @default(now()) @map("created_at")                   // 등록 시간
+  updatedAt                    DateTime          @updatedAt @map("updated_at")                        // 수정 시간
+
+  customerNo                   Int               @map("customer_no")                                  // 고객 번호 
+  couponNo                     Int?              @map("coupon_no")                                    // 쿠폰 번호
+  customer                     Customer          @relation(fields: [customerNo], references: [no])    // 고객 테이블 참조 
+  coupon                       Coupon?           @relation(fields: [couponNo], references: [no])      // 쿠폰 테이블 참조
+
+  orderItem                    OrderItem[]                                                            // 주문 목록 테이블
+  payment                      Payment?                                                               // 결제 테이블
+
+  @@map("orders")
+}
+
+/** 주문아이템 */ 
+model OrderItem {
+  no                    Int               @id @default(autoincrement())                                      // 주문목록 번호
+  quantity              Int                                                                                  // 수량 
+  totalPrice            Int               @map("total_price")                                                // 총 금액 (주문시점 금액 X 수량 )
+  unitPrice             Int               @map("unit_price")                                                 // [주문시점] 가격
+  breadName             String            @db.VarChar(30) @map("bread_name")                                 // [주문시점] 빵 이름
+  breadImageUrl         String            @map("bread_image_url")                                            // [주문시점] 빵 이미지 URL
+  countryOfOrigin       String            @db.VarChar(300) @map("country_of_origin")                         // [주문시점] 빵 원산지
+  allergyInfo           String            @db.VarChar(300) @map("allergy_info")                              // [주문시점] 빵 알러지 정보
+
+  createdAt             DateTime          @default(now()) @map("created_at")                                 // 등록 시간
+  updatedAt             DateTime          @updatedAt @map("updated_at")                                      // 수정 시간
+
+  orderNo               Int               @map("order_no")                                                   // 주문 번호
+  breadNo               Int?              @unique @map("bread_no")                                                   // 빵 번호
+  order                 Order             @relation(fields: [orderNo], references: [no], onDelete: Cascade)  // 주문 테이블 참조
+  bread                 Bread?            @relation(fields: [breadNo], references: [no], onDelete: SetNull)   // 빵 테이블 참조
+  
+  review                Review?                                                                              // 리뷰 테이블
+
+  @@map("order_items")
+}
+
+/** 리뷰 */
+model Review {
+  no                    Int               @id @default(autoincrement())                                        // 리뷰번호
+  content               String            @db.VarChar(500)                                                     // 내용
+  isVisible             Boolean           @map("is_visible") @default(false)                                   // 노출 여부
+  rating                Int                                                                                    // 평점
+  helpfulCount          Int               @map("helpful_count")                                                // 도움돼요 클릭 수 
+  reportCount           Int               @map("report_count")                                                 // 신고 수
+                              
+  createdAt             DateTime          @default(now()) @map("created_at")                                   // 등록 시간
+  updatedAt             DateTime          @updatedAt @map("updated_at")                                        // 수정 시간
+                            
+  orderItemNo           Int               @unique @map("order_item_no")                                        // 주문아이템 번호
+  orderItem             OrderItem         @relation(fields: [orderItemNo], references: [no])                   // 주문아이템 테이블 참조
+
+  @@map("reviews")
+}
+
+/** 고객 */
+model Customer {
+  no                    Int               @id @default(autoincrement())           // 고객번호
+  id                    String            @db.VarChar(30) @unique                 // 아이디        
+  pw                    String            @db.VarChar(300)                        // 비밀번호
+  name                  String            @db.VarChar(30)                         // 이름
+  mobileNumber          String            @db.VarChar(20) @map("mobile_number")   // 전화번호
+  refreshToken          String?           @db.VarChar(300) @map("refresh_token")  // 리프레시 토큰
+  providerType          String?           @db.VarChar(30) @map("provider_type")   // 소셜 로그인 타입 코드
+  providerId            String?           @db.VarChar(100) @map("provider_id")    // 소셜 로그인 식별자
+  defaultAddressNo      Int?              @map("default_address_no")              // 기본 배송지
+  isServiceTermsAgreed  Boolean           @map("is_service_terms_agreed")         // 서비스 이용약관 동의여부
+  isPrivacyTermsAgreed  Boolean           @map("is_privacy_terms_agreed")         // 개인정보 수집, 이용 동의 여부
+  isMarketingTermsAgreed Boolean          @map("is_marketing_terms_agreed")       // 마케팅 목적 개인정보 이용 및 광고 수신 동의 여부
+
+  createdAt             DateTime          @default(now()) @map("created_at")      // 등록시간
+  updatedAt             DateTime          @updatedAt @map("updated_at")           // 수정시간
+
+  address               Address[]                                                 // 주소 테이블
+  customerCoupon        CustomerCoupon[]                                          // 고객에게 발급 된 쿠폰 테이블
+  order                 Order[]                                                   // 주문 테이블
+
+  @@map("customers")
+}
+
+/** 주소 */
+model Address {
+  no                    Int               @id @default(autoincrement())             // 주소 번호
+  address               String            @db.VarChar(300)                          // 주소 
+  addressDetail         String            @db.VarChar(200) @map("address_detail")   // 상세 주소
+  zipcode               String            @db.VarChar(10)                           // 우편번호
+  message               String            @db.VarChar(30)                           // 배송메세지
+  recipientName         String            @db.VarChar(30) @map("recipient_name")    // 수령인
+  recipientMobile       String            @db.VarChar(20) @map("recipient_mobile")  // 수령인 전화번호
+
+  createdAt             DateTime          @default(now()) @map("created_at")        // 등록시간
+  updatedAt             DateTime          @updatedAt @map("updated_at")             // 수정시간
+
+  customerNo            Int               @map("customer_no")
+  customer              Customer          @relation(fields: [customerNo], references: [no], onDelete: Cascade)
+
+  @@map("addresses")
+}
+
+/** 쿠폰 */
+model Coupon {
+  no                    Int               @id @default(autoincrement())              // 쿠폰 번호
+  name                  String            @db.VarChar(30)                            // 쿠폰명
+  amount                Int                                                          // 할인금액 (원 단위 기준)
+  expireAfterDays       Int               @map("expire_after_days")                  // 발급일 기준 만료일
+
+  createdAt             DateTime          @default(now())                            // 등록 시간
+  updatedAt             DateTime          @updatedAt                                 // 수정 시간
+
+  customerCoupons       CustomerCoupon[]                                             // 고객에게 발급 된 쿠폰 테이블
+  orders                Order[]                                                      // 주문 테이블 
+
+  @@map("coupons")
+}
+
+/** 고객에게 발급된 쿠폰 */
+model CustomerCoupon {
+  no                    Int               @id @default(autoincrement())              // 고객에게 발급된 쿠폰 번호
+  issuedAt              DateTime          @map("issued_at")                          // 쿠폰 발급일
+  expiredAt             DateTime          @map("expired_at")                         // 쿠폰 만료일
+  isUsed                Boolean           @default(false) @map("is_used")            // 사용여부
+  isExpired             Boolean           @default(false) @map("is_expired")         // 만료여부
+
+  createdAt             DateTime          @default(now())                            // 등록 시간
+  updatedAt             DateTime          @updatedAt                                 // 수정 시간 
+
+  customerNo            Int?                                                         // 고객 번호
+  couponNo              Int                                                          // 쿠폰 번호
+  customer              Customer?         @relation(fields: [customerNo], references: [no], onDelete: SetNull) // 고객 테이블 참조
+  coupon                Coupon            @relation(fields: [couponNo], references: [no])                      // 쿠폰 테이블 참조
+
+  @@map("customer_coupon")
+}
+
+/** 결제 */
+model Payment {
+  no                  Int                 @id @default(autoincrement())           // 결제 번호
+  orderedAt           DateTime            @map("ordered_at")                      // 주문일자
+  paidConfirmedAt     DateTime?           @map("paid_confirmed_at")               // 입금확인일자
+  isPaid              Boolean             @default(false) @map("is_paid")         // 입금확인여부
+  canceledRequestedAt DateTime?           @map("canceled_requested_at")           // 취소신청일자
+  canceledConfirmedAt DateTime?           @map("canceled_confirmed_at")           // 취소완료일자
+  canceledReason      String?             @db.VarChar(50) @map("canceled_reason") // 취소사유
+  isCanceled          Boolean             @default(false) @map("is_canceled")     // 취소여부
+  isRefunded          Boolean             @default(false) @map("is_refunded")     // 환불여부
+  bankCode            String              @map("bank_code")                       // 은행코드
+  accountNumber       String              @map("account_number")                  // 계좌번호
+  accountHolderName   String              @map("account_holder_name")             // 예금주
+  memo                String?             @map("memo")                            // 메모
+
+  createdAt           DateTime            @default(now()) @map("created_at")      // 등록시간
+  updatedAt           DateTime            @updatedAt @map("updated_at")           // 수정시간
+
+  orderNo             Int                 @unique @map("order_no") 
+  order               Order               @relation(fields: [orderNo], references: [no])
+
+  @@map("payments")
+}
+
+/** 사용자 (관리자) */
+model User {
+  no                    Int               @id @default(autoincrement())           // 사용자(관리자) 번호
+  id                    String            @db.VarChar(30) @unique                 // 아이디            
+  pw                    String            @db.VarChar(300)                        // 비밀번호
+  name                  String            @db.VarChar(30)                         // 이름                        
+  userRole              String            @db.VarChar(3) @map("user_role")        // 역할
+  refreshToken          String?           @db.VarChar(300) @map("refresh_token")  // 리프레시 토큰
+
+  createdAt             DateTime          @default(now())                         // 등록시간
+  updatedAt             DateTime          @updatedAt @map("updated_at")           // 수정시간    
+
+  @@map("users")
+}
+
+/** 배송 방법 */
+model DeliveryMethod {
+  no                    Int               @id @default(autoincrement())             // 배송방법 번호
+  name                  String            @db.VarChar(30)                           // 배송방법명
+  memo                  String?           @db.VarChar(50)                           // 설명
+  deliveryTypeCode      String            @db.VarChar(3) @map("delivery_type_code") // 배송타입코드
+  fee                   Int                                                         // 배송비
+  isActive              Boolean           @map("is_active")                         // 사용여부
+
+  createdAt             DateTime          @default(now()) @map("created_at")        // 등록시간
+  updatedAt             DateTime          @updatedAt @map("updated_at")             // 수정시간
+
+  @@map("delivery_methods")
+}
+
+
+/** 공통 코드 */
+model CommonCode {
+  no                    Int               @id @default(autoincrement())           // 공통코드 번호
+  groupName             String            @db.VarChar(30) @map("group_name")      // 코드그룹명
+  code                  String            @db.VarChar(3)                          // 코드
+  name                  String            @db.VarChar(30)                         // 코드명
+  remarkTxt             String?           @map("remark_txt") @db.VarChar(50)      // 비고
+
+  createdAt             DateTime          @default(now()) @map("created_at")      // 등록시간
+  updatedAt             DateTime          @updatedAt @map("updated_at")           // 수정시간
+
+  @@map("common_codes")
+}
+
+/** 이미지 */
+model Image {
+  no                    Int               @id @default(autoincrement())                // 이미지 번호
+  url                   String?                                                        // 이미지 URL
+  publicId              String?           @map("public_id")                            // 퍼블릭 아이디 (Cloudinary 이미지 키)
+  imageTargetType       String            @db.VarChar(30) @map("image_target_type")    // 이미지 대상 타입 (테이블명)
+  imageTargetNo         Int               @map("image_target_no")                      // 이미지 대상 No (해당하는 테이블 NO)
+  order                 Int                                                            // 이미지 정렬 순서
+
+  createdAt             DateTime          @default(now()) @map("created_at")           // 등록 시간
+  updatedAt             DateTime          @updatedAt @map("updated_at")                // 수정 시간
+
+  @@map("images")
+}
+

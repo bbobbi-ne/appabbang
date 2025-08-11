@@ -106,7 +106,6 @@ export const getByStatus = async (breadStatus: string) => {
       select: {
         publicId: true,
         url: true,
-        name: true,
         order: true,
         imageTargetNo: true,
       },
@@ -162,7 +161,6 @@ export const getByNo = async (type: ClientType | undefined, no: number) => {
       select: {
         publicId: true,
         url: true,
-        name: true,
         order: true,
       },
     });
@@ -213,7 +211,7 @@ export const createWithImages = async (
           data: {
             publicId: result.public_id,
             url: result.secure_url,
-            name: result.original_filename,
+            // name: result.original_filename,
             imageTargetNo: bread.no,
             imageTargetType: IMAGE_TARGET_TYPE, // 빵 이미지
             order: index + 1,
@@ -257,7 +255,6 @@ export const updateWithoutImages = async (
       select: {
         publicId: true,
         url: true,
-        name: true,
         order: true,
       },
     });
@@ -289,7 +286,7 @@ export const updateWithImages = async (
     const findedImages = await prisma.image.findMany({
       where: { imageTargetNo: no, imageTargetType: IMAGE_TARGET_TYPE },
       orderBy: { order: 'asc' },
-      select: { order: true, publicId: true, url: true, name: true },
+      select: { order: true, publicId: true, url: true },
     });
     const lastOrder = findedImages[findedImages.length - 1]?.order || 0;
     const uploadResults = await ImageService.updateCloudinary(lastOrder, images);
@@ -301,7 +298,7 @@ export const updateWithImages = async (
           data: {
             publicId: result.public_id,
             url: result.secure_url,
-            name: result.original_filename,
+            // name: result.original_filename,
             imageTargetNo: no,
             imageTargetType: IMAGE_TARGET_TYPE,
             order: lastOrder + index + 1,
@@ -337,7 +334,9 @@ export const remove = async (noList: number[]) => {
         publicId: true,
       },
     });
-    const publicIdList = idList.map((item: { publicId: string }) => item.publicId);
+    const publicIdList = idList
+      .map((item: { publicId: string | null }) => item.publicId)
+      .filter((item: string | null) => item !== null);
 
     await ImageService.removeCloudinary(publicIdList);
 

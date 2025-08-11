@@ -40,8 +40,14 @@ export const getOne = async (req: Request, res: Response) => {
 
 /** 배송 방법 생성 */
 export const create = async (req: Request, res: Response) => {
-  const { name, memo = '', fee, isActive, deliveryType } = req.body;
-  const created = await DeliveryMethodService.create({ name, memo, fee, isActive, deliveryType });
+  const { name, memo = '', fee, isActive, deliveryTypeCode } = req.body;
+  const created = await DeliveryMethodService.create({
+    name,
+    memo,
+    fee,
+    isActive,
+    deliveryTypeCode,
+  });
 
   res.status(201).json(created);
 };
@@ -49,13 +55,13 @@ export const create = async (req: Request, res: Response) => {
 /** 배송 방법 수정 */
 export const update = async (req: Request, res: Response) => {
   const no = req.params.no as unknown as number;
-  const { name, memo = '', fee, isActive, deliveryType } = req.body;
+  const { name, memo = '', fee, isActive, deliveryTypeCode } = req.body;
   const updated = await DeliveryMethodService.update(no, {
     name,
     memo,
     fee,
     isActive,
-    deliveryType,
+    deliveryTypeCode,
   });
 
   res.status(200).json(updated);

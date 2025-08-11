@@ -12,7 +12,7 @@ export const getList = async () => {
   const deliveryMethods = await prisma.deliveryMethod.findMany();
   const data = deliveryMethods.map((deliveryMethod) => ({
     ...deliveryMethod,
-    deliveryTypeName: getCodeName(deliveryMethod.deliveryType),
+    deliveryTypeName: getCodeName(deliveryMethod.deliveryTypeCode),
   }));
 
   return data;
@@ -26,7 +26,7 @@ export const getListByQuery = async (query: any) => {
 
   const data = deliveryMethods.map((deliveryMethod) => ({
     ...deliveryMethod,
-    deliveryTypeName: getCodeName(deliveryMethod.deliveryType),
+    deliveryTypeName: getCodeName(deliveryMethod.deliveryTypeCode),
   }));
 
   return data;
@@ -37,14 +37,14 @@ export const getOne = async (no: number) => {
   const one = await prisma.deliveryMethod.findUnique({ where: { no } });
   const data = {
     ...one,
-    deliveryTypeName: getCodeName(one?.deliveryType || ''),
+    deliveryTypeName: getCodeName(one?.deliveryTypeCode || ''),
   };
   return data;
 };
 
 /** 배송 방법 생성 */
 export const create = async (
-  data: Pick<DeliveryMethod, 'name' | 'memo' | 'fee' | 'isActive' | 'deliveryType'>,
+  data: Pick<DeliveryMethod, 'name' | 'memo' | 'fee' | 'isActive' | 'deliveryTypeCode'>,
 ) => {
   const created = await prisma.deliveryMethod.create({ data });
   return created;
@@ -53,12 +53,12 @@ export const create = async (
 /** 배송 방법 수정 */
 export const update = async (
   no: number,
-  data: Pick<DeliveryMethod, 'name' | 'memo' | 'fee' | 'isActive' | 'deliveryType'>,
+  data: Pick<DeliveryMethod, 'name' | 'memo' | 'fee' | 'isActive' | 'deliveryTypeCode'>,
 ) => {
   const updated = await prisma.deliveryMethod.update({ where: { no }, data });
   const result = {
     ...updated,
-    deliveryTypeName: getCodeName(updated.deliveryType),
+    deliveryTypeName: getCodeName(updated.deliveryTypeCode),
   };
   return result;
 };
@@ -68,7 +68,7 @@ export const remove = async (no: number) => {
   const removed = await prisma.deliveryMethod.delete({ where: { no } });
   const result = {
     ...removed,
-    deliveryTypeName: getCodeName(removed.deliveryType),
+    deliveryTypeName: getCodeName(removed.deliveryTypeCode),
   };
   return result;
 };
