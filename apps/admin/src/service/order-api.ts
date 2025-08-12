@@ -29,12 +29,9 @@ export const getOrdersDetail = async ({
 
   try {
     const response = await ordersApi.ordersDetail(params.no);
-    // toast.success('주문상세정보 조회에 성공했습니다.');
-    return {
-      data: response.data,
-    };
+    return { data: response.data };
   } catch (error: any) {
-    const message = error.data.message || '주문상세정보를 불러오는데 실패했습니다.';
+    const message = error?.data?.message || '주문상세정보를 불러오는데 실패했습니다.';
     toast.error('주문상세정보를 불러오는데 실패했습니다.', {
       description: message,
     });
@@ -51,15 +48,15 @@ export const updateOrderStatus = async ({
 }) => {
   try {
     const response = await ordersApi.statusUpdate(no, orderStatus);
-    toast.success('주문 상태가 업데이트 되었습니다.');
+    // toast.success('주문 상태가 업데이트 되었습니다.');
     return {
       data: response.data,
     };
   } catch (error: any) {
     console.log(error, '에러발생');
 
-    const message = error.data.message || '빵 상태 업데이트를 실패했습니다.';
-    toast.error('빵 상태 업데이트를 실패했습니다.', {
+    const message = error.data.message || '주문 상태 업데이트를 실패했습니다.';
+    toast.error('주문 상태 업데이트를 실패했습니다.', {
       description: message,
     });
     throw new Error(message);

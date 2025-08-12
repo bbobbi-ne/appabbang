@@ -1,7 +1,6 @@
 import { toast } from 'sonner';
 import { CustomHttpClient } from '@/service/instance';
 import { CommonCode } from '@/api/CommonCode';
-import type { ApiConfig } from '@/api/http-client';
 
 const commonCodeApi = new CommonCode(new CustomHttpClient());
 
