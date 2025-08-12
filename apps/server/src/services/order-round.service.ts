@@ -358,6 +358,16 @@ export const updateWithoutImage = async (body: UpdateOrderRoundInput) => {
 
   try {
     const result = await prisma.$transaction(async (tx) => {
+      // 0. 현재 시작일자가 존재하는 주문차수를 조회한다. (수정대상 제외)
+      const findOr = await selectStartedAtOrderRound(startedAt);
+
+      if (findOr && findOr.no !== body.no) {
+        throw AppError.notFound('다른 주문차수 일자에 포함됩니다. 시작~종료일자를 검토하세요.', {
+          no,
+          diffNo: findOr.no,
+        });
+      }
+
       // 1. 주문차수 수정 :: orderRound
       const orResult = await tx.orderRound.update({
         where: { no },
@@ -600,7 +610,7 @@ export const getNow = async () => {
 /**
  * 현재 시작일자가 포함된 주문차수 조회
  */
-export const selectStartedAtOrderRound = async (startedAt: string) => {
+export const selectStartedAtOrderRound = async (startedAt: Date) => {
   const result = await prisma.$transaction(async (tx) => {
     const data = tx.orderRound.findFirst({
       where: {
