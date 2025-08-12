@@ -21,7 +21,6 @@ export interface IOrderRoundProps {
 export default function Header() {
   const [data, setData] = useState<IOrderRoundProps>();
   const navigate = useNavigate();
-  const { addToast } = useToast();
   const flag = true; // 로그인 세션 정보
 
   // 현재 진행중인 주문차수 조회
