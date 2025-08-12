@@ -17,7 +17,13 @@ import {
 } from '@appabbang/ui';
 import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
 import { SortAsc, SortDesc } from 'lucide-react';
-import { formatIsoWithoutSeconds, formatKR, formatToDate, formatToDateTime } from '@/utils/format';
+import {
+  formatIso,
+  formatIsoWithoutSeconds,
+  formatKR,
+  formatToDate,
+  formatToDateTime,
+} from '@/utils/format';
 import {
   useOrderAndStatusAndDliveryTypeQuery,
   useOrderStatusUpdateMutation,
@@ -772,7 +778,7 @@ export const paymentsColumns = () => {
         </Button>
       ),
       cell: (info) => {
-        return <p className="text-center">{formatIsoWithoutSeconds(info.getValue())}</p>;
+        return <p className="text-center">{formatIso(info.getValue())}</p>;
       },
     }),
     columnHelper.accessor('paidConfirmedAt', {
@@ -783,7 +789,7 @@ export const paymentsColumns = () => {
         </Button>
       ),
       cell: (info) => {
-        const value = info.getValue() === null ? '미입금' : info.getValue();
+        const value = info.getValue() === null ? '미입금' : formatIso(info.getValue());
 
         return <p className="text-center">{value}</p>;
       },

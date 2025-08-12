@@ -29,13 +29,9 @@ export function formatToDateTimeIso(date: Date, time: string) {
   return isoString;
 }
 
-/**
- * ISO 문자열을 yyyy-MM-dd HH:mm 형식으로 변환
- */
 export function formatIsoWithoutSeconds(isoString: string) {
   return format(new Date(isoString), 'yyyy-MM-dd HH:mm');
 }
-
-export function formatIsoWithoutTime(isoString: string) {
-  return format(new Date(isoString), 'yyyy-MM-dd');
+export function formatIso(isoString: string) {
+  return format(new Date(isoString), 'yyyy-MM-dd HH:mm:ss');
 }

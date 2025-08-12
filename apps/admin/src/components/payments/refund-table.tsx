@@ -1,5 +1,5 @@
 import type { OrdersDetailData, PaymentsDetailData } from '@/api/data-contracts';
-import { formatIsoWithoutTime, formatKR } from '@/utils/format';
+import { formatIso, formatKR } from '@/utils/format';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@appabbang/ui';
 
 function RefundTable({
@@ -47,7 +47,7 @@ function RefundTable({
         <div className="text-right space-y-1">
           <div className="flex">
             <label className="flex-3/5">주문일자 :</label>
-            <p className="flex-2/5">{formatIsoWithoutTime(paymentDetail.createdAt)}</p>
+            <p className="flex-2/5">{formatIso(paymentDetail.createdAt)}</p>
           </div>
           <div className="flex">
             <label className="flex-3/5">주문자 :</label>
