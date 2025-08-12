@@ -28,13 +28,11 @@ export const updatePaid = async (req: Request, res: Response) => {
 
   await paymentService.update(Number(no), {
     isPaid,
-    ...(isPaid && {
-      paidConfirmedAt: new Date(),
-    }),
+    paidConfirmedAt: isPaid ? new Date() : null,
   });
 
   // 11: 접수 완료
-  await orderService.updateOrderStatus(Number(orderNo), '11');
+  // await orderService.updateOrderStatus(Number(orderNo), '11');
   res.status(200).json({ message: '결제 입금 확인 완료' });
 };
 

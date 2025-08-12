@@ -322,10 +322,10 @@ export type OrdersListData = {
    */
   orderNumber: string;
   /**
-   * 주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소됨)
+   * 주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소요청, 51-취소완료, 52-취소완료(환불))
    * @example "10"
    */
-  orderStatus: "10" | "20" | "30" | "40" | "50";
+  orderStatus: "10" | "20" | "30" | "40" | "50" | "51" | "52";
   /**
    * 주문 상태명
    * @example "접수됨"
@@ -517,10 +517,10 @@ export interface OrdersDetailData {
    */
   orderNumber: string;
   /**
-   * 주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소됨)
+   * 주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소요청, 51-취소완료, 52-취소완료(환불))
    * @example "10"
    */
-  orderStatus: "10" | "20" | "30" | "40" | "50";
+  orderStatus: "10" | "20" | "30" | "40" | "50" | "51" | "52";
   /**
    * 총 주문 금액
    * @example 15000
@@ -730,10 +730,10 @@ export type OrdersUpdateData = any;
 
 export interface StatusUpdateBody {
   /**
-   * 변경할 주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소됨)
+   * 주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소요청, 51-취소완료, 52-취소완료(환불))
    * @example "10"
    */
-  orderStatus: "10" | "20" | "30" | "40" | "50";
+  orderStatus: "10" | "20" | "30" | "40" | "50" | "51" | "52";
 }
 
 export type StatusUpdateResult = any;
@@ -1716,6 +1716,34 @@ export type PaymentsListData = {
    * @example "2024-06-22T12:34:56.000Z"
    */
   updatedAt: string;
+  /** 주문 정보 */
+  order: {
+    /**
+     * 주문 번호
+     * @example 4
+     */
+    no: number;
+    /**
+     * 주문 총 금액
+     * @example 6000
+     */
+    totalPrice: number;
+    /**
+     * 주문 상태
+     * @example "50"
+     */
+    orderStatus: string;
+    /**
+     * 주문 상태 이름
+     * @example "접수요청"
+     */
+    orderStatusName: string;
+    /**
+     * 주문번호
+     * @example "ORD-20250811-99468690"
+     */
+    orderNumber?: string;
+  };
 }[];
 
 export interface PaymentsDetailData {

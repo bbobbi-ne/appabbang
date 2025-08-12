@@ -45,7 +45,7 @@ export function useOrderAndStatusAndDliveryTypeQuery() {
 
 export function useOrdersDetailQuery(no: number) {
   return useQuery({
-    queryKey: ['bread', { no }],
+    queryKey: ['order', { no }],
     queryFn: getOrdersDetail,
     staleTime: Infinity,
     retry: 1,
@@ -57,8 +57,10 @@ export function useOrderStatusUpdateMutation() {
   const queryClient = useQueryClient();
   const { mutate, isError, isSuccess, error } = useMutation({
     mutationFn: updateOrderStatus,
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['order', { no: variables.no }] });
+      queryClient.invalidateQueries({ queryKey: ['payments'] });
     },
   });
 
