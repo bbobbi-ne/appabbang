@@ -220,7 +220,7 @@ export default function OrderPage() {
             <CardContent>
               <CardComment
                 title="1. 이번 주문서에 포함된 빵을 확인하세요!"
-                comment="현재 주문서에 포함된 빵 목록은 다음과 같습니다."
+                comment="현재 주문서에 포함된 빵 목록은 다음과 같습니다. 카드를 클릭하면 빵 결제목록에 담을 수 있습니다."
               />
 
               {/* 주문차수 빵 목록 */}
