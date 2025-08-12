@@ -51,7 +51,7 @@ export async function updatePaid({
   try {
     const response = await paymentApi.paidUpdate(no, data);
 
-    if (rowOrderStatus.name === '접수요청') {
+    if (rowOrderStatus.name === '접수요청' && data.isPaid) {
       const orderStatusres = await getOrderStatus();
 
       const foundStatus = orderStatusres.data.find((status) => status.name === '접수완료');
