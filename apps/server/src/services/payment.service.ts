@@ -13,6 +13,8 @@ export const getList = async () => {
         select: {
           no: true,
           totalPrice: true,
+          orderStatus: true,
+          orderNumber: true,
         },
       },
     },
@@ -20,6 +22,10 @@ export const getList = async () => {
 
   const result = list.map((item) => ({
     ...item,
+    order: {
+      ...item.order,
+      orderStatusName: getOrderStatusName(item.order.orderStatus),
+    },
     bankCodeName: getBankCodeName(item.bankCode),
   }));
 
@@ -35,6 +41,7 @@ export const getOneByNo = async (no: number) => {
         select: {
           no: true,
           totalPrice: true,
+          orderStatus: true,
         },
       },
     },
@@ -62,3 +69,8 @@ export const update = async (no: number, body: Partial<Payment>) => {
 export const getBankCodeName = (code: string): string => {
   return commonCodeMap.bankCodeMap.get(code) || '-';
 };
+
+/** 주문 상태 조회 */
+export function getOrderStatusName(code: string): string {
+  return commonCodeMap.orderStatusMap.get(code) || '-';
+}
