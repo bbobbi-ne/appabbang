@@ -8,10 +8,10 @@ import CardComment from '@/components/common/card-comment';
 import Payment from '@/components/order/Payment';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { formSchema } from '@/validate/form-schema';
+import { formSchema } from '@/validate/order-form-schema';
 import NonCustomerOrderForm from '@/components/order/non-customer-order-form';
 import { getOrderRound, insertOrders, searchBankList, searchDeliveryList } from '@/services/apis';
-import type { FormSchema } from '@/validate/form-schema';
+import type { FormSchema } from '@/validate/order-form-schema';
 import useToast from '@/hooks/useToast';
 import { useParams } from '@tanstack/react-router';
 

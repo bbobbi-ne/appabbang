@@ -3,7 +3,7 @@
  */
 
 import type { BankCodeProps, DeliveryProps } from '@/interface/bread-interface';
-import type { FormSchema } from '@/validate/form-schema';
+import type { FormSchema } from '@/validate/order-form-schema';
 import {
   Button,
   Checkbox,
