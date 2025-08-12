@@ -514,6 +514,8 @@ export const getLatest = async () => {
         name: true,
         startedAt: true,
         endedAt: true,
+        minOrderQty: true,
+        maxOrderQty: true,
         orderRoundBreads: {
           select: {
             bread: {
@@ -578,6 +580,8 @@ export const getNow = async () => {
         name: true,
         startedAt: true,
         endedAt: true,
+        minOrderQty: true,
+        maxOrderQty: true,
         orderRoundBreads: {
           select: {
             orderRoundNo: true,
@@ -608,6 +612,8 @@ export const selectStartedAtOrderRound = async (startedAt: string) => {
         name: true,
         startedAt: true,
         endedAt: true,
+        minOrderQty: true,
+        maxOrderQty: true,
         orderRoundBreads: {
           select: {
             orderRoundNo: true,
