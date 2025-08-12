@@ -14,16 +14,13 @@ const countBtnCss = `
 `;
 
 /** Main Function */
-function Payment({ bread, handlers }: PaymentProp) {
-  const [count, setCount] = useState<number>(0); // 수량
+function Payment({ bread, min, max, handlers }: PaymentProp) {
+  const [count, setCount] = useState<number>(min); // 수량
   const [amount, setAmount] = useState<number>(0); // 금액
 
   /** React Hooks  */
   useEffect(() => {
-    const price = bread.unitPrice;
-
-    setCount(1);
-    setAmount(price);
+    setAmount(bread.unitPrice);
   }, []);
 
   /** Functions */
@@ -31,11 +28,14 @@ function Payment({ bread, handlers }: PaymentProp) {
   const countHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
     const btnVal = e.currentTarget.value;
 
-    const newCount = btnVal.includes('plus') ? count + 1 : count > 1 ? count - 1 : 1;
+    let newCount = btnVal.includes('plus') ? count + 1 : count > 1 ? count - 1 : 1;
     const newAmount = bread.unitPrice * newCount;
 
     bread.count = newCount;
     bread.price = newAmount;
+
+    // 수량은 최대주문수량까지만 넘어갈 수 있음
+    newCount = newCount <= max ? newCount : max;
 
     // 상태 업데이트
     setCount(newCount);
@@ -48,12 +48,31 @@ function Payment({ bread, handlers }: PaymentProp) {
     btnVal.includes('minus') && count === 1 && handlers.onRemove?.(bread);
   };
 
+  // 수량 수정 가능하도록 변경하는 함수
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = Number(e.target.value);
+
+    // 최소, 최대 수량 제한
+    if (value < min) value = min;
+    if (value > max) value = max;
+
+    setCount(value);
+
+    const newAmount = bread.unitPrice * value;
+    setAmount(newAmount);
+
+    bread.count = value;
+    bread.price = newAmount;
+
+    handlers.onCountChange(bread, 'input');
+  };
+
   return (
     <Card className="flex flex-row items-start m-4">
       <CardTitle className="mt-auto mb-auto ml-8 h-auto w-1/3 text-[18px] ">{bread.name}</CardTitle>
 
       <div className="flex flex-row items-start *:mt-5 *:mb-5">
-        <Input type="text" className="m-4 text-right w-15" disabled value={count} />
+        <Input type="number" className="m-4 text-right w-20" value={count} onChange={onChange} />
         <Button type="button" className={countBtnCss} value="plus" onClick={countHandler}>
           +
         </Button>

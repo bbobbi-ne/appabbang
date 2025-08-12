@@ -23,6 +23,8 @@ export default function OrderPage() {
   const [fee, setFee] = useState<number>(0); // 배송비
   const [totalCount, setTotalCount] = useState<number>(0); // 최종 수량
   const [totalPrice, setTotalPrice] = useState<number>(0); // 최종 금액
+  const [min, setMin] = useState<number>(0); // 최소주문수량
+  const [max, setMax] = useState<number>(0); // 최대주문수량
   // 메인페이지에서 넘어온 주문차수 파라미터
   const { orderRoundNo } = useParams({ from: '/_sub-page/order/$orderRoundNo' });
 
@@ -178,7 +180,11 @@ export default function OrderPage() {
 
   /** 주문차수 빵 목록 조회 및 설정 */
   useEffect(() => {
-    orderRoundData && setOrderRoundBreads(orderRoundData.data.orderRoundBreads);
+    if (orderRoundData) {
+      setOrderRoundBreads(orderRoundData.data.orderRoundBreads);
+      setMin(orderRoundData.data.minOrderQty);
+      setMax(orderRoundData.data.maxOrderQty);
+    }
     orderRoundErr && setErrMsg('빵 목록을 조회하는 데 문제가 발생했습니다.');
   }, [orderRoundData, orderRoundErr]);
 
@@ -235,7 +241,9 @@ export default function OrderPage() {
 
             {paymentList.length === 0
               ? null
-              : paymentList.map((data, i) => <Payment key={i} bread={data} handlers={handlers} />)}
+              : paymentList.map((data, i) => (
+                  <Payment key={i} bread={data} min={min} max={max} handlers={handlers} />
+                ))}
           </div>
 
           <div className="mt-5 mb-5 mr-10 text-right font-bold text-[18px]">
