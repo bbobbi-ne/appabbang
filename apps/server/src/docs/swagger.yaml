@@ -635,8 +635,8 @@ paths:
                       example: ORD-20240622-12345
                     orderStatus:
                       type: string
-                      enum: ['10', '20', '30', '40', '50']
-                      description: '주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소됨)'
+                      enum: ['10', '20', '30', '40', '50',"51","52"]
+                      description: '주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소요청, 51-취소완료, 52-취소완료(환불))'
                       example: '10'
                     orderStatusName:
                       type: string
@@ -988,8 +988,8 @@ paths:
                     example: ORD-20240622-12345
                   orderStatus:
                     type: string
-                    enum: ['10', '20', '30', '40', '50']
-                    description: '주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소됨)'
+                    enum: ['10', '20', '30', '40', '50',"51","52"]
+                    description: '주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소요청, 51-취소완료, 52-취소완료(환불))'
                     example: '10'
                   totalPrice:
                     type: integer
@@ -1292,8 +1292,8 @@ paths:
               properties:
                 orderStatus:
                   type: string
-                  enum: ['10', '20', '30', '40', '50']
-                  description: '변경할 주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소됨)'
+                  enum: ['10', '20', '30', '40', '50',"51","52"]
+                  description: '주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소요청, 51-취소완료, 52-취소완료(환불))'
                   example: '10'
       responses:
         '200':
@@ -3119,6 +3119,7 @@ paths:
                     - bankCodeName
                     - createdAt
                     - updatedAt
+                    - order
                   properties:
                     no:
                       type: integer
@@ -3182,6 +3183,36 @@ paths:
                       format: date-time
                       description: 결제 수정일시
                       example: '2024-06-22T12:34:56.000Z'
+                    order:
+                      type: object
+                      description: 주문 정보
+                      required:
+                        - no
+                        - totalPrice
+                        - orderStatus
+                        - orderStatusName
+                      properties:
+                        no:
+                          type: integer
+                          description: 주문 번호
+                          example: 4
+                        totalPrice:
+                          type: integer
+                          description: 주문 총 금액
+                          example: 6000
+                        orderStatus:
+                          type: string
+                          description: 주문 상태
+                          example: "50"
+                        orderStatusName:
+                          type: string
+                          description: 주문 상태 이름
+                          example: "접수요청"
+                        orderNumber:
+                          type: string
+                          description: 주문번호
+                          example: "ORD-20250811-99468690"
+                          
 
   /payments/{no}:
     get:
