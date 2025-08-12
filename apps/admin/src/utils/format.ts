@@ -35,3 +35,7 @@ export function formatToDateTimeIso(date: Date, time: string) {
 export function formatIsoWithoutSeconds(isoString: string) {
   return format(new Date(isoString), 'yyyy-MM-dd HH:mm');
 }
+
+export function formatIsoWithoutTime(isoString: string) {
+  return format(new Date(isoString), 'yyyy-MM-dd');
+}
