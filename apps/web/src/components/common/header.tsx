@@ -1,12 +1,49 @@
+import { getOrderRoundNow } from '@/services/apis';
+import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { User, ScrollText, LogIn, LogOut } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-// const linkCss = `px-2 font-bold w-30`; // 오타 수정: 'font-bol' → 'font-bold'
-// const imgCss = `w-10 h-10 cursor-pointer`;
+export interface IOrderRoundProps {
+  no: number;
+  name: string;
+  startedAt: string;
+  endedAt: string;
+  minOrderQty: number;
+  maxOrderQty: number;
+  orderRoundBreads: {
+    orderRoundNo: number;
+    breadNo: number;
+  }[];
+}
 
 export default function Header() {
+  const [data, setData] = useState<IOrderRoundProps>();
   const navigate = useNavigate();
   const flag = true; // 로그인 세션 정보
+
+  // 현재 진행중인 주문차수 조회
+  const {
+    isLoading,
+    data: getData,
+    error,
+  } = useQuery({
+    queryKey: ['getOrderRoundNow'],
+    queryFn: getOrderRoundNow,
+  });
+
+  useEffect(() => {
+    getData && setData(getData.data);
+  }, [getData]);
+
+  const onOrderMove = (no: number) => {
+    navigate({
+      to: '/order/$orderRoundNo',
+      params: { orderRoundNo: String(no) },
+    });
+  };
+
+  if (error || !data) return <div>주문 정보를 불러오지 못했습니다.</div>;
 
   return (
     <header className="w-full fixed top-0 left-0 right-0 z-50 bg-background border-b">
@@ -14,9 +51,14 @@ export default function Header() {
       <div className="container mx-auto px-2">
         {/* 1 ROW : 아이콘 메뉴 (주문서, 마이페이지, 로그인, 로그아웃) */}
         <nav className="flex items-center justify-end py-2 bg-background">
-          <Link to="/order" className="px-2 text-xs">
-            <ScrollText strokeWidth={1} size={16} className="text-primary hover:text-foreground" />
-          </Link>
+          {!isLoading ? (
+            <ScrollText
+              strokeWidth={1}
+              size={16}
+              className="text-primary hover:text-foreground cursor-pointer"
+              onClick={() => onOrderMove(data.no)}
+            />
+          ) : null}
           <Link to="/mypage/info" className="px-2 text-xs">
             <User strokeWidth={1} size={16} className="text-primary hover:text-foreground" />
           </Link>
