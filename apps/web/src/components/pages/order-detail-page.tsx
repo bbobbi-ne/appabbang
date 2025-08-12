@@ -9,6 +9,7 @@ import type { IOrderItem } from '../mypage/order-item';
 import OrderItem from '../mypage/order-item';
 import { ArrowRight } from 'lucide-react';
 import AddressModifyDialog from '../mypage/address-modify-dialog';
+import { useNavigate } from '@tanstack/react-router';
 
 interface IDataProps {
   no: number;
@@ -40,6 +41,7 @@ interface IAddressProps {
 function OrderDetailPage({ orderNo }: { orderNo: number }) {
   const [data, setData] = useState<IDataProps | null>(null);
   const [address, setAddress] = useState<IAddressProps>();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const result = orders.find((data) => data.no === orderNo) || null;
@@ -61,10 +63,13 @@ function OrderDetailPage({ orderNo }: { orderNo: number }) {
     }
   }, [orderNo]);
 
+  // 배송현황 이동
+  const onDeliveryMove = (no: number) => navigate({ to: `/mypage/order-delivery/${no}` });
+
   if (!data) return <div>주문정보를 조회중입니다...</div>;
   else
     return (
-      <div className="w-full flex flex-col justify-center items-center mb-30">
+      <div className="w-full flex flex-col justify-center items-center mt-10 mb-30">
         <Card className="mt-2 mb-5 flex flex-col w-2/3">
           <CardContent className="mt-4 flex gap-3">
             <div className="font-bold">
@@ -106,7 +111,10 @@ function OrderDetailPage({ orderNo }: { orderNo: number }) {
               <div className="flex flex-row mb-5">
                 <div className="font-bold text-2xl mr-5">배송정보</div>
                 {data.orderStatus == '30' ? (
-                  <div className="text-[14px] text-gray-500 flex flex-row items-center cursor-pointer">
+                  <div
+                    className="text-[14px] text-gray-500 flex flex-row items-center cursor-pointer"
+                    onClick={() => onDeliveryMove(data.no)}
+                  >
                     수령현황 보기
                     <ArrowRight />
                   </div>
