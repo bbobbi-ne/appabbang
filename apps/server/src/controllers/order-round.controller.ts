@@ -23,15 +23,28 @@ export async function getOne(req: Request, res: Response) {
 
 /**
  * 주문차수 등록
+ * 주문차수 등록 시 현재 시작일자가 이 전에 등록된 주문차수 중 시작-종료일에 포함되어 있는지 확인한다. 만약 존재하면 등록불가.
  */
 export async function create(req: Request, res: Response) {
-  const { no, seq, name, breadNoList: breadNoListStr, startedAt, endedAt } = req.body;
+  const { no, seq, name, orderRoundBreads: breadNoListStr, startedAt, endedAt } = req.body;
   let breadNoListJson = JSON.parse(breadNoListStr); // json parsing
   // breadNoList에서 breadNo 값만 추출
   const breadNoList = breadNoListJson.map((bread: { breadNo: number }) => bread.breadNo);
   const model = { no, seq, name, breadNoList, startedAt, endedAt };
   const image = req.files?.image as UploadedFile[] | UploadedFile | undefined;
   let orderRound;
+
+  // 시작일자가 포함된 주문차수 조회
+  const ingOr = await OrderRoundService.selectStartedAtOrderRound(startedAt);
+  if (ingOr)
+    throw AppError.notFound(
+      `주문차수를 등록할 수 없습니다. (이미 진행중인 주문차수가 존재합니다. ${ingOr.no})`,
+      {
+        no,
+        seq,
+        name,
+      },
+    );
 
   !image
     ? (orderRound = await OrderRoundService.createWithoutImage(model)) // 이미지 없는 주문차수 등록
@@ -47,6 +60,8 @@ export async function create(req: Request, res: Response) {
  * 1) '주문차수' 항목은 수정할 수 없음.
  * 2) 주문차수-빵 테이블의 수정 프로세스는 삭제 -> 신규등록하는 로직
  * 3) 이미지 삭제는 별도의 API로 수행
+ *
+ * 주문차수 수정 시 현재 시작s일자가 이 전에 등록된 주문차수 중 시작-종료일에 포함되어 있는지 확인한다. 만약 존재하면 수정불가.
  */
 export async function update(req: Request, res: Response) {
   const { no, seq, name, public_id, breadNoList: breadNoListStr, startedAt, endedAt } = req.body;
@@ -65,6 +80,17 @@ export async function update(req: Request, res: Response) {
       seq,
       name,
     });
+
+  const ingOr = await OrderRoundService.selectStartedAtOrderRound(startedAt);
+  if (ingOr)
+    throw AppError.notFound(
+      `주문차수를 수정할 수 없습니다. (이미 진행중인 주문차수가 존재합니다. : ${ingOr.no})`,
+      {
+        no,
+        seq,
+        name,
+      },
+    );
 
   // 이미지 유무에 따른 주문차수 수정
   !image

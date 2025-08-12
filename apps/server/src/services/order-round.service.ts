@@ -574,3 +574,33 @@ export const getNow = async () => {
 
   return result;
 };
+
+/**
+ * 현재 시작일자가 포함된 주문차수 조회
+ */
+export const selectStartedAtOrderRound = async (startedAt: string) => {
+  const result = await prisma.$transaction(async (tx) => {
+    const data = tx.orderRound.findFirst({
+      where: {
+        startedAt: { lte: startedAt },
+        endedAt: { gte: startedAt },
+      },
+      select: {
+        no: true,
+        name: true,
+        startedAt: true,
+        endedAt: true,
+        orderRoundBreads: {
+          select: {
+            orderRoundNo: true,
+            breadNo: true,
+          },
+        },
+      },
+    });
+
+    return data;
+  });
+
+  return result;
+};
