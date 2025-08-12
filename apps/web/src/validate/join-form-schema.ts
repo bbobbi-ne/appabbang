@@ -14,6 +14,17 @@ const ID_VALIDATION = {
   required: { message: '아이디를 입력하세요.' },
 };
 
+const NAME_VALIDATION = {
+  min: { value: 2, message: '이름은 2자 이상 입력 바랍니다.' },
+  max: { value: 30, message: '이름은 30자 이내로 입력 바랍니다.' },
+  regex: {
+    // 영문 대/소문자 + 숫자 조합, 5~30자
+    value: /^[가-힣]{2,30}$/,
+    message: '이름은 한글 2~30자 입력 가능합니다.',
+  },
+  required: { message: '이름을 입력하세요.' },
+};
+
 const PASSWORD_VALIDATION = {
   min: { value: 10, message: '비밀번호는 10자 이상 입력 바랍니다.' },
   max: { value: 30, message: '비밀번호는 30자 이내로 입력 바랍니다.' },
@@ -57,6 +68,12 @@ export const joinSchema = z
       .min(ID_VALIDATION.min.value, ID_VALIDATION.min.message)
       .max(ID_VALIDATION.max.value, ID_VALIDATION.max.message)
       .regex(ID_VALIDATION.regex.value, { message: ID_VALIDATION.regex.message }),
+    name: z
+      .string({ required_error: NAME_VALIDATION.required.message })
+      .trim()
+      .min(NAME_VALIDATION.min.value, NAME_VALIDATION.min.message)
+      .max(NAME_VALIDATION.max.value, NAME_VALIDATION.max.message)
+      .regex(NAME_VALIDATION.regex.value, { message: NAME_VALIDATION.regex.message }),
     password: z
       .string({ required_error: PASSWORD_VALIDATION.required.message })
       .trim()
@@ -99,7 +116,6 @@ export const joinSchema = z
     isMarketingTermsAgreed: z.boolean({
       required_error: '마케팅 목적 개인정보 이용 및 광고 수신 동의 처리방침을 확인 바랍니다.',
     }),
-    isAgree: z.boolean(),
   })
   .superRefine(({ password, passwordConfirm }, ctx) => {
     // 비밀번호 확인 :: 틀리면 오류

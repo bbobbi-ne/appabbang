@@ -22,24 +22,27 @@ import { joinSchema, type JoinSchemaType } from '@/validate/join-form-schema';
 import ServiceIsAgreedDialog from './service-terms-agreed-dialog';
 import PrivacyTermsAgreedDialog from './privacy-terms-agreed-dialog';
 import useToast from '@/hooks/useToast';
+import { createCustomer } from '@/services/user-apis';
+import { useNavigate } from '@tanstack/react-router';
 
 const labelMinWidth = 'min-w-[120px]';
 
 export default function JoinForm() {
   const { addToast } = useToast();
+  const navigate = useNavigate();
 
   // 폼 선언
   const form = useForm<JoinSchemaType>({
     resolver: zodResolver(joinSchema),
     defaultValues: {
       id: '',
+      name: '',
       password: '',
       passwordConfirm: '',
       mobileNumber: '',
       address: '',
       addressDetail: '',
       zipcode: '',
-      isAgree: false,
       isServiceTermsAgreed: false,
       isPrivacyTermsAgreed: false,
       isMarketingTermsAgreed: false,
@@ -64,6 +67,8 @@ export default function JoinForm() {
         type: 'error',
         message: '아빠빵 처리방침 약관을 확인 바랍니다.',
       });
+
+      return;
     }
 
     // success
@@ -74,7 +79,9 @@ export default function JoinForm() {
    * 회원가입 submit
    */
   const onSubmit: SubmitHandler<JoinSchemaType> = (data) => {
-    console.log('success');
+    createCustomer(data);
+
+    navigate({ to: '/' }); // 메인페이지로 이동
   };
 
   return (
@@ -92,6 +99,25 @@ export default function JoinForm() {
               <div className="w-full space-y-1">
                 <FormControl>
                   <Input type="text" {...field} placeholder="아이디 입력" maxLength={30} />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </div>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem className="flex items-center">
+              <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
+                <span className="text-red-700">*</span> 이름
+              </FormLabel>
+
+              <div className="w-full space-y-1">
+                <FormControl>
+                  <Input type="text" {...field} placeholder="이름 입력" maxLength={30} />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>
