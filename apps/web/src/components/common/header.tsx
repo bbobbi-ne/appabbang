@@ -45,12 +45,6 @@ export default function Header() {
     });
   };
 
-  const onAlert = () =>
-    addToast({
-      message: '현재 진행중인 주문차수 조회 과정에서 문제가 발생했습니다.',
-      type: 'error',
-    });
-
   if (error || !data) return <div>주문 정보를 불러오지 못했습니다.</div>;
 
   return (
