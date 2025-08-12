@@ -9,12 +9,18 @@ let IMAGE_TARGET_TYPE_CODE: string | null = null;
 const IMAGE_TARGET_TYPE_NAME = 'orderRound';
 
 // OrderRound 등록 타입
-type CreateOrderRoundInput = Pick<OrderRound, 'name' | 'startedAt' | 'endedAt'> & {
+type CreateOrderRoundInput = Pick<
+  OrderRound,
+  'name' | 'startedAt' | 'endedAt' | 'minOrderQty' | 'maxOrderQty'
+> & {
   breadNoList: number[];
 };
 
 // OrderRound 수정 타입
-type UpdateOrderRoundInput = Pick<OrderRound, 'no' | 'name' | 'startedAt' | 'endedAt'> & {
+type UpdateOrderRoundInput = Pick<
+  OrderRound,
+  'no' | 'name' | 'startedAt' | 'endedAt' | 'minOrderQty' | 'maxOrderQty'
+> & {
   breadNoList: number[];
 };
 
@@ -57,6 +63,8 @@ export const getOrderRoundList = async () => {
         name: true,
         startedAt: true,
         endedAt: true,
+        minOrderQty: true,
+        maxOrderQty: true,
         orderRoundBreads: {
           select: {
             bread: {
@@ -121,6 +129,8 @@ export const getOrderRound = async (no: number) => {
         name: true,
         startedAt: true,
         endedAt: true,
+        minOrderQty: true,
+        maxOrderQty: true,
         orderRoundBreads: {
           select: {
             bread: {
@@ -223,6 +233,8 @@ export const createWithoutImage = async (body: CreateOrderRoundInput) => {
           name: body.name,
           startedAt: body.startedAt,
           endedAt: body.endedAt,
+          minOrderQty: body.minOrderQty,
+          maxOrderQty: body.maxOrderQty,
         },
       });
 
@@ -266,6 +278,8 @@ export const createWithImage = async (
           name: body.name,
           startedAt: new Date(body.startedAt),
           endedAt: new Date(body.endedAt),
+          minOrderQty: body.minOrderQty,
+          maxOrderQty: body.maxOrderQty,
         },
       });
 
@@ -340,7 +354,7 @@ const createOrderRoundBread = async (
  * 주문차수 수정 (이미지 X)
  */
 export const updateWithoutImage = async (body: UpdateOrderRoundInput) => {
-  const { no, name, startedAt, endedAt } = body;
+  const { no, name, startedAt, endedAt, minOrderQty, maxOrderQty } = body;
 
   try {
     const result = await prisma.$transaction(async (tx) => {
@@ -351,6 +365,8 @@ export const updateWithoutImage = async (body: UpdateOrderRoundInput) => {
           name,
           startedAt,
           endedAt,
+          minOrderQty,
+          maxOrderQty,
         },
       });
 
@@ -394,7 +410,7 @@ export const updateWithImage = async (
   body: UpdateOrderRoundInput,
   image: UploadedFile[] | UploadedFile,
 ) => {
-  const { no, name, startedAt, endedAt } = body;
+  const { no, name, startedAt, endedAt, minOrderQty, maxOrderQty } = body;
 
   try {
     const result = await prisma.$transaction(async (tx) => {
@@ -405,6 +421,8 @@ export const updateWithImage = async (
           name,
           startedAt: new Date(startedAt),
           endedAt: new Date(endedAt),
+          minOrderQty,
+          maxOrderQty,
         },
       });
 

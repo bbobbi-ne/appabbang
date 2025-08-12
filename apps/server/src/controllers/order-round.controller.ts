@@ -26,11 +26,20 @@ export async function getOne(req: Request, res: Response) {
  * 주문차수 등록 시 현재 시작일자가 이 전에 등록된 주문차수 중 시작-종료일에 포함되어 있는지 확인한다. 만약 존재하면 등록불가.
  */
 export async function create(req: Request, res: Response) {
-  const { no, seq, name, orderRoundBreads: breadNoListStr, startedAt, endedAt } = req.body;
-  let breadNoListJson = JSON.parse(breadNoListStr); // json parsing
+  const {
+    no,
+    seq,
+    name,
+    orderRoundBreads: orderRoundBreadsStr,
+    startedAt,
+    endedAt,
+    minOrderQty,
+    maxOrderQty,
+  } = req.body;
+  let json = JSON.parse(orderRoundBreadsStr); // json parsing
   // breadNoList에서 breadNo 값만 추출
-  const breadNoList = breadNoListJson.map((bread: { breadNo: number }) => bread.breadNo);
-  const model = { no, seq, name, breadNoList, startedAt, endedAt };
+  const breadNoList = json.map((bread: { breadNo: number }) => bread.breadNo);
+  const model = { no, seq, name, breadNoList, startedAt, endedAt, minOrderQty, maxOrderQty };
   const image = req.files?.image as UploadedFile[] | UploadedFile | undefined;
   let orderRound;
 
@@ -64,11 +73,31 @@ export async function create(req: Request, res: Response) {
  * 주문차수 수정 시 현재 시작s일자가 이 전에 등록된 주문차수 중 시작-종료일에 포함되어 있는지 확인한다. 만약 존재하면 수정불가.
  */
 export async function update(req: Request, res: Response) {
-  const { no, seq, name, public_id, breadNoList: breadNoListStr, startedAt, endedAt } = req.body;
+  const {
+    no,
+    seq,
+    name,
+    public_id,
+    breadNoList: breadNoListStr,
+    startedAt,
+    endedAt,
+    minOrderQty,
+    maxOrderQty,
+  } = req.body;
   let breadNoListJson = JSON.parse(breadNoListStr); // json parsing
   // breadNoList에서 breadNo 값만 추출
   const breadNoList = breadNoListJson.map((bread: { breadNo: number }) => bread.breadNo);
-  const model = { no: Number(no), seq, name, public_id, breadNoList, startedAt, endedAt };
+  const model = {
+    no: Number(no),
+    seq,
+    name,
+    public_id,
+    breadNoList,
+    startedAt,
+    endedAt,
+    minOrderQty,
+    maxOrderQty,
+  };
   const image = req.files?.image as UploadedFile[] | UploadedFile | undefined;
   let result;
 
