@@ -296,6 +296,9 @@ importers:
       '@faker-js/faker':
         specifier: ^9.6.0
         version: 9.8.0
+      '@ramonak/react-progress-bar':
+        specifier: ^5.4.0
+        version: 5.4.0(react-dom@19.1.0(react@18.3.1))(react@18.3.1)
       '@types/react-slick':
         specifier: ^0.23.13
         version: 0.23.13
@@ -332,6 +335,9 @@ importers:
       styled-components:
         specifier: ^6.1.19
         version: 6.1.19(react-dom@19.1.0(react@18.3.1))(react@18.3.1)
+      zustand:
+        specifier: ^5.0.5
+        version: 5.0.5(@types/react@18.3.23)(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))
     devDependencies:
       swagger-typescript-api:
         specifier: ^13.2.7
@@ -1378,6 +1384,12 @@ packages:
 
   '@radix-ui/rect@1.1.1':
     resolution: {integrity: sha512-HPwpGIzkl28mWyZqG52jiqDJ12waP11Pa1lGoiyUkIEuMLBP0oeK/C89esbXrxsky5we7dfd8U58nm0SgAWpVw==}
+
+  '@ramonak/react-progress-bar@5.4.0':
+    resolution: {integrity: sha512-3MJ0TKPw7xhearDuO6egIRQrvuERoLn6CVc2hKnw89iEegUL6DzMY7Rptmz2KaHjK0zbev+PGyyvDW+IK4FJBg==}
+    peerDependencies:
+      react: ^16.0.0 || ^17 || ^18 || ^19
+      react-dom: ^16.0.0 || ^17 || ^18 || ^19
 
   '@rolldown/pluginutils@1.0.0-beta.9':
     resolution: {integrity: sha512-e9MeMtVWo186sgvFFJOPGy7/d2j2mZhLJIdVW0C/xDluuOvymEATqz6zKsP0ZmXGzQtqlyjz5sC1sYQUoJG98w==}
@@ -5695,6 +5707,11 @@ snapshots:
 
   '@radix-ui/rect@1.1.1': {}
 
+  '@ramonak/react-progress-bar@5.4.0(react-dom@19.1.0(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      react: 18.3.1
+      react-dom: 19.1.0(react@18.3.1)
+
   '@rolldown/pluginutils@1.0.0-beta.9': {}
 
   '@rollup/rollup-android-arm-eabi@4.41.1':
@@ -9100,6 +9117,11 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.1.5
 
+  use-sync-external-store@1.5.0(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+    optional: true
+
   use-sync-external-store@1.5.0(react@19.1.0):
     dependencies:
       react: 19.1.0
@@ -9333,6 +9355,12 @@ snapshots:
       commander: 9.5.0
 
   zod@3.25.36: {}
+
+  zustand@5.0.5(@types/react@18.3.23)(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1)):
+    optionalDependencies:
+      '@types/react': 18.3.23
+      react: 18.3.1
+      use-sync-external-store: 1.5.0(react@18.3.1)
 
   zustand@5.0.5(@types/react@19.1.5)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0)):
     optionalDependencies:
