@@ -32,7 +32,7 @@ export const updatePaid = async (req: Request, res: Response) => {
   });
 
   // 11: 접수 완료
-  // await orderService.updateOrderStatus(Number(orderNo), '11');
+  // await orderService.update(Number(orderNo), { orderStatus: '11' });
   res.status(200).json({ message: '결제 입금 확인 완료' });
 };
 
@@ -49,6 +49,6 @@ export const updateRefund = async (req: Request, res: Response) => {
   });
 
   // 51: 취소 완료
-  await orderService.updateOrderStatus(Number(orderNo), '51');
+  // await orderService.update(Number(orderNo), { orderStatus: '51' });
   res.status(200).json({ message: '결제 환불 취소 완료' });
 };

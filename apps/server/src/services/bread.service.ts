@@ -4,19 +4,21 @@ import { Bread, Image } from '@prisma/client';
 import * as ImageService from './image.service';
 import { UploadedFile } from 'express-fileupload';
 import { AppError } from '@/types';
-import { ClientType } from '@/types/client-payload';
 
-const IMAGE_TARGET_TYPE = '10'; // 빵 이미지 코드
-const CUSTOMER_AVALIABLE_BREAD_STATUS = ['10', '40', '50']; // 고객은 판매, 재료소진, 출시예정 만 조회 가능
+type CreateBreadRequestBody = Pick<
+  Bread,
+  'name' | 'description' | 'unitPrice' | 'breadStatus' | 'countryOfOrigin' | 'allergyInfo'
+>;
+type UpdateBreadRequestBody = CreateBreadRequestBody;
+const IMAGE_TARGET_TYPE_CODE = '10'; // 빵 이미지 코드
 
 /** 빵 목록 전체 조회 */
 export const getAll = async () => {
-  // 최대 10000 개 조회
   const result = await prisma.$transaction(async (tx) => {
     const breads = await tx.bread.findMany({
-      take: 10000,
+      take: 10000, // 최대 10000 개 조회
       orderBy: {
-        no: 'desc',
+        createdAt: 'desc',
       },
     });
 
@@ -24,106 +26,25 @@ export const getAll = async () => {
       take: 10000,
       orderBy: [{ no: 'desc' }, { order: 'asc' }],
       where: {
-        imageTargetType: IMAGE_TARGET_TYPE,
+        imageTargetType: IMAGE_TARGET_TYPE_CODE,
         order: 1,
       },
-    });
-
-    const imageMap = new Map<number, string>();
-    images.forEach((img: any) => {
-      imageMap.set(img.imageTargetNo, img.url);
-    });
-
-    const data = breads.map((bread: any) => ({
-      ...bread,
-      breadStatusName: getBreadStatusName(bread.breadStatus),
-      images: [...(imageMap.get(bread.no) ? [{ url: imageMap.get(bread.no) }] : [])],
-    }));
-
-    return data;
-  });
-
-  return result;
-};
-
-/** 고객을 위한 빵 전체 조회 */
-export const getAllForCustomer = async () => {
-  const result = await prisma.$transaction(async (tx) => {
-    const breads = await tx.bread.findMany({
-      where: { breadStatus: { in: CUSTOMER_AVALIABLE_BREAD_STATUS } },
       select: {
-        no: true,
-        name: true,
-        description: true,
-        unitPrice: true,
-        breadStatus: true,
-      },
-    });
-
-    const images = await tx.image.findMany({
-      take: 10000,
-      orderBy: [{ no: 'desc' }, { order: 'asc' }],
-      where: {
-        imageTargetType: IMAGE_TARGET_TYPE,
-        order: 1,
-      },
-    });
-
-    const imageMap = new Map<number, string>();
-    images.forEach((img: any) => {
-      imageMap.set(img.imageTargetNo, img.url);
-    });
-
-    const data = breads.map((bread: any) => ({
-      ...bread,
-      breadStatusName: getBreadStatusName(bread.breadStatus),
-      images: [...(imageMap.get(bread.no) ? [{ url: imageMap.get(bread.no) }] : [])],
-    }));
-
-    return data;
-  });
-
-  return result;
-};
-
-export const getByStatus = async (breadStatus: string) => {
-  const result = await prisma.$transaction(async (tx) => {
-    const breads = await tx.bread.findMany({
-      take: 10000,
-      orderBy: {
-        no: 'desc',
-      },
-      where: { breadStatus },
-    });
-
-    const images = await tx.image.findMany({
-      take: 10000,
-      orderBy: [{ no: 'desc' }, { order: 'asc' }],
-      where: {
-        imageTargetType: IMAGE_TARGET_TYPE,
-        imageTargetNo: { in: breads.map((bread: Bread) => bread.no) },
-      },
-      select: {
-        publicId: true,
-        url: true,
-        order: true,
         imageTargetNo: true,
+        url: true,
       },
     });
 
-    const imageMap = new Map<number, { url: string }[]>();
-    images.forEach(({ imageTargetNo, url }: Partial<Image>) => {
-      if (imageTargetNo && url) {
-        // Map에 없으면 추가함 1: [{url: ___}] 형태
-        !imageMap.has(imageTargetNo) && imageMap.set(imageTargetNo, []);
-        imageMap.get(imageTargetNo)!.push({ url });
-      }
+    const imageMap = new Map<number, string>();
+    images.forEach((img: Pick<Image, 'imageTargetNo' | 'url'>) => {
+      // imageTargetNo 는 빵 no 와 동일함
+      imageMap.set(img.imageTargetNo, img.url ?? '');
     });
 
-    const data = breads.map((bread: any) => ({
+    const data = breads.map((bread: Bread) => ({
       ...bread,
       breadStatusName: getBreadStatusName(bread.breadStatus),
-      images: imageMap.get(bread.no),
+      images: [...(imageMap.get(bread.no) ? [{ url: imageMap.get(bread.no) }] : [])],
     }));
 
     return data;
@@ -138,7 +59,7 @@ export function getBreadStatusName(code: string): string {
 }
 
 /** 빵 상세 조회 */
-export const getByNo = async (type: ClientType | undefined, no: number) => {
+export const getByNo = async (no: number) => {
   const result = await prisma.$transaction(async (tx) => {
     const bread = await tx.bread.findUnique({
       where: { no },
@@ -148,13 +69,8 @@ export const getByNo = async (type: ClientType | undefined, no: number) => {
       throw AppError.notFound('빵을 찾을 수 없습니다.', { breadNo: no });
     }
 
-    // 고객은 판매, 재료소진, 출시예정 만 조회 가능
-    if (type !== ClientType.USER && !CUSTOMER_AVALIABLE_BREAD_STATUS.includes(bread.breadStatus)) {
-      throw AppError.badRequest('잘못된 요청입니다.', { type, breadStatus: bread.breadStatus });
-    }
-
     const images = await tx.image.findMany({
-      where: { imageTargetType: IMAGE_TARGET_TYPE, imageTargetNo: no },
+      where: { imageTargetType: IMAGE_TARGET_TYPE_CODE, imageTargetNo: no },
       orderBy: {
         order: 'asc',
       },
@@ -165,158 +81,94 @@ export const getByNo = async (type: ClientType | undefined, no: number) => {
       },
     });
 
-    const data = {
-      ...bread,
-      images,
-    };
-
-    return data;
+    return { ...bread, images };
   });
 
   return result;
 };
 
-/** 빵 생성 (이미지 없음) */
-export const createWithoutImages = async (
-  body: Pick<
-    Bread,
-    'name' | 'description' | 'unitPrice' | 'breadStatus' | 'countryOfOrigin' | 'allergyInfo'
-  >,
+/** 빵 생성 */
+export const create = async (
+  body: CreateBreadRequestBody,
+  images?: UploadedFile[] | UploadedFile,
 ) => {
-  const result = await prisma.bread.create({
-    data: body,
-  });
-
-  return { ...result, images: [] };
-};
-
-/** 빵 생성 (이미지 있음) */
-export const createWithImages = async (
-  body: Pick<
-    Bread,
-    'name' | 'description' | 'unitPrice' | 'breadStatus' | 'countryOfOrigin' | 'allergyInfo'
-  >,
-  images: UploadedFile[] | UploadedFile,
-) => {
-  const result = await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx) => {
     const bread = await tx.bread.create({
       data: body,
     });
 
-    const uploadResults = await ImageService.createCloudinary(images);
+    if (images) {
+      const uploadResults = await ImageService.createCloudinary(images);
+      await Promise.all(
+        uploadResults.map(async (result, index) => {
+          await tx.image.create({
+            data: {
+              publicId: result.public_id,
+              url: result.secure_url,
+              // name: result.original_filename,
+              imageTargetNo: bread.no,
+              imageTargetType: IMAGE_TARGET_TYPE_CODE, // 빵 이미지
+              order: index + 1,
+            },
+          });
 
-    const uploadedImages = await Promise.all(
-      uploadResults.map(async (result, index) => {
-        await tx.image.create({
-          data: {
+          return {
             publicId: result.public_id,
             url: result.secure_url,
-            // name: result.original_filename,
-            imageTargetNo: bread.no,
-            imageTargetType: IMAGE_TARGET_TYPE, // 빵 이미지
+            name: result.original_filename,
             order: index + 1,
-          },
-        });
-
-        return {
-          publicId: result.public_id,
-          url: result.secure_url,
-          name: result.original_filename,
-          order: index + 1,
-        };
-      }),
-    );
-
-    return { ...bread, images: uploadedImages };
+          };
+        }),
+      );
+    }
   });
-
-  return result;
 };
 
-/** 빵 수정 (이미지 없음) */
-export const updateWithoutImages = async (
+/** 빵 수정 */
+export const update = async (
   no: number,
-  body: Partial<
-    Pick<
-      Bread,
-      'name' | 'description' | 'unitPrice' | 'breadStatus' | 'countryOfOrigin' | 'allergyInfo'
-    >
-  >,
+  body: UpdateBreadRequestBody,
+  images?: UploadedFile[] | UploadedFile,
 ) => {
-  const result = await prisma.$transaction(async (tx) => {
-    const bread = await tx.bread.update({
+  await prisma.$transaction(async (tx) => {
+    await tx.bread.update({
       where: { no },
       data: body,
     });
 
-    const images = await tx.image.findMany({
-      where: { imageTargetNo: no, imageTargetType: IMAGE_TARGET_TYPE },
-      orderBy: { order: 'asc' },
-      select: {
-        publicId: true,
-        url: true,
-        order: true,
-      },
-    });
+    if (images) {
+      // 기존 이미지의 마지막 순서 조회하여 클라우디너리 이미지 업로드
+      const findedImages = await prisma.image.findMany({
+        where: { imageTargetNo: no, imageTargetType: IMAGE_TARGET_TYPE_CODE },
+        orderBy: { order: 'asc' },
+        select: { order: true, publicId: true, url: true },
+      });
+      const lastOrder = findedImages[findedImages.length - 1]?.order || 0;
+      const uploadResults = await ImageService.updateCloudinary(lastOrder, images);
 
-    return { ...bread, images };
-  });
-  return result;
-};
-
-/** 빵 수정 (이미지 있음) */
-export const updateWithImages = async (
-  no: number,
-  body: Partial<
-    Pick<
-      Bread,
-      'name' | 'description' | 'unitPrice' | 'breadStatus' | 'countryOfOrigin' | 'allergyInfo'
-    >
-  >,
-  images: UploadedFile[] | UploadedFile,
-) => {
-  const result = await prisma.$transaction(async (tx) => {
-    // 빵 수정
-    const bread = await tx.bread.update({
-      where: { no },
-      data: body,
-    });
-
-    // 기존 이미지의 마지막 순서 조회하여 클라우디너리 이미지 업로드
-    const findedImages = await prisma.image.findMany({
-      where: { imageTargetNo: no, imageTargetType: IMAGE_TARGET_TYPE },
-      orderBy: { order: 'asc' },
-      select: { order: true, publicId: true, url: true },
-    });
-    const lastOrder = findedImages[findedImages.length - 1]?.order || 0;
-    const uploadResults = await ImageService.updateCloudinary(lastOrder, images);
-
-    // 이미지 생성 (db)
-    const uploadedImages = await Promise.all(
-      uploadResults.map(async (result, index) => {
-        await tx.image.create({
-          data: {
+      // 이미지 생성 (db)
+      await Promise.all(
+        uploadResults.map(async (result, index) => {
+          await tx.image.create({
+            data: {
+              publicId: result.public_id,
+              url: result.secure_url,
+              // name: result.original_filename,
+              imageTargetNo: no,
+              imageTargetType: IMAGE_TARGET_TYPE_CODE,
+              order: lastOrder + index + 1,
+            },
+          });
+          return {
             publicId: result.public_id,
             url: result.secure_url,
-            // name: result.original_filename,
-            imageTargetNo: no,
-            imageTargetType: IMAGE_TARGET_TYPE,
+            name: result.original_filename,
             order: lastOrder + index + 1,
-          },
-        });
-        return {
-          publicId: result.public_id,
-          url: result.secure_url,
-          name: result.original_filename,
-          order: lastOrder + index + 1,
-        };
-      }),
-    );
-
-    return { ...bread, images: uploadedImages };
+          };
+        }),
+      );
+    }
   });
-
-  return result;
 };
 
 /** 빵 삭제 (여러건) */
@@ -329,7 +181,7 @@ export const remove = async (noList: number[]) => {
 
     // 대상 publicId 조회
     const idList = await tx.image.findMany({
-      where: { imageTargetNo: { in: noList }, imageTargetType: IMAGE_TARGET_TYPE },
+      where: { imageTargetNo: { in: noList }, imageTargetType: IMAGE_TARGET_TYPE_CODE },
       select: {
         publicId: true,
       },
