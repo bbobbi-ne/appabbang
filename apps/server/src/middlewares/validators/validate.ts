@@ -357,22 +357,7 @@ export const updateOrderValidator = [
     .isInt()
     .toInt()
     .withMessage('no 를 올바르게 입력해주세요.'),
-  body('orderStatus')
-    .trim()
-    .notEmpty()
-    .withMessage('orderStatus는 필수입니다')
-    .isIn(['10', '20', '30', '40', '50'])
-    .withMessage('유효한 상태여야 합니다 (10, 20, 30, 40, 50)'),
-  body('paid')
-    .trim()
-    .notEmpty()
-    .withMessage('paid는 필수입니다')
-    .isBoolean()
-    .toBoolean()
-    .withMessage('boolean 타입이어야 합니다.'),
-  body('address').trim().notEmpty().withMessage('address는 필수입니다'),
-  body('addressDetail').trim().notEmpty().withMessage('addressDetail는 필수입니다'),
-  body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
+  body('trackingNumber').trim().optional(),
 ];
 
 export const updateOrderStatusValidator = [

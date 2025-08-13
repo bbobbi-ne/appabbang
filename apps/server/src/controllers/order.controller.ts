@@ -4,34 +4,34 @@ import { AppError } from '@/types';
 
 /** 주문 목록 조회 */
 export const getList = async (_: Request, res: Response) => {
-  // const orders = await OrderService.getOrderList();
-
-  res.status(200).json([]);
+  const list = await OrderService.getList();
+  res.status(200).json(list);
 };
 
 /** 주문 상세 조회 */
 export const getOne = async (req: Request, res: Response) => {
-  // const order = await OrderService.getOrderByNo(Number(req.params.no));
-  res.status(200).json({});
+  const one = await OrderService.getByNo(Number(req.params.no));
+  res.status(200).json(one);
 };
 
 /** 주문 생성 (비회원, 회원) */
 export const create = async (req: Request, res: Response) => {
   const {
-    name,
-    mobileNumber,
+    ordererName,
+    ordererMobile,
+    recipientName,
+    recipientMobile,
     address,
     addressDetail,
     zipcode,
     message,
-    recipientName,
-    recipientMobile,
-    orderItems,
-    deliveryMethodNo,
-    orderPw,
+    orderRoundNo,
     totalPrice,
-    discountNo,
-    discountAmount,
+    trackingNumber,
+    isPaymentRefundTermsAgreed,
+    customerCouponNo,
+    deliveryMethodNo,
+    orderItems,
     bankCode,
     accountNumber,
     accountHolderName,
@@ -39,63 +39,54 @@ export const create = async (req: Request, res: Response) => {
 
   const user = req.user;
 
-  if (!user && !orderPw) {
-    throw AppError.badRequest('주문 비밀번호를 입력해주세요.');
+  if (!user) {
+    if (!req.body.orderPw) {
+      throw AppError.badRequest('주문 비밀번호를 입력해주세요.');
+    }
+
+    if (!req.body.isServiceTermsAgreed) {
+      throw AppError.badRequest('서비스 약관에 동의해주세요.');
+    }
+
+    if (!req.body.isPrivacyTermsAgreed) {
+      throw AppError.badRequest('개인정보 수집 및 이용 약관에 동의해주세요.');
+    }
   }
 
-  if (!user) {
-    // const newOrder = await OrderService.createNonMemberOrder({
-    //   name,
-    //   mobileNumber,
-    //   address,
-    //   addressDetail,
-    //   zipcode,
-    //   message,
-    //   recipientName,
-    //   recipientMobile,
-    //   orderItems,
-    //   deliveryMethodNo,
-    //   orderPw,
-    //   totalPrice,
-    //   discountNo,
-    //   discountAmount,
-    //   bankCode,
-    //   accountNumber,
-    //   accountHolderName,
-    // });
-    res.status(201).json({});
-  } else {
-    // const newOrder = await OrderService.createMemberOrder({
-    //   orderItems,
-    //   customerNo: user.no,
-    //   addressNo: user.addressNo,
-    //   deliveryMethodNo,
-    //   discountNo,
-    //   totalPrice,
-    //   discountAmount,
-    //   bankCode,
-    //   accountNumber,
-    //   accountHolderName,
-    // });
-    res.status(201).json({});
-  }
+  await OrderService.create(user?.no, {
+    ordererName,
+    ordererMobile,
+    recipientName,
+    recipientMobile,
+    address,
+    addressDetail,
+    zipcode,
+    message,
+    orderRoundNo,
+    totalPrice,
+    trackingNumber,
+    isPaymentRefundTermsAgreed,
+    orderPw: req.body.orderPw,
+    isServiceTermsAgreed: req.body.isServiceTermsAgreed,
+    isPrivacyTermsAgreed: req.body.isPrivacyTermsAgreed,
+    deliveryMethodNo,
+    orderItems,
+    bankCode,
+    accountNumber,
+    accountHolderName,
+    customerCouponNo,
+  });
+
+  res.status(200).json({ message: '주문이 완료되었습니다.' });
 };
 
 /** 주문 수정 */
 export const update = async (req: Request, res: Response) => {
   const { no } = req.params;
-  const { orderStatus, trackingNumber, address, addressDetail, zipcode, message } = req.body;
 
-  // const updated = await OrderService.updateOrder(Number(no), {
-  //   orderStatus,
-  //   trackingNumber,
-  //   address,
-  //   addressDetail,
-  //   zipcode,
-  //   message,
-  // });
+  await OrderService.update(Number(no), req.body);
 
-  res.status(200).json({});
+  res.status(200).json({ message: '주문이 수정되었습니다.' });
 };
 
 /** 주문 상태 수정 */
@@ -103,7 +94,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
   const { no } = req.params;
   const { orderStatus } = req.body;
 
-  // const updated = await OrderService.updateOrderStatus(Number(no), orderStatus);
+  await OrderService.update(Number(no), { orderStatus });
 
-  res.status(200).json({});
+  res.status(200).json({ message: '주문 상태가 수정되었습니다.' });
 };
