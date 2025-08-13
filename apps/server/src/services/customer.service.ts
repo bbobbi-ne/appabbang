@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { AppError } from '@/types';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Customer } from '@prisma/client';
 
 const SALT_ROUNDS = 10;
@@ -210,4 +210,41 @@ export const updateRefreshToken = async (id: string, refreshToken: string) => {
       '고객 정보를 등록하는 과정에서 오류가 발생했습니다. 관리자 확인이 필요합니다. (refresh)',
     );
   }
+};
+
+/**
+ * 로그아웃 - 토큰에 담겨져 있는 고객 정보 조회
+ */
+export const getTokenCustomer = async (token: string) => {
+  const decoded = jwt.verify(token, JWT_ACCESS_SECRET) as JwtPayload;
+
+  if (!decoded.id) {
+    throw AppError.forbidden('token이 유효하지 않습니다.');
+  }
+
+  const result = await prisma.$transaction(async (tx) => {
+    const customer = await tx.customer.findUnique({
+      where: { id: decoded.id },
+    });
+
+    return customer;
+  });
+
+  return result;
+};
+
+/**
+ * 로그아웃 - refreshToken 초기화
+ */
+export const invalidateRefreshToken = async (id: string) => {
+  const result = await prisma.$transaction(async (tx) => {
+    const update = await tx.customer.update({
+      where: { id },
+      data: { refreshToken: null },
+    });
+
+    return update;
+  });
+
+  return result;
 };

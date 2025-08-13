@@ -29,6 +29,9 @@ router.post(
   asyncHandler(customerController.create),
 );
 
+/** POST /customers/logout : 고객 로그아웃 */
+router.post('/logout', optionalAuth, asyncHandler(customerController.logout));
+
 /** PUT /customers/{no} : 고객 수정 */
 // router.put('/:no', requireAdmin, asyncHandler(customerController.update));
 

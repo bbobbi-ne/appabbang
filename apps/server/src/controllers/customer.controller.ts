@@ -100,3 +100,37 @@ export const update = async (_: Request, res: Response) => {
 export const remove = async (_: Request, res: Response) => {
   res.status(204).json('Hello World');
 };
+
+/**
+ * 로그아웃
+ */
+export const logout = async (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    throw AppError.unauthorized('서버와 통신을 위한 헤더정보 확인 중 오류가 발생되었습니다.');
+  }
+
+  const token = authHeader.split(' ')[1] as string;
+
+  // 로그아웃할 고객 정보 조회
+  const customer = await CustomerService.getTokenCustomer(token);
+
+  if (!customer) {
+    throw AppError.internalServerError(
+      '로그아웃 과정에서 문제가 발생했습니다. 관리자 확인이 필요합니다.',
+    );
+  }
+
+  // refreshToken 제거
+  await CustomerService.invalidateRefreshToken(customer.id);
+
+  // Cookie의 refreshToken 제거
+  res.clearCookie(REFRESH_COOKIE.name, {
+    httpOnly: true,
+    sameSite: 'strict', // 소문자 + 리터럴
+    maxAge: 0,
+  });
+
+  res.sendStatus(204);
+};
