@@ -30,8 +30,7 @@ class CustomError extends Error {
  */
 type ICustomerProps = {
   id: string;
-  password: string;
-  passwordConfirm: string;
+  pw: string;
   mobileNumber: string;
   address: string;
   addressDetail: string;
@@ -43,7 +42,7 @@ type ICustomerProps = {
 
 export async function createCustomer(data: ICustomerProps) {
   client
-    .post('/join', data)
+    .post('/customers', data)
     .then(({ status }) => {
       if (status === 201) return { code: 201, message: 'success' };
       else throw new CustomError(500, 'fail');

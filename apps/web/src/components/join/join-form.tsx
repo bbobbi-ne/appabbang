@@ -37,8 +37,8 @@ export default function JoinForm() {
     defaultValues: {
       id: '',
       name: '',
-      password: '',
-      passwordConfirm: '',
+      pw: '',
+      pwConfirm: '',
       mobileNumber: '',
       address: '',
       addressDetail: '',
@@ -81,7 +81,7 @@ export default function JoinForm() {
   const onSubmit: SubmitHandler<JoinSchemaType> = (data) => {
     createCustomer(data);
 
-    navigate({ to: '/' }); // 메인페이지로 이동
+    // navigate({ to: '/' }); // 메인페이지로 이동
   };
 
   return (
@@ -128,7 +128,7 @@ export default function JoinForm() {
         {/* 비밀번호 */}
         <FormField
           control={form.control}
-          name="password"
+          name="pw"
           render={({ field }) => (
             <FormItem className="flex items-center">
               <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
@@ -148,7 +148,7 @@ export default function JoinForm() {
         {/* 비밀번호 확인 */}
         <FormField
           control={form.control}
-          name="passwordConfirm"
+          name="pwConfirm"
           render={({ field }) => (
             <FormItem className="flex items-center">
               <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>

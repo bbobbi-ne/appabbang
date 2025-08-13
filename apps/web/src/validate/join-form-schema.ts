@@ -74,13 +74,13 @@ export const joinSchema = z
       .min(NAME_VALIDATION.min.value, NAME_VALIDATION.min.message)
       .max(NAME_VALIDATION.max.value, NAME_VALIDATION.max.message)
       .regex(NAME_VALIDATION.regex.value, { message: NAME_VALIDATION.regex.message }),
-    password: z
+    pw: z
       .string({ required_error: PASSWORD_VALIDATION.required.message })
       .trim()
       .min(PASSWORD_VALIDATION.min.value, PASSWORD_VALIDATION.min.message)
       .max(PASSWORD_VALIDATION.max.value, PASSWORD_VALIDATION.max.message)
       .regex(PASSWORD_VALIDATION.regex.value, { message: PASSWORD_VALIDATION.regex.message }),
-    passwordConfirm: z
+    pwConfirm: z
       .string({ required_error: PASSWORD_VALIDATION.required.message })
       .trim()
       .min(PASSWORD_VALIDATION.min.value, PASSWORD_VALIDATION.min.message)
@@ -117,9 +117,9 @@ export const joinSchema = z
       required_error: '마케팅 목적 개인정보 이용 및 광고 수신 동의 처리방침을 확인 바랍니다.',
     }),
   })
-  .superRefine(({ password, passwordConfirm }, ctx) => {
+  .superRefine(({ pw, pwConfirm }, ctx) => {
     // 비밀번호 확인 :: 틀리면 오류
-    if (password !== passwordConfirm) {
+    if (pw !== pwConfirm) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['passwordConfirm'],
