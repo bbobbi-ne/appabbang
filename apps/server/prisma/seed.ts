@@ -208,6 +208,21 @@ async function main() {
   });
 }
 
+// 쿠폰 초기화
+await prisma.coupon.deleteMany();
+
+// 쿠폰 생성
+await prisma.coupon.createMany({
+  data: [
+    {
+      no: 1,
+      name: '첫 로그인 감사 쿠폰',
+      amount: 5000,
+      expireAfterDays: 30,
+    },
+  ],
+});
+
 main()
   .catch((e) => {
     console.error(e);
