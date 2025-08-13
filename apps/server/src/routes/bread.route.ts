@@ -42,14 +42,6 @@ router.put(
   asyncHandler(breadsController.update),
 );
 
-/** PUT /breads/{no}/status : 빵 상태 수정 */
-router.put(
-  '/:no/status',
-  requireAdmin,
-  validate(updateBreadStatusValidator),
-  asyncHandler(breadsController.updateBreadStatus),
-);
-
 /** DELETE /breads : 빵 삭제 (여러건) */
 router.delete(
   '/',
