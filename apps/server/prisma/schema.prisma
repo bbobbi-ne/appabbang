@@ -82,20 +82,20 @@ model Order {
   totalPrice                   Int               @map("total_price")                                  // 총 금액
   trackingNumber               String            @db.VarChar(50) @map("tracking_number")              // 송장번호
   isPaymentRefundTermsAgreed   Boolean           @map("is_payment_refund_terms_agreed")               // 결제, 환불 약관 동의여부
-  orderPw                      String            @db.VarChar(300) @map("order_pw")                    // [비회원] 주문서 비밀번호
-  isServiceTermsAgreed         Boolean           @map("is_service_terms_agreed")                      // [비회원] 서비스 이용약관 동의여부
-  isPrivacyTermsAgreed         Boolean           @map("is_privacy_terms_agreed")                      // [비회원] 개인정보 수집, 이용 동의여부
+  orderPw                      String?           @db.VarChar(300) @map("order_pw")                    // [비회원] 주문서 비밀번호
+  isServiceTermsAgreed         Boolean?          @map("is_service_terms_agreed")                      // [비회원] 서비스 이용약관 동의여부
+  isPrivacyTermsAgreed         Boolean?          @map("is_privacy_terms_agreed")                      // [비회원] 개인정보 수집, 이용 동의여부
   memo                         String            @db.VarChar(50) @map("memo")
 
   createdAt                    DateTime          @default(now()) @map("created_at")                   // 등록 시간
   updatedAt                    DateTime          @updatedAt @map("updated_at")                        // 수정 시간
 
-  customerNo                   Int               @map("customer_no")                                  // 고객 번호 
+  customerNo                   Int?              @map("customer_no")                                  // 고객 번호 
   couponNo                     Int?              @map("coupon_no")                                    // 쿠폰 번호
-  customer                     Customer          @relation(fields: [customerNo], references: [no])    // 고객 테이블 참조 
+  customer                     Customer?         @relation(fields: [customerNo], references: [no])    // 고객 테이블 참조 
   coupon                       Coupon?           @relation(fields: [couponNo], references: [no])      // 쿠폰 테이블 참조
 
-  orderItem                    OrderItem[]                                                            // 주문 목록 테이블
+  orderItems                   OrderItem[]                                                            // 주문 목록 테이블
   payment                      Payment?                                                               // 결제 테이블
 
   @@map("orders")
