@@ -29,10 +29,14 @@ export const getAll = async () => {
         imageTargetType: IMAGE_TARGET_TYPE_CODE,
         order: 1,
       },
+      select: {
+        imageTargetNo: true,
+        url: true,
+      },
     });
 
     const imageMap = new Map<number, string>();
-    images.forEach((img: Image) => {
+    images.forEach((img: Pick<Image, 'imageTargetNo' | 'url'>) => {
       // imageTargetNo 는 빵 no 와 동일함
       imageMap.set(img.imageTargetNo, img.url ?? '');
     });

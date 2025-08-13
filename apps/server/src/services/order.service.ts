@@ -257,7 +257,16 @@ export const getByNo = async (no: number) => {
     where: { no },
     include: {
       payment: { select: { bankCode: true, accountNumber: true, accountHolderName: true } },
-      orderItems: { select: { breadNo: true, quantity: true, unitPrice: true, totalPrice: true } },
+      orderItems: {
+        select: {
+          breadNo: true,
+          quantity: true,
+          unitPrice: true,
+          totalPrice: true,
+          breadName: true,
+          //   breadImageUrl: true,
+        },
+      },
     },
   });
   return {
