@@ -2,7 +2,7 @@ import { Router } from 'express';
 import * as customerController from '@/controllers/customer.controller';
 import * as addressController from '@/controllers/address.controller';
 import { asyncHandler } from '@/middlewares/error.middleware';
-import { requireAdmin } from '@/middlewares/auth.middleware';
+import { optionalAuth, requireAdmin } from '@/middlewares/auth.middleware';
 import {
   createAddressValidator,
   deleteAddressValidator,
@@ -11,6 +11,7 @@ import {
   updateAddressValidator,
   validate,
 } from '@/middlewares/validators/validate';
+import { createCustomerValidator } from '@/middlewares/validators/customer-validate';
 
 const router = Router();
 
@@ -21,7 +22,12 @@ router.get('/', requireAdmin, asyncHandler(customerController.getList));
 router.get('/:no', requireAdmin, asyncHandler(customerController.getOne));
 
 /** POST /customers : 고객 생성 */
-// router.post('/', requireAdmin, asyncHandler(customerController.create));
+router.post(
+  '/',
+  optionalAuth,
+  validate(createCustomerValidator),
+  asyncHandler(customerController.create),
+);
 
 /** PUT /customers/{no} : 고객 수정 */
 // router.put('/:no', requireAdmin, asyncHandler(customerController.update));
