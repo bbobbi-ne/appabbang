@@ -243,12 +243,11 @@ export const getList = async () => {
       payment: { select: { isPaid: true } },
     },
   });
-  return {
-    list: list.map((item) => ({
-      ...item,
-      orderStatusName: getOrderStatusName(item?.orderStatus || ''),
-    })),
-  };
+
+  return list.map((item) => ({
+    ...item,
+    orderStatusName: getOrderStatusName(item?.orderStatus || ''),
+  }));
 };
 
 /** 주문 상세 조회 */
@@ -269,6 +268,11 @@ export const getByNo = async (no: number) => {
       },
     },
   });
+
+  if (!one) {
+    throw AppError.notFound('주문을 찾을 수 없습니다.');
+  }
+
   return {
     ...one,
     orderStatusName: getOrderStatusName(one?.orderStatus || ''),
