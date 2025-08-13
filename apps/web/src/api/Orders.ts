@@ -17,6 +17,8 @@ import type {
   OrdersListData,
   OrdersUpdateData,
   OrdersUpdatePayload,
+  StatusUpdateBody,
+  StatusUpdateResult,
 } from "./data-contracts";
 import { ContentType, HttpClient, type RequestParams } from "./http-client";
 
@@ -97,6 +99,29 @@ export class Orders<SecurityDataType = unknown> {
   ) =>
     this.http.request<OrdersUpdateData, any>({
       path: `/orders/${no}`,
+      method: "PUT",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 주문의 상태만 수정합니다. (권한: 관리자만)
+   *
+   * @tags Orders
+   * @name StatusUpdate
+   * @summary 주문 상태 수정
+   * @request PUT:/orders/{no}/status
+   * @secure
+   * @response `200` `StatusUpdateResult` 주문 상태 수정 성공
+   */
+  statusUpdate = (
+    no: number,
+    data: StatusUpdateBody,
+    params: RequestParams = {},
+  ) =>
+    this.http.request<StatusUpdateResult, any>({
+      path: `/orders/${no}/status`,
       method: "PUT",
       body: data,
       secure: true,
