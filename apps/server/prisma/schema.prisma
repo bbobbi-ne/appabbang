@@ -152,7 +152,7 @@ model Customer {
   pw                    String            @db.VarChar(300)                        // 비밀번호
   name                  String            @db.VarChar(30)                         // 이름
   mobileNumber          String            @db.VarChar(20) @map("mobile_number")   // 전화번호
-  refreshToken          String?           @db.VarChar(300) @map("refresh_token")  // 리프레시 토큰
+  refreshToken          String?           @map("refresh_token")  // 리프레시 토큰
   providerType          String?           @db.VarChar(30) @map("provider_type")   // 소셜 로그인 타입 코드
   providerId            String?           @db.VarChar(100) @map("provider_id")    // 소셜 로그인 식별자
   defaultAddressNo      Int?              @map("default_address_no")              // 기본 배송지

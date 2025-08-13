@@ -86,7 +86,13 @@ export const create = async (req: Request, res: Response) => {
   // 고객 RefreshToken 정보 업데이트
   await CustomerService.updateRefreshToken(customer.id, refreshToken);
 
-  res.status(201).json(accessToken);
+  // 결과값 전송
+  const result = {
+    data: customer,
+    accessToken,
+  };
+
+  res.status(201).json(result);
 };
 export const update = async (_: Request, res: Response) => {
   res.status(200).json('Hello World');

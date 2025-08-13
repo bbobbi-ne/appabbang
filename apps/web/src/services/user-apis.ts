@@ -28,7 +28,7 @@ class CustomError extends Error {
 /**
  * 회원가입
  */
-type ICustomerProps = {
+export async function createCustomer(data: {
   id: string;
   pw: string;
   mobileNumber: string;
@@ -38,25 +38,27 @@ type ICustomerProps = {
   isServiceTermsAgreed: boolean;
   isPrivacyTermsAgreed: boolean;
   isMarketingTermsAgreed: boolean;
-};
-
-export async function createCustomer(data: ICustomerProps) {
+}) {
   client
     .post('/customers', data)
-    .then(({ status }) => {
-      if (status === 201) return { code: 201, message: 'success' };
-      else throw new CustomError(500, 'fail');
-    })
-    .catch(({ status }) => {
-      status === 400 &&
+    .then((response) => {
+      if (response.status === 201) {
+        window.sessionStorage.setItem('accessToken', response.data.accessToken);
+
         addToast({
-          message: '회원가입 요청에서 문제가 발생했습니다. 관리자 확인이 필요합니다.',
-          type: 'error',
+          type: 'success',
+          message: `${response.data.data.name}님, 환영합니다!`,
         });
 
-      status === 500 &&
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1500);
+      } else throw new CustomError(500, 'fail');
+    })
+    .catch((e) => {
+      e.response.status === 500 &&
         addToast({
-          message: '서버에서 회원가입 과정 중 문제가 발생했습니다. 관리자 확인이 필요합니다.',
+          message: e.response.data.error.message,
           type: 'error',
         });
     });

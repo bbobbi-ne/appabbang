@@ -23,13 +23,11 @@ import ServiceIsAgreedDialog from './service-terms-agreed-dialog';
 import PrivacyTermsAgreedDialog from './privacy-terms-agreed-dialog';
 import useToast from '@/hooks/useToast';
 import { createCustomer } from '@/services/user-apis';
-import { useNavigate } from '@tanstack/react-router';
 
 const labelMinWidth = 'min-w-[120px]';
 
 export default function JoinForm() {
   const { addToast } = useToast();
-  const navigate = useNavigate();
 
   // 폼 선언
   const form = useForm<JoinSchemaType>({
@@ -80,8 +78,6 @@ export default function JoinForm() {
    */
   const onSubmit: SubmitHandler<JoinSchemaType> = (data) => {
     createCustomer(data);
-
-    // navigate({ to: '/' }); // 메인페이지로 이동
   };
 
   return (
