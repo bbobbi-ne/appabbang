@@ -1,5 +1,7 @@
 import { TablePagination } from '@/components/ui/table-pagination';
-import { customersColumns, type CustomerColumns } from '@/data/columns';
+import TableSkeleton from '@/components/ui/table-skeletion';
+import { customersColumns, type CustomersListItem } from '@/data/columns';
+import { useCustomersListQuery } from '@/hooks/use-customer';
 import {
   Card,
   CardContent,
@@ -34,10 +36,11 @@ function RouteComponent() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
+  const { data: customers, isLoading, isError } = useCustomersListQuery();
   const columns = customersColumns();
 
-  const table = useReactTable<CustomerColumns>({
-    data: [],
+  const table = useReactTable<CustomersListItem>({
+    data: customers || [],
     columns,
     state: {
       pagination,
@@ -53,15 +56,14 @@ function RouteComponent() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  // if (isLoading) return <TableSkeleton />;
-  // if (isError) return <>에러임</>;
+  if (isLoading) return <TableSkeleton />;
+  if (isError) return <>에러임</>;
 
   return (
     <>
       <Card className="shadow-none bg-background border-none">
         <CardHeader>
           <CardTitle>고객관리</CardTitle>
-          {/* <MaterialCreateDialog /> */}
         </CardHeader>
         <CardContent className="max-h-[550px] border-1 p-0 m-6 mt-0 rounded-lg overflow-auto relative">
           <Table className="table-fixed">

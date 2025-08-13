@@ -9,12 +9,18 @@ let IMAGE_TARGET_TYPE_CODE: string | null = null;
 const IMAGE_TARGET_TYPE_NAME = 'orderRound';
 
 // OrderRound 등록 타입
-type CreateOrderRoundInput = Pick<OrderRound, 'name' | 'startedAt' | 'endedAt'> & {
+type CreateOrderRoundInput = Pick<
+  OrderRound,
+  'name' | 'startedAt' | 'endedAt' | 'minOrderQty' | 'maxOrderQty'
+> & {
   breadNoList: number[];
 };
 
 // OrderRound 수정 타입
-type UpdateOrderRoundInput = Pick<OrderRound, 'no' | 'name' | 'startedAt' | 'endedAt'> & {
+type UpdateOrderRoundInput = Pick<
+  OrderRound,
+  'no' | 'name' | 'startedAt' | 'endedAt' | 'minOrderQty' | 'maxOrderQty'
+> & {
   breadNoList: number[];
 };
 
@@ -57,6 +63,8 @@ export const getOrderRoundList = async () => {
         name: true,
         startedAt: true,
         endedAt: true,
+        minOrderQty: true,
+        maxOrderQty: true,
         orderRoundBreads: {
           select: {
             bread: {
@@ -73,19 +81,22 @@ export const getOrderRoundList = async () => {
 
     // 2. 주문차수 이미지 조회
     const imageTargetType = await getImageTargetTypeCode(IMAGE_TARGET_TYPE_NAME); // return code
-
-    const images = await tx.image.findMany({
-      where: {
-        imageTargetType,
-        order: 1,
-      },
-      orderBy: [{ no: 'desc' }, { order: 'asc' }],
-    });
-
+    let images;
     const imageMap = new Map<number, string>();
-    images.forEach((img: any) => {
-      imageMap.set(img.imageTargetNo, img.url);
-    });
+
+    if (imageTargetType) {
+      images = await tx.image.findMany({
+        where: {
+          imageTargetType,
+          order: 1,
+        },
+        orderBy: [{ no: 'desc' }, { order: 'asc' }],
+      });
+
+      images.forEach((img: any) => {
+        imageMap.set(img.imageTargetNo, img.url);
+      });
+    }
 
     // 3. 데이터 정렬 (or: orderRound)
     const data = list.map((or) => {
@@ -118,6 +129,8 @@ export const getOrderRound = async (no: number) => {
         name: true,
         startedAt: true,
         endedAt: true,
+        minOrderQty: true,
+        maxOrderQty: true,
         orderRoundBreads: {
           select: {
             bread: {
@@ -143,40 +156,48 @@ export const getOrderRound = async (no: number) => {
 
     // 주문차수의 이미지 조회
     const imageTargetType = await getImageTargetTypeCode(IMAGE_TARGET_TYPE_NAME);
-    const image = await tx.image.findFirst({
-      where: {
-        imageTargetType,
-        imageTargetNo: no,
-        order: 1,
-      },
-      select: {
-        publicId: true,
-        url: true,
-        name: true,
-        order: true,
-      },
-    });
+    let image;
+
+    if (imageTargetType) {
+      image = await tx.image.findFirst({
+        where: {
+          imageTargetType,
+          imageTargetNo: no,
+          order: 1,
+        },
+        select: {
+          publicId: true,
+          url: true,
+          // name: true,
+          order: true,
+        },
+      });
+    }
 
     /******/
     // 주문차수-빵 매핑된 빵의 이미지 조회
     const breadImageTargetType = await getImageTargetTypeCode('breads');
-    const breadImages = await tx.image.findMany({
-      take: 10000,
-      orderBy: [{ no: 'desc' }, { order: 'asc' }],
-      where: {
-        imageTargetType: breadImageTargetType,
-        order: 1,
-      },
-    });
-
+    let breadImages;
     const imageMap = new Map<number, string>();
-    breadImages.forEach((img: any) => {
-      imageMap.set(img.imageTargetNo, img.url);
-    });
+
+    if (breadImageTargetType) {
+      breadImages = await tx.image.findMany({
+        take: 10000,
+        orderBy: [{ no: 'desc' }, { order: 'asc' }],
+        where: {
+          imageTargetType: breadImageTargetType,
+          order: 1,
+        },
+      });
+
+      breadImages.forEach((img: any) => {
+        imageMap.set(img.imageTargetNo, img.url);
+      });
+    }
 
     /******/
     // 주문차수에 매핑된 빵 정보에 이미지 정보 삽입
-    const newBreads = or.orderRoundBreads.map(({ bread }) => ({
+    const newBreads = or.orderRoundBreads.map(({ bread }: any) => ({
       ...bread,
       images: [...(imageMap.get(bread.no) ? [{ url: imageMap.get(bread.no) }] : [])],
     }));
@@ -212,6 +233,8 @@ export const createWithoutImage = async (body: CreateOrderRoundInput) => {
           name: body.name,
           startedAt: body.startedAt,
           endedAt: body.endedAt,
+          minOrderQty: body.minOrderQty,
+          maxOrderQty: body.maxOrderQty,
         },
       });
 
@@ -255,6 +278,8 @@ export const createWithImage = async (
           name: body.name,
           startedAt: new Date(body.startedAt),
           endedAt: new Date(body.endedAt),
+          minOrderQty: body.minOrderQty,
+          maxOrderQty: body.maxOrderQty,
         },
       });
 
@@ -281,17 +306,19 @@ export const createWithImage = async (
       // 4. 이미지 정보를 데이터베이스에 저장
       const imageTargetType = await getImageTargetTypeCode(IMAGE_TARGET_TYPE_NAME); // return code
 
-      if (url && publicId) {
-        await tx.image.create({
-          data: {
-            url,
-            publicId,
-            name,
-            imageTargetType,
-            imageTargetNo: orResult.no,
-            order: 1,
-          },
-        });
+      if (imageTargetType) {
+        if (url && publicId) {
+          await tx.image.create({
+            data: {
+              url,
+              publicId,
+              // name,
+              imageTargetType,
+              imageTargetNo: orResult.no,
+              order: 1,
+            },
+          });
+        }
       }
 
       return { ...orResult, breadNoList, image: imgResult[0] };
@@ -327,10 +354,20 @@ const createOrderRoundBread = async (
  * 주문차수 수정 (이미지 X)
  */
 export const updateWithoutImage = async (body: UpdateOrderRoundInput) => {
-  const { no, name, startedAt, endedAt } = body;
+  const { no, name, startedAt, endedAt, minOrderQty, maxOrderQty } = body;
 
   try {
     const result = await prisma.$transaction(async (tx) => {
+      // 0. 현재 시작일자가 존재하는 주문차수를 조회한다. (수정대상 제외)
+      const findOr = await selectStartedAtOrderRound(startedAt);
+
+      if (findOr && findOr.no !== body.no) {
+        throw AppError.notFound('다른 주문차수 일자에 포함됩니다. 시작~종료일자를 검토하세요.', {
+          no,
+          diffNo: findOr.no,
+        });
+      }
+
       // 1. 주문차수 수정 :: orderRound
       const orResult = await tx.orderRound.update({
         where: { no },
@@ -338,6 +375,8 @@ export const updateWithoutImage = async (body: UpdateOrderRoundInput) => {
           name,
           startedAt,
           endedAt,
+          minOrderQty,
+          maxOrderQty,
         },
       });
 
@@ -381,7 +420,7 @@ export const updateWithImage = async (
   body: UpdateOrderRoundInput,
   image: UploadedFile[] | UploadedFile,
 ) => {
-  const { no, name, startedAt, endedAt } = body;
+  const { no, name, startedAt, endedAt, minOrderQty, maxOrderQty } = body;
 
   try {
     const result = await prisma.$transaction(async (tx) => {
@@ -392,6 +431,8 @@ export const updateWithImage = async (
           name,
           startedAt: new Date(startedAt),
           endedAt: new Date(endedAt),
+          minOrderQty,
+          maxOrderQty,
         },
       });
 
@@ -420,11 +461,19 @@ export const updateWithImage = async (
 
       // 3. 이미지 수정
       // 기존 이미지의 마지막 순서 조회하여 클라우디너리 이미지 업로드
-      const findImg = await prisma.image.findFirst({
-        where: { imageTargetNo: no, imageTargetType },
-        orderBy: { order: 'asc' },
-        select: { order: true, publicId: true, url: true, name: true },
-      });
+      let findImg;
+      if (imageTargetType) {
+        findImg = await prisma.image.findFirst({
+          where: { imageTargetNo: no, imageTargetType },
+          orderBy: { order: 'asc' },
+          select: {
+            order: true,
+            publicId: true,
+            url: true,
+            // name: true
+          },
+        });
+      }
 
       // 클라우디너리에 재업로드
       const lastOrder = findImg?.order || 0;
@@ -439,12 +488,12 @@ export const updateWithImage = async (
       }
 
       /* 등록 */
-      if (uploadResult[0]) {
+      if (uploadResult[0] && imageTargetType) {
         returnImg = await prisma.image.create({
           data: {
             publicId: uploadResult[0].public_id,
             url: uploadResult[0].secure_url,
-            name: uploadResult[0].original_filename,
+            // name: uploadResult[0].original_filename,
             imageTargetNo: no,
             imageTargetType,
             order: 1,
@@ -475,6 +524,8 @@ export const getLatest = async () => {
         name: true,
         startedAt: true,
         endedAt: true,
+        minOrderQty: true,
+        maxOrderQty: true,
         orderRoundBreads: {
           select: {
             bread: {
@@ -497,7 +548,7 @@ export const getLatest = async () => {
     const imageTargetType = await getImageTargetTypeCode(IMAGE_TARGET_TYPE_NAME);
     let image;
 
-    if (or) {
+    if (or && imageTargetType) {
       image = await tx.image.findFirst({
         where: {
           imageTargetType,
@@ -507,7 +558,7 @@ export const getLatest = async () => {
         select: {
           publicId: true,
           url: true,
-          name: true,
+          // name: true,
           order: true,
         },
       });
@@ -539,6 +590,40 @@ export const getNow = async () => {
         name: true,
         startedAt: true,
         endedAt: true,
+        minOrderQty: true,
+        maxOrderQty: true,
+        orderRoundBreads: {
+          select: {
+            orderRoundNo: true,
+            breadNo: true,
+          },
+        },
+      },
+    });
+
+    return data;
+  });
+
+  return result;
+};
+
+/**
+ * 현재 시작일자가 포함된 주문차수 조회
+ */
+export const selectStartedAtOrderRound = async (startedAt: Date) => {
+  const result = await prisma.$transaction(async (tx) => {
+    const data = tx.orderRound.findFirst({
+      where: {
+        startedAt: { lte: startedAt },
+        endedAt: { gte: startedAt },
+      },
+      select: {
+        no: true,
+        name: true,
+        startedAt: true,
+        endedAt: true,
+        minOrderQty: true,
+        maxOrderQty: true,
         orderRoundBreads: {
           select: {
             orderRoundNo: true,

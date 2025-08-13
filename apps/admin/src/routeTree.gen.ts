@@ -15,6 +15,7 @@ import { Route as DashboardImport } from './routes/dashboard'
 import { Route as IndexImport } from './routes/index'
 import { Route as DashboardIndexImport } from './routes/dashboard/index'
 import { Route as DashboardPurchasesIndexImport } from './routes/dashboard/purchases/index'
+import { Route as DashboardPaymentIndexImport } from './routes/dashboard/payment/index'
 import { Route as DashboardOrdersIndexImport } from './routes/dashboard/orders/index'
 import { Route as DashboardOrderRoundIndexImport } from './routes/dashboard/orderRound/index'
 import { Route as DashboardMaterialsIndexImport } from './routes/dashboard/materials/index'
@@ -44,6 +45,12 @@ const DashboardIndexRoute = DashboardIndexImport.update({
 const DashboardPurchasesIndexRoute = DashboardPurchasesIndexImport.update({
   id: '/purchases/',
   path: '/purchases/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+
+const DashboardPaymentIndexRoute = DashboardPaymentIndexImport.update({
+  id: '/payment/',
+  path: '/payment/',
   getParentRoute: () => DashboardRoute,
 } as any)
 
@@ -137,6 +144,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardOrdersIndexImport
       parentRoute: typeof DashboardImport
     }
+    '/dashboard/payment/': {
+      id: '/dashboard/payment/'
+      path: '/payment'
+      fullPath: '/dashboard/payment'
+      preLoaderRoute: typeof DashboardPaymentIndexImport
+      parentRoute: typeof DashboardImport
+    }
     '/dashboard/purchases/': {
       id: '/dashboard/purchases/'
       path: '/purchases'
@@ -156,6 +170,7 @@ interface DashboardRouteChildren {
   DashboardMaterialsIndexRoute: typeof DashboardMaterialsIndexRoute
   DashboardOrderRoundIndexRoute: typeof DashboardOrderRoundIndexRoute
   DashboardOrdersIndexRoute: typeof DashboardOrdersIndexRoute
+  DashboardPaymentIndexRoute: typeof DashboardPaymentIndexRoute
   DashboardPurchasesIndexRoute: typeof DashboardPurchasesIndexRoute
 }
 
@@ -166,6 +181,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardMaterialsIndexRoute: DashboardMaterialsIndexRoute,
   DashboardOrderRoundIndexRoute: DashboardOrderRoundIndexRoute,
   DashboardOrdersIndexRoute: DashboardOrdersIndexRoute,
+  DashboardPaymentIndexRoute: DashboardPaymentIndexRoute,
   DashboardPurchasesIndexRoute: DashboardPurchasesIndexRoute,
 }
 
@@ -182,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/materials': typeof DashboardMaterialsIndexRoute
   '/dashboard/orderRound': typeof DashboardOrderRoundIndexRoute
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
+  '/dashboard/payment': typeof DashboardPaymentIndexRoute
   '/dashboard/purchases': typeof DashboardPurchasesIndexRoute
 }
 
@@ -193,6 +210,7 @@ export interface FileRoutesByTo {
   '/dashboard/materials': typeof DashboardMaterialsIndexRoute
   '/dashboard/orderRound': typeof DashboardOrderRoundIndexRoute
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
+  '/dashboard/payment': typeof DashboardPaymentIndexRoute
   '/dashboard/purchases': typeof DashboardPurchasesIndexRoute
 }
 
@@ -206,6 +224,7 @@ export interface FileRoutesById {
   '/dashboard/materials/': typeof DashboardMaterialsIndexRoute
   '/dashboard/orderRound/': typeof DashboardOrderRoundIndexRoute
   '/dashboard/orders/': typeof DashboardOrdersIndexRoute
+  '/dashboard/payment/': typeof DashboardPaymentIndexRoute
   '/dashboard/purchases/': typeof DashboardPurchasesIndexRoute
 }
 
@@ -220,6 +239,7 @@ export interface FileRouteTypes {
     | '/dashboard/materials'
     | '/dashboard/orderRound'
     | '/dashboard/orders'
+    | '/dashboard/payment'
     | '/dashboard/purchases'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -230,6 +250,7 @@ export interface FileRouteTypes {
     | '/dashboard/materials'
     | '/dashboard/orderRound'
     | '/dashboard/orders'
+    | '/dashboard/payment'
     | '/dashboard/purchases'
   id:
     | '__root__'
@@ -241,6 +262,7 @@ export interface FileRouteTypes {
     | '/dashboard/materials/'
     | '/dashboard/orderRound/'
     | '/dashboard/orders/'
+    | '/dashboard/payment/'
     | '/dashboard/purchases/'
   fileRoutesById: FileRoutesById
 }
@@ -281,6 +303,7 @@ export const routeTree = rootRoute
         "/dashboard/materials/",
         "/dashboard/orderRound/",
         "/dashboard/orders/",
+        "/dashboard/payment/",
         "/dashboard/purchases/"
       ]
     },
@@ -306,6 +329,10 @@ export const routeTree = rootRoute
     },
     "/dashboard/orders/": {
       "filePath": "dashboard/orders/index.tsx",
+      "parent": "/dashboard"
+    },
+    "/dashboard/payment/": {
+      "filePath": "dashboard/payment/index.tsx",
       "parent": "/dashboard"
     },
     "/dashboard/purchases/": {

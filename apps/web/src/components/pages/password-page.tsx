@@ -1,4 +1,7 @@
-import { passwordModifyFormSchema, type PasswordModifyFormSchema } from '@/validate/form-schema';
+import {
+  passwordModifyFormSchema,
+  type PasswordModifyFormSchema,
+} from '@/validate/password-modify-form-schema';
 import {
   Button,
   Card,

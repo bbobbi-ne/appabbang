@@ -8,10 +8,10 @@ import CardComment from '@/components/common/card-comment';
 import Payment from '@/components/order/Payment';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { formSchema } from '@/validate/form-schema';
+import { formSchema } from '@/validate/order-form-schema';
 import NonCustomerOrderForm from '@/components/order/non-customer-order-form';
 import { getOrderRound, insertOrders, searchBankList, searchDeliveryList } from '@/services/apis';
-import type { FormSchema } from '@/validate/form-schema';
+import type { FormSchema } from '@/validate/order-form-schema';
 import useToast from '@/hooks/useToast';
 import { useParams } from '@tanstack/react-router';
 
@@ -23,6 +23,8 @@ export default function OrderPage() {
   const [fee, setFee] = useState<number>(0); // 배송비
   const [totalCount, setTotalCount] = useState<number>(0); // 최종 수량
   const [totalPrice, setTotalPrice] = useState<number>(0); // 최종 금액
+  const [min, setMin] = useState<number>(0); // 최소주문수량
+  const [max, setMax] = useState<number>(0); // 최대주문수량
   // 메인페이지에서 넘어온 주문차수 파라미터
   const { orderRoundNo } = useParams({ from: '/_sub-page/order/$orderRoundNo' });
 
@@ -178,7 +180,11 @@ export default function OrderPage() {
 
   /** 주문차수 빵 목록 조회 및 설정 */
   useEffect(() => {
-    orderRoundData && setOrderRoundBreads(orderRoundData.data.orderRoundBreads);
+    if (orderRoundData) {
+      setOrderRoundBreads(orderRoundData.data.orderRoundBreads);
+      setMin(orderRoundData.data.minOrderQty);
+      setMax(orderRoundData.data.maxOrderQty);
+    }
     orderRoundErr && setErrMsg('빵 목록을 조회하는 데 문제가 발생했습니다.');
   }, [orderRoundData, orderRoundErr]);
 
@@ -214,7 +220,7 @@ export default function OrderPage() {
             <CardContent>
               <CardComment
                 title="1. 이번 주문서에 포함된 빵을 확인하세요!"
-                comment="현재 주문서에 포함된 빵 목록은 다음과 같습니다."
+                comment="현재 주문서에 포함된 빵 목록은 다음과 같습니다. 카드를 클릭하면 빵 결제목록에 담을 수 있습니다."
               />
 
               {/* 주문차수 빵 목록 */}
@@ -235,7 +241,9 @@ export default function OrderPage() {
 
             {paymentList.length === 0
               ? null
-              : paymentList.map((data, i) => <Payment key={i} bread={data} handlers={handlers} />)}
+              : paymentList.map((data, i) => (
+                  <Payment key={i} bread={data} min={min} max={max} handlers={handlers} />
+                ))}
           </div>
 
           <div className="mt-5 mb-5 mr-10 text-right font-bold text-[18px]">

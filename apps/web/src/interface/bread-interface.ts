@@ -31,6 +31,8 @@ export interface BreadCardProps {
 export interface PaymentProp {
   key: number;
   bread: BreadProps;
+  min: number;
+  max: number;
   handlers: {
     onCountChange: (bread: BreadProps, type: string) => void;
     onRemove?: (bread: BreadProps) => void;

@@ -405,10 +405,10 @@ export const deleteOrderValidator = [
  */
 export const createOrderRoundValidator = [
   body('name').trim().notEmpty().withMessage('주문차수명은 필수 입력항목입니다.'),
-  body('breadNoList').exists().withMessage('빵 목록은 필수 입력항목입니다.'),
+  body('orderRoundBreads').exists().withMessage('빵 목록은 필수 입력항목입니다.'),
   // .isArray({ min: 1 })
   // .withMessage('빵 목록은 하나 이상의 요소를 가진 배열이어야 합니다.'),
-  body('breadNoList.*').isInt().toInt().withMessage('빵 목록 안의 값은 정수여야 합니다.'),
+  body('orderRoundBreads.*').isInt().toInt().withMessage('빵 목록 안의 값은 정수여야 합니다.'),
   body('startedAt')
     .trim()
     .notEmpty()

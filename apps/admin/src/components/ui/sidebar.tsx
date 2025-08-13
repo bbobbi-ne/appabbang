@@ -13,11 +13,11 @@ import ThemeToggleBtn from './theme-toggle-btn';
 const items = [
   { title: 'Home', url: '/dashboard' },
   { title: '빵관리', url: '/dashboard/breads' },
-  { title: '재료관리', url: '/dashboard/materials' },
+  { title: '결제관리', url: '/dashboard/payment' },
   { title: '주문관리', url: '/dashboard/orders' },
   { title: '주문차수', url: '/dashboard/orderRound' },
   { title: '발주관리', url: '/dashboard/purchases' },
-  { title: '고객센터', url: '/dashboard/customers' },
+  { title: '고객관리', url: '/dashboard/customers' },
 ];
 
 export function Sidebar() {

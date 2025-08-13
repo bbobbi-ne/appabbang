@@ -635,8 +635,8 @@ paths:
                       example: ORD-20240622-12345
                     orderStatus:
                       type: string
-                      enum: ['10', '20', '30', '40', '50']
-                      description: '주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소됨)'
+                      enum: ['10', '20', '30', '40', '50',"51","52"]
+                      description: '주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소요청, 51-취소완료, 52-취소완료(환불))'
                       example: '10'
                     orderStatusName:
                       type: string
@@ -988,8 +988,8 @@ paths:
                     example: ORD-20240622-12345
                   orderStatus:
                     type: string
-                    enum: ['10', '20', '30', '40', '50']
-                    description: '주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소됨)'
+                    enum: ['10', '20', '30', '40', '50',"51","52"]
+                    description: '주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소요청, 51-취소완료, 52-취소완료(환불))'
                     example: '10'
                   totalPrice:
                     type: integer
@@ -1292,8 +1292,8 @@ paths:
               properties:
                 orderStatus:
                   type: string
-                  enum: ['10', '20', '30', '40', '50']
-                  description: '변경할 주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소됨)'
+                  enum: ['10', '20', '30', '40', '50',"51","52"]
+                  description: '주문 상태 (10-접수됨, 20-제조중, 30-배송중, 40-완료, 50-취소요청, 51-취소완료, 52-취소완료(환불))'
                   example: '10'
       responses:
         '200':
@@ -1353,6 +1353,8 @@ paths:
                     - name
                     - startedAt
                     - endedAt
+                    - minOrderQty
+                    - maxOrderQty
                     - orderRoundBreads
                     - image
                   properties:
@@ -1374,6 +1376,14 @@ paths:
                       format: date-time
                       description: 종료일시
                       example: 2025-07-31T11:00:00.000Z
+                    minOrderQty:
+                      type: integer
+                      description: 최소주문수량
+                      example: 1
+                    maxOrderQty:
+                      type: integer
+                      description: 최대주문수량
+                      example: 999
                     orderRoundBreads:
                       type: array
                       items:
@@ -1416,6 +1426,8 @@ paths:
                 - name
                 - startedAt
                 - endedAt
+                - minOrderQty
+                - maxOrderQty
                 - orderRoundBreads
               properties:
                 name:
@@ -1432,6 +1444,14 @@ paths:
                   format: date-time
                   description: 종료일시
                   example: 2025-07-31T11:00:00.000Z
+                minOrderQty:
+                  type: integer
+                  description: 최소주문수량
+                  example: 1
+                maxOrderQty:
+                  type: integer
+                  description: 최대주문수량
+                  example: 1
                 orderRoundBreads:
                   type: array
                   description: 빵 번호 목록 (JSON 문자열 형태로 전송)
@@ -1475,6 +1495,8 @@ paths:
                   - name
                   - startedAt
                   - endedAt
+                  - minOrderQty
+                  - maxOrderQty
                   - orderRoundBread
                 properties:
                   no:
@@ -1495,6 +1517,14 @@ paths:
                     format: date-time
                     description: 종료일시
                     example: 2025-07-31T11:00:00.000Z
+                  minOrderQty:
+                    type: integer
+                    description: 최소주문수량
+                    example: 1
+                  maxOrderQty:
+                    type: integer
+                    description: 최대주문수량
+                    example: 1
                   orderRoundBread:
                     type: array
                     items:
@@ -1537,6 +1567,8 @@ paths:
                   - name
                   - startedAt
                   - endedAt
+                  - minOrderQty
+                  - maxOrderQty
                   - orderRoundBread
                   - image
                 properties:
@@ -1558,6 +1590,14 @@ paths:
                     format: date-time
                     description: 종료일시
                     example: 2025-07-31T11:00:00.000Z
+                  minOrderQty:
+                    type: integer
+                    description: 최소주문수량
+                    example: 1
+                  maxOrderQty:
+                    type: integer
+                    description: 최대주문수량
+                    example: 1
                   orderRoundBread:
                     type: array
                     items:
@@ -1627,6 +1667,8 @@ paths:
                   - name
                   - startedAt
                   - endedAt
+                  - minOrderQty
+                  - maxOrderQty
                   - orderRoundBreads
                   - image
                 properties:
@@ -1648,6 +1690,14 @@ paths:
                     format: date-time
                     description: 종료일시
                     example: 2025-07-31T11:00:00.000Z
+                  minOrderQty:
+                    type: integer
+                    description: 최소주문수량
+                    example: 1
+                  maxOrderQty:
+                    type: integer
+                    description: 최대주문수량
+                    example: 1
                   orderRoundBreads:
                     type: array
                     items:
@@ -1715,6 +1765,8 @@ paths:
                 - name
                 - startedAt
                 - endedAt
+                - minOrderQty
+                - maxOrderQty
                 - orderRoundBreads
               properties:
                 no:
@@ -1739,6 +1791,14 @@ paths:
                   format: date-time
                   description: 종료일시
                   example: 2025-07-31T11:00:00.000Z
+                minOrderQty:
+                    type: integer
+                    description: 최소주문수량
+                    example: 1
+                maxOrderQty:
+                  type: integer
+                  description: 최대주문수량
+                  example: 1
                 orderRoundBreads:
                   type: string
                   description: 빵 번호 목록 (JSON 문자열 형태로 전송)
@@ -3119,6 +3179,7 @@ paths:
                     - bankCodeName
                     - createdAt
                     - updatedAt
+                    - order
                   properties:
                     no:
                       type: integer
@@ -3182,6 +3243,36 @@ paths:
                       format: date-time
                       description: 결제 수정일시
                       example: '2024-06-22T12:34:56.000Z'
+                    order:
+                      type: object
+                      description: 주문 정보
+                      required:
+                        - no
+                        - totalPrice
+                        - orderStatus
+                        - orderStatusName
+                      properties:
+                        no:
+                          type: integer
+                          description: 주문 번호
+                          example: 4
+                        totalPrice:
+                          type: integer
+                          description: 주문 총 금액
+                          example: 6000
+                        orderStatus:
+                          type: string
+                          description: 주문 상태
+                          example: "50"
+                        orderStatusName:
+                          type: string
+                          description: 주문 상태 이름
+                          example: "접수요청"
+                        orderNumber:
+                          type: string
+                          description: 주문번호
+                          example: "ORD-20250811-99468690"
+                          
 
   /payments/{no}:
     get:

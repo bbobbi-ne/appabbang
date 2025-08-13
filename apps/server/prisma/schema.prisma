@@ -38,7 +38,9 @@ model OrderRound {
   name                String              @db.VarChar(30)                             // 주문차수명
   startedAt           DateTime            @map("started_at")                          // 주문 시작 시간
   endedAt             DateTime            @map("ended_at")                            // 주문 마감 시간
-  
+  minOrderQty         Int                 @map("min_order_qty")                       // 최소구매가능수량
+  maxOrderQty         Int                 @map("max_order_qty")                       // 최대구매가능수량
+
   createdAt           DateTime            @default(now()) @map("created_at")          // 등록 시간
   updatedAt           DateTime            @updatedAt @map("updated_at")               // 수정 시간
 
