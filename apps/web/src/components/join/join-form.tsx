@@ -22,12 +22,14 @@ import { joinSchema, type JoinSchemaType } from '@/validate/join-form-schema';
 import ServiceIsAgreedDialog from './service-terms-agreed-dialog';
 import PrivacyTermsAgreedDialog from './privacy-terms-agreed-dialog';
 import useToast from '@/hooks/useToast';
-import { createCustomer } from '@/services/user-apis';
+import { createCustomer } from '@/services/customer-apis';
+import { useAccessTokenStore } from '@/store/session';
 
 const labelMinWidth = 'min-w-[120px]';
 
 export default function JoinForm() {
   const { addToast } = useToast();
+  const { set } = useAccessTokenStore();
 
   // 폼 선언
   const form = useForm<JoinSchemaType>({
@@ -77,7 +79,7 @@ export default function JoinForm() {
    * 회원가입 submit
    */
   const onSubmit: SubmitHandler<JoinSchemaType> = (data) => {
-    createCustomer(data);
+    createCustomer(data, set);
   };
 
   return (
