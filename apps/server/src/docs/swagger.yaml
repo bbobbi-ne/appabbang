@@ -32,6 +32,8 @@ tags:
     description: 결제 API
   - name: My
     description: 본인만 접근 가능한 API
+  - name: Coupons
+    description: 쿠폰 API
 
 components:
   securitySchemes:
@@ -3413,3 +3415,214 @@ paths:
       responses:
         '204':
           description: 배송지 삭제 성공
+
+  /coupons:
+    get:
+      tags: [Coupons]
+      summary: 쿠폰 목록 조회
+      description: 모든 쿠폰 목록을 조회합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 쿠폰 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - no
+                    - name
+                    - amount
+                    - expireAfterDays
+                    - createdAt
+                    - updatedAt
+                  properties:
+                    no:
+                      type: integer
+                      description: 쿠폰 번호
+                      example: 1
+                    name:
+                      type: string
+                      description: 쿠폰명
+                      example: '첫 로그인 쿠폰'
+                    amount:
+                      type: integer
+                      description: 할인 금액 (원)
+                      example: 3000
+                    expireAfterDays:
+                      type: integer
+                      description: 발급일 기준 만료일
+                      example: 30
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: 생성일시
+                      example: '2024-01-01T00:00:00.000Z'
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      description: 수정일시
+                      example: '2024-01-01T00:00:00.000Z'
+
+    post:
+      tags: [Coupons]
+      summary: 쿠폰 생성
+      description: 새로운 쿠폰을 생성합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - amount
+                - expireAfterDays
+              properties:
+                name:
+                  type: string
+                  description: 쿠폰명
+                  example: '신규 가입 쿠폰'
+                amount:
+                  type: integer
+                  description: 할인 금액 (원)
+                  example: 5000
+                expireAfterDays:
+                  type: integer
+                  description: 발급일 기준 만료일
+                  example: 60
+      responses:
+        '201':
+          description: 쿠폰 생성 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: 성공 메시지
+                    example: '쿠폰이 생성되었습니다.'
+
+  /coupons/{no}:
+    get:
+      tags: [Coupons]
+      summary: 쿠폰 상세 조회
+      description: 특정 쿠폰의 상세 정보를 조회합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 쿠폰 번호
+          example: 1
+      responses:
+        '200':
+          description: 쿠폰 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - no
+                  - name
+                  - amount
+                  - expireAfterDays
+                properties:
+                  no:
+                    type: integer
+                    description: 쿠폰 번호
+                    example: 1
+                  name:
+                    type: string
+                    description: 쿠폰명
+                    example: '첫 로그인 쿠폰'
+                  amount:
+                    type: integer
+                    description: 할인 금액 (원)
+                    example: 3000
+                  expireAfterDays:
+                    type: integer
+                    description: 발급일 기준 만료일
+                    example: 30
+
+    put:
+      tags: [Coupons]
+      summary: 쿠폰 수정
+      description: 기존 쿠폰의 정보를 수정합니다. 첫 로그인 쿠폰이거나 이미 발급된 쿠폰이 있을 경우 이름만 수정 가능합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 쿠폰 번호
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 쿠폰명
+                  example: '수정된 쿠폰명'
+                amount:
+                  type: integer
+                  description: 할인 금액 (원)
+                  example: 5000
+                expireAfterDays:
+                  type: integer
+                  description: 발급일 기준 만료일
+                  example: 60
+      responses:
+        '200':
+          description: 쿠폰 수정 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: 성공 메시지
+                    example: '쿠폰이 수정되었습니다.'
+
+    delete:
+      tags: [Coupons]
+      summary: 쿠폰 삭제
+      description: 특정 쿠폰을 삭제합니다. 첫 로그인 쿠폰(no=1)이나 고객에게 발급된 쿠폰은 삭제할 수 없습니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 쿠폰 번호
+          example: 2
+      responses:
+        '204':
+          description: 쿠폰 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: 성공 메시지
+                    example: '쿠폰이 삭제되었습니다.'
