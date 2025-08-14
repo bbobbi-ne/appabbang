@@ -43,7 +43,7 @@ export async function createCustomer(
   set: (accountToken: string) => void,
 ) {
   try {
-    const response = await client.post('/customers', data);
+    const response = await client.post('/auth/customers/join', data);
 
     if (response.status === 201) {
       // accessToken을 상태관리에 저장
@@ -76,11 +76,11 @@ export async function createCustomer(
  * 로그인
  */
 export const login = async (
-  data: { id: string; pw: string; type: string },
+  data: { id: string; pw: string },
   set: (accessToken: string) => void,
 ) => {
   try {
-    const response = await client.post('/customers/login', data);
+    const response = await client.post('/auth/customers/login', data);
 
     if (response.status === 200) {
       // accessToken을 상태관리에 저장
@@ -115,7 +115,7 @@ export const login = async (
 export const logout = async (accessToken: string, reset: (accessToken: string) => void) => {
   try {
     const response = await client.post(
-      '/customers/logout',
+      '/auth/customers/logout',
       {},
       { headers: { Authorization: `Bearer ${accessToken}` } },
     );

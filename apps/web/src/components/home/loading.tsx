@@ -3,7 +3,7 @@
  */
 
 import { Container } from '@/styles/home';
-import { Card, CardContent, CardDescription, Skeleton } from '@appabbang/ui';
+import { Card, CardContent, Skeleton } from '@appabbang/ui';
 import clsx from 'clsx';
 
 function MainLoading() {

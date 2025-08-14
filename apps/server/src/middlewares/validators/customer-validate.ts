@@ -2,7 +2,7 @@
  * 고객 정보 validate
  */
 import { RequestHandler } from 'express';
-import { validationResult, body, query, param } from 'express-validator';
+import { validationResult, body } from 'express-validator';
 import { AppError } from '@/types';
 
 export const validate = (validators: RequestHandler[]): RequestHandler => {

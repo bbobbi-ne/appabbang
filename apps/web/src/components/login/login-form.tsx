@@ -28,7 +28,7 @@ function LoginForm() {
   /**
    * 로그인
    */
-  const onSubmit = (data: { id: string; pw: string; type: string }) => {
+  const onSubmit = (data: { id: string; pw: string }) => {
     login(data, set);
   };
 
@@ -66,25 +66,6 @@ function LoginForm() {
               <div className="w-full space-y-1">
                 <FormControl>
                   <Input type="password" {...field} placeholder="비밀번호 입력" maxLength={30} />
-                </FormControl>
-                <FormMessage className="text-xs" />
-              </div>
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="type"
-          render={({ field }) => (
-            <FormItem className="hidden">
-              <FormLabel errorCheck={false} className={`whitespace-nowrap px-2 py-3 flex-1/4 `}>
-                사용자 타입
-              </FormLabel>
-
-              <div className="w-full space-y-1">
-                <FormControl>
-                  <Input type="text" {...field} maxLength={30} />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>

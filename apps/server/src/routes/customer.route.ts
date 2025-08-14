@@ -2,7 +2,7 @@ import { Router } from 'express';
 import * as customerController from '@/controllers/customer.controller';
 import * as addressController from '@/controllers/address.controller';
 import { asyncHandler } from '@/middlewares/error.middleware';
-import { optionalAuth, requireAdmin, requireCustomer } from '@/middlewares/auth.middleware';
+import { requireAdmin } from '@/middlewares/auth.middleware';
 import {
   createAddressValidator,
   deleteAddressValidator,
@@ -11,10 +11,6 @@ import {
   updateAddressValidator,
   validate,
 } from '@/middlewares/validators/validate';
-import {
-  createCustomerValidator,
-  loginCustomerValidator,
-} from '@/middlewares/validators/customer-validate';
 
 const router = Router();
 
@@ -23,15 +19,6 @@ router.get('/', requireAdmin, asyncHandler(customerController.getList));
 
 /** GET /customers/{no} : 고객 상세 조회 */
 router.get('/:no', requireAdmin, asyncHandler(customerController.getOne));
-
-/** POST /customers : 고객 생성 */
-router.post('/', validate(createCustomerValidator), asyncHandler(customerController.create));
-
-/** POST /customers/login : 고객 로그인 */
-router.post('/login', validate(loginCustomerValidator), asyncHandler(customerController.login));
-
-/** POST /customers/logout : 고객 로그아웃 */
-router.post('/logout', requireCustomer, asyncHandler(customerController.logout));
 
 /** PUT /customers/{no} : 고객 수정 */
 // router.put('/:no', requireAdmin, asyncHandler(customerController.update));

@@ -1,9 +1,14 @@
 import { Router } from 'express';
 import * as authController from '@/controllers/auth.controller';
-import { requireAuth } from '@/middlewares/auth.middleware';
+import { requireAuth, requireCustomer } from '@/middlewares/auth.middleware';
 import { loginValidator, validate } from '@/middlewares/validators/validate';
 import { asyncHandler } from '@/middlewares/error.middleware';
 import { KakaoClient } from '@/lib/kakao';
+import {
+  createCustomerValidator,
+  loginCustomerValidator,
+} from '@/middlewares/validators/customer-validate';
+import * as CustomerController from '@/controllers/customer.controller';
 
 const router = Router();
 
@@ -13,9 +18,6 @@ router.post('/login', validate(loginValidator), asyncHandler(authController.logi
 /** GET /auth/me : 내 정보 조회 */
 router.get('/me', requireAuth, asyncHandler(authController.me));
 
-/** POST /auth/refresh : 액세스 토큰 재발급 */
-router.post('/refresh', asyncHandler(authController.refresh));
-
 /** GET /auth/kakao/url : 카카오 로그인 URL 발급 */
 router.get('/kakao/url', (_, res) => {
   const url = KakaoClient.getAuthCodeURL();
@@ -24,6 +26,26 @@ router.get('/kakao/url', (_, res) => {
     url,
   });
 });
+
+/** POST /auth/customers/login : 고객 회원가입 */
+router.post(
+  '/customers/join',
+  validate(createCustomerValidator),
+  asyncHandler(CustomerController.create),
+);
+
+/** POST /customers/login : 고객 로그인 */
+router.post(
+  '/customers/login',
+  validate(loginCustomerValidator),
+  asyncHandler(CustomerController.login),
+);
+
+/** POST /customers/logout : 고객 로그아웃 */
+router.post('/customers/logout', requireCustomer, asyncHandler(CustomerController.logout));
+
+/** POST /auth/refresh : 액세스 토큰 재발급 */
+router.post('/refresh', asyncHandler(authController.refresh));
 
 /** POST /auth/kakao/login : 카카오 로그인 */
 router.post('/kakao/login', async (req, res, next) => {
