@@ -11,7 +11,7 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || '';
 const JWT_REFRESH_EXPIRES_IN = '7d';
 
 // OrderRound 등록 타입
-type CreateCustomerInput = Pick<
+export type CreateCustomerInput = Pick<
   Customer,
   | 'id'
   | 'name'
@@ -52,12 +52,6 @@ export const getByIdForLogin = async (id: string) => {
   const result = await prisma.$transaction(async (tx) => {
     const customer = await tx.customer.findFirst({
       where: { id },
-      select: {
-        no: true,
-        id: true,
-        pw: true,
-        name: true,
-      },
     });
 
     return customer;

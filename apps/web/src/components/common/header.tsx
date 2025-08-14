@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { User, ScrollText, LogIn, LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import Loading from './loading';
 
 export interface IOrderRoundProps {
   no: number;
@@ -59,7 +60,7 @@ export default function Header() {
     navigate({ to: '/mypage/info' });
   };
 
-  if (error || !data) return <div>주문 정보를 불러오지 못했습니다.</div>;
+  if (error || !data) return <Loading />;
 
   return (
     <header className="w-full fixed top-0 left-0 right-0 z-50 bg-background border-b">
