@@ -3536,6 +3536,7 @@ paths:
                   - name
                   - amount
                   - expireAfterDays
+                  - isRestricted
                 properties:
                   no:
                     type: integer
@@ -3553,6 +3554,10 @@ paths:
                     type: integer
                     description: 발급일 기준 만료일
                     example: 30
+                  isRestricted:
+                    type: boolean
+                    description: 수정 불가 여부
+                    example: true
 
     put:
       tags: [Coupons]

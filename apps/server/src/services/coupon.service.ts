@@ -31,7 +31,20 @@ export const getOne = async (no: number) => {
       expireAfterDays: true,
     },
   });
-  return coupon;
+
+  if (!coupon) {
+    throw AppError.badRequest('존재하지 않는 쿠폰입니다.');
+  }
+
+  // 첫 로그인 쿠폰이거나, 이미 발급된 쿠폰이 있을 경우 수정 불가 구분을 위해 추가
+  const isFirstLoginCoupon = no === 1;
+  const customerCoupon = await prisma.customerCoupon.findFirst({
+    where: { couponNo: no },
+    select: { couponNo: true },
+  });
+  const isRestricted = isFirstLoginCoupon || !!customerCoupon;
+
+  return { ...coupon, isRestricted };
 };
 
 /** 쿠폰 생성 */
