@@ -22,11 +22,7 @@ function LoginForm() {
 
   const form = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      id: '',
-      pw: '',
-      type: 'customer',
-    },
+    defaultValues: { id: '', pw: '' },
   });
 
   /**
