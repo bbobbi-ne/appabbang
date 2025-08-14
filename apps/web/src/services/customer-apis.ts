@@ -3,19 +3,9 @@
  */
 
 import useToast from '@/hooks/useToast';
-import axios from 'axios';
+import { client } from './common-apis';
 
 const { addToast } = useToast();
-
-/** axios 생성한 것을 컴포넌트에서 사용함. */
-const client = axios.create({
-  baseURL: 'http://localhost:4000',
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-});
 
 class CustomError extends Error {
   code: number;
@@ -70,6 +60,13 @@ export async function createCustomer(
       message: e.response.data.error.message,
     });
   }
+}
+
+/** 카카오 인가코드 받기 */
+export async function getKakaoCode() {
+  client.get(`http://localhost:4000/auth/kakao/url`).then((response) => {
+    document.location.href = response.data.url;
+  });
 }
 
 /**

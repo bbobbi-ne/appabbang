@@ -3,7 +3,7 @@ import Infomation from '../home/infomation-content';
 import InstagramContent from '../home/instagram-content';
 import OrderContent from '../home/order-content';
 import SellPopularProducts from '../home/sell-popular-products-content';
-import { getLatest } from '@/services/apis';
+import { getLatest } from '@/services/order-round-apis';
 import MainLoading from '../home/loading';
 import Loading from '../common/loading';
 
