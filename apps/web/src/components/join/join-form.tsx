@@ -1,15 +1,12 @@
-import { useForm } from 'react-hook-form';
-import z from 'zod';
+/**
+ * 회원가입 폼
+ */
+
+import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
   Checkbox,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
   Form,
   FormControl,
   FormField,
@@ -18,74 +15,76 @@ import {
   FormMessage,
   Input,
   Label,
-  ScrollArea,
 } from '@appabbang/ui';
 import DaumPostApi from '@/components/common/daum-post-api';
 import { getFormattedMobile } from '@/utils';
-
-export const joinSchema = z.object({
-  id: z
-    .string()
-    .trim()
-    .min(1, '받으실 분의 성함을 입력해주세요')
-    .max(10, '최대 10자 이내로 입력해주세요'),
-  pw: z.string().trim().min(1, '비밀번호를 입력해주세요'),
-  pwchk: z.string().trim().min(1, '비밀번호를 입력해주세요'),
-  mobileNumber: z
-    .string()
-    .trim()
-    .min(1, '받으실 분의 연락처를 입력해주세요')
-    .refine((val) => /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/.test(val), {
-      message: '휴대폰번호 형식이 올바르지 않습니다.',
-    }),
-  address: z.string().trim().min(1, '주소를 입력해주세요'),
-  addressDetail: z
-    .string()
-    .trim()
-    .min(1, '주소를 입력해주세요')
-    .max(30, '최대 30자 이내로 입력해주세요'),
-  zipcode: z.string().trim().min(1, '주소를 입력해주세요'),
-  message: z
-    .string()
-    .trim()
-    .min(1, '배송메세지를 입력해주세요')
-    .max(30, '최대 30자 이내로 입력해주세요'),
-  isAgree: z.boolean(),
-});
-export type JoinSchemaType = z.infer<typeof joinSchema>;
+import { joinSchema, type JoinSchemaType } from '@/validate/join-form-schema';
+import ServiceIsAgreedDialog from './service-terms-agreed-dialog';
+import PrivacyTermsAgreedDialog from './privacy-terms-agreed-dialog';
+import useToast from '@/hooks/useToast';
+import { createCustomer } from '@/services/customer-apis';
+import { useAccessTokenStore } from '@/store/session';
 
 const labelMinWidth = 'min-w-[120px]';
 
-type Props = {
-  onSubmit: (data: JoinSchemaType) => Promise<void>;
-  isLoading: boolean;
-};
+export default function JoinForm() {
+  const { addToast } = useToast();
+  const { set } = useAccessTokenStore();
 
-export default function JoinForm({ onSubmit, isLoading }: Props) {
   // 폼 선언
   const form = useForm<JoinSchemaType>({
     resolver: zodResolver(joinSchema),
     defaultValues: {
       id: '',
+      name: '',
       pw: '',
-      pwchk: '',
+      pwConfirm: '',
       mobileNumber: '',
       address: '',
       addressDetail: '',
       zipcode: '',
-      message: '',
-      isAgree: false,
+      isServiceTermsAgreed: false,
+      isPrivacyTermsAgreed: false,
+      isMarketingTermsAgreed: false,
     },
   });
 
-  const handleSubmit = async (data: JoinSchemaType) => {
-    await onSubmit(data);
+  /**
+   * 회원가입 submit 전 핸들러
+   */
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // 아빠빵 처리방침 3가지 true 확인
+    if (
+      !(
+        form.getValues('isServiceTermsAgreed') &&
+        form.getValues('isPrivacyTermsAgreed') &&
+        form.getValues('isMarketingTermsAgreed')
+      )
+    ) {
+      addToast({
+        type: 'error',
+        message: '아빠빵 처리방침 약관을 확인 바랍니다.',
+      });
+
+      return;
+    }
+
+    // success
+    form.handleSubmit(onSubmit)(e);
+  };
+
+  /**
+   * 회원가입 submit
+   */
+  const onSubmit: SubmitHandler<JoinSchemaType> = (data) => {
+    createCustomer(data, set);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        {/* 받으실 분 */}
+      <form onSubmit={handleSubmit} className="space-y-4">
         <FormField
           control={form.control}
           name="id"
@@ -97,7 +96,26 @@ export default function JoinForm({ onSubmit, isLoading }: Props) {
 
               <div className="w-full space-y-1">
                 <FormControl>
-                  <Input {...field} placeholder="아이디를 입력해주세요" maxLength={10} />
+                  <Input type="text" {...field} placeholder="아이디 입력" maxLength={30} />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </div>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem className="flex items-center">
+              <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
+                <span className="text-red-700">*</span> 이름
+              </FormLabel>
+
+              <div className="w-full space-y-1">
+                <FormControl>
+                  <Input type="text" {...field} placeholder="이름 입력" maxLength={30} />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>
@@ -117,7 +135,7 @@ export default function JoinForm({ onSubmit, isLoading }: Props) {
 
               <div className="w-full space-y-1">
                 <FormControl>
-                  <Input {...field} placeholder="비밀번호를 입력해주세요" maxLength={10} />
+                  <Input type="password" {...field} placeholder="비밀번호 입력" maxLength={30} />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>
@@ -128,7 +146,7 @@ export default function JoinForm({ onSubmit, isLoading }: Props) {
         {/* 비밀번호 확인 */}
         <FormField
           control={form.control}
-          name="pwchk"
+          name="pwConfirm"
           render={({ field }) => (
             <FormItem className="flex items-center">
               <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
@@ -136,7 +154,12 @@ export default function JoinForm({ onSubmit, isLoading }: Props) {
               </FormLabel>
               <div className="w-full space-y-1">
                 <FormControl>
-                  <Input {...field} placeholder="비밀번호를 재입력해주세요" maxLength={10} />
+                  <Input
+                    type="password"
+                    {...field}
+                    placeholder="비밀번호 확인 입력"
+                    maxLength={30}
+                  />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>
@@ -144,20 +167,20 @@ export default function JoinForm({ onSubmit, isLoading }: Props) {
           )}
         />
 
-        {/* 연락처 */}
+        {/* 휴대번호 */}
         <FormField
           control={form.control}
           name="mobileNumber"
           render={({ field }) => (
             <FormItem className="flex items-center">
               <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
-                <span className="text-red-700">*</span> 연락처
+                <span className="text-red-700">*</span> 휴대번호
               </FormLabel>
               <div className="w-full space-y-1">
                 <FormControl>
                   <Input
                     {...field}
-                    placeholder="연락처를 입력해주세요"
+                    placeholder="휴대번호 입력"
                     onChange={(e) => {
                       const formattedValue = getFormattedMobile(e.target.value);
                       field.onChange(formattedValue);
@@ -194,7 +217,6 @@ export default function JoinForm({ onSubmit, isLoading }: Props) {
                         if (!data) return;
                         form.setValue('zipcode', data[0] ?? '');
                         form.setValue('address', data[1] ?? '');
-                        // form.setValue('addressDetail', data[2] ?? '');
                       }}
                       variant="secondary"
                     />
@@ -244,78 +266,112 @@ export default function JoinForm({ onSubmit, isLoading }: Props) {
           </div>
         </div>
 
-        {/* 배송 메세지 */}
-        <FormField
-          control={form.control}
-          name="message"
-          render={({ field }) => (
-            <FormItem className="flex items-center">
-              <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
-                <span className="text-red-700">*</span> 배송메세지
-              </FormLabel>
-              <div className="w-full space-y-1">
-                <FormControl>
-                  <Input {...field} placeholder="배송메세지를 입력해주세요." />
-                </FormControl>
+        <div className="flex flex-col gap-0">
+          {/* 서비스 이용약관 동의여부 */}
+          <FormField
+            control={form.control}
+            name="isServiceTermsAgreed"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="mb-0"
+                      />
+                    </FormControl>
 
-                <FormMessage className="text-xs" />
-              </div>
-            </FormItem>
-          )}
-        />
+                    <FormLabel
+                      errorCheck={false}
+                      className={`${labelMinWidth} whitespace-nowrap cursor-pointer text-xs`}
+                    >
+                      아빠빵 서비스 이용약관 처리방침에 동의합니다.
+                    </FormLabel>
+                  </div>
 
-        {/* 동의 여부 */}
-        <FormField
-          control={form.control}
-          name="isAgree"
-          render={({ field }) => (
-            <FormItem>
-              <div className="flex justify-between items-center gap-2">
-                <div className="flex items-center gap-2">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      className="mb-0"
-                    />
-                  </FormControl>
-
-                  <FormLabel
-                    errorCheck={false}
-                    className={`${labelMinWidth} whitespace-nowrap cursor-pointer text-xs`}
-                  >
-                    아빠빵 이용약관 및 개인정보 처리방침에 동의합니다.
-                  </FormLabel>
-                </div>
-
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="link" className="text-xs p-0" type="button">
-                      약관 보기
+                  <ServiceIsAgreedDialog>
+                    <Button type="button" variant="link" className="text-xs p-o">
+                      약관보기
                     </Button>
-                  </DialogTrigger>
-                  <DialogContent
-                    onInteractOutside={(e) => {
-                      e.preventDefault();
-                    }}
-                    className="overflow-y-auto max-h-11/12 p-0"
-                  >
-                    <ScrollArea className="h-[600px] p-8">
-                      <DialogHeader>
-                        <DialogTitle hidden>약관</DialogTitle>
-                      </DialogHeader>
-                      <DialogDescription hidden>약관</DialogDescription>
-                      <JoinAgreeDialog />
-                    </ScrollArea>
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </FormItem>
-          )}
-        />
+                  </ServiceIsAgreedDialog>
+                </div>
+              </FormItem>
+            )}
+          />
+
+          {/* 개인정보 수집, 이용 동의여부 */}
+          <FormField
+            control={form.control}
+            name="isPrivacyTermsAgreed"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex justify-between items-center gap-2">
+                  <div className="flex items-center gap-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="mb-0"
+                      />
+                    </FormControl>
+
+                    <FormLabel
+                      errorCheck={false}
+                      className={`${labelMinWidth} whitespace-nowrap cursor-pointer text-xs`}
+                    >
+                      아빠빵 개인정보 수집 및 이용 처리방침에 동의합니다.
+                    </FormLabel>
+                  </div>
+
+                  <PrivacyTermsAgreedDialog>
+                    <Button type="button" variant="link" className="text-xs p-o">
+                      약관보기
+                    </Button>
+                  </PrivacyTermsAgreedDialog>
+                </div>
+              </FormItem>
+            )}
+          />
+
+          {/* 마케팅 목적 개인정보 이용 및 광고 수신 동의여부 */}
+          <FormField
+            control={form.control}
+            name="isMarketingTermsAgreed"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex justify-between items-center gap-2">
+                  <div className="flex items-center gap-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="mb-0"
+                      />
+                    </FormControl>
+
+                    <FormLabel
+                      errorCheck={false}
+                      className={`${labelMinWidth} whitespace-nowrap cursor-pointer text-xs`}
+                    >
+                      마케팅, 광고 목적 개인정보 이용 처리방침에 동의합니다.
+                    </FormLabel>
+                  </div>
+
+                  <ServiceIsAgreedDialog>
+                    <Button type="button" variant="link" className="text-xs p-o">
+                      약관보기
+                    </Button>
+                  </ServiceIsAgreedDialog>
+                </div>
+              </FormItem>
+            )}
+          />
+        </div>
 
         <div className="mt-8 flex gap-2 pb-10">
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full">
             가입하기
           </Button>
         </div>
@@ -323,37 +379,3 @@ export default function JoinForm({ onSubmit, isLoading }: Props) {
     </Form>
   );
 }
-
-const JoinAgreeDialog = () => {
-  return (
-    <div>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-      <p>이곳은 약관입니다.</p>
-    </div>
-  );
-};

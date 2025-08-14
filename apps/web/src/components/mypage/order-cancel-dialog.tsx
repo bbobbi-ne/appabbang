@@ -2,7 +2,10 @@
  * 주문취소
  */
 
-import { orderCancelFormSchema, type OrderCancelFormSchema } from '@/validate/order-form-schema';
+import {
+  orderCancelFormSchema,
+  type OrderCancelFormSchema,
+} from '@/validate/order-cancel-form-schema';
 import {
   FormField,
   FormItem,

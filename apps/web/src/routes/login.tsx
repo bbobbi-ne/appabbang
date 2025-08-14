@@ -3,7 +3,7 @@
  * * 카카오 로그인 API
  */
 
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import {
   Button,
   Card,
@@ -40,7 +40,7 @@ export const Route = createFileRoute('/login')({
 });
 
 export const adminLoginSchema = z.object({
-  id: z.string().min(4, '아이디는 최소 4글자 이상이어야 합니다.'),
+  id: z.string().min(6, '아이디는 최소 6글자 이상이어야 합니다.'),
   pw: z
     .string()
     .min(8, '비밀번호는 최소 8자 이상이어야 합니다.')
@@ -51,7 +51,7 @@ export const adminLoginSchema = z.object({
 type AdminLoginForm = z.infer<typeof adminLoginSchema>;
 
 function RouteComponent() {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const onSubmit = useMutation({
     // mutationFn: loginCreate,
     onSuccess: (res) => {
@@ -118,6 +118,13 @@ function RouteComponent() {
                   </FormItem>
                 )}
               />
+
+              <div
+                className="text-gray-500 text-right mt-10 mb-3 cursor-pointer"
+                onClick={() => navigate({ to: '/join' })}
+              >
+                아직 회원이 아니신가요? 회원가입 이동하기
+              </div>
               <Button className="w-full" type="submit" onClick={() => alert('작업중입니다.')}>
                 로그인
               </Button>

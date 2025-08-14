@@ -24,7 +24,7 @@ interface AgreedProps {
   setAgreed: (flag: boolean) => void;
 }
 
-const termsOfService = `
+export const termsOfService = `
   1. 서비스의 제공 등
   (가) 아빠빵은 여러 가지 각종 제품, 이벤트 정보 및 리워드 서비스 등을 제공하며 필요에 따라 그 내용이 추가, 변경 및 정지될 수 있습니다.
       또한 아빠빵은 천재지변 또는 중계선 고장 등의 불가피한 사정으로 인하여 서비스를 중단할 수 있습니다.
@@ -43,7 +43,7 @@ const termsOfService = `
       다만, "비회원"의 거래관련 정보 및 고객문의 등에 대한 회신에 있어서는 제외됩니다.
 `;
 
-const personalInfoCollectAndUsed = `
+export const personalInfoCollectAndUsed = `
   1. 개인정보 수집목적 및 이용목적 : 비회원 구매 서비스 제공
 
   2. 수집하는 개인정보 항목
@@ -71,10 +71,10 @@ const personalInfoCollectAndUsed = `
   -보존이유: 통신비밀보호법
   -보존기간 : 3개월
 
-※ 동의를 거부할 수 있으나 거부시 비회원 구매 서비스 이용이 불가능합니다.
+※ 동의를 거부할 수 있으나 거부 시 아빠빵 서비스 이용이 불가능합니다.
 `;
 
-const withdrawalOfSubscription = `
+export const withdrawalOfSubscription = `
   1. 청약철회 등 및 환불
   ‘아빠빵’(이하 “업체”)은 「전자상거래 등에서의 소비자보호에 관한 법률」 제17조 및 같은 법 시행령 제21조에 따라, 식품의 특성상 청약철회(주문 취소 및 환불)가 제한됨을 안내드립니다.
   업체는 아래와 같은 경우에 한하여 환불 처리를 지원합니다.
