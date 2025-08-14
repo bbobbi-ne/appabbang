@@ -46,6 +46,7 @@ export default function JoinForm() {
       isServiceTermsAgreed: false,
       isPrivacyTermsAgreed: false,
       isMarketingTermsAgreed: false,
+      type: 'customer',
     },
   });
 
