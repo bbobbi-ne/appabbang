@@ -1,5 +1,6 @@
 import type {
   BreadsListData,
+  CouponsListData,
   CustomersListData,
   OrderRoundListData,
   OrdersListData,
@@ -58,6 +59,7 @@ export type PaymentsListItem = PaymentsListData[number];
 export type OrderRoundListItem = OrderRoundListData[number];
 export type BreadListItem = BreadsListData[number];
 export type OrdersListItem = OrdersListData[number];
+export type CouponsListItem = CouponsListData[number];
 
 export const BreadsColumns = () => {
   const columnHelper = createColumnHelper<BreadListItem>();
@@ -989,6 +991,85 @@ export const customersColumns = () => {
         </Button>
       ),
       cell: (info) => {},
+    }),
+  ];
+
+  return columns;
+};
+
+export const couponsColumns = () => {
+  const columnHelper = createColumnHelper<CouponsListItem>();
+
+  const columns: ColumnDef<CouponsListItem, any>[] = [
+    columnHelper.display({
+      id: 'cell-no',
+      maxSize: 1,
+      header: ({ column }) => {
+        const isSorted = column.getIsSorted() === 'asc';
+        return (
+          <Button
+            className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary gap-0`}
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            {isSorted ? <SortAsc /> : <SortDesc />} 번호
+          </Button>
+        );
+      },
+      cell: (info) => {
+        const index = info.table.getPrePaginationRowModel().rows.length - info.row.index;
+        return <p className="text-center">{index}</p>;
+      },
+    }),
+    columnHelper.accessor('name', {
+      header: ({ column }) => (
+        <Button className="p-0" variant="ghost">
+          쿠폰명
+        </Button>
+      ),
+      cell: (info) => {
+        return <p>{info.getValue()}</p>;
+      },
+    }),
+    columnHelper.accessor('amount', {
+      header: ({ column }) => (
+        <Button className="p-0" variant="ghost">
+          쿠폰금액
+        </Button>
+      ),
+      cell: (info) => {
+        return <p>{info.getValue()} 원</p>;
+      },
+    }),
+    columnHelper.accessor('expireAfterDays', {
+      header: ({ column }) => (
+        <Button className="p-0" variant="ghost">
+          쿠폰만료일
+        </Button>
+      ),
+      cell: (info) => {
+        return <p>발급 후 {info.getValue()} 일</p>;
+      },
+    }),
+    columnHelper.accessor('createdAt', {
+      header: ({ column }) => (
+        <Button className="p-0" variant="ghost">
+          등록일시
+        </Button>
+      ),
+      cell: (info) => {
+        return <p>{formatIso(info.getValue())}</p>;
+      },
+    }),
+    columnHelper.accessor('updatedAt', {
+      header: ({ column }) => (
+        <Button className="p-0" variant="ghost">
+          수정일시
+        </Button>
+      ),
+      cell: (info) => {
+        return <p>{formatIso(info.getValue())}</p>;
+      },
     }),
   ];
 

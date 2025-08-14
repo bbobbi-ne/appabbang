@@ -20,6 +20,7 @@ import { Route as DashboardOrdersIndexImport } from './routes/dashboard/orders/i
 import { Route as DashboardOrderRoundIndexImport } from './routes/dashboard/orderRound/index'
 import { Route as DashboardMaterialsIndexImport } from './routes/dashboard/materials/index'
 import { Route as DashboardCustomersIndexImport } from './routes/dashboard/customers/index'
+import { Route as DashboardCouponsIndexImport } from './routes/dashboard/coupons/index'
 import { Route as DashboardBreadsIndexImport } from './routes/dashboard/breads/index'
 
 // Create/Update Routes
@@ -78,6 +79,12 @@ const DashboardCustomersIndexRoute = DashboardCustomersIndexImport.update({
   getParentRoute: () => DashboardRoute,
 } as any)
 
+const DashboardCouponsIndexRoute = DashboardCouponsIndexImport.update({
+  id: '/coupons/',
+  path: '/coupons/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+
 const DashboardBreadsIndexRoute = DashboardBreadsIndexImport.update({
   id: '/breads/',
   path: '/breads/',
@@ -114,6 +121,13 @@ declare module '@tanstack/react-router' {
       path: '/breads'
       fullPath: '/dashboard/breads'
       preLoaderRoute: typeof DashboardBreadsIndexImport
+      parentRoute: typeof DashboardImport
+    }
+    '/dashboard/coupons/': {
+      id: '/dashboard/coupons/'
+      path: '/coupons'
+      fullPath: '/dashboard/coupons'
+      preLoaderRoute: typeof DashboardCouponsIndexImport
       parentRoute: typeof DashboardImport
     }
     '/dashboard/customers/': {
@@ -166,6 +180,7 @@ declare module '@tanstack/react-router' {
 interface DashboardRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardBreadsIndexRoute: typeof DashboardBreadsIndexRoute
+  DashboardCouponsIndexRoute: typeof DashboardCouponsIndexRoute
   DashboardCustomersIndexRoute: typeof DashboardCustomersIndexRoute
   DashboardMaterialsIndexRoute: typeof DashboardMaterialsIndexRoute
   DashboardOrderRoundIndexRoute: typeof DashboardOrderRoundIndexRoute
@@ -177,6 +192,7 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardBreadsIndexRoute: DashboardBreadsIndexRoute,
+  DashboardCouponsIndexRoute: DashboardCouponsIndexRoute,
   DashboardCustomersIndexRoute: DashboardCustomersIndexRoute,
   DashboardMaterialsIndexRoute: DashboardMaterialsIndexRoute,
   DashboardOrderRoundIndexRoute: DashboardOrderRoundIndexRoute,
@@ -194,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/breads': typeof DashboardBreadsIndexRoute
+  '/dashboard/coupons': typeof DashboardCouponsIndexRoute
   '/dashboard/customers': typeof DashboardCustomersIndexRoute
   '/dashboard/materials': typeof DashboardMaterialsIndexRoute
   '/dashboard/orderRound': typeof DashboardOrderRoundIndexRoute
@@ -206,6 +223,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dashboard/breads': typeof DashboardBreadsIndexRoute
+  '/dashboard/coupons': typeof DashboardCouponsIndexRoute
   '/dashboard/customers': typeof DashboardCustomersIndexRoute
   '/dashboard/materials': typeof DashboardMaterialsIndexRoute
   '/dashboard/orderRound': typeof DashboardOrderRoundIndexRoute
@@ -220,6 +238,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/breads/': typeof DashboardBreadsIndexRoute
+  '/dashboard/coupons/': typeof DashboardCouponsIndexRoute
   '/dashboard/customers/': typeof DashboardCustomersIndexRoute
   '/dashboard/materials/': typeof DashboardMaterialsIndexRoute
   '/dashboard/orderRound/': typeof DashboardOrderRoundIndexRoute
@@ -235,6 +254,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dashboard/'
     | '/dashboard/breads'
+    | '/dashboard/coupons'
     | '/dashboard/customers'
     | '/dashboard/materials'
     | '/dashboard/orderRound'
@@ -246,6 +266,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/dashboard/breads'
+    | '/dashboard/coupons'
     | '/dashboard/customers'
     | '/dashboard/materials'
     | '/dashboard/orderRound'
@@ -258,6 +279,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dashboard/'
     | '/dashboard/breads/'
+    | '/dashboard/coupons/'
     | '/dashboard/customers/'
     | '/dashboard/materials/'
     | '/dashboard/orderRound/'
@@ -299,6 +321,7 @@ export const routeTree = rootRoute
       "children": [
         "/dashboard/",
         "/dashboard/breads/",
+        "/dashboard/coupons/",
         "/dashboard/customers/",
         "/dashboard/materials/",
         "/dashboard/orderRound/",
@@ -313,6 +336,10 @@ export const routeTree = rootRoute
     },
     "/dashboard/breads/": {
       "filePath": "dashboard/breads/index.tsx",
+      "parent": "/dashboard"
+    },
+    "/dashboard/coupons/": {
+      "filePath": "dashboard/coupons/index.tsx",
       "parent": "/dashboard"
     },
     "/dashboard/customers/": {
