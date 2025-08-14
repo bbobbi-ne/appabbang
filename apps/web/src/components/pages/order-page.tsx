@@ -10,7 +10,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formSchema } from '@/validate/order-form-schema';
 import NonCustomerOrderForm from '@/components/order/non-customer-order-form';
-import { insertOrders, searchBankList, searchDeliveryList } from '@/services/apis';
+import { insertOrders, searchBankList, searchDeliveryList } from '@/services/order-apis';
 import { getOrderRound } from '@/services/order-round-apis';
 import type { FormSchema } from '@/validate/order-form-schema';
 import useToast from '@/hooks/useToast';

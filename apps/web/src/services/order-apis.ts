@@ -1,5 +1,5 @@
 import useToast from '@/hooks/useToast';
-import { client } from './common';
+import { client } from './common-apis';
 
 /** 전체 빵 목록 조회 */
 export async function searchBreadList() {
