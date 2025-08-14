@@ -25,6 +25,8 @@ import { TablePagination } from '../ui/table-pagination';
 import { useState } from 'react';
 import { couponsColumns, type CouponsListItem } from '@/data/columns';
 import { useCouponsQuery } from '@/hooks/use-coupon';
+import { CouponCreateDialog } from '@/components/coupons/coupon-create-dialog';
+import { CouponModifyDialog } from './coupon-modify-dialog';
 
 export const CouponsPage = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -59,6 +61,7 @@ export const CouponsPage = () => {
       <Card className="shadow-none bg-background border-none">
         <CardHeader>
           <CardTitle>쿠폰 관리</CardTitle>
+          <CouponCreateDialog />
         </CardHeader>
         <CardContent className="max-h-[550px] border-1 p-0 m-6 mt-0 rounded-lg overflow-auto relative">
           <Table>
@@ -92,9 +95,11 @@ export const CouponsPage = () => {
               {table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} className="cursor-pointer ">
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="text-center">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
+                    <CouponModifyDialog no={cell.row.original.no} key={cell.id}>
+                      <TableCell>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    </CouponModifyDialog>
                   ))}
                 </TableRow>
               ))}

@@ -2061,6 +2061,11 @@ export interface CouponsDetailData {
    * @example 30
    */
   expireAfterDays: number;
+  /**
+   * 수정 불가 여부
+   * @example true
+   */
+  isRestricted: boolean;
 }
 
 export interface CouponsUpdatePayload {
