@@ -527,3 +527,33 @@ export const deleteMyAddressValidator = [
     .toInt()
     .withMessage('no 를 올바르게 입력해주세요.'),
 ];
+
+/** 쿠폰 생성 validate */
+export const createCouponValidator = [
+  body('name').trim().notEmpty().withMessage('이름은 필수입니다'),
+  body('amount').trim().notEmpty().withMessage('할인금액은 필수입니다'),
+  body('expireAfterDays').trim().notEmpty().withMessage('만료일자는 필수입니다'),
+];
+
+/** 쿠폰 수정 validate */
+export const updateCouponValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  body('name').trim().notEmpty().withMessage('이름은 필수입니다'),
+  body('amount').trim().notEmpty().withMessage('할인금액은 필수입니다'),
+  body('expireAfterDays').trim().notEmpty().withMessage('만료일자는 필수입니다'),
+];
+
+/** 쿠폰 삭제 validate */
+export const deleteCouponValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+];
