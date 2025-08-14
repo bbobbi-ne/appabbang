@@ -19,12 +19,9 @@ export async function getByNo(req: Request, res: Response) {
 
 /** 빵 등록 */
 export async function create(req: Request, res: Response) {
-  const { name, description, unitPrice, breadStatus, countryOfOrigin, allergyInfo } = req.body;
-  const payload = { name, description, unitPrice, breadStatus, countryOfOrigin, allergyInfo };
-
   const images = req.files?.image as UploadedFile[] | UploadedFile | undefined;
 
-  await BreadService.create(payload, images);
+  await BreadService.create(req.body, images);
   res.status(201).json({ message: '등록이 완료되었습니다.' });
 }
 
@@ -37,12 +34,9 @@ export async function update(req: Request, res: Response) {
     throw AppError.notFound('빵을 찾을 수 없습니다.', { breadNo: no });
   }
 
-  const { name, description, unitPrice, breadStatus, countryOfOrigin, allergyInfo } = req.body;
-  const payload = { name, description, unitPrice, breadStatus, countryOfOrigin, allergyInfo };
-
   const images = req.files?.image as UploadedFile[] | UploadedFile | undefined;
 
-  await BreadService.update(parseInt(no!), payload, images);
+  await BreadService.update(parseInt(no!), req.body, images);
   res.status(200).json({ message: '수정이 완료되었습니다.' });
 }
 

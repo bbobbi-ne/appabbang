@@ -16,27 +16,6 @@ export const getOne = async (req: Request, res: Response) => {
 
 /** 주문 생성 (비회원, 회원) */
 export const create = async (req: Request, res: Response) => {
-  const {
-    ordererName,
-    ordererMobile,
-    recipientName,
-    recipientMobile,
-    address,
-    addressDetail,
-    zipcode,
-    message,
-    orderRoundNo,
-    totalPrice,
-    trackingNumber,
-    isPaymentRefundTermsAgreed,
-    customerCouponNo,
-    deliveryMethodNo,
-    orderItems,
-    bankCode,
-    accountNumber,
-    accountHolderName,
-  } = req.body;
-
   const user = req.user;
 
   if (!user) {
@@ -53,29 +32,7 @@ export const create = async (req: Request, res: Response) => {
     }
   }
 
-  await OrderService.create(user?.no, {
-    ordererName,
-    ordererMobile,
-    recipientName,
-    recipientMobile,
-    address,
-    addressDetail,
-    zipcode,
-    message,
-    orderRoundNo,
-    totalPrice,
-    trackingNumber,
-    isPaymentRefundTermsAgreed,
-    orderPw: req.body.orderPw,
-    isServiceTermsAgreed: req.body.isServiceTermsAgreed,
-    isPrivacyTermsAgreed: req.body.isPrivacyTermsAgreed,
-    deliveryMethodNo,
-    orderItems,
-    bankCode,
-    accountNumber,
-    accountHolderName,
-    customerCouponNo,
-  });
+  await OrderService.create(user?.no, req.body);
 
   res.status(200).json({ message: '주문이 완료되었습니다.' });
 };
