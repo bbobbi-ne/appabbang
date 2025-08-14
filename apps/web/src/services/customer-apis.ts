@@ -227,3 +227,38 @@ export const getCustomerInfo = async (accessToken: string) => {
     });
   }
 };
+
+/**
+ * 고객정보 수정
+ */
+export const updateCustomer = async (data: any, accessToken: string) => {
+  try {
+    const response = await client.post(
+      '/auth/customers/update',
+      {
+        id: data.id,
+        name: data.name,
+        mobileNumber: data.mobileNumber,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+
+    if (response.status === 200) {
+      addToast({
+        type: 'success',
+        message: '정상적으로 수정되었습니다.',
+      });
+
+      return response.data.customer;
+    } else throw new CustomError(500, 'fail');
+  } catch (e: any) {
+    addToast({
+      type: 'error',
+      message: e.response.data.error.message,
+    });
+  }
+};

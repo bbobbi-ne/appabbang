@@ -19,35 +19,42 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import type { ICustomerProps } from '../pages/info-page';
 import Loading from '../common/loading';
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { updateCustomer } from '@/services/customer-apis';
+import { useAccessTokenStore } from '@/store/session';
+import { getFormattedMobile } from '@/utils';
 
 interface InfoFormProps {
   customer?: ICustomerProps;
 }
 
+const labelMinWidth = 'min-w-[120px]';
+
 function InfoForm({ customer }: InfoFormProps) {
-  const [dateFormatted, setDateFormatted] = useState<string>('');
+  const { accessToken } = useAccessTokenStore();
 
   useEffect(() => {
     if (customer) {
-      const date = dayjs(customer.createdAt);
-      const dateFormatted = date.format('YYYY-MM-DD HH:mm:ss');
-      setDateFormatted(dateFormatted);
+      form.reset({
+        name: customer.name ?? '',
+        id: customer.id ?? '',
+        mobileNumber: customer.mobileNumber ?? '',
+        createdAt: dayjs(customer.createdAt).format('YYYY-MM-DD HH:mm:ss') ?? '',
+      });
     }
   }, [customer]);
-
-  /** default form values */
-  const defaultValues: CustomerFormSchema = {
-    name: '', // 이름
-    id: '', // 아이디
-    mobileNumber: '', // 휴대번호
-    createdAt: '', // 가입일자(등록일자)
-  };
 
   /** form - schema connect */
   const form = useForm({
     resolver: zodResolver(customerFormSchema),
-    defaultValues,
+    defaultValues: customer
+      ? {
+          name: customer.name || '',
+          id: customer.id || '',
+          mobileNumber: customer.mobileNumber || '',
+          createdAt: dayjs(customer.createdAt).format('YYYY-MM-DD HH:mm:ss') || '',
+        }
+      : undefined,
   });
 
   /**
@@ -60,7 +67,14 @@ function InfoForm({ customer }: InfoFormProps) {
   /**
    * form submit
    */
-  const onSubmit: SubmitHandler<CustomerFormSchema> = (data) => {};
+  const onSubmit: SubmitHandler<CustomerFormSchema> = (data) => {
+    (async () => {
+      const { mobileNumber } = await updateCustomer(data, accessToken);
+
+      // 변경된 값으로 form 설정
+      form.setValue('mobileNumber', mobileNumber);
+    })();
+  };
 
   if (!customer) return <Loading />;
   return (
@@ -72,22 +86,24 @@ function InfoForm({ customer }: InfoFormProps) {
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem className="w-full m-auto flex flex-row items-center justify-center">
-                  <FormLabel htmlFor="name" errorCheck={false} className="w-25">
+                <FormItem className="flex items-center">
+                  <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
                     <span className="text-red-700">*</span> 이름
                   </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      id="name"
-                      placeholder="이름 입력"
-                      {...field}
-                      onChange={(e) => field.onChange(e)}
-                      value={customer.name}
-                      disabled
-                    />
-                  </FormControl>
-                  <FormMessage />
+
+                  <div className="w-full space-y-1">
+                    <FormControl>
+                      <Input
+                        type="text"
+                        {...field}
+                        placeholder="이름 입력"
+                        maxLength={30}
+                        value={field.value ?? ''}
+                        disabled
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </div>
                 </FormItem>
               )}
             />
@@ -96,68 +112,78 @@ function InfoForm({ customer }: InfoFormProps) {
               control={form.control}
               name="id"
               render={({ field }) => (
-                <FormItem className="w-full m-auto flex flex-row items-center justify-center">
-                  <FormLabel htmlFor="id" errorCheck={false} className="w-25">
+                <FormItem className="flex items-center">
+                  <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
                     <span className="text-red-700">*</span> 아이디
                   </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      id="id"
-                      placeholder="아이디 입력"
-                      {...field}
-                      onChange={(e) => field.onChange(e)}
-                      value={customer.id}
-                      disabled
-                    />
-                  </FormControl>
-                  <FormMessage />
+
+                  <div className="w-full space-y-1">
+                    <FormControl>
+                      <Input
+                        type="text"
+                        {...field}
+                        placeholder="아이디 입력"
+                        maxLength={30}
+                        value={field.value ?? ''}
+                        disabled
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            {/* 휴대번호 */}
+            <FormField
+              control={form.control}
+              name="mobileNumber"
+              render={({ field }) => (
+                <FormItem className="flex items-center">
+                  <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
+                    <span className="text-red-700">*</span> 휴대번호
+                  </FormLabel>
+                  <div className="w-full space-y-1">
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="휴대번호 입력"
+                        onChange={(e) => {
+                          const formattedValue = getFormattedMobile(e.target.value);
+                          field.onChange(formattedValue);
+                        }}
+                        maxLength={13}
+                        value={field.value ?? ''}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </div>
                 </FormItem>
               )}
             />
 
             <FormField
               control={form.control}
-              name="mobileNumber"
-              render={({ field }) => (
-                <FormItem className="w-full m-auto flex flex-row items-center justify-center">
-                  <FormLabel htmlFor="mobileNumber" errorCheck={false} className="w-25">
-                    <span className="text-red-700">*</span> 휴대번호
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      id="mobileNumber"
-                      placeholder="휴대번호 입력"
-                      {...field}
-                      onChange={(e) => field.onChange(e)}
-                      value={customer.mobileNumber}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="createdAt"
               render={({ field }) => (
-                <FormItem className="w-full m-auto flex flex-row items-center justify-center">
-                  <FormLabel htmlFor="createdAt" errorCheck={false} className="w-25">
-                    <span className="ml-2">가입일자</span>
+                <FormItem className="flex items-center">
+                  <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
+                    <span className="text-red-700 ml-2"></span> 가입일자
                   </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      id="createdAt"
-                      {...field}
-                      placeholder="가입일자 입력"
-                      onChange={(e) => field.onChange(e)}
-                      value={dateFormatted}
-                      disabled
-                    />
-                  </FormControl>
-                  <FormMessage />
+
+                  <div className="w-full space-y-1">
+                    <FormControl>
+                      <Input
+                        type="text"
+                        {...field}
+                        placeholder="가입일자 입력"
+                        maxLength={30}
+                        value={field.value ?? ''}
+                        disabled
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </div>
                 </FormItem>
               )}
             />

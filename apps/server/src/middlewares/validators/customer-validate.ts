@@ -221,3 +221,36 @@ export const loginCustomerValidator = [
     .trim()
     .escape(),
 ];
+
+/**
+ * 고객정보 수정 유효성 검증
+ */
+export const updateCustomerValidator = [
+  body(NAME_VALIDATION.key)
+    .notEmpty()
+    .withMessage(NAME_VALIDATION.empty.message)
+    .matches(NAME_VALIDATION.matches.value)
+    .withMessage(NAME_VALIDATION.matches.message)
+    .isString()
+    .withMessage(NAME_VALIDATION.string.message)
+    .isLength({ min: NAME_VALIDATION.length.min, max: NAME_VALIDATION.length.max })
+    .withMessage(NAME_VALIDATION.length.message)
+    .trim()
+    .escape(),
+
+  body(MOBILE_NUMBER_VALIDATION.key)
+    .notEmpty()
+    .withMessage(MOBILE_NUMBER_VALIDATION.empty.message)
+    .matches(MOBILE_NUMBER_VALIDATION.matches.value)
+    .withMessage(MOBILE_NUMBER_VALIDATION.matches.message)
+    .trim()
+    .escape(),
+
+  body(MOBILE_NUMBER_VALIDATION.key)
+    .notEmpty()
+    .withMessage(MOBILE_NUMBER_VALIDATION.empty.message)
+    .matches(MOBILE_NUMBER_VALIDATION.matches.value)
+    .withMessage(MOBILE_NUMBER_VALIDATION.matches.message)
+    .trim()
+    .escape(),
+];

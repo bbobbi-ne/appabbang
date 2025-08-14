@@ -7,6 +7,7 @@ import { KakaoClient } from '@/lib/kakao';
 import {
   createCustomerValidator,
   loginCustomerValidator,
+  updateCustomerValidator,
 } from '@/middlewares/validators/customer-validate';
 import * as CustomerController from '@/controllers/customer.controller';
 
@@ -74,5 +75,13 @@ router.post('/kakao/login', async (req, res, next) => {
 
   console.log('/login finish');
 });
+
+/** POST /customers/update : 고객 정보 수정 */
+router.post(
+  '/customers/update',
+  requireCustomer,
+  validate(updateCustomerValidator),
+  asyncHandler(authController.update),
+);
 
 export default router;

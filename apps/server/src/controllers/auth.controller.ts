@@ -110,3 +110,20 @@ export const refresh = async (req: Request, res: Response) => {
     throw AppError.forbidden('Invalid refresh token');
   }
 };
+
+/**
+ * 고객정보 수정
+ */
+export const update = async (req: Request, res: Response) => {
+  if (!req.user) throw AppError.unauthorized('토큰에 저장된 고객정보를 확인할 수 없습니다.');
+
+  // 고객 정보 조회
+  const findCustomer = await userService.getCustomerInfo(req.user.no);
+  if (!findCustomer)
+    throw AppError.internalServerError(
+      '고객정보 조회 과정에서 오류가 발생했습니다. 관리자 확인이 필요합니다.',
+    );
+
+  const customer = await userService.update(req.body);
+  res.status(200).json({ customer });
+};
