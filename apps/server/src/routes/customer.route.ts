@@ -12,6 +12,7 @@ import {
   validate,
 } from '@/middlewares/validators/validate';
 import { createCustomerValidator } from '@/middlewares/validators/customer-validate';
+import { authenticateToken } from '@/middlewares/validators/customer-token-validate';
 
 const router = Router();
 
@@ -30,7 +31,7 @@ router.post(
 );
 
 /** POST /customers/logout : 고객 로그아웃 */
-router.post('/logout', optionalAuth, asyncHandler(customerController.logout));
+router.post('/logout', optionalAuth, authenticateToken, asyncHandler(customerController.logout));
 
 /** PUT /customers/{no} : 고객 수정 */
 // router.put('/:no', requireAdmin, asyncHandler(customerController.update));

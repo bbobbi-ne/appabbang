@@ -215,16 +215,10 @@ export const updateRefreshToken = async (id: string, refreshToken: string) => {
 /**
  * 로그아웃 - 토큰에 담겨져 있는 고객 정보 조회
  */
-export const getTokenCustomer = async (token: string) => {
-  const decoded = jwt.verify(token, JWT_ACCESS_SECRET) as JwtPayload;
-
-  if (!decoded.id) {
-    throw AppError.forbidden('token이 유효하지 않습니다.');
-  }
-
+export const getTokenCustomer = async (data: CreateCustomerInput) => {
   const result = await prisma.$transaction(async (tx) => {
-    const customer = await tx.customer.findUnique({
-      where: { id: decoded.id },
+    const customer = await tx.customer.findFirst({
+      where: { id: data.id },
     });
 
     return customer;
