@@ -100,7 +100,7 @@ export const createCustomerInfo = async (data: CreateCustomerInput) => {
 
       if (createCustomer) {
         // 배송지 저장
-        await tx.address.create({
+        const addressInfo = await tx.address.create({
           data: {
             address,
             addressDetail,
@@ -109,6 +109,14 @@ export const createCustomerInfo = async (data: CreateCustomerInput) => {
             recipientName: name,
             recipientMobile: mobileNumber,
             customerNo: createCustomer.no,
+          },
+        });
+
+        // 고객-기본배송지 연결
+        await tx.customer.update({
+          where: { no: createCustomer.no },
+          data: {
+            defaultAddressNo: addressInfo.no,
           },
         });
 
