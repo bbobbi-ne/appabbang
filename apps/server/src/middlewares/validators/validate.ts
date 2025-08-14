@@ -531,8 +531,8 @@ export const deleteMyAddressValidator = [
 /** 쿠폰 생성 validate */
 export const createCouponValidator = [
   body('name').trim().notEmpty().withMessage('이름은 필수입니다'),
-  body('amount').trim().notEmpty().withMessage('할인금액은 필수입니다'),
-  body('expireAfterDays').trim().notEmpty().withMessage('만료일자는 필수입니다'),
+  body('amount').trim().notEmpty().isInt().toInt().withMessage('할인금액은 필수입니다'),
+  body('expireAfterDays').trim().notEmpty().isInt().toInt().withMessage('만료일자는 필수입니다'),
 ];
 
 /** 쿠폰 수정 validate */
@@ -543,9 +543,26 @@ export const updateCouponValidator = [
     .isInt()
     .toInt()
     .withMessage('no 를 올바르게 입력해주세요.'),
-  body('name').trim().notEmpty().withMessage('이름은 필수입니다'),
-  body('amount').trim().notEmpty().withMessage('할인금액은 필수입니다'),
-  body('expireAfterDays').trim().notEmpty().withMessage('만료일자는 필수입니다'),
+  body('name')
+    .trim()
+    .notEmpty()
+    .withMessage('이름은 필수입니다')
+    .isLength({ min: 1, max: 30 })
+    .withMessage('이름은 1자 이상 30자 이하여야 합니다.'),
+  body('amount')
+    .trim()
+    .notEmpty()
+    .withMessage('할인금액은 필수입니다')
+    .isInt({ min: 100, max: 50000 })
+    .toInt()
+    .withMessage('할인금액은 100원 이상 50,000원 이하여야 합니다.'),
+  body('expireAfterDays')
+    .trim()
+    .notEmpty()
+    .withMessage('만료일자는 필수입니다')
+    .isInt({ min: 1, max: 99999 })
+    .toInt()
+    .withMessage('만료일자는 1일 이상 99,999일 이하여야 합니다.'),
 ];
 
 /** 쿠폰 삭제 validate */
