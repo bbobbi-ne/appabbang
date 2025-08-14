@@ -2,7 +2,7 @@
  * 내 정보수정
  */
 
-import { customerFormSchema, type CustomerFormSchema } from '@/validate/customer-form-schema';
+import { customerFormSchema, type CustomerFormSchema } from '@/validate/info-form-schema';
 import {
   Button,
   Card,
