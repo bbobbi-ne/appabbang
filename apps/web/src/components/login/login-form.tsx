@@ -1,4 +1,5 @@
 import { login } from '@/services/customer-apis';
+import { useCustomerStore } from '@/store/customer';
 import { useAccessTokenStore } from '@/store/session';
 import { loginSchema, type LoginFormType } from '@/validate/login-form-schema';
 import {
@@ -18,7 +19,8 @@ import { useForm } from 'react-hook-form';
 /** 로그인 폼 */
 function LoginForm() {
   const navigate = useNavigate();
-  const { set } = useAccessTokenStore();
+  const { set: setAccessToken } = useAccessTokenStore();
+  const { set: setCustomer } = useCustomerStore();
 
   const form = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
@@ -29,7 +31,7 @@ function LoginForm() {
    * 로그인
    */
   const onSubmit = (data: { id: string; pw: string }) => {
-    login(data, set);
+    login(data, setAccessToken, setCustomer);
   };
 
   return (
