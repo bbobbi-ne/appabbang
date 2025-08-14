@@ -15,8 +15,8 @@ import type {
   LoginCreateData,
   LoginCreatePayload,
   RefreshCreateData,
-} from './data-contracts';
-import { ContentType, HttpClient, type RequestParams } from './http-client';
+} from "./data-contracts";
+import { ContentType, HttpClient, type RequestParams } from "./http-client";
 
 export class Auth<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -37,10 +37,10 @@ export class Auth<SecurityDataType = unknown> {
   loginCreate = (data: LoginCreatePayload, params: RequestParams = {}) =>
     this.http.request<LoginCreateData, any>({
       path: `/auth/login`,
-      method: 'POST',
+      method: "POST",
       body: data,
       type: ContentType.Json,
-      format: 'json',
+      format: "json",
       ...params,
     });
   /**
@@ -56,9 +56,9 @@ export class Auth<SecurityDataType = unknown> {
   getAuth = (params: RequestParams = {}) =>
     this.http.request<GetAuthData, any>({
       path: `/auth/me`,
-      method: 'GET',
+      method: "GET",
       secure: true,
-      format: 'json',
+      format: "json",
       ...params,
     });
   /**
@@ -73,8 +73,8 @@ export class Auth<SecurityDataType = unknown> {
   refreshCreate = (params: RequestParams = {}) =>
     this.http.request<RefreshCreateData, any>({
       path: `/auth/refresh`,
-      method: 'POST',
-      format: 'json',
+      method: "POST",
+      format: "json",
       ...params,
     });
 }

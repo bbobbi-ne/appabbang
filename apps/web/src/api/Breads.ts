@@ -34,7 +34,7 @@ export class Breads<SecurityDataType = unknown> {
   }
 
   /**
-   * @description 빵 목록을 조회합니다. breadStatus 쿼리 파라미터로 상태별 필터링이 가능합니다. (권한: 선택적 로그인 - 어드민은 추가 정보 제공)
+   * @description 빵 목록을 조회합니다. (권한: 선택적 로그인 - 어드민은 추가 정보 제공)
    *
    * @tags Breads
    * @name BreadsList
@@ -43,17 +43,10 @@ export class Breads<SecurityDataType = unknown> {
    * @secure
    * @response `200` `BreadsListData` 빵 목록 조회 성공
    */
-  breadsList = (
-    query?: {
-      /** 빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정) */
-      breadStatus?: "10" | "20" | "30" | "40" | "50";
-    },
-    params: RequestParams = {},
-  ) =>
+  breadsList = (params: RequestParams = {}) =>
     this.http.request<BreadsListData, any>({
       path: `/breads`,
       method: "GET",
-      query: query,
       secure: true,
       format: "json",
       ...params,
