@@ -16,8 +16,26 @@ import {
 } from '@appabbang/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, type SubmitHandler } from 'react-hook-form';
+import type { ICustomerProps } from '../pages/info-page';
+import Loading from '../common/loading';
+import dayjs from 'dayjs';
+import { useEffect, useState } from 'react';
 
-function InfoForm() {
+interface InfoFormProps {
+  customer?: ICustomerProps;
+}
+
+function InfoForm({ customer }: InfoFormProps) {
+  const [dateFormatted, setDateFormatted] = useState<string>('');
+
+  useEffect(() => {
+    if (customer) {
+      const date = dayjs(customer.createdAt);
+      const dateFormatted = date.format('YYYY-MM-DD HH:mm:ss');
+      setDateFormatted(dateFormatted);
+    }
+  }, [customer]);
+
   /** default form values */
   const defaultValues: CustomerFormSchema = {
     name: '', // 이름
@@ -44,6 +62,7 @@ function InfoForm() {
    */
   const onSubmit: SubmitHandler<CustomerFormSchema> = (data) => {};
 
+  if (!customer) return <Loading />;
   return (
     <div className="w-full flex flex-row items-center justify-center">
       <Card className="p-10 flex flex-row items-center justify-center w-2/3">
@@ -64,6 +83,7 @@ function InfoForm() {
                       placeholder="이름 입력"
                       {...field}
                       onChange={(e) => field.onChange(e)}
+                      value={customer.name}
                       disabled
                     />
                   </FormControl>
@@ -87,6 +107,7 @@ function InfoForm() {
                       placeholder="아이디 입력"
                       {...field}
                       onChange={(e) => field.onChange(e)}
+                      value={customer.id}
                       disabled
                     />
                   </FormControl>
@@ -110,6 +131,7 @@ function InfoForm() {
                       placeholder="휴대번호 입력"
                       {...field}
                       onChange={(e) => field.onChange(e)}
+                      value={customer.mobileNumber}
                     />
                   </FormControl>
                   <FormMessage />
@@ -131,6 +153,7 @@ function InfoForm() {
                       {...field}
                       placeholder="가입일자 입력"
                       onChange={(e) => field.onChange(e)}
+                      value={dateFormatted}
                       disabled
                     />
                   </FormControl>

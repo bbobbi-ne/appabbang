@@ -210,9 +210,9 @@ export const logout = async (accessToken: string, reset: (accessToken: string) =
 /**
  * 현재 세션의 고객 정보 조회
  */
-export const getCustomer = async (accessToken: string) => {
+export const getCustomerInfo = async (accessToken: string) => {
   try {
-    const response = await client.get('/auth/me', {
+    const response = await client.get('/auth/customers/info', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

@@ -27,6 +27,9 @@ router.get('/kakao/url', (_, res) => {
   });
 });
 
+/** GET /auth/customers/info : 고객 상세정보 */
+router.get('/customers/info', requireCustomer, asyncHandler(authController.getCustomerInfo));
+
 /** POST /auth/customers/login : 고객 회원가입 */
 router.post(
   '/customers/join',
