@@ -90,7 +90,10 @@ export const requireAdmin = async (req: Request, _: Response, next: NextFunction
 /** 고객 전용 - 고객(customer 타입)만 허용 */
 export const requireCustomer = async (req: Request, _: Response, next: NextFunction) => {
   try {
+    console.log('req');
+    console.log(req);
     const user = await verifyToken(req);
+    console.log(user);
 
     if (user.type !== 'customer') {
       throw AppError.forbidden('Access denied: Customer access required');

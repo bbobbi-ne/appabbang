@@ -2,12 +2,6 @@ import { CookieOptions, Request, Response } from 'express';
 import * as CustomerService from '@/services/customer.service';
 import { AppError } from '@/types';
 import bcrypt from 'bcrypt';
-// import { commonCodeMap } from '@/services/common-code.service';
-
-/** 코드 조회 */
-// export function getCodeName(code: string): string {
-//   return commonCodeMap.deliveryTypeMap.get(code) || '-';
-// }
 
 /**
  * RefreshToken을 Cookie에 담을 때 정보
@@ -30,9 +24,6 @@ export const getListAll = async (_: Request, res: Response) => {
 export const getOne = async (_: Request, res: Response) => {
   res.status(200).json('Hello World');
 };
-
-// 비교
-// console.log(await bcrypt.compare(password, hashedPassword));
 
 /**
  * 회원가입
@@ -76,7 +67,7 @@ export const create = async (req: Request, res: Response) => {
   const customer = await CustomerService.createCustomerInfo(model);
 
   // JWT 토큰 발급
-  const { ...payload } = customer;
+  const payload = { ...customer, type: 'customer' };
   const accessToken = CustomerService.generateAccessToken(payload);
   const refreshToken = CustomerService.generateRefreshToken(payload);
 
@@ -99,6 +90,38 @@ export const update = async (_: Request, res: Response) => {
 };
 export const remove = async (_: Request, res: Response) => {
   res.status(204).json('Hello World');
+};
+
+/**
+ * 로그인
+ */
+export const login = async (req: Request, res: Response) => {
+  const { id, pw } = req.body;
+
+  const customer = await CustomerService.getByIdForLogin(id);
+  if (!customer) throw AppError.internalServerError('고객 정보가 존재하지 않습니다.');
+
+  const compare = await bcrypt.compare(pw, customer.pw);
+  if (!compare) throw AppError.unauthorized('아이디 또는 비밀번호를 확인 바랍니다.');
+
+  // jwt token 발급
+  const payload = { ...customer, type: 'customer' };
+  const accessToken = CustomerService.generateAccessToken(payload);
+  const refreshToken = CustomerService.generateRefreshToken(payload);
+
+  // cookie 설정
+  res.cookie(REFRESH_COOKIE.name, refreshToken, REFRESH_COOKIE.option as CookieOptions);
+
+  // 고객 RefreshToken 정보 업데이트
+  await CustomerService.updateRefreshToken(customer.id, refreshToken);
+
+  // 결과값 전송
+  const result = {
+    data: customer,
+    accessToken,
+  };
+
+  res.status(200).json(result);
 };
 
 /**

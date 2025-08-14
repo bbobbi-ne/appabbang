@@ -11,7 +11,10 @@ import {
   updateAddressValidator,
   validate,
 } from '@/middlewares/validators/validate';
-import { createCustomerValidator } from '@/middlewares/validators/customer-validate';
+import {
+  createCustomerValidator,
+  loginCustomerValidator,
+} from '@/middlewares/validators/customer-validate';
 
 const router = Router();
 
@@ -22,15 +25,10 @@ router.get('/', requireAdmin, asyncHandler(customerController.getList));
 router.get('/:no', requireAdmin, asyncHandler(customerController.getOne));
 
 /** POST /customers : 고객 생성 */
-router.post(
-  '/',
-  requireCustomer,
-  validate(createCustomerValidator),
-  asyncHandler(customerController.create),
-);
+router.post('/', validate(createCustomerValidator), asyncHandler(customerController.create));
 
 /** POST /customers/login : 고객 로그인 */
-router.post('/login', requireCustomer, asyncHandler(customerController.login));
+router.post('/login', validate(loginCustomerValidator), asyncHandler(customerController.login));
 
 /** POST /customers/logout : 고객 로그아웃 */
 router.post('/logout', requireCustomer, asyncHandler(customerController.logout));

@@ -193,3 +193,31 @@ export const createCustomerValidator = [
     .trim()
     .escape(),
 ];
+
+/**
+ * 로그인 유효성 검증
+ */
+export const loginCustomerValidator = [
+  body(ID_VALIDATION.key)
+    .notEmpty()
+    .withMessage(ID_VALIDATION.empty.message)
+    .matches(ID_VALIDATION.matches.value)
+    .withMessage(ID_VALIDATION.matches.message)
+    .isString()
+    .withMessage(ID_VALIDATION.string.message)
+    .isLength({ min: ID_VALIDATION.length.min, max: ID_VALIDATION.length.max })
+    .withMessage(ID_VALIDATION.length.message)
+    .trim()
+    .escape(),
+  body(PASSWORD_VALIDATION.key)
+    .notEmpty()
+    .withMessage(PASSWORD_VALIDATION.empty.message)
+    .matches(PASSWORD_VALIDATION.matches.value)
+    .withMessage(PASSWORD_VALIDATION.matches.message)
+    .isString()
+    .withMessage(PASSWORD_VALIDATION.string.message)
+    .isLength({ min: PASSWORD_VALIDATION.length.min, max: PASSWORD_VALIDATION.length.max })
+    .withMessage(PASSWORD_VALIDATION.length.message)
+    .trim()
+    .escape(),
+];
