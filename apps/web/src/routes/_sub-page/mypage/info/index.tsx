@@ -30,7 +30,6 @@ function RouteComponent() {
       // 고객 상세정보, 고객의 보유 쿠폰 정보, 주문 총 금액 조회
       const { customer, coupon, totalAmount } = await getCustomerInfo(accessToken);
       setCustomerDetail(customer);
-      console.log(customer);
 
       setCouponQty(coupon.length);
       setTotalAmount(totalAmount);
