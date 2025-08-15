@@ -8,7 +8,12 @@ import {
 } from '@appabbang/ui';
 import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 import CouponForm, { type FormType } from './coupon-form';
-import { useCouponDetailQuery, useCouponUpdateMutation } from '@/hooks/use-coupon';
+import {
+  useCouponDeleteMutation,
+  useCouponDetailQuery,
+  useCouponUpdateMutation,
+} from '@/hooks/use-coupon';
+import { toast } from 'sonner';
 
 interface breadModifyDialogProps {
   children: React.ReactNode;
@@ -29,7 +34,18 @@ export function CouponModifyDialog({ children, no }: breadModifyDialogProps) {
 function DialogBody({ no, setOpen }: { no: number; setOpen: Dispatch<SetStateAction<boolean>> }) {
   const { data: currentData, isSuccess: currentDataIsSuccess } = useCouponDetailQuery(no);
   const couponsUpdateMutation = useCouponUpdateMutation(no);
+  const couponsDeleteMutation = useCouponDeleteMutation(no);
   const [currentValues, setCurrentValues] = useState<FormType | undefined>();
+
+  const deleteFn = async (no: number) => {
+    try {
+      await couponsDeleteMutation.mutateAsync(no);
+      toast.success('삭제가 완료되었습니다.');
+      setOpen(false);
+    } catch (error: any) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     if (currentDataIsSuccess) {
@@ -62,6 +78,8 @@ function DialogBody({ no, setOpen }: { no: number; setOpen: Dispatch<SetStateAct
           submitFn={couponsUpdateMutation.mutateAsync}
           no={no}
           isRestricted={currentData?.isRestricted}
+          deleteFn={deleteFn}
+          deleteLoading={couponsDeleteMutation.isPending}
         />
       )}
     </DialogContent>

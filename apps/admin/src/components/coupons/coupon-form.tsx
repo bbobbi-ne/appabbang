@@ -9,6 +9,15 @@ import {
   FormMessage,
   Input,
   Form,
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogFooter,
+  AlertDialogCancel,
 } from '@appabbang/ui';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -33,9 +42,19 @@ interface Props {
   no?: number;
   setOpen: Dispatch<SetStateAction<boolean>>;
   isRestricted?: boolean;
+  deleteFn?: (no: number) => Promise<void>;
+  deleteLoading?: boolean;
 }
 
-export default function BreadForm({ submitFn, currentValues, no, setOpen, isRestricted }: Props) {
+export default function BreadForm({
+  submitFn,
+  currentValues,
+  no,
+  setOpen,
+  isRestricted,
+  deleteFn,
+  deleteLoading,
+}: Props) {
   const form = useForm<FormType>({
     resolver: zodResolver(schema),
     defaultValues: currentValues
@@ -198,6 +217,37 @@ export default function BreadForm({ submitFn, currentValues, no, setOpen, isRest
               {form.formState.errors.root.message}
             </p>
           )}
+
+          {no && (
+            <>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" disabled={isRestricted}>
+                    삭제
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent onClick={(e) => e.preventDefault()}>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>쿠폰을 삭제하시겠습니까?</AlertDialogTitle>
+                    <AlertDialogDescription></AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>취소</AlertDialogCancel>
+                    <AlertDialogAction
+                      disabled={deleteLoading}
+                      className="bg-destructive hover:bg-destructive/90"
+                      onClick={async () => await deleteFn?.(no ?? 0)}
+                    >
+                      삭제
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
+          )}
+
+          <div className="w-full" />
+
           <DialogClose asChild>
             <Button type="button" variant="outline">
               취소

@@ -36,8 +36,7 @@ export const getCouponDetail = async (no: number) => {
 /** 서비스: 쿠폰 생성 */
 export const createCoupon = async (data: CouponsCreatePayload) => {
   try {
-    const response = await couponApi.couponsCreate(data);
-    return response.data;
+    await couponApi.couponsCreate(data);
   } catch (error: any) {
     const message = error.data.message || '쿠폰을 생성하는데 실패했습니다.';
     toast.error('쿠폰을 생성하는데 실패했습니다.', {
@@ -50,8 +49,7 @@ export const createCoupon = async (data: CouponsCreatePayload) => {
 /** 서비스: 쿠폰 수정 */
 export const updateCoupon = async (no: number, data: CouponsUpdatePayload) => {
   try {
-    const response = await couponApi.couponsUpdate(no, data);
-    return response.data;
+    await couponApi.couponsUpdate(no, data);
   } catch (error: any) {
     const message = error.data.message || '쿠폰을 수정하는데 실패했습니다.';
     toast.error('쿠폰을 수정하는데 실패했습니다.', {
@@ -64,8 +62,7 @@ export const updateCoupon = async (no: number, data: CouponsUpdatePayload) => {
 /** 서비스: 쿠폰 삭제 */
 export const deleteCoupon = async (no: number) => {
   try {
-    const response = await couponApi.couponsDelete(no);
-    return response.data;
+    await couponApi.couponsDelete(no);
   } catch (error: any) {
     const message = error.data.message || '쿠폰을 삭제하는데 실패했습니다.';
     toast.error('쿠폰을 삭제하는데 실패했습니다.', {
