@@ -1,72 +1,54 @@
-import type { BreadsListData, CommonCodeDetailData } from '@/api/data-contracts';
+import type { BreadsListData } from '@/api/data-contracts';
 import {
   breadsCreate,
   breadsDelete,
   imageDelete,
   getBreads,
   breadsUpdate,
-  statusUpdate,
   breadsDetail,
 } from '@/service/bread-api';
-import { getBreadStatus } from '@/service/common-api';
-import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-export function useGetBreadsAndStatusQuery() {
-  const results = useQueries({
-    queries: [
-      {
-        queryKey: ['breads'],
-        queryFn: getBreads,
-        staleTime: Infinity,
-        retry: 1,
-        select: (res) => (res as { data: BreadsListData }).data,
-      },
-      {
-        queryKey: ['breadStatus', 'common'],
-        queryFn: getBreadStatus,
-        staleTime: Infinity,
-        retry: 1,
-        select: (res) => (res as { data: CommonCodeDetailData }).data,
-      },
-    ],
+/** 🔹 빵 목록 조회 */
+export function useGetBreadsQuery() {
+  return useQuery({
+    queryKey: ['breads'],
+    queryFn: getBreads,
+    staleTime: Infinity,
+    retry: 1,
+    select: (res) => (res as { data: BreadsListData }).data,
   });
-
-  const [breadsQuery, breadStatusQuery] = results;
-
-  return {
-    breads: breadsQuery.data,
-    breadStatus: breadStatusQuery.data,
-    isLoading: breadsQuery.isLoading || breadStatusQuery.isLoading,
-    isError: breadsQuery.isError || breadStatusQuery.isError,
-    error: breadsQuery.error || breadStatusQuery.error,
-  };
 }
 
-export function useBreadsDetailQuery(no: number) {
+/** 🔹 단일 빵 정보 조회 */
+export function useGetBreadDetailQuery(no: number) {
   return useQuery({
     queryKey: ['bread', { no }],
     queryFn: breadsDetail,
     staleTime: Infinity,
+    enabled: !!no,
     retry: 1,
     select: (res) => res.data,
   });
 }
 
-export function useBreadsCreateMutation() {
+/** 🔹 빵 생성 */
+export function useCreateBreadMutation() {
   const queryClient = useQueryClient();
-  const { mutateAsync, error, isError, isSuccess, isPending } = useMutation({
+  const mutation = useMutation({
     mutationFn: breadsCreate,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['breads'] });
     },
   });
 
-  return { breadsCreateMutation: mutateAsync, isError, error, isSuccess, isPending };
+  return { createBread: mutation.mutateAsync, ...mutation };
 }
 
-export function useBreadsUpdateMutation() {
+/** 🔹 빵 업데이트 */
+export function useUpdateBreadMutation() {
   const queryClient = useQueryClient();
-  const { mutateAsync, isError, isSuccess, error } = useMutation({
+  const mutation = useMutation({
     mutationFn: breadsUpdate,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['breads'] });
@@ -74,36 +56,26 @@ export function useBreadsUpdateMutation() {
     },
   });
 
-  return { breadsUpdateMutation: mutateAsync, isError, isSuccess, error };
+  return { updateBread: mutation.mutateAsync, ...mutation };
 }
 
-export function useStatusUpdateMutation() {
+/** 🔹 빵 삭제 */
+export function useDeleteBreadMutation() {
   const queryClient = useQueryClient();
-  const { mutate, isError, isSuccess, error } = useMutation({
-    mutationFn: statusUpdate,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['breads'] });
-    },
-  });
-
-  return { statusUpdateMutation: mutate, isError, isSuccess, error };
-}
-
-export function useBreadsDeleteMutation() {
-  const queryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const mutation = useMutation({
     mutationFn: breadsDelete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['breads'] });
     },
   });
 
-  return { deleteBreadMutation: mutate };
+  return { deleteBread: mutation.mutate, ...mutation };
 }
 
-export function useimageDeleteMutation() {
+/** 🔹 빵 이미지 삭제 */
+export function useDeleteBreadImageMutation() {
   const queryClient = useQueryClient();
-  const { mutate, isPending } = useMutation({
+  const mutation = useMutation({
     mutationFn: imageDelete,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['breads'] });
@@ -111,5 +83,5 @@ export function useimageDeleteMutation() {
     },
   });
 
-  return { imageDeleteMutation: mutate, isPending };
+  return { deleteBreadImage: mutation.mutate, ...mutation };
 }
