@@ -38,6 +38,7 @@ export const loginSchema = z.object({
     .min(PASSWORD_VALIDATION.min.value, PASSWORD_VALIDATION.min.message)
     .max(PASSWORD_VALIDATION.max.value, PASSWORD_VALIDATION.max.message)
     .regex(PASSWORD_VALIDATION.regex.value, { message: PASSWORD_VALIDATION.regex.message }),
+  type: z.string(),
 });
 
 export type LoginFormType = z.infer<typeof loginSchema>;

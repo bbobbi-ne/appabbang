@@ -25,7 +25,7 @@ function LoginForm() {
 
   const form = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { id: '', pw: '' },
+    defaultValues: { id: '', pw: '', type: 'customer' },
   });
 
   /**
@@ -69,6 +69,25 @@ function LoginForm() {
               <div className="w-full space-y-1">
                 <FormControl>
                   <PasswordInput {...field} placeholder="비밀번호 입력" maxLength={30} />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </div>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem className="hidden">
+              <FormLabel errorCheck={false} className={`whitespace-nowrap px-2 py-3 flex-1/4 `}>
+                유저타입
+              </FormLabel>
+
+              <div className="w-full space-y-1">
+                <FormControl>
+                  <Input {...field} maxLength={30} value="customer" />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>

@@ -36,18 +36,18 @@ router.get('/customers/info', requireCustomer, asyncHandler(authController.getCu
 router.post(
   '/customers/join',
   validate(createCustomerValidator),
-  asyncHandler(CustomerController.create),
+  asyncHandler(authController.create),
 );
 
 /** POST /customers/login : 고객 로그인 */
 router.post(
   '/customers/login',
   validate(loginCustomerValidator),
-  asyncHandler(CustomerController.login),
+  asyncHandler(authController.login),
 );
 
 /** POST /customers/logout : 고객 로그아웃 */
-router.post('/customers/logout', requireCustomer, asyncHandler(CustomerController.logout));
+router.post('/customers/logout', requireCustomer, asyncHandler(authController.logout));
 
 /** POST /auth/refresh : 액세스 토큰 재발급 */
 router.post('/refresh', asyncHandler(authController.refresh));
