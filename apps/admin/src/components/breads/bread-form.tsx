@@ -8,8 +8,6 @@ import {
   FormLabel,
   FormMessage,
   Input,
-  RadioGroup,
-  RadioGroupItem,
   Textarea,
   Form,
   ScrollArea,
@@ -19,9 +17,7 @@ import { useForm } from 'react-hook-form';
 import { ImageUploadField } from './Image-upload-field';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useGetBreadsAndStatusQuery } from '@/hooks/use-breads';
-import { type Dispatch, type SetStateAction } from 'react';
-import { formatKR } from '@/utils/format';
+import { formatCurrencyKR } from '@/utils/format';
 
 export const breadSchema = z.object({
   name: z.string().trim().min(1, '메뉴명을 입력해주세요'),
@@ -43,12 +39,7 @@ export const breadSchema = z.object({
   breadStatus: z.string({
     required_error: '상태를 선택해주세요',
   }),
-  image: z.array(
-    z.union([
-      z.instanceof(File),
-      z.object({}).passthrough(), // 어떤 object든 허용
-    ]),
-  ),
+  image: z.array(z.union([z.instanceof(File), z.object({}).passthrough()])),
 });
 export type BreadsDailogForm = z.infer<typeof breadSchema>;
 
@@ -56,12 +47,10 @@ interface BreadFormProps {
   submitFn: (arg: any) => Promise<any>;
   currentValues?: BreadsDailogForm;
   no?: number;
-  setOpen: Dispatch<SetStateAction<boolean>>;
+  onSuccess?: () => void;
 }
 
-function BreadForm({ submitFn, currentValues, no, setOpen }: BreadFormProps) {
-  const breadStatus = useGetBreadsAndStatusQuery().breadStatus;
-
+function BreadForm({ submitFn, currentValues, no, onSuccess }: BreadFormProps) {
   const form = useForm<BreadsDailogForm>({
     resolver: zodResolver(breadSchema),
     defaultValues: currentValues
@@ -101,7 +90,7 @@ function BreadForm({ submitFn, currentValues, no, setOpen }: BreadFormProps) {
       await submitFn({ formData: formData, no: no || {} });
 
       form.reset();
-      setOpen(false);
+      onSuccess?.();
     } catch (error: any) {
       const message = error.message ?? '알 수 없는 에러가 발생했습니다. 잠시 후 다시 시도해주세요.';
 
@@ -166,7 +155,7 @@ function BreadForm({ submitFn, currentValues, no, setOpen }: BreadFormProps) {
                     inputMode="numeric"
                     placeholder="단가를 입력해주세요"
                     {...field}
-                    value={formatKR(field.value)}
+                    value={formatCurrencyKR(field.value)}
                     onChange={(e) => {
                       const onlyDigits = e.target.value.replace(/\D/g, '');
                       if (onlyDigits.length > 5) {
@@ -263,39 +252,6 @@ function BreadForm({ submitFn, currentValues, no, setOpen }: BreadFormProps) {
               </div>
             </FormItem>
           )}
-        />
-
-        <FormField
-          control={form.control}
-          name="breadStatus"
-          render={({ field }) => {
-            return (
-              <FormItem className="hidden">
-                <FormLabel errorCheck={false} className="whitespace-nowrap pr-2 py-3 flex-1/4">
-                  <strong className="text-red-500">*</strong> 상태
-                </FormLabel>
-                <div className="flex-3/4">
-                  <FormControl>
-                    <RadioGroup
-                      value={field.value || ''}
-                      onValueChange={field.onChange}
-                      className="grid grid-cols-2 "
-                    >
-                      {breadStatus?.map(({ name, code }) => (
-                        <FormItem key={code} className="space-x-1">
-                          <FormControl>
-                            <RadioGroupItem value={code} />
-                          </FormControl>
-                          <FormLabel>{name}</FormLabel>
-                        </FormItem>
-                      ))}
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            );
-          }}
         />
 
         <DialogFooter>
