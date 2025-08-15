@@ -34,7 +34,7 @@ function RouteComponent() {
       setCouponQty(coupon.length);
       setTotalAmount(totalAmount);
     })();
-  }, [customer]);
+  }, [accessToken]);
 
   return (
     <SubLayout title="마이페이지">

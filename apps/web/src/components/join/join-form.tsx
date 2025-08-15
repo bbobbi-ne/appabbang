@@ -15,6 +15,7 @@ import {
   FormMessage,
   Input,
   Label,
+  PasswordInput,
 } from '@appabbang/ui';
 import DaumPostApi from '@/components/common/daum-post-api';
 import { getFormattedMobile } from '@/utils';
@@ -137,7 +138,7 @@ export default function JoinForm() {
 
               <div className="w-full space-y-1">
                 <FormControl>
-                  <Input type="password" {...field} placeholder="비밀번호 입력" maxLength={30} />
+                  <PasswordInput {...field} placeholder="비밀번호 입력" maxLength={30} />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>
@@ -156,12 +157,7 @@ export default function JoinForm() {
               </FormLabel>
               <div className="w-full space-y-1">
                 <FormControl>
-                  <Input
-                    type="password"
-                    {...field}
-                    placeholder="비밀번호 확인 입력"
-                    maxLength={30}
-                  />
+                  <PasswordInput {...field} placeholder="비밀번호 확인 입력" maxLength={30} />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>

@@ -11,6 +11,7 @@ import {
   FormMessage,
   Button,
   Form,
+  PasswordInput,
 } from '@appabbang/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from '@tanstack/react-router';
@@ -67,7 +68,7 @@ function LoginForm() {
 
               <div className="w-full space-y-1">
                 <FormControl>
-                  <Input type="password" {...field} placeholder="비밀번호 입력" maxLength={30} />
+                  <PasswordInput {...field} placeholder="비밀번호 입력" maxLength={30} />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>
