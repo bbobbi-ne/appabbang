@@ -2101,3 +2101,27 @@ export interface CouponsDeleteData {
    */
   message?: string;
 }
+
+export interface IssueCreatePayload {
+  /**
+   * 쿠폰을 발급받을 고객 번호 배열
+   * @example [1,2,3]
+   */
+  noList: number[];
+}
+
+export interface IssueCreateData {
+  /**
+   * 성공 메시지
+   * @example "쿠폰이 발급되었습니다"
+   */
+  message: string;
+}
+
+export type IssueCreateError = {
+  /**
+   * 에러 메시지
+   * @example "고객번호는 필수입니다"
+   */
+  error?: string;
+};

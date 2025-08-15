@@ -1,4 +1,4 @@
-import { useCouponDetailQuery } from '@/hooks/use-coupon';
+import { useCouponDetailQuery, useCouponIssueMutation } from '@/hooks/use-coupon';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import {
@@ -24,7 +24,6 @@ import {
   type Table as TableType,
 } from '@tanstack/react-table';
 import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
-import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 export const CouponDetailPage = () => {
@@ -74,25 +73,18 @@ export const CouponDetailPage = () => {
   // 선택된 고객 수 (검색 필터링과 관계없이 전체 선택된 고객)
   const selectedCustomers = table.getSelectedRowModel().rows.length;
 
-  // TODO: API 작성 이후 연동
-  const issuedCouponMutation = useMutation({
-    mutationFn: async (selectedCustomerNos: number[]) =>
-      new Promise((resolve) => {
-        console.log(selectedCustomerNos);
-        alert(`쿠폰을 발급하고있습니다.`);
-        setTimeout(() => {
-          resolve(true);
-        }, 3000);
-      }),
-    onSuccess: () => {
+  const issueCouponMutation = useCouponIssueMutation(Number(no));
+  const issueCoupon = async (selectedCustomerNos: number[]) => {
+    try {
+      await issueCouponMutation.mutateAsync(selectedCustomerNos);
       toast.success('쿠폰이 발급되었습니다.');
-      table.resetRowSelection(); // 선택 상태 초기화
-      // TODO: 고객 refetch
-    },
-    onError: () => {
-      toast.error('쿠폰 발급에 실패했습니다.');
-    },
-  });
+    } catch (error: any) {
+      toast.error(error?.response?.data?.error?.message || '쿠폰 발급에 실패했습니다.');
+      setTimeout(() => {
+        toast.error('아직 고객 데이터가 샘플이라는 뜻이지요.');
+      }, 2000);
+    }
+  };
 
   useEffect(() => {
     if (isError) {
@@ -138,12 +130,12 @@ export const CouponDetailPage = () => {
         </div>
         <Button
           // size="sm"
-          disabled={selectedCustomers === 0 || issuedCouponMutation.isPending}
-          onClick={() => {
+          disabled={selectedCustomers === 0 || issueCouponMutation.isPending}
+          onClick={async () => {
             if (window.confirm('선택한 고객에게 쿠폰을 발급하시겠습니까?')) {
               const selectedRows = table.getFilteredSelectedRowModel().rows;
               const selectedCustomerNos = selectedRows.map((row) => row.original.no);
-              issuedCouponMutation.mutate(selectedCustomerNos);
+              await issueCoupon(selectedCustomerNos);
             }
           }}
         >

@@ -71,3 +71,8 @@ export const deleteCoupon = async (no: number) => {
     throw new Error(message);
   }
 };
+
+/** 서비스: 쿠폰 발급 (쿠폰하나를 여러 고객에게 발급) */
+export const issueCoupon = async (no: number, noList: number[]) => {
+  await couponApi.issueCreate(no, { noList });
+};

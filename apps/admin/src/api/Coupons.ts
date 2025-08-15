@@ -18,6 +18,9 @@ import type {
   CouponsListData,
   CouponsUpdateData,
   CouponsUpdatePayload,
+  IssueCreateData,
+  IssueCreateError,
+  IssueCreatePayload,
 } from "./data-contracts";
 import { ContentType, HttpClient, type RequestParams } from "./http-client";
 
@@ -123,6 +126,39 @@ export class Coupons<SecurityDataType = unknown> {
       path: `/coupons/${no}`,
       method: "DELETE",
       secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+ * @description 특정 쿠폰을 선택된 고객들에게 발급합니다. (권한: 관리자만)
+ *
+ * @tags Coupons
+ * @name IssueCreate
+ * @summary 쿠폰 발급
+ * @request POST:/coupons/{no}/issue
+ * @secure
+ * @response `200` `IssueCreateData` 쿠폰 발급 성공
+ * @response `400` `{
+  \**
+   * 에러 메시지
+   * @example "고객번호는 필수입니다"
+   *\
+    error?: string,
+
+}` 잘못된 요청 (고객 번호가 누락되었거나 잘못된 형식)
+ * @response `404` `void` 쿠폰을 찾을 수 없음
+ */
+  issueCreate = (
+    no: number,
+    data: IssueCreatePayload,
+    params: RequestParams = {},
+  ) =>
+    this.http.request<IssueCreateData, IssueCreateError>({
+      path: `/coupons/${no}/issue`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
       format: "json",
       ...params,
     });

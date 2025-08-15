@@ -5,6 +5,7 @@ import {
   deleteCoupon,
   getCouponDetail,
   getCouponsList,
+  issueCoupon,
   updateCoupon,
 } from '@/service/coupon-api';
 
@@ -65,4 +66,18 @@ export function useCouponDeleteMutation(no: number) {
   });
 
   return deleteCouponMutation;
+}
+
+/** 훅: 쿠폰 발급 (쿠폰하나를 여러 고객에게 발급) */
+export function useCouponIssueMutation(no: number) {
+  // const queryClient = useQueryClient();
+  const issueCouponMutation = useMutation({
+    mutationFn: (noList: number[]) => issueCoupon(no, noList),
+    onSuccess: () => {
+      // TODO: 고객 refetch
+      // queryClient.invalidateQueries({ queryKey: ['/customers'] });
+    },
+  });
+
+  return issueCouponMutation;
 }
