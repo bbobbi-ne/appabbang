@@ -27,7 +27,7 @@ model Bread {
   updatedAt             DateTime          @updatedAt @map("updated_at")               // 수정시간
 
   orderRoundBreads      OrderRoundBread[]                                             // 빵 - 주문차수 매핑 테이블
-  orderItem             OrderItem?
+  orderItem             OrderItem[]
 
   @@map("breads")
 }
@@ -118,7 +118,7 @@ model OrderItem {
   updatedAt             DateTime          @updatedAt @map("updated_at")                                      // 수정 시간
 
   orderNo               Int               @map("order_no")                                                   // 주문 번호
-  breadNo               Int?              @unique @map("bread_no")                                                   // 빵 번호
+  breadNo               Int?              @map("bread_no")                                                   // 빵 번호
   order                 Order             @relation(fields: [orderNo], references: [no], onDelete: Cascade)  // 주문 테이블 참조
   bread                 Bread?            @relation(fields: [breadNo], references: [no], onDelete: SetNull)   // 빵 테이블 참조
   
