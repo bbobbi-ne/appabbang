@@ -4,12 +4,13 @@ import { requireAuth, requireCustomer } from '@/middlewares/auth.middleware';
 import { loginValidator, validate } from '@/middlewares/validators/validate';
 import { asyncHandler } from '@/middlewares/error.middleware';
 import { KakaoClient } from '@/lib/kakao';
+import * as CustomerController from '@/controllers/customer.controller';
 import {
   createCustomerValidator,
   loginCustomerValidator,
+  updateCustomerPwValidator,
   updateCustomerValidator,
-} from '@/middlewares/validators/customer-validate';
-import * as CustomerController from '@/controllers/customer.controller';
+} from '@/middlewares/validators/auth-validate';
 
 const router = Router();
 
@@ -82,6 +83,14 @@ router.post(
   requireCustomer,
   validate(updateCustomerValidator),
   asyncHandler(authController.update),
+);
+
+/** POST /customers/update/pw : 고객 정보 수정 - 비밀번호 변경 */
+router.post(
+  '/customers/update/pw',
+  requireCustomer,
+  validate(updateCustomerPwValidator),
+  asyncHandler(authController.updatePw),
 );
 
 export default router;

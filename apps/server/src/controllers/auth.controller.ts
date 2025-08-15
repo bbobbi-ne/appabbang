@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import bcrypt from 'bcrypt';
 import {
   comparePassword,
   generateAccessToken,
@@ -16,7 +17,7 @@ import { ClientPayload, ClientType } from '@/types/client-payload';
 export const login = async (req: Request, res: Response) => {
   const { id, pw, type } = req.body;
 
-  const client = await getClientForLogin(id, type);
+  const client = await userService.getClientForLogin(id, type);
   const isValid = await comparePassword(pw, client.pw);
 
   if (!isValid) {
@@ -38,36 +39,6 @@ export const login = async (req: Request, res: Response) => {
   res.status(200).json({ accessToken });
 };
 
-// 클라이언트 조회
-async function getClientForLogin(id: string, type: ClientType) {
-  if (type === ClientType.USER) {
-    const user = await userService.getByIdForLogin(id);
-    if (!user) throw AppError.unauthorized('아이디 또는 비밀번호를 확인해주세요.');
-    return {
-      ...user,
-      type,
-      pw: user.pw,
-      userRole: user.userRole as 'admin' | 'subadmin',
-    };
-  }
-
-  if (type === ClientType.CUSTOMER) {
-    const customer = await customerService.getByIdForLogin(id);
-    if (!customer?.pw || !customer.id) {
-      throw AppError.unauthorized('아이디 또는 비밀번호를 확인해주세요.');
-    }
-    return {
-      no: customer.no,
-      name: customer.name,
-      id: customer.id,
-      pw: customer.pw,
-      type,
-    };
-  }
-
-  throw AppError.badRequest('잘못된 로그인 유형입니다.');
-}
-
 /** 내 정보 조회 */
 export const me = async (req: Request, res: Response) => {
   if (!req.user) {
@@ -86,9 +57,6 @@ export const getCustomerInfo = async (req: Request, res: Response) => {
   // 고객 상세정보 조회 + 고객 보유 쿠폰 조회
   const { customer, coupon } = await userService.getCustomerInfo(req.user.no);
   const totalAmount = await userService.getOrderAccumulatedAmount(req.user.no);
-
-  console.log(totalAmount);
-
   res.status(200).json({ customer, coupon, totalAmount });
 };
 
@@ -126,4 +94,33 @@ export const update = async (req: Request, res: Response) => {
 
   const customer = await userService.update(req.body);
   res.status(200).json({ customer });
+};
+
+/**
+ * 고객정보 수정 : 비밀번호 변경
+ */
+export const updatePw = async (req: Request, res: Response) => {
+  if (!req.user) throw AppError.unauthorized('토큰에 저장된 고객정보를 확인할 수 없습니다.');
+
+  const { no } = req.user;
+  const { pw, pwModify } = req.body;
+
+  // 고객 정보 조회
+  const customer = await userService.findCustomerPw(no);
+  if (!customer)
+    throw AppError.internalServerError(
+      '고객정보 조회 과정에서 오류가 발생했습니다. 관리자 확인이 필요합니다.',
+    );
+
+  // 비밀번호 비교
+  const isValid = await comparePassword(pw, customer.pw);
+  if (!isValid) throw AppError.internalServerError('현재 비밀번호가 올바르지 않습니다.');
+
+  // 비밀번호 해싱
+  const saltRounds = 12;
+  const hashedPw = await bcrypt.hash(pwModify, saltRounds);
+
+  // 비밀번호 변경
+  await userService.updatePw(no, hashedPw);
+  res.status(200).json();
 };

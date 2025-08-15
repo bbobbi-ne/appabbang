@@ -109,6 +109,19 @@ const ZIPCODE_VALIDATION = {
   empty: { message: '우편번호를 입력하세요.' },
 };
 
+/** 비밀번호 변경 전용 validation */
+const UPDATE_PASSWORD_VALIDATION = {
+  key: ['pw', 'pwModify'],
+  length: { min: 10, max: 30, message: '비밀번호는 10~30자 이내로 입력해야 합니다.' },
+  matches: {
+    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[^\s]{10,30}$/g,
+    message:
+      '비밀번호는 영문 대소문자 + 숫자 + 특수문자 포함, 10~30자리, 공백 제외하여 입력 가능합니다.',
+  },
+  string: { message: '비밀번호는 문자열로 입력해야 합니다.' },
+  empty: { message: '비밀번호를 입력하세요.' },
+};
+
 /**
  * 회원가입 유효성 검증
  */
@@ -251,6 +264,40 @@ export const updateCustomerValidator = [
     .withMessage(MOBILE_NUMBER_VALIDATION.empty.message)
     .matches(MOBILE_NUMBER_VALIDATION.matches.value)
     .withMessage(MOBILE_NUMBER_VALIDATION.matches.message)
+    .trim()
+    .escape(),
+];
+
+/**
+ * 고객정보 수정 - 비밀번호 변경
+ */
+export const updateCustomerPwValidator = [
+  body(UPDATE_PASSWORD_VALIDATION.key[0])
+    .notEmpty()
+    .withMessage(UPDATE_PASSWORD_VALIDATION.empty.message)
+    .matches(UPDATE_PASSWORD_VALIDATION.matches.value)
+    .withMessage(UPDATE_PASSWORD_VALIDATION.matches.message)
+    .isString()
+    .withMessage(UPDATE_PASSWORD_VALIDATION.string.message)
+    .isLength({
+      min: UPDATE_PASSWORD_VALIDATION.length.min,
+      max: UPDATE_PASSWORD_VALIDATION.length.max,
+    })
+    .withMessage(UPDATE_PASSWORD_VALIDATION.length.message)
+    .trim()
+    .escape(),
+  body(UPDATE_PASSWORD_VALIDATION.key[1])
+    .notEmpty()
+    .withMessage(UPDATE_PASSWORD_VALIDATION.empty.message)
+    .matches(UPDATE_PASSWORD_VALIDATION.matches.value)
+    .withMessage(UPDATE_PASSWORD_VALIDATION.matches.message)
+    .isString()
+    .withMessage(UPDATE_PASSWORD_VALIDATION.string.message)
+    .isLength({
+      min: UPDATE_PASSWORD_VALIDATION.length.min,
+      max: UPDATE_PASSWORD_VALIDATION.length.max,
+    })
+    .withMessage(UPDATE_PASSWORD_VALIDATION.length.message)
     .trim()
     .escape(),
 ];
