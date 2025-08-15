@@ -3,15 +3,19 @@ import { toast } from 'sonner';
 import { Payments } from '@/api/Payments';
 import type { PaidUpdatePayload, StatusUpdateBody } from '@/api/data-contracts';
 import type { QueryFunctionContext } from '@tanstack/react-query';
-import { updateOrderStatus } from './order-api';
-import { getOrderStatus } from './common-api';
 
+// ✅ 결제 API 인스턴스 생성
 const paymentApi = new Payments(new CustomHttpClient());
-type OrderStatusCode = StatusUpdateBody['orderStatus'];
+
+/**
+ * 결제 정보 전체 목록 조회 API
+ *
+ * - 서버에서 모든 결제 내역 리스트를 가져옴
+ * - 실패 시 toast 알림 후 에러 throw
+ */
 export async function getPaymentsList() {
   try {
     const response = await paymentApi.paymentsList();
-    // toast.success('결제 정보를 조회에 성공했습니다.');
     return {
       data: response.data,
     };
@@ -23,6 +27,13 @@ export async function getPaymentsList() {
     throw new Error(message);
   }
 }
+
+/**
+ * 결제 상세 정보 조회 API
+ *
+ * @param queryKey React Query에서 전달하는 쿼리 키
+ * - queryKey[1]에 { no: number } 형태의 결제 번호가 포함됨
+ */
 export const getPaymentDetail = async ({
   queryKey,
 }: QueryFunctionContext<[string, { no: number }]>) => {
@@ -39,35 +50,20 @@ export const getPaymentDetail = async ({
     throw new Error(message);
   }
 };
-export async function updatePaid({
-  no,
-  rowOrderStatus,
-  data,
-}: {
-  no: number;
-  rowOrderStatus: { code: string; name: string };
-  data: PaidUpdatePayload;
-}) {
+
+/**
+ * 결제 상태(입금 확인) 업데이트 API
+ *
+ * @param no 결제/주문 번호
+ * @param data PaidUpdatePayload (입금 여부 데이터)
+ *
+ * - 결제 상태 업데이트
+ */
+export async function updatePaid({ no, data }: { no: number; data: PaidUpdatePayload }) {
   try {
+    // 1. 결제 상태 업데이트
     const response = await paymentApi.paidUpdate(no, data);
 
-    if (rowOrderStatus.name === '접수요청' && data.isPaid) {
-      const orderStatusres = await getOrderStatus();
-
-      const foundStatus = orderStatusres.data.find((status) => status.name === '접수완료');
-
-      if (!foundStatus) {
-        throw new Error('접수완료 상태를 찾을 수 없습니다.');
-      }
-
-      await updateOrderStatus({
-        no,
-        orderStatus: {
-          orderStatus: foundStatus.code as OrderStatusCode,
-        },
-      });
-    }
-    // toast.success('입금 확인 업데이트에 성공했습니다.');
     return {
       data: response.data,
     };
