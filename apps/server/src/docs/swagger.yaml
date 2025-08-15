@@ -1185,17 +1185,17 @@ paths:
                 name:
                   type: string
                   description: 주문차수명
-                  example: '주문 1차'
+                  example: '주문 1월'
                 startedAt:
                   type: string
                   format: date-time
                   description: 시작일시
-                  example: 2025-07-01T11:00:00.000Z
+                  example: 2025-01-01T11:00:00.000Z
                 endedAt:
                   type: string
                   format: date-time
                   description: 종료일시
-                  example: 2025-07-31T11:00:00.000Z
+                  example: 2025-01-31T11:00:00.000Z
                 minOrderQty:
                   type: integer
                   description: 최소주문수량
@@ -1207,16 +1207,7 @@ paths:
                 orderRoundBreads:
                   type: array
                   description: 빵 번호 목록 (JSON 문자열 형태로 전송)
-                  example: '[{"breadNo": 1}, {"breadNo": 2}, {"breadNo": 3}]'
-                  items:
-                    type: object
-                    required:
-                      breadNo
-                    properties:
-                      breadNo:
-                        type: integer
-                        description: 빵 번호
-                        example: 1
+                  example: '[{"no": 1, "name": "판매빵"}, {"no": 5, "name": "출시예정빵"}]'
                 image:
                   type: string
                   format: binary
@@ -1249,7 +1240,7 @@ paths:
                   - endedAt
                   - minOrderQty
                   - maxOrderQty
-                  - orderRoundBread
+                  - orderRoundBreads
                 properties:
                   no:
                     type: integer
@@ -1277,7 +1268,7 @@ paths:
                     type: integer
                     description: 최대주문수량
                     example: 1
-                  orderRoundBread:
+                  orderRoundBreads:
                     type: array
                     items:
                       type: object
@@ -1321,7 +1312,7 @@ paths:
                   - endedAt
                   - minOrderQty
                   - maxOrderQty
-                  - orderRoundBread
+                  - orderRoundBreads
                   - image
                 properties:
                   no:
@@ -1350,7 +1341,7 @@ paths:
                     type: integer
                     description: 최대주문수량
                     example: 1
-                  orderRoundBread:
+                  orderRoundBreads:
                     type: array
                     items:
                       type: object
@@ -1552,9 +1543,9 @@ paths:
                   description: 최대주문수량
                   example: 1
                 orderRoundBreads:
-                  type: string
+                  type: array
                   description: 빵 번호 목록 (JSON 문자열 형태로 전송)
-                  example: '[{"breadNo": 1}, {"breadNo": 2}, {"breadNo": 3}]'
+                  example: '[{"no": 1, "name": "판매빵"}, {"no": 5, "name": "출시예정빵"}]'
                 image:
                   type: string
                   format: binary
