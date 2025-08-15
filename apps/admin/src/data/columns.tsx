@@ -1023,7 +1023,7 @@ export const couponsColumns = () => {
     }),
     columnHelper.accessor('name', {
       maxSize: 20,
-      header: ({ column }) => (
+      header: () => (
         <Button className="p-0" variant="ghost">
           쿠폰명
         </Button>
@@ -1034,46 +1034,46 @@ export const couponsColumns = () => {
     }),
     columnHelper.accessor('amount', {
       maxSize: 15,
-      header: ({ column }) => (
+      header: () => (
         <Button className="p-0" variant="ghost">
           쿠폰금액
         </Button>
       ),
       cell: (info) => {
-        return <p>{info.getValue()} 원</p>;
+        return <p className="text-right">{formatKR(info.getValue())} 원</p>;
       },
     }),
     columnHelper.accessor('expireAfterDays', {
       maxSize: 15,
-      header: ({ column }) => (
+      header: () => (
         <Button className="p-0" variant="ghost">
           쿠폰만료일
         </Button>
       ),
       cell: (info) => {
-        return <p>발급 후 {info.getValue()} 일</p>;
+        return <p className="text-right">{info.getValue()} 일</p>;
       },
     }),
     columnHelper.accessor('createdAt', {
       maxSize: 15,
-      header: ({ column }) => (
+      header: () => (
         <Button className="p-0" variant="ghost">
-          등록일시
+          등록일
         </Button>
       ),
       cell: (info) => {
-        return <p>{formatIso(info.getValue())}</p>;
+        return <p className="text-center">{formatToDate(info.getValue())}</p>;
       },
     }),
     columnHelper.accessor('updatedAt', {
       maxSize: 15,
-      header: ({ column }) => (
+      header: () => (
         <Button className="p-0" variant="ghost">
-          수정일시
+          수정일
         </Button>
       ),
       cell: (info) => {
-        return <p>{formatIso(info.getValue())}</p>;
+        return <p className="text-center">{formatToDate(info.getValue())}</p>;
       },
     }),
     columnHelper.display({

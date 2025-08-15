@@ -95,7 +95,7 @@ export const CouponsPage = () => {
               )}
 
               {table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="cursor-pointer ">
+                <TableRow key={row.id} className="cursor-pointer text-xs">
                   {row.getVisibleCells().map((cell) => {
                     // action 컬럼은 CouponModifyDialog로 감싸지 않음
                     if (cell.column.id === 'actions') {

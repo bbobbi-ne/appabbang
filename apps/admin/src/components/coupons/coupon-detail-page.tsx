@@ -137,7 +137,7 @@ export const CouponDetailPage = () => {
           />
         </div>
         <Button
-          size="sm"
+          // size="sm"
           disabled={selectedCustomers === 0 || issuedCouponMutation.isPending}
           onClick={() => {
             if (window.confirm('선택한 고객에게 쿠폰을 발급하시겠습니까?')) {
