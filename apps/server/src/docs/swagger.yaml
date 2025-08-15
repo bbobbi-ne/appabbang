@@ -3631,3 +3631,61 @@ paths:
                     type: string
                     description: 성공 메시지
                     example: '쿠폰이 삭제되었습니다.'
+
+  /coupons/{no}/issue:
+    post:
+      tags: [Coupons]
+      summary: 쿠폰 발급
+      description: 특정 쿠폰을 선택된 고객들에게 발급합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 쿠폰 번호
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - noList
+              properties:
+                noList:
+                  type: array
+                  items:
+                    type: integer
+                  description: 쿠폰을 발급받을 고객 번호 배열
+                  example: [1, 2, 3]
+      responses:
+        '200':
+          description: 쿠폰 발급 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    type: string
+                    description: 성공 메시지
+                    example: '쿠폰이 발급되었습니다'
+        '400':
+          description: 잘못된 요청 (고객 번호가 누락되었거나 잘못된 형식)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: 에러 메시지
+                    example: '고객번호는 필수입니다'
+        '404':
+          description: 쿠폰을 찾을 수 없음

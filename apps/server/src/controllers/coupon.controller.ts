@@ -34,3 +34,12 @@ export const remove = async (req: Request, res: Response) => {
   await CouponService.remove(no);
   res.status(204).json({ message: '쿠폰이 삭제되었습니다.' });
 };
+
+/** 쿠폰 발급 (쿠폰하나를 여러 고객에게 발급) */
+export const issueCoupon = async (req: Request, res: Response) => {
+  const couponNo = Number(req.params.no);
+  const customerNos = req.body.noList;
+
+  await CouponService.issueCoupon(couponNo, customerNos);
+  res.status(200).json({ message: '쿠폰이 발급되었습니다.' });
+};

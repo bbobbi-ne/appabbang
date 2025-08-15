@@ -33,7 +33,7 @@ export const getOne = async (no: number) => {
   });
 
   if (!coupon) {
-    throw AppError.badRequest('존재하지 않는 쿠폰입니다.');
+    throw AppError.notFound('존재하지 않는 쿠폰입니다.');
   }
 
   // 첫 로그인 쿠폰이거나, 이미 발급된 쿠폰이 있을 경우 수정 불가 구분을 위해 추가
@@ -81,7 +81,7 @@ export const remove = async (no: number) => {
     where: { no },
   });
   if (!coupon) {
-    throw AppError.badRequest('존재하지 않는 쿠폰입니다.');
+    throw AppError.notFound('존재하지 않는 쿠폰입니다.');
   }
 
   // 조건 1. 첫 로그인 쿠폰은 삭제 불가
@@ -106,4 +106,29 @@ export const remove = async (no: number) => {
   });
 
   return true;
+};
+
+/** 쿠폰 발급 (쿠폰하나를 여러 고객에게 발급) */
+export const issueCoupon = async (couponNo: number, customerNos: number[]) => {
+  const coupon = await prisma.coupon.findUnique({
+    where: {
+      no: couponNo,
+    },
+  });
+
+  if (!coupon) {
+    throw AppError.notFound('존재하지 않는 쿠폰입니다.');
+  }
+
+  const issuedAt = new Date();
+  const expiredAt = new Date(issuedAt.getTime() + coupon.expireAfterDays * 24 * 60 * 60 * 1000);
+
+  await prisma.customerCoupon.createMany({
+    data: customerNos.map((customerNo) => ({
+      couponNo,
+      customerNo,
+      issuedAt,
+      expiredAt,
+    })),
+  });
 };

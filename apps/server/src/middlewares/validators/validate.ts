@@ -574,3 +574,19 @@ export const deleteCouponValidator = [
     .toInt()
     .withMessage('no 를 올바르게 입력해주세요.'),
 ];
+
+/** 쿠폰 발급 validate (쿠폰하나를 여러 고객에게 발급) */
+export const issueCouponValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  body('noList')
+    .exists()
+    .withMessage('noList(고객번호 배열)는 필수입니다')
+    .isArray({ min: 1 })
+    .withMessage('noList는 하나 이상의 요소를 가진 배열이어야 합니다.'),
+  body('noList.*').isInt().toInt().withMessage('noList 안의 값은 정수여야 합니다.'),
+];

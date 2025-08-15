@@ -6,6 +6,7 @@ import {
   createCouponValidator,
   deleteCouponValidator,
   updateCouponValidator,
+  issueCouponValidator,
   validate,
 } from '@/middlewares/validators/validate';
 
@@ -39,6 +40,14 @@ router.delete(
   requireAdmin,
   validate(deleteCouponValidator),
   asyncHandler(couponController.remove),
+);
+
+/** POST /coupons/{no}/issue : 쿠폰 발급 (쿠폰하나를 여러 고객에게 발급) */
+router.post(
+  '/:no/issue',
+  requireAdmin,
+  validate(issueCouponValidator),
+  asyncHandler(couponController.issueCoupon),
 );
 
 export default router;
