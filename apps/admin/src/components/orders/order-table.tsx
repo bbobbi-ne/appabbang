@@ -1,8 +1,8 @@
 import type { OrdersDetailData } from '@/api/data-contracts';
-import { formatKR } from '@/utils/format';
+import { formatCurrencyKR } from '@/utils/format';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@appabbang/ui';
 
-type OrderItem = OrdersDetailData['orderItem'][number];
+type OrderItem = OrdersDetailData['orderItems'][number];
 
 function OrderTable({ orderItem, deliveryFee }: { orderItem: OrderItem[]; deliveryFee: number }) {
   const totalPrice = orderItem.reduce((acc, item) => {
@@ -28,11 +28,11 @@ function OrderTable({ orderItem, deliveryFee }: { orderItem: OrderItem[]; delive
             {orderItem.map((item) => (
               <TableRow key={item.breadNo}>
                 <TableCell className="line-clamp-2 pb-0 whitespace-normal break-words">
-                  {item.bread.name}
+                  {item.breadName}
                 </TableCell>
                 <TableCell>{item.quantity}</TableCell>
-                <TableCell>{formatKR(item.unitPrice)}</TableCell>
-                <TableCell>{formatKR(item.totalPrice)}</TableCell>
+                <TableCell>{formatCurrencyKR(item.unitPrice)}</TableCell>
+                <TableCell>{formatCurrencyKR(item.totalPrice)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

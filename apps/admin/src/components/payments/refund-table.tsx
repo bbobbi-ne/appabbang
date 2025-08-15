@@ -1,5 +1,5 @@
 import type { OrdersDetailData, PaymentsDetailData } from '@/api/data-contracts';
-import { formatIso, formatKR } from '@/utils/format';
+import { formatIsoToDateTime, formatCurrencyKR } from '@/utils/format';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@appabbang/ui';
 
 function RefundTable({
@@ -10,9 +10,9 @@ function RefundTable({
   paymentDetail: PaymentsDetailData;
 }) {
   const totalPrice =
-    ordersDetail.orderItem.reduce((acc, item) => {
+    ordersDetail.orderItems.reduce((acc, item) => {
       return acc + item.totalPrice;
-    }, 0) + ordersDetail.deliveryMethod.fee;
+    }, 0) + ordersDetail.deliveryMethodFee;
   return (
     <div className="space-y-6">
       <div
@@ -29,14 +29,14 @@ function RefundTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {ordersDetail.orderItem.map((item) => (
+            {ordersDetail.orderItems.map((item) => (
               <TableRow key={item.breadNo}>
                 <TableCell className="line-clamp-2 pb-0 whitespace-normal break-words">
-                  {item.bread.name}
+                  {item.breadName}
                 </TableCell>
                 <TableCell>{item.quantity}</TableCell>
-                <TableCell>{formatKR(item.unitPrice)}</TableCell>
-                <TableCell>{formatKR(item.totalPrice)}</TableCell>
+                <TableCell>{formatCurrencyKR(item.unitPrice)}</TableCell>
+                <TableCell>{formatCurrencyKR(item.totalPrice)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -47,11 +47,11 @@ function RefundTable({
         <div className="text-right space-y-1">
           <div className="flex">
             <label className="flex-3/5">주문일자 :</label>
-            <p className="flex-2/5">{formatIso(paymentDetail.createdAt)}</p>
+            <p className="flex-2/5">{formatIsoToDateTime(paymentDetail.createdAt)}</p>
           </div>
           <div className="flex">
             <label className="flex-3/5">주문자 :</label>
-            <p className="flex-2/5">{ordersDetail.customer.name}</p>
+            <p className="flex-2/5">{ordersDetail.ordererName}</p>
           </div>
           <div className="flex">
             <label className="flex-3/5">환불계좌 :</label>
@@ -63,11 +63,11 @@ function RefundTable({
           </div>
           <div className="flex">
             <label className="flex-3/5">주문금액 :</label>
-            <p className="flex-2/5">{formatKR(totalPrice)}원</p>
+            <p className="flex-2/5">{formatCurrencyKR(totalPrice)}원</p>
           </div>
           <div className="flex">
             <label className="flex-3/5">배송비(-) :</label>
-            <p className="flex-2/5">{formatKR(ordersDetail.deliveryMethod.fee)}원</p>
+            <p className="flex-2/5">{formatCurrencyKR(ordersDetail.deliveryMethodFee)}원</p>
           </div>
           <div className="flex">
             <label className="flex-3/5">할인금액(-) :</label>
@@ -75,7 +75,9 @@ function RefundTable({
           </div>
           <div className="flex text-red-500 font-semibold">
             <label className="flex-3/5">환불 예정 금액 :</label>
-            <p className="flex-2/5">{formatKR(totalPrice - ordersDetail.deliveryMethod.fee)}원</p>
+            <p className="flex-2/5">
+              {formatCurrencyKR(totalPrice - ordersDetail.deliveryMethodFee)}원
+            </p>
           </div>
         </div>
       )}

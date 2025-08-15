@@ -1,4 +1,4 @@
-import { useOrderRoundImgDeleteMutation } from '@/hooks/use-order-round';
+import { useOrderRoundImageDeleteMutation } from '@/hooks/use-order-round';
 import { Input } from '@appabbang/ui';
 import { useRef } from 'react';
 import type { ControllerRenderProps } from 'react-hook-form';
@@ -12,7 +12,7 @@ export function ImageUpload({
 }) {
   const { value, onChange } = field;
   const inputRef = useRef<HTMLInputElement>(null);
-  const { orderRoundImgDeleteMutation } = useOrderRoundImgDeleteMutation();
+  const { orderRoundImageDeleteMutation } = useOrderRoundImageDeleteMutation();
   const handleInputClick = () => {
     inputRef.current?.click();
   };
@@ -32,7 +32,7 @@ export function ImageUpload({
       inputRef.current?.click();
       return;
     }
-    orderRoundImgDeleteMutation({ no: no!, publicId: value.publicId });
+    orderRoundImageDeleteMutation({ no: no!, publicId: value.publicId });
     onChange(null);
   };
 
