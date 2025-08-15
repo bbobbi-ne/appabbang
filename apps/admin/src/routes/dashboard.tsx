@@ -20,7 +20,14 @@ export const Route = createFileRoute('/dashboard')({
 
 export default function DashboardLayout() {
   return (
-    <SidebarProvider>
+    <SidebarProvider
+      style={
+        {
+          '--sidebar-width': '13rem',
+          '--sidebar-width-mobile': '13rem',
+        } as React.CSSProperties
+      }
+    >
       <DashboardContent />
     </SidebarProvider>
   );
