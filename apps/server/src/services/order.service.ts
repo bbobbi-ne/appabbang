@@ -57,7 +57,7 @@ export const create = async (no: number | undefined, body: CreateOrderRequestBod
   } = body;
 
   await prisma.$transaction(async (tx) => {
-    // 배송 방법 조회
+    // 1. 배송 방법 조회
     const deliveryMethod = await tx.deliveryMethod.findUnique({
       where: { no: deliveryMethodNo },
     });
@@ -66,9 +66,9 @@ export const create = async (no: number | undefined, body: CreateOrderRequestBod
       throw AppError.badRequest('배송 방법을 찾을 수 없습니다.');
     }
 
+    // 2. 쿠폰 처리
     let discountAmount = 0;
     let couponNo = null;
-    // 쿠폰 조회
     if (no && customerCouponNo) {
       const customerCoupon = await tx.customerCoupon.findUnique({
         where: { no: customerCouponNo },
@@ -77,99 +77,48 @@ export const create = async (no: number | undefined, body: CreateOrderRequestBod
           isExpired: true,
           expiredAt: true,
           customerNo: true,
-          coupon: {
-            select: {
-              amount: true,
-              no: true,
-            },
-          },
+          coupon: { select: { amount: true, no: true } },
         },
       });
 
-      if (!customerCoupon) {
-        throw AppError.badRequest('쿠폰을 찾을 수 없습니다.');
-      }
-
-      if (customerCoupon.isUsed) {
-        throw AppError.badRequest('이미 사용된 쿠폰입니다.');
-      }
-
-      if (customerCoupon.isExpired || customerCoupon.expiredAt < new Date()) {
+      if (!customerCoupon) throw AppError.badRequest('쿠폰을 찾을 수 없습니다.');
+      if (customerCoupon.isUsed) throw AppError.badRequest('이미 사용된 쿠폰입니다.');
+      if (customerCoupon.isExpired || customerCoupon.expiredAt < new Date())
         throw AppError.badRequest('만료된 쿠폰입니다.');
-      }
-
-      if (customerCoupon.customerNo !== no) {
+      if (customerCoupon.customerNo !== no)
         throw AppError.badRequest('쿠폰 소유자가 일치하지 않습니다.');
-      }
 
-      await tx.customerCoupon.update({
-        where: { no: customerCouponNo },
-        data: { isUsed: true },
-      });
-
+      await tx.customerCoupon.update({ where: { no: customerCouponNo }, data: { isUsed: true } });
       couponNo = customerCoupon.coupon.no;
       discountAmount = customerCoupon.coupon.amount || 0;
     }
 
-    // 빵 번호 리스트 생성
+    // 3. 빵 조회
     const breadNoList = orderItems.map((item) => item.breadNo).filter((no) => no !== null);
 
-    // 빵 조회
     const breads = await tx.bread.findMany({
-      where: {
-        no: { in: breadNoList },
-      },
+      where: { no: { in: breadNoList } },
       select: { no: true, unitPrice: true, name: true, countryOfOrigin: true, allergyInfo: true },
     });
 
-    // 빵 이미지 조회
     const images = await tx.image.findMany({
-      where: {
-        imageTargetType: 'breads',
-        imageTargetNo: { in: breadNoList },
-        order: 1,
-      },
+      where: { imageTargetType: 'breads', imageTargetNo: { in: breadNoList }, order: 1 },
       select: { imageTargetNo: true, url: true },
     });
 
-    // 빵이미지 매핑
     const imageMap = Object.fromEntries(images.map((img) => [img.imageTargetNo, img.url]));
-    // {빵번호: 빵정보} 매핑
     const breadMap = Object.fromEntries(
       breads.map((b) => [b.no, { ...b, url: imageMap[b.no] || '' }]),
     );
 
-    // 1. 주문 아이템 생성
-    await tx.orderItem.createMany({
-      data: orderItems.map((item) => {
-        const bread = breadMap[item.breadNo!];
-
-        if (!bread) {
-          throw AppError.badRequest('빵을 찾을 수 없습니다.');
-        }
-
-        return {
-          quantity: item.quantity,
-          unitPrice: bread.unitPrice,
-          totalPrice: bread.unitPrice * item.quantity,
-          breadName: bread.name,
-          countryOfOrigin: bread.countryOfOrigin,
-          allergyInfo: bread.allergyInfo,
-          breadNo: item.breadNo,
-          orderNo: newOrder.no,
-          breadImageUrl: bread.url,
-        };
-      }),
-    });
-
-    // 계산 검증
-    const originPrice = orderItems.reduce(
-      (acc, item) => acc + (breadMap[item.breadNo!]!.unitPrice || 0 * item.quantity),
-      0,
-    );
+    // 4. 금액 계산
+    const originPrice = orderItems.reduce((acc, item) => {
+      const bread = breadMap[item.breadNo!];
+      if (!bread) throw AppError.badRequest(`빵 번호 ${item.breadNo}를 찾을 수 없습니다.`);
+      return acc + bread.unitPrice * item.quantity;
+    }, 0);
 
     const deliveryMethodFee = deliveryMethod.fee;
-
     const calculatedTotalPrice = originPrice - discountAmount + deliveryMethodFee;
 
     if (calculatedTotalPrice !== totalPrice) {
@@ -182,7 +131,7 @@ export const create = async (no: number | undefined, body: CreateOrderRequestBod
       });
     }
 
-    // 2. 주문 생성
+    // 5. 주문 생성
     const newOrder = await tx.order.create({
       data: {
         orderNumber: generateOrderNumber(),
@@ -198,19 +147,16 @@ export const create = async (no: number | undefined, body: CreateOrderRequestBod
         message,
         deliveryMethodName: deliveryMethod.name,
         deliveryMethodFee: deliveryMethod.fee,
-        discountAmount: 0,
+        discountAmount: 0, // 일단 0 유지
+        totalPrice,
         isPaymentRefundTermsAgreed,
         orderRoundNo,
-        totalPrice,
         memo: '',
-        // customer의 정보와 주문인&주문인전화번호가 다른경우도 검증해야할까?
-        // = customer가 주문인과 일치해야하는가?
         customer: no ? { connect: { no } } : {},
         coupon: couponNo ? { connect: { no: couponNo } } : {},
         ...(!no
           ? {
-              // 비회원 입력 항목
-              orderPw: await hashPassword(orderPw || ''), // 비밀번호 암호화
+              orderPw: await hashPassword(orderPw || ''),
               isPrivacyTermsAgreed,
               isServiceTermsAgreed,
             }
@@ -222,7 +168,29 @@ export const create = async (no: number | undefined, body: CreateOrderRequestBod
       },
     });
 
-    // 3. 결제 생성
+    // 6. 주문 아이템 생성
+    await tx.orderItem.createMany({
+      data: orderItems.map((item) => {
+        const bread = breadMap[item.breadNo!];
+        if (!bread) {
+          throw AppError.badRequest(`빵 번호 ${item.breadNo}를 찾을 수 없습니다.`);
+        }
+
+        return {
+          orderNo: newOrder.no,
+          breadNo: item.breadNo!,
+          quantity: item.quantity,
+          unitPrice: bread.unitPrice,
+          totalPrice: bread.unitPrice * item.quantity,
+          breadName: bread.name,
+          countryOfOrigin: bread.countryOfOrigin,
+          allergyInfo: bread.allergyInfo,
+          breadImageUrl: bread.url,
+        };
+      }),
+    });
+
+    // 7. 결제 생성
     await tx.payment.create({
       data: {
         orderNo: newOrder.no,
