@@ -10,6 +10,7 @@ import {
   TableBody,
   CardFooter,
   TableCell,
+  Button,
 } from '@appabbang/ui';
 import {
   flexRender,
@@ -27,15 +28,16 @@ import { couponsColumns, type CouponsListItem } from '@/data/columns';
 import { useCouponsQuery } from '@/hooks/use-coupon';
 import { CouponCreateDialog } from '@/components/coupons/coupon-create-dialog';
 import { CouponModifyDialog } from './coupon-modify-dialog';
+import { useNavigate } from '@tanstack/react-router';
 
 export const CouponsPage = () => {
+  const navigate = useNavigate();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const columns = couponsColumns();
   const {
     // isError, isLoading,
-
     data: coupons,
   } = useCouponsQuery();
 
@@ -94,13 +96,35 @@ export const CouponsPage = () => {
 
               {table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} className="cursor-pointer ">
-                  {row.getVisibleCells().map((cell) => (
-                    <CouponModifyDialog no={cell.row.original.no} key={cell.id}>
-                      <TableCell>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    </CouponModifyDialog>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    // action 컬럼은 CouponModifyDialog로 감싸지 않음
+                    if (cell.column.id === 'actions') {
+                      return (
+                        <TableCell key={cell.id}>
+                          <div className="flex justify-center">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                navigate({ to: `/dashboard/coupons/${cell.row.original.no}` })
+                              }
+                            >
+                              쿠폰 발급
+                            </Button>
+                          </div>
+                        </TableCell>
+                      );
+                    }
+
+                    // 나머지 컬럼은 CouponModifyDialog로 감쌈
+                    return (
+                      <CouponModifyDialog no={cell.row.original.no} key={cell.id}>
+                        <TableCell>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      </CouponModifyDialog>
+                    );
+                  })}
                 </TableRow>
               ))}
             </TableBody>

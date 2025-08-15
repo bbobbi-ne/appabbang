@@ -1022,6 +1022,7 @@ export const couponsColumns = () => {
       },
     }),
     columnHelper.accessor('name', {
+      maxSize: 20,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           쿠폰명
@@ -1032,6 +1033,7 @@ export const couponsColumns = () => {
       },
     }),
     columnHelper.accessor('amount', {
+      maxSize: 15,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           쿠폰금액
@@ -1042,6 +1044,7 @@ export const couponsColumns = () => {
       },
     }),
     columnHelper.accessor('expireAfterDays', {
+      maxSize: 15,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           쿠폰만료일
@@ -1052,6 +1055,7 @@ export const couponsColumns = () => {
       },
     }),
     columnHelper.accessor('createdAt', {
+      maxSize: 15,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           등록일시
@@ -1062,6 +1066,7 @@ export const couponsColumns = () => {
       },
     }),
     columnHelper.accessor('updatedAt', {
+      maxSize: 15,
       header: ({ column }) => (
         <Button className="p-0" variant="ghost">
           수정일시
@@ -1070,6 +1075,11 @@ export const couponsColumns = () => {
       cell: (info) => {
         return <p>{formatIso(info.getValue())}</p>;
       },
+    }),
+    columnHelper.display({
+      id: 'actions',
+      maxSize: 20,
+      header: '발급',
     }),
   ];
 

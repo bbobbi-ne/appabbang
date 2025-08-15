@@ -22,6 +22,7 @@ import { Route as DashboardMaterialsIndexImport } from './routes/dashboard/mater
 import { Route as DashboardCustomersIndexImport } from './routes/dashboard/customers/index'
 import { Route as DashboardCouponsIndexImport } from './routes/dashboard/coupons/index'
 import { Route as DashboardBreadsIndexImport } from './routes/dashboard/breads/index'
+import { Route as DashboardCouponsNoImport } from './routes/dashboard/coupons/$no'
 
 // Create/Update Routes
 
@@ -91,6 +92,12 @@ const DashboardBreadsIndexRoute = DashboardBreadsIndexImport.update({
   getParentRoute: () => DashboardRoute,
 } as any)
 
+const DashboardCouponsNoRoute = DashboardCouponsNoImport.update({
+  id: '/coupons/$no',
+  path: '/coupons/$no',
+  getParentRoute: () => DashboardRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -114,6 +121,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexImport
+      parentRoute: typeof DashboardImport
+    }
+    '/dashboard/coupons/$no': {
+      id: '/dashboard/coupons/$no'
+      path: '/coupons/$no'
+      fullPath: '/dashboard/coupons/$no'
+      preLoaderRoute: typeof DashboardCouponsNoImport
       parentRoute: typeof DashboardImport
     }
     '/dashboard/breads/': {
@@ -179,6 +193,7 @@ declare module '@tanstack/react-router' {
 
 interface DashboardRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardCouponsNoRoute: typeof DashboardCouponsNoRoute
   DashboardBreadsIndexRoute: typeof DashboardBreadsIndexRoute
   DashboardCouponsIndexRoute: typeof DashboardCouponsIndexRoute
   DashboardCustomersIndexRoute: typeof DashboardCustomersIndexRoute
@@ -191,6 +206,7 @@ interface DashboardRouteChildren {
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardCouponsNoRoute: DashboardCouponsNoRoute,
   DashboardBreadsIndexRoute: DashboardBreadsIndexRoute,
   DashboardCouponsIndexRoute: DashboardCouponsIndexRoute,
   DashboardCustomersIndexRoute: DashboardCustomersIndexRoute,
@@ -209,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/coupons/$no': typeof DashboardCouponsNoRoute
   '/dashboard/breads': typeof DashboardBreadsIndexRoute
   '/dashboard/coupons': typeof DashboardCouponsIndexRoute
   '/dashboard/customers': typeof DashboardCustomersIndexRoute
@@ -222,6 +239,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/dashboard/coupons/$no': typeof DashboardCouponsNoRoute
   '/dashboard/breads': typeof DashboardBreadsIndexRoute
   '/dashboard/coupons': typeof DashboardCouponsIndexRoute
   '/dashboard/customers': typeof DashboardCustomersIndexRoute
@@ -237,6 +255,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/coupons/$no': typeof DashboardCouponsNoRoute
   '/dashboard/breads/': typeof DashboardBreadsIndexRoute
   '/dashboard/coupons/': typeof DashboardCouponsIndexRoute
   '/dashboard/customers/': typeof DashboardCustomersIndexRoute
@@ -253,6 +272,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/dashboard/'
+    | '/dashboard/coupons/$no'
     | '/dashboard/breads'
     | '/dashboard/coupons'
     | '/dashboard/customers'
@@ -265,6 +285,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dashboard'
+    | '/dashboard/coupons/$no'
     | '/dashboard/breads'
     | '/dashboard/coupons'
     | '/dashboard/customers'
@@ -278,6 +299,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/dashboard/'
+    | '/dashboard/coupons/$no'
     | '/dashboard/breads/'
     | '/dashboard/coupons/'
     | '/dashboard/customers/'
@@ -320,6 +342,7 @@ export const routeTree = rootRoute
       "filePath": "dashboard.tsx",
       "children": [
         "/dashboard/",
+        "/dashboard/coupons/$no",
         "/dashboard/breads/",
         "/dashboard/coupons/",
         "/dashboard/customers/",
@@ -332,6 +355,10 @@ export const routeTree = rootRoute
     },
     "/dashboard/": {
       "filePath": "dashboard/index.tsx",
+      "parent": "/dashboard"
+    },
+    "/dashboard/coupons/$no": {
+      "filePath": "dashboard/coupons/$no.tsx",
       "parent": "/dashboard"
     },
     "/dashboard/breads/": {
