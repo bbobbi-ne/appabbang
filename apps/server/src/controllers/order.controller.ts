@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as OrderService from '@/services/order.service';
+import * as paymentService from '@/services/payment.service';
 import { AppError } from '@/types';
 
 /** 주문 목록 조회 */
@@ -95,6 +96,25 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
   const { orderStatus } = req.body;
 
   await OrderService.update(Number(no), { orderStatus });
+
+  const payment = await paymentService.getOneByNo(Number(no));
+
+  // 접수요청 및 취소완료로 변경시 입금확인 false로 수정
+  if (['10', '51'].includes(orderStatus)) {
+    await paymentService.update(Number(no), {
+      isPaid: false,
+      paidConfirmedAt: null,
+    });
+  }
+
+  // 접수요청,취소요청,취소완료를 제외한 상태로 변경시 입금확인 true으로 수정
+  if (!['10', '51'].includes(orderStatus)) {
+    console.log('실행함');
+    await paymentService.update(Number(no), {
+      isPaid: true,
+      paidConfirmedAt: payment?.paidConfirmedAt ?? new Date(),
+    });
+  }
 
   res.status(200).json({ message: '주문 상태가 수정되었습니다.' });
 };
