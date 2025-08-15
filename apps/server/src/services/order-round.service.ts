@@ -233,8 +233,8 @@ export const createWithoutImage = async (body: CreateOrderRoundInput) => {
           name: body.name,
           startedAt: body.startedAt,
           endedAt: body.endedAt,
-          minOrderQty: body.minOrderQty,
-          maxOrderQty: body.maxOrderQty,
+          minOrderQty: Number(body.minOrderQty),
+          maxOrderQty: Number(body.maxOrderQty),
         },
       });
 
