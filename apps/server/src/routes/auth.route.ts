@@ -4,11 +4,13 @@ import { requireAuth, requireCustomer } from '@/middlewares/auth.middleware';
 import { loginValidator, validate } from '@/middlewares/validators/validate';
 import { asyncHandler } from '@/middlewares/error.middleware';
 import { KakaoClient } from '@/lib/kakao';
+import * as CustomerController from '@/controllers/customer.controller';
 import {
   createCustomerValidator,
   loginCustomerValidator,
-} from '@/middlewares/validators/customer-validate';
-import * as CustomerController from '@/controllers/customer.controller';
+  updateCustomerPwValidator,
+  updateCustomerValidator,
+} from '@/middlewares/validators/auth-validate';
 
 const router = Router();
 
@@ -27,22 +29,25 @@ router.get('/kakao/url', (_, res) => {
   });
 });
 
+/** GET /auth/customers/info : 고객 상세정보 */
+router.get('/customers/info', requireCustomer, asyncHandler(authController.getCustomerInfo));
+
 /** POST /auth/customers/login : 고객 회원가입 */
 router.post(
   '/customers/join',
   validate(createCustomerValidator),
-  asyncHandler(CustomerController.create),
+  asyncHandler(authController.create),
 );
 
 /** POST /customers/login : 고객 로그인 */
 router.post(
   '/customers/login',
   validate(loginCustomerValidator),
-  asyncHandler(CustomerController.login),
+  asyncHandler(authController.login),
 );
 
 /** POST /customers/logout : 고객 로그아웃 */
-router.post('/customers/logout', requireCustomer, asyncHandler(CustomerController.logout));
+router.post('/customers/logout', requireCustomer, asyncHandler(authController.logout));
 
 /** POST /auth/refresh : 액세스 토큰 재발급 */
 router.post('/refresh', asyncHandler(authController.refresh));
@@ -71,5 +76,21 @@ router.post('/kakao/login', async (req, res, next) => {
 
   console.log('/login finish');
 });
+
+/** POST /customers/update : 고객 정보 수정 */
+router.post(
+  '/customers/update',
+  requireCustomer,
+  validate(updateCustomerValidator),
+  asyncHandler(authController.update),
+);
+
+/** POST /customers/update/pw : 고객 정보 수정 - 비밀번호 변경 */
+router.post(
+  '/customers/update/pw',
+  requireCustomer,
+  validate(updateCustomerPwValidator),
+  asyncHandler(authController.updatePw),
+);
 
 export default router;

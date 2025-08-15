@@ -1,15 +1,5 @@
 import useToast from '@/hooks/useToast';
-import axios from 'axios';
-
-/** axios 생성한 것을 컴포넌트에서 사용함. */
-const client = axios.create({
-  baseURL: 'http://localhost:4000',
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-});
+import { client } from './common-apis';
 
 /** 전체 빵 목록 조회 */
 export async function searchBreadList() {
@@ -50,26 +40,4 @@ export async function insertOrders(data: any) {
           type: 'error',
         });
     });
-}
-
-/** 카카오 인가코드 받기 */
-export async function getKakaoCode() {
-  client.get(`http://localhost:4000/auth/kakao/url`).then((response) => {
-    document.location.href = response.data.url;
-  });
-}
-
-/** 최신 주문차수 조회 */
-export async function getLatest() {
-  return client.get(`/order-round/latest`);
-}
-
-/** 특정 주문차수 조회 */
-export async function getOrderRound(no: number) {
-  return client.get(`/order-round/${no}`);
-}
-
-/** 현재일시가 포함하는 특정 주문차수 조회 */
-export async function getOrderRoundNow() {
-  return client.get(`/order-round/now`);
 }

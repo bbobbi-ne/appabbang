@@ -15,6 +15,7 @@ import {
   FormMessage,
   Input,
   Label,
+  PasswordInput,
 } from '@appabbang/ui';
 import DaumPostApi from '@/components/common/daum-post-api';
 import { getFormattedMobile } from '@/utils';
@@ -24,12 +25,14 @@ import PrivacyTermsAgreedDialog from './privacy-terms-agreed-dialog';
 import useToast from '@/hooks/useToast';
 import { createCustomer } from '@/services/customer-apis';
 import { useAccessTokenStore } from '@/store/session';
+import { useCustomerStore } from '@/store/customer';
 
 const labelMinWidth = 'min-w-[120px]';
 
 export default function JoinForm() {
   const { addToast } = useToast();
-  const { set } = useAccessTokenStore();
+  const { set: setAccessToken } = useAccessTokenStore();
+  const { set: setCustomer } = useCustomerStore();
 
   // 폼 선언
   const form = useForm<JoinSchemaType>({
@@ -79,7 +82,7 @@ export default function JoinForm() {
    * 회원가입 submit
    */
   const onSubmit: SubmitHandler<JoinSchemaType> = (data) => {
-    createCustomer(data, set);
+    createCustomer(data, setAccessToken, setCustomer);
   };
 
   return (
@@ -135,7 +138,7 @@ export default function JoinForm() {
 
               <div className="w-full space-y-1">
                 <FormControl>
-                  <Input type="password" {...field} placeholder="비밀번호 입력" maxLength={30} />
+                  <PasswordInput {...field} placeholder="비밀번호 입력" maxLength={30} />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>
@@ -154,12 +157,7 @@ export default function JoinForm() {
               </FormLabel>
               <div className="w-full space-y-1">
                 <FormControl>
-                  <Input
-                    type="password"
-                    {...field}
-                    placeholder="비밀번호 확인 입력"
-                    maxLength={30}
-                  />
+                  <PasswordInput {...field} placeholder="비밀번호 확인 입력" maxLength={30} />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>

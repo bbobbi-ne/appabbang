@@ -1,3 +1,5 @@
+import { updateCustomerPw, type CustomerPwType } from '@/services/customer-apis';
+import { useAccessTokenStore } from '@/store/session';
 import {
   passwordModifyFormSchema,
   type PasswordModifyFormSchema,
@@ -11,18 +13,22 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input,
+  PasswordInput,
 } from '@appabbang/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 
+const labelMinWidth = 'min-w-[120px]';
+
 // 비밀번호 변경 페이지
 export default function PasswordPage() {
+  const { accessToken } = useAccessTokenStore();
+
   /** default form values */
   const defaultValues: PasswordModifyFormSchema = {
-    password: '', // 현재 비밀번호
-    passwordModify: '', // 새 비밀번호
-    passwordConfirm: '', // 비밀번호 확인
+    pw: '', // 현재 비밀번호
+    pwModify: '', // 새 비밀번호
+    pwConfirm: '', // 비밀번호 확인
   };
 
   /** form - schema connect */
@@ -39,9 +45,18 @@ export default function PasswordPage() {
   };
 
   /**
-   * form submit
+   * form submit - 비밀번호 변경
    */
-  const onSubmit: SubmitHandler<PasswordModifyFormSchema> = (data) => {};
+  const onSubmit: SubmitHandler<PasswordModifyFormSchema> = (data: CustomerPwType) => {
+    (async () => {
+      await updateCustomerPw(data, accessToken);
+
+      // 비밀번호는 민감정보이므로 세팅하지 않고 빈값으로 처리
+      form.setValue('pw', '');
+      form.setValue('pwModify', '');
+      form.setValue('pwConfirm', '');
+    })();
+  };
 
   return (
     <div className="w-full flex flex-row items-center justify-center">
@@ -50,66 +65,88 @@ export default function PasswordPage() {
           <form onSubmit={onFormHandler} className="w-2/3 *:m-2 *:has-[.submitBtn]:mt-5">
             <FormField
               control={form.control}
-              name="password"
+              name="pw"
               render={({ field }) => (
-                <FormItem className="w-full m-auto flex flex-row items-center justify-center">
-                  <FormLabel htmlFor="password" errorCheck={false} className="w-50">
-                    <span className="text-red-700">*</span> 현재 비밀번호 입력
+                <FormItem className="flex items-center">
+                  <FormLabel
+                    htmlFor="pw"
+                    errorCheck={false}
+                    className={`${labelMinWidth} whitespace-nowrap`}
+                  >
+                    <span className="text-red-700">*</span> 현재 비밀번호
                   </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      id="password"
-                      placeholder="현재 비밀번호 입력"
-                      {...field}
-                      onChange={(e) => field.onChange(e)}
-                    />
-                  </FormControl>
-                  <FormMessage />
+
+                  <div className="w-full space-y-1">
+                    <FormControl>
+                      <PasswordInput
+                        id="pw"
+                        {...field}
+                        placeholder="현재 비밀번호 입력"
+                        maxLength={30}
+                        value={field.value ?? ''}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </div>
                 </FormItem>
               )}
             />
 
             <FormField
               control={form.control}
-              name="passwordModify"
+              name="pwModify"
               render={({ field }) => (
-                <FormItem className="w-full m-auto flex flex-row items-center justify-center">
-                  <FormLabel htmlFor="id" errorCheck={false} className="w-50">
+                <FormItem className="flex items-center">
+                  <FormLabel
+                    htmlFor="pwModify"
+                    errorCheck={false}
+                    className={`${labelMinWidth} whitespace-nowrap`}
+                  >
                     <span className="text-red-700">*</span> 새 비밀번호
                   </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      id="passwordModify"
-                      placeholder="새 비밀번호 입력"
-                      {...field}
-                      onChange={(e) => field.onChange(e)}
-                    />
-                  </FormControl>
-                  <FormMessage />
+
+                  <div className="w-full space-y-1">
+                    <FormControl>
+                      <PasswordInput
+                        id="pwModify"
+                        placeholder="새 비밀번호 입력"
+                        {...field}
+                        onChange={(e) => field.onChange(e)}
+                        maxLength={30}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </div>
                 </FormItem>
               )}
             />
 
             <FormField
               control={form.control}
-              name="passwordConfirm"
+              name="pwConfirm"
               render={({ field }) => (
-                <FormItem className="w-full m-auto flex flex-row items-center justify-center">
-                  <FormLabel htmlFor="passwordConfirm" errorCheck={false} className="w-50">
+                <FormItem className="flex items-center">
+                  <FormLabel
+                    htmlFor="pwConfirm"
+                    errorCheck={false}
+                    className={`${labelMinWidth} whitespace-nowrap`}
+                  >
                     <span className="text-red-700">*</span> 비밀번호 확인
                   </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      id="passwordConfirm"
-                      placeholder="비밀번호 확인 입력"
-                      {...field}
-                      onChange={(e) => field.onChange(e)}
-                    />
-                  </FormControl>
-                  <FormMessage />
+
+                  <div className="w-full space-y-1">
+                    <FormControl>
+                      <PasswordInput
+                        id="pwConfirm"
+                        placeholder="비밀번호 확인 입력"
+                        {...field}
+                        onChange={(e) => field.onChange(e)}
+                        maxLength={30}
+                        value={field.value ?? ''}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </div>
                 </FormItem>
               )}
             />

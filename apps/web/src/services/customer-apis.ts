@@ -3,19 +3,26 @@
  */
 
 import useToast from '@/hooks/useToast';
-import axios from 'axios';
+import { client } from './common-apis';
 
 const { addToast } = useToast();
 
-/** axios 생성한 것을 컴포넌트에서 사용함. */
-const client = axios.create({
-  baseURL: 'http://localhost:4000',
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-});
+interface ICustomerProps {
+  no: number | null;
+  id: string | '';
+  name: string | '';
+  defaultAddressNo: number | null;
+  isServiceTermsAgreed: boolean | null;
+  isPrivacyTermsAgreed: boolean | null;
+  isMarketingTermsAgreed: boolean | null;
+  type: string | null;
+
+  // 필요 민감정보
+  // mobileNumber
+  // providerId
+  // providerType
+  // refreshToken
+}
 
 class CustomError extends Error {
   code: number;
@@ -40,16 +47,41 @@ export async function createCustomer(
     isPrivacyTermsAgreed: boolean;
     isMarketingTermsAgreed: boolean;
   },
-  set: (accountToken: string) => void,
+  setAccessToken: (accountToken: string) => void,
+  setCustomer: (model: ICustomerProps) => void,
 ) {
   try {
     const response = await client.post('/auth/customers/join', data);
 
     if (response.status === 201) {
+      // 고객 간단정보를 상태관리에 저장
+      const {
+        no,
+        id,
+        name,
+        defaultAddressNo,
+        isMarketingTermsAgreed,
+        isPrivacyTermsAgreed,
+        isServiceTermsAgreed,
+        type,
+      } = response.data.data;
+
+      const model = {
+        no,
+        id,
+        name,
+        defaultAddressNo,
+        isServiceTermsAgreed,
+        isPrivacyTermsAgreed,
+        isMarketingTermsAgreed,
+        type,
+      };
+      setCustomer(model);
+
       // accessToken을 상태관리에 저장
       const accessToken = response.data.accessToken;
       sessionStorage.setItem('accessToken', accessToken);
-      set(accessToken);
+      setAccessToken(accessToken);
 
       // success message
       addToast({
@@ -72,21 +104,53 @@ export async function createCustomer(
   }
 }
 
+/** 카카오 인가코드 받기 */
+export async function getKakaoCode() {
+  client.get(`http://localhost:4000/auth/kakao/url`).then((response) => {
+    document.location.href = response.data.url;
+  });
+}
+
 /**
  * 로그인
  */
 export const login = async (
   data: { id: string; pw: string },
-  set: (accessToken: string) => void,
+  setAccessToken: (accessToken: string) => void,
+  setCustomer: (model: ICustomerProps) => void,
 ) => {
   try {
     const response = await client.post('/auth/customers/login', data);
 
     if (response.status === 200) {
+      // 고객 간단정보를 상태관리에 저장
+      const {
+        no,
+        id,
+        name,
+        defaultAddressNo,
+        isMarketingTermsAgreed,
+        isPrivacyTermsAgreed,
+        isServiceTermsAgreed,
+        type,
+      } = response.data.data;
+
+      const model = {
+        no,
+        id,
+        name,
+        defaultAddressNo,
+        isServiceTermsAgreed,
+        isPrivacyTermsAgreed,
+        isMarketingTermsAgreed,
+        type,
+      };
+      setCustomer(model);
+
       // accessToken을 상태관리에 저장
       const accessToken = response.data.accessToken;
       sessionStorage.setItem('accessToken', accessToken);
-      set(accessToken);
+      setAccessToken(accessToken);
 
       // success message
       addToast({
@@ -135,6 +199,104 @@ export const logout = async (accessToken: string, reset: (accessToken: string) =
     } else {
       throw new CustomError(500, 'fail');
     }
+  } catch (e: any) {
+    addToast({
+      type: 'error',
+      message: e.response.data.error.message,
+    });
+  }
+};
+
+/**
+ * 현재 세션의 고객 정보 조회
+ */
+export const getCustomerInfo = async (accessToken: string) => {
+  try {
+    const response = await client.get('/auth/customers/info', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response.status === 200) return response.data;
+    else throw new CustomError(500, 'fail');
+  } catch (e: any) {
+    addToast({
+      type: 'error',
+      message: e.response.data.error.message,
+    });
+  }
+};
+
+/**
+ * 고객정보 수정
+ */
+export type CustomerType = {
+  id: string;
+  name: string;
+  mobileNumber: string;
+};
+export const updateCustomer = async (data: CustomerType, accessToken: string) => {
+  try {
+    const response = await client.post(
+      '/auth/customers/update',
+      {
+        id: data.id,
+        name: data.name,
+        mobileNumber: data.mobileNumber,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+
+    if (response.status === 200) {
+      addToast({
+        type: 'success',
+        message: '정상적으로 수정되었습니다.',
+      });
+
+      return response.data.customer;
+    } else throw new CustomError(500, 'fail');
+  } catch (e: any) {
+    addToast({
+      type: 'error',
+      message: e.response.data.error.message,
+    });
+  }
+};
+
+/**
+ * 고객정보 수정 : 비밀번호 변경
+ */
+export type CustomerPwType = {
+  pw: string;
+  pwModify: string;
+  pwConfirm: string;
+};
+export const updateCustomerPw = async ({ pw, pwModify }: CustomerPwType, accessToken: string) => {
+  try {
+    const response = await client.post(
+      '/auth/customers/update/pw',
+      { pw, pwModify },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+
+    if (response.status === 200) {
+      addToast({
+        type: 'success',
+        message: '정상적으로 수정되었습니다.',
+      });
+
+      // 비밀번호는 민감정보라서 딱히 던지는 데이터가 존재하지 않음.
+      return;
+    } else throw new CustomError(500, 'fail');
   } catch (e: any) {
     addToast({
       type: 'error',

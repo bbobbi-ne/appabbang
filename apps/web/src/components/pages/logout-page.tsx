@@ -6,6 +6,7 @@
 import { logout } from '@/services/customer-apis';
 import { useAccessTokenStore } from '@/store/session';
 import { useEffect } from 'react';
+import Loading from '../common/loading';
 
 export default function LogoutPage() {
   const { accessToken, reset } = useAccessTokenStore();
@@ -17,5 +18,5 @@ export default function LogoutPage() {
     logout(accessToken, reset);
   }, []);
 
-  return <></>;
+  return <Loading title="로그아웃" />;
 }

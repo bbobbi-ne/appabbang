@@ -8,9 +8,11 @@ import MenuButton from './menu-button';
 interface CustomerProp {
   id: string;
   name: string;
+  couponQty: number;
+  totalAmount: number;
 }
 
-function CustomerInfoCard({ id, name }: CustomerProp) {
+function CustomerInfoCard({ id, name, couponQty, totalAmount }: CustomerProp) {
   return (
     <div className="flex flex-col">
       <Card className="w-full h-full ml-auto mr-auto">
@@ -24,11 +26,11 @@ function CustomerInfoCard({ id, name }: CustomerProp) {
             </div>
             <div className="w-3/12 *:text-center *:m-5 border-r border-l">
               <p>누적금액</p>
-              <p className="font-bold ">1,000,000원</p>
+              <p className="font-bold ">{totalAmount}원</p>
             </div>
             <div className="w-3/12 *:text-center *:m-5">
               <p>총 보유 쿠폰 수</p>
-              <p className="font-bold ">2개</p>
+              <p className="font-bold ">{couponQty}개</p>
             </div>
           </div>
         </CardContent>

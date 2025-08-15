@@ -1,4 +1,5 @@
 import { login } from '@/services/customer-apis';
+import { useCustomerStore } from '@/store/customer';
 import { useAccessTokenStore } from '@/store/session';
 import { loginSchema, type LoginFormType } from '@/validate/login-form-schema';
 import {
@@ -10,6 +11,7 @@ import {
   FormMessage,
   Button,
   Form,
+  PasswordInput,
 } from '@appabbang/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from '@tanstack/react-router';
@@ -18,18 +20,19 @@ import { useForm } from 'react-hook-form';
 /** 로그인 폼 */
 function LoginForm() {
   const navigate = useNavigate();
-  const { set } = useAccessTokenStore();
+  const { set: setAccessToken } = useAccessTokenStore();
+  const { set: setCustomer } = useCustomerStore();
 
   const form = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { id: '', pw: '' },
+    defaultValues: { id: '', pw: '', type: 'customer' },
   });
 
   /**
    * 로그인
    */
   const onSubmit = (data: { id: string; pw: string }) => {
-    login(data, set);
+    login(data, setAccessToken, setCustomer);
   };
 
   return (
@@ -65,7 +68,26 @@ function LoginForm() {
 
               <div className="w-full space-y-1">
                 <FormControl>
-                  <Input type="password" {...field} placeholder="비밀번호 입력" maxLength={30} />
+                  <PasswordInput {...field} placeholder="비밀번호 입력" maxLength={30} />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </div>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem className="hidden">
+              <FormLabel errorCheck={false} className={`whitespace-nowrap px-2 py-3 flex-1/4 `}>
+                유저타입
+              </FormLabel>
+
+              <div className="w-full space-y-1">
+                <FormControl>
+                  <Input {...field} maxLength={30} value="customer" />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>
