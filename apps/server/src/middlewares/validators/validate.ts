@@ -527,3 +527,66 @@ export const deleteMyAddressValidator = [
     .toInt()
     .withMessage('no 를 올바르게 입력해주세요.'),
 ];
+
+/** 쿠폰 생성 validate */
+export const createCouponValidator = [
+  body('name').trim().notEmpty().withMessage('이름은 필수입니다'),
+  body('amount').trim().notEmpty().isInt().toInt().withMessage('할인금액은 필수입니다'),
+  body('expireAfterDays').trim().notEmpty().isInt().toInt().withMessage('만료일자는 필수입니다'),
+];
+
+/** 쿠폰 수정 validate */
+export const updateCouponValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  body('name')
+    .trim()
+    .notEmpty()
+    .withMessage('이름은 필수입니다')
+    .isLength({ min: 1, max: 30 })
+    .withMessage('이름은 1자 이상 30자 이하여야 합니다.'),
+  body('amount')
+    .trim()
+    .notEmpty()
+    .withMessage('할인금액은 필수입니다')
+    .isInt({ min: 100, max: 50000 })
+    .toInt()
+    .withMessage('할인금액은 100원 이상 50,000원 이하여야 합니다.'),
+  body('expireAfterDays')
+    .trim()
+    .notEmpty()
+    .withMessage('만료일자는 필수입니다')
+    .isInt({ min: 1, max: 99999 })
+    .toInt()
+    .withMessage('만료일자는 1일 이상 99,999일 이하여야 합니다.'),
+];
+
+/** 쿠폰 삭제 validate */
+export const deleteCouponValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+];
+
+/** 쿠폰 발급 validate (쿠폰하나를 여러 고객에게 발급) */
+export const issueCouponValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  body('noList')
+    .exists()
+    .withMessage('noList(고객번호 배열)는 필수입니다')
+    .isArray({ min: 1 })
+    .withMessage('noList는 하나 이상의 요소를 가진 배열이어야 합니다.'),
+  body('noList.*').isInt().toInt().withMessage('noList 안의 값은 정수여야 합니다.'),
+];
