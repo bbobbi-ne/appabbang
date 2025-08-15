@@ -560,6 +560,9 @@ paths:
                   type: object
                   required:
                     - no
+                    - address
+                    - addressDetail
+                    - deliveryMethodName
                     - orderNumber
                     - orderStatus
                     - orderStatusName
@@ -608,6 +611,22 @@ paths:
                       format: date-time
                       description: 주문 수정일시
                       example: '2024-06-22T12:34:56.000Z'
+                    address:
+                      type: string
+                      description: "주소"
+                      example : "서울시 강남구"
+                    addressDetail:
+                      type: string
+                      description: "상세 주소"
+                      example : "123-45"
+                    deliveryMethodName:
+                      type: string
+                      description: "배송방법"
+                      example : "우체국"
+                    zipcode:
+                      type: string
+                      description: "우편번호"
+                      example : "12345"
                     payment:
                       type: object
                       properties:
@@ -759,6 +778,7 @@ paths:
                   recipientMobile: "010-1234-5678"
                   address: "서울시 강남구"
                   addressDetail: "123-45"
+                  discountAmount: 0
                   zipcode: "12345"
                   message: "문 앞에 놓아주세요"
                   orderRoundNo: 1
@@ -849,6 +869,7 @@ paths:
                   - isPaymentRefundTermsAgreed
                   - createdAt
                   - updatedAt
+                  - orderItems
                 properties:
                   no:
                     type: integer
