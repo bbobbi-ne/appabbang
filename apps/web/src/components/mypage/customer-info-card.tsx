@@ -4,15 +4,32 @@
 
 import { Card, CardContent } from '@appabbang/ui';
 import MenuButton from './menu-button';
+import { useAccessTokenStore } from '@/store/session';
+import { useCustomerStore } from '@/store/customer';
+import { useEffect, useState } from 'react';
+import { getCustomerInfo } from '@/services/customer-apis';
 
-interface CustomerProp {
-  id: string;
-  name: string;
-  couponQty: number;
-  totalAmount: number;
-}
+function CustomerInfoCard() {
+  const { accessToken } = useAccessTokenStore();
+  const {
+    customer: { id, name },
+  } = useCustomerStore();
+  const [_, setCustomerDetail] = useState();
+  const [couponQty, setCouponQty] = useState<number>(0);
+  const [totalAmount, setTotalAmount] = useState<number>(0);
 
-function CustomerInfoCard({ id, name, couponQty, totalAmount }: CustomerProp) {
+  /**
+   * 고객 상세정보 조회
+   */
+  useEffect(() => {
+    (async () => {
+      const { customer, coupon, totalAmount } = await getCustomerInfo(accessToken);
+      setCustomerDetail(customer);
+      setCouponQty(coupon.length);
+      setTotalAmount(totalAmount);
+    })();
+  }, [accessToken]);
+
   return (
     <div className="flex flex-col">
       <Card className="w-full h-full ml-auto mr-auto">
