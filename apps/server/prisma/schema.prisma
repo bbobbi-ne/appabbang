@@ -152,7 +152,7 @@ model Customer {
   pw                    String            @db.VarChar(300)                        // 비밀번호
   name                  String            @db.VarChar(30)                         // 이름
   mobileNumber          String            @db.VarChar(20) @map("mobile_number")   // 전화번호
-  refreshToken          String?           @db.VarChar(300) @map("refresh_token")  // 리프레시 토큰
+  refreshToken          String?           @map("refresh_token")  // 리프레시 토큰
   providerType          String?           @db.VarChar(30) @map("provider_type")   // 소셜 로그인 타입 코드
   providerId            String?           @db.VarChar(100) @map("provider_id")    // 소셜 로그인 식별자
   defaultAddressNo      Int?              @map("default_address_no")              // 기본 배송지
@@ -208,8 +208,8 @@ model Coupon {
 /** 고객에게 발급된 쿠폰 */
 model CustomerCoupon {
   no                    Int               @id @default(autoincrement())              // 고객에게 발급된 쿠폰 번호
-  issuedAt              DateTime          @map("issued_at")                          // 쿠폰 발급일
-  expiredAt             DateTime          @map("expired_at")                         // 쿠폰 만료일
+  issuedAt              DateTime          @map("issued_at")                          // 쿠폰 발급일 (현재일자(또는 발생일자))
+  expiredAt             DateTime          @map("expired_at")                         // 쿠폰 만료일 (현재일자(또는 발생일자) + Coupon.expireAfterDays)
   isUsed                Boolean           @default(false) @map("is_used")            // 사용여부
   isExpired             Boolean           @default(false) @map("is_expired")         // 만료여부
 

@@ -1,3 +1,4 @@
+import LogoutPage from '@/components/pages/logout-page';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/logout')({
@@ -5,5 +6,5 @@ export const Route = createFileRoute('/logout')({
 });
 
 function RouteComponent() {
-  return <div>작업 전입니다... "/logout/"!</div>;
+  return <LogoutPage />;
 }

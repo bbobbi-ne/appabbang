@@ -2,7 +2,7 @@ import { Card } from '@appabbang/ui';
 import CardComment from './card-comment';
 
 interface LoadingProp {
-  title: string;
+  title?: string;
 }
 
 function Loading({ title }: LoadingProp) {
@@ -13,7 +13,7 @@ function Loading({ title }: LoadingProp) {
           className="ml-10 mb-2"
           type="loading"
           title="Loading ..."
-          comment={`[${title}] 잠시만 기다려주세요...`}
+          comment={title ? `[${title}] 잠시만 기다려주세요...` : '잠시만 기다려주세요...'}
         />
       </Card>
     </div>

@@ -20,9 +20,6 @@ router.get('/', requireAdmin, asyncHandler(customerController.getList));
 /** GET /customers/{no} : 고객 상세 조회 */
 router.get('/:no', requireAdmin, asyncHandler(customerController.getOne));
 
-/** POST /customers : 고객 생성 */
-// router.post('/', requireAdmin, asyncHandler(customerController.create));
-
 /** PUT /customers/{no} : 고객 수정 */
 // router.put('/:no', requireAdmin, asyncHandler(customerController.update));
 

@@ -22,7 +22,7 @@ function RouteComponent() {
   const fetchLogin = useCallback(
     async (code: string) => {
       try {
-        const response = await (
+        await (
           await fetch('http://localhost:4000/auth/kakao/login', {
             method: 'POST',
             headers: {
@@ -32,11 +32,9 @@ function RouteComponent() {
           })
         ).json();
 
-        console.log(response);
-        navigate({ to: '/order/form' }); // 주문서 폼으로 이동
+        navigate({ to: '/' }); // 메인화면으로 이동
       } catch (error) {
         alert('Function fetchLogin error!');
-        console.error(error);
       }
     },
     [navigate],

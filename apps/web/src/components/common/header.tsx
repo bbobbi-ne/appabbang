@@ -1,8 +1,11 @@
-import { getOrderRoundNow } from '@/services/apis';
+import useToast from '@/hooks/useToast';
+import { getOrderRoundNow } from '@/services/order-round-apis';
+import { useAccessTokenStore } from '@/store/session';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { User, ScrollText, LogIn, LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import Loading from './loading';
 
 export interface IOrderRoundProps {
   no: number;
@@ -20,7 +23,8 @@ export interface IOrderRoundProps {
 export default function Header() {
   const [data, setData] = useState<IOrderRoundProps>();
   const navigate = useNavigate();
-  const flag = true; // 로그인 세션 정보
+  const { accessToken } = useAccessTokenStore();
+  const { addToast } = useToast();
 
   // 현재 진행중인 주문차수 조회
   const {
@@ -43,7 +47,20 @@ export default function Header() {
     });
   };
 
-  if (error || !data) return <div>주문 정보를 불러오지 못했습니다.</div>;
+  const onMypage = () => {
+    if (!accessToken) {
+      addToast({
+        type: 'warning',
+        message: '로그인한 고객님만 접근 가능합니다.',
+      });
+
+      return;
+    }
+
+    navigate({ to: '/mypage/info' });
+  };
+
+  if (error || !data) return <Loading />;
 
   return (
     <header className="w-full fixed top-0 left-0 right-0 z-50 bg-background border-b">
@@ -59,17 +76,18 @@ export default function Header() {
               onClick={() => onOrderMove(data.no)}
             />
           ) : null}
-          <Link to="/mypage/info" className="px-2 text-xs">
-            <User strokeWidth={1} size={16} className="text-primary hover:text-foreground" />
-          </Link>
 
-          {flag ? (
-            <Link to="/login" className="px-2 text-xs">
-              <LogIn strokeWidth={1} size={16} className="text-primary hover:text-foreground" />
-            </Link>
-          ) : (
+          <div className="px-2 text-xs cursor-pointer" onClick={onMypage}>
+            <User strokeWidth={1} size={16} className="text-primary hover:text-foreground" />
+          </div>
+
+          {accessToken ? (
             <Link to="/logout" className="px-2 text-xs">
               <LogOut strokeWidth={1} size={16} className="text-primary hover:text-foreground" />
+            </Link>
+          ) : (
+            <Link to="/login" className="px-2 text-xs">
+              <LogIn strokeWidth={1} size={16} className="text-primary hover:text-foreground" />
             </Link>
           )}
         </nav>

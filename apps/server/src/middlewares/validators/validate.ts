@@ -393,74 +393,6 @@ export const deleteOrderValidator = [
     .withMessage('no 를 올바르게 입력해주세요.'),
 ];
 
-/**
- * 주문차수 등록 validate
- */
-export const createOrderRoundValidator = [
-  body('name').trim().notEmpty().withMessage('주문차수명은 필수 입력항목입니다.'),
-  body('orderRoundBreads').exists().withMessage('빵 목록은 필수 입력항목입니다.'),
-  // .isArray({ min: 1 })
-  // .withMessage('빵 목록은 하나 이상의 요소를 가진 배열이어야 합니다.'),
-  body('orderRoundBreads.*').isInt().toInt().withMessage('빵 목록 안의 값은 정수여야 합니다.'),
-  body('startedAt')
-    .trim()
-    .notEmpty()
-    .withMessage('시작일자는 필수 입력항목입니다.')
-    .isISO8601()
-    .withMessage('시작일자는 ISO8601 날짜 형식이어야 합니다.'),
-  body('endedAt')
-    .trim()
-    .notEmpty()
-    .withMessage('종료일자는 필수 입력항목입니다.')
-    .isISO8601()
-    .withMessage('종료일자는 ISO8601 날짜 형식이어야 합니다.'),
-];
-
-/**
- * 주문차수 수정 validate
- */
-export const updateOrderRoundValidator = [
-  param('no')
-    .exists()
-    .withMessage('주문차수No는 필수 입력항목입니다.')
-    .isInt()
-    .toInt()
-    .withMessage('no 를 올바르게 입력해주세요.'),
-  body('seq')
-    .exists()
-    .withMessage('주문차수는 필수 입력항목입니다.')
-    .isInt()
-    .toInt()
-    .withMessage('주문차수를 올바르게 입력해주세요.'),
-  body('name').trim().notEmpty().withMessage('주문차수명은 필수 입력항목입니다.'),
-  body('startedAt')
-    .trim()
-    .notEmpty()
-    .withMessage('시작일자는 필수 입력항목입니다.')
-    .isISO8601()
-    .withMessage('시작일자는 ISO8601 날짜 형식이어야 합니다.'),
-  body('endedAt')
-    .trim()
-    .notEmpty()
-    .withMessage('종료일자는 필수 입력항목입니다.')
-    .isISO8601()
-    .withMessage('종료일자는 ISO8601 날짜 형식이어야 합니다.'),
-  body('breadNoList').exists().withMessage('빵 목록은 필수 입력항목입니다.'),
-  body('breadNoList.*').isInt().toInt().withMessage('빵 목록 안의 값은 정수여야 합니다.'),
-];
-
-/**
- * 주문차수 삭제 validate
- */
-export const deleteOrderRoundImageValidator = [
-  body('publicId')
-    .exists()
-    .withMessage('이미지 ID값이 누락되었습니다. (publicId)')
-    .trim()
-    .notEmpty()
-    .withMessage('이미지 ID는 비어있을 수 없습니다.'),
-];
-
 /** 배송지 상세 조회 validate */
 export const getMyAddressValidator = [
   param('no')
@@ -519,4 +451,67 @@ export const deleteMyAddressValidator = [
     .isInt()
     .toInt()
     .withMessage('no 를 올바르게 입력해주세요.'),
+];
+
+/** 쿠폰 생성 validate */
+export const createCouponValidator = [
+  body('name').trim().notEmpty().withMessage('이름은 필수입니다'),
+  body('amount').trim().notEmpty().isInt().toInt().withMessage('할인금액은 필수입니다'),
+  body('expireAfterDays').trim().notEmpty().isInt().toInt().withMessage('만료일자는 필수입니다'),
+];
+
+/** 쿠폰 수정 validate */
+export const updateCouponValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  body('name')
+    .trim()
+    .notEmpty()
+    .withMessage('이름은 필수입니다')
+    .isLength({ min: 1, max: 30 })
+    .withMessage('이름은 1자 이상 30자 이하여야 합니다.'),
+  body('amount')
+    .trim()
+    .notEmpty()
+    .withMessage('할인금액은 필수입니다')
+    .isInt({ min: 100, max: 50000 })
+    .toInt()
+    .withMessage('할인금액은 100원 이상 50,000원 이하여야 합니다.'),
+  body('expireAfterDays')
+    .trim()
+    .notEmpty()
+    .withMessage('만료일자는 필수입니다')
+    .isInt({ min: 1, max: 99999 })
+    .toInt()
+    .withMessage('만료일자는 1일 이상 99,999일 이하여야 합니다.'),
+];
+
+/** 쿠폰 삭제 validate */
+export const deleteCouponValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+];
+
+/** 쿠폰 발급 validate (쿠폰하나를 여러 고객에게 발급) */
+export const issueCouponValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  body('noList')
+    .exists()
+    .withMessage('noList(고객번호 배열)는 필수입니다')
+    .isArray({ min: 1 })
+    .withMessage('noList는 하나 이상의 요소를 가진 배열이어야 합니다.'),
+  body('noList.*').isInt().toInt().withMessage('noList 안의 값은 정수여야 합니다.'),
 ];

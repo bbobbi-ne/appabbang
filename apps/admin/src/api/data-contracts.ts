@@ -370,6 +370,7 @@ export type OrdersListData = {
    * @example "2024-06-22T12:34:56.000Z"
    */
   updatedAt: string;
+
   /**
    * 주소
    * @example "서울시 강남구"
@@ -611,12 +612,14 @@ export interface OrdersDetailData {
   /**
    * 송장번호
    * @example ""
+
    */
   trackingNumber: string;
   /**
    * 결제, 환불 약관 동의여부
    * @example true
    */
+
   isPaymentRefundTermsAgreed: boolean;
   /**
    * 주문 생성일시
@@ -1998,3 +2001,150 @@ export type AddressesUpdatePayload = object;
 export type AddressesUpdateData = any;
 
 export type AddressesDeleteData = any;
+
+export type CouponsListData = {
+  /**
+   * 쿠폰 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 쿠폰명
+   * @example "첫 로그인 쿠폰"
+   */
+  name: string;
+  /**
+   * 할인 금액 (원)
+   * @example 3000
+   */
+  amount: number;
+  /**
+   * 발급일 기준 만료일
+   * @example 30
+   */
+  expireAfterDays: number;
+  /**
+   * 생성일시
+   * @format date-time
+   * @example "2024-01-01T00:00:00.000Z"
+   */
+  createdAt: string;
+  /**
+   * 수정일시
+   * @format date-time
+   * @example "2024-01-01T00:00:00.000Z"
+   */
+  updatedAt: string;
+}[];
+
+export interface CouponsCreatePayload {
+  /**
+   * 쿠폰명
+   * @example "신규 가입 쿠폰"
+   */
+  name: string;
+  /**
+   * 할인 금액 (원)
+   * @example 5000
+   */
+  amount: number;
+  /**
+   * 발급일 기준 만료일
+   * @example 60
+   */
+  expireAfterDays: number;
+}
+
+export interface CouponsCreateData {
+  /**
+   * 성공 메시지
+   * @example "쿠폰이 생성되었습니다."
+   */
+  message?: string;
+}
+
+export interface CouponsDetailData {
+  /**
+   * 쿠폰 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 쿠폰명
+   * @example "첫 로그인 쿠폰"
+   */
+  name: string;
+  /**
+   * 할인 금액 (원)
+   * @example 3000
+   */
+  amount: number;
+  /**
+   * 발급일 기준 만료일
+   * @example 30
+   */
+  expireAfterDays: number;
+  /**
+   * 수정 불가 여부
+   * @example true
+   */
+  isRestricted: boolean;
+}
+
+export interface CouponsUpdatePayload {
+  /**
+   * 쿠폰명
+   * @example "수정된 쿠폰명"
+   */
+  name?: string;
+  /**
+   * 할인 금액 (원)
+   * @example 5000
+   */
+  amount?: number;
+  /**
+   * 발급일 기준 만료일
+   * @example 60
+   */
+  expireAfterDays?: number;
+}
+
+export interface CouponsUpdateData {
+  /**
+   * 성공 메시지
+   * @example "쿠폰이 수정되었습니다."
+   */
+  message?: string;
+}
+
+export interface CouponsDeleteData {
+  /**
+   * 성공 메시지
+   * @example "쿠폰이 삭제되었습니다."
+   */
+  message?: string;
+}
+
+export interface IssueCreatePayload {
+  /**
+   * 쿠폰을 발급받을 고객 번호 배열
+   * @example [1,2,3]
+   */
+  noList: number[];
+}
+
+export interface IssueCreateData {
+  /**
+   * 성공 메시지
+   * @example "쿠폰이 발급되었습니다"
+   */
+  message: string;
+}
+
+export type IssueCreateError = {
+  /**
+   * 에러 메시지
+   * @example "고객번호는 필수입니다"
+   */
+  error?: string;
+};

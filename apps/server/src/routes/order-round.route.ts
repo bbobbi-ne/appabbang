@@ -3,14 +3,14 @@
  */
 import { Router } from 'express';
 import * as orderRoundController from '@/controllers/order-round.controller';
+import { validate } from '@/middlewares/validators/validate';
+import { asyncHandler } from '@/middlewares/error.middleware';
+import { optionalAuth, requireAdmin } from '@/middlewares/auth.middleware';
 import {
   createOrderRoundValidator,
   deleteOrderRoundImageValidator,
   updateOrderRoundValidator,
-  validate,
-} from '@/middlewares/validators/validate';
-import { asyncHandler } from '@/middlewares/error.middleware';
-import { optionalAuth, requireAdmin } from '@/middlewares/auth.middleware';
+} from '@/middlewares/validators/order-round.validate';
 
 const router = Router();
 
