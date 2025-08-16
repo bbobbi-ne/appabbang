@@ -42,7 +42,7 @@ export const create = async (req: Request, res: Response) => {
   } = req.body;
 
   // 중복계정 확인
-  const findCustomer = await userService.getByIdForLogin(id);
+  const findCustomer = await userService.getCustomerId(id);
   if (findCustomer) throw AppError.internalServerError('이미 존재하는 아이디입니다.');
 
   // 비밀번호 해싱

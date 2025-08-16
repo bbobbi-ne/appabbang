@@ -228,6 +228,21 @@ export const getOne = async (id: string) => {
 };
 
 /**
+ * 고객 ID 조회
+ */
+export const getCustomerId = async (id: string) => {
+  const result = await prisma.$transaction(async (tx) => {
+    const customer = await tx.customer.findFirst({
+      where: { id },
+    });
+
+    return customer;
+  });
+
+  return result;
+};
+
+/**
  * 고객 상세정보 조회
  */
 export const getCustomerInfo = async (no: number) => {
