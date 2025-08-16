@@ -2,7 +2,112 @@ import { prisma } from '@/lib/prisma';
 import { AppError } from '@/types';
 import { Address } from '@prisma/client';
 
-/** 배송지 목록 조회 */
+/** 내 정보 상세정보 조회 */
+export const getMyInfo = async (no: number) => {
+  const result = await prisma.$transaction(async (tx) => {
+    // 고객정보
+    const customer = await tx.customer.findUnique({
+      where: { no },
+      select: {
+        no: true,
+        id: true,
+        name: true,
+        mobileNumber: true,
+        defaultAddressNo: true,
+        createdAt: true,
+
+        // relationship
+        address: true,
+        customerCoupon: true,
+      },
+    });
+
+    // 할인정보
+    const coupon = await tx.customerCoupon.findMany({
+      where: { customerNo: no },
+      include: {
+        coupon: true,
+      },
+    });
+
+    return { customer, coupon };
+  });
+
+  return result;
+};
+
+/**
+ * 내 정보 상세 조회(민감정보 조회 전용)
+ * email, pw, refreshToken 등
+ */
+export const getMyInfoDetail = async (id: string) => {
+  const result = await prisma.$transaction(async (tx) => {
+    const customer = await tx.customer.findUnique({ where: { id } });
+
+    return customer;
+  });
+
+  return result;
+};
+
+/**
+ * 주문 누적금액 조회
+ */
+export const getOrderAccumulatedAmount = async (no: number) => {
+  const result = await prisma.$transaction(async (tx) => {
+    let totalPrice = 0;
+
+    const getTotalPrice = await tx.order.aggregate({
+      where: { customerNo: no },
+      _sum: { totalPrice: true },
+    });
+
+    if (getTotalPrice._sum) {
+      totalPrice = getTotalPrice._sum.totalPrice || 0;
+    }
+
+    return totalPrice;
+  });
+
+  return result;
+};
+
+/**
+ * 내 정보 수정
+ */
+export const update = async (data: {
+  id: string;
+  name: string;
+  mobileNumber: string;
+  createdAt: string;
+}) => {
+  const result = await prisma.$transaction(async (tx) => {
+    const updateCustomer = await tx.customer.update({
+      where: { id: data.id },
+      data: { mobileNumber: data.mobileNumber },
+    });
+
+    return updateCustomer;
+  });
+
+  return result;
+};
+
+/**
+ * 내 정보 수정 : 비밀번호 변경
+ */
+export const updatePw = async (no: number, hashedPw: string): Promise<void> => {
+  await prisma.$transaction(async (tx) => {
+    await tx.customer.update({
+      where: { no },
+      data: {
+        pw: hashedPw,
+      },
+    });
+  });
+};
+
+/** 내 배송지 목록 조회 */
 export const getAddressList = async (customerNo: number) => {
   const list = await prisma.address.findMany({
     where: { customerNo },
@@ -33,7 +138,7 @@ export const getAddressList = async (customerNo: number) => {
   return result;
 };
 
-/** 배송지 상세 조회 */
+/** 내 배송지 상세 조회 */
 export const getAddressOne = async (no: number, customerNo: number) => {
   const one = await prisma.address.findUnique({ where: { no, customerNo } });
 
@@ -52,7 +157,7 @@ export const getAddressOne = async (no: number, customerNo: number) => {
   return result;
 };
 
-/** 배송지 등록 */
+/** 내 배송지 등록 */
 export const createAddress = async (
   customerNo: number,
   data: Omit<Address, 'no' | 'customerNo' | 'createdAt' | 'updatedAt'>,
@@ -75,7 +180,7 @@ export const createAddress = async (
   });
 };
 
-/** 배송지 수정 */
+/** 내 배송지 수정 */
 export const updateAddress = async (
   no: number,
   customerNo: number,
@@ -94,7 +199,7 @@ export const updateAddress = async (
   });
 };
 
-/** 배송지 삭제 */
+/** 내 배송지 삭제 */
 export const deleteAddress = async (no: number, customerNo: number) => {
   const customer = await prisma.customer.findFirst({ where: { no: customerNo } });
   const defaultAddressNo = customer?.defaultAddressNo;
