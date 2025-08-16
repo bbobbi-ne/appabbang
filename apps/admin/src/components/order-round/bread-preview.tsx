@@ -1,9 +1,9 @@
-import { useBreadsDetailQuery } from '@/hooks/use-breads';
-import { formatKR } from '@/utils/format';
+import { useGetBreadDetailQuery } from '@/hooks/use-breads';
+import { formatCurrencyKR } from '@/utils/format';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@appabbang/ui';
 
 function BreadPreview({ no }: { no: number }) {
-  const { data, isSuccess, isLoading } = useBreadsDetailQuery(no);
+  const { data, isLoading } = useGetBreadDetailQuery(no);
 
   if (isLoading) return;
 
@@ -23,7 +23,7 @@ function BreadPreview({ no }: { no: number }) {
         <div className="space-y-1">
           <div className="flex text-xs">
             <p className="flex-2/5">가격 : </p>
-            <p className="flex-4/5">{formatKR(data!.unitPrice)}원</p>
+            <p className="flex-4/5">{formatCurrencyKR(data!.unitPrice)}원</p>
           </div>
           <div className="flex text-xs">
             <p className="flex-2/5">알레르기 정보 : </p>

@@ -1,24 +1,27 @@
 import { Router } from 'express';
 import * as authController from '@/controllers/auth.controller';
-import { requireAuth, requireCustomer } from '@/middlewares/auth.middleware';
+import { requireAuth } from '@/middlewares/auth.middleware';
 import { loginValidator, validate } from '@/middlewares/validators/validate';
 import { asyncHandler } from '@/middlewares/error.middleware';
 import { KakaoClient } from '@/lib/kakao';
-import * as CustomerController from '@/controllers/customer.controller';
-import {
-  createCustomerValidator,
-  loginCustomerValidator,
-  updateCustomerPwValidator,
-  updateCustomerValidator,
-} from '@/middlewares/validators/auth-validate';
 
 const router = Router();
 
-/** POST /auth/login : 로그인 */
+/** POST /auth/login : 로그인 (어드민, 고객) */
 router.post('/login', validate(loginValidator), asyncHandler(authController.login));
 
-/** GET /auth/me : 내 정보 조회 */
+/** GET /auth/me : 내 정보 조회 (어드민, 고객) */
 router.get('/me', requireAuth, asyncHandler(authController.me));
+
+/** POST /auth/refresh : 액세스 토큰 재발급 */
+router.post('/refresh', asyncHandler(authController.refresh));
+
+/** POST /logout : 로그아웃 (어드민, 고객) */
+router.post('/logout', requireAuth, asyncHandler(authController.logout));
+
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
 /** GET /auth/kakao/url : 카카오 로그인 URL 발급 */
 router.get('/kakao/url', (_, res) => {
@@ -28,29 +31,6 @@ router.get('/kakao/url', (_, res) => {
     url,
   });
 });
-
-/** GET /auth/customers/info : 고객 상세정보 */
-router.get('/customers/info', requireCustomer, asyncHandler(authController.getCustomerInfo));
-
-/** POST /auth/customers/login : 고객 회원가입 */
-router.post(
-  '/customers/join',
-  validate(createCustomerValidator),
-  asyncHandler(authController.create),
-);
-
-/** POST /customers/login : 고객 로그인 */
-router.post(
-  '/customers/login',
-  validate(loginCustomerValidator),
-  asyncHandler(authController.login),
-);
-
-/** POST /customers/logout : 고객 로그아웃 */
-router.post('/customers/logout', requireCustomer, asyncHandler(authController.logout));
-
-/** POST /auth/refresh : 액세스 토큰 재발급 */
-router.post('/refresh', asyncHandler(authController.refresh));
 
 /** POST /auth/kakao/login : 카카오 로그인 */
 router.post('/kakao/login', async (req, res, next) => {
@@ -76,21 +56,5 @@ router.post('/kakao/login', async (req, res, next) => {
 
   console.log('/login finish');
 });
-
-/** PUT /customers/update : 고객 정보 수정 */
-router.put(
-  '/customers/update',
-  requireCustomer,
-  validate(updateCustomerValidator),
-  asyncHandler(authController.update),
-);
-
-/** PUT /customers/update/pw : 고객 정보 수정 - 비밀번호 변경 */
-router.put(
-  '/customers/update/pw',
-  requireCustomer,
-  validate(updateCustomerPwValidator),
-  asyncHandler(authController.updatePw),
-);
 
 export default router;

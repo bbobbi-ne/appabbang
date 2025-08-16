@@ -1,35 +1,18 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  ScrollArea,
-} from '@appabbang/ui';
-import { useState, type Dispatch, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import OrderRoundForm from './order-round-form';
 import { useOrderRoundDetailQuery, useOrderRoundUpdateMutation } from '@/hooks/use-order-round';
 import { format } from 'date-fns';
+import { DialogLayout } from '../ui/dialog-layout';
 
 function OrderRoundModifyDialog({ children, no }: { children: ReactNode; no: number }) {
-  const [open, setOpen] = useState(false);
-
   return (
-    <Dialog open={open} onOpenChange={(v) => setOpen(v)}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      {open && <OrderRoundModifyDialogBody setOpen={setOpen} no={no} />}
-    </Dialog>
+    <DialogLayout trigger={children} description="주문차수를 등록해주세요" title="주문차수 등록">
+      {({ close }) => <DialogBody no={no} close={close} />}
+    </DialogLayout>
   );
 }
 
-function OrderRoundModifyDialogBody({
-  setOpen,
-  no,
-}: {
-  setOpen: Dispatch<React.SetStateAction<boolean>>;
-  no: number;
-}) {
+function DialogBody({ close, no }: { close: () => void; no: number }) {
   const { data, isLoading } = useOrderRoundDetailQuery(no);
   const { orderRoundUpdateMutation } = useOrderRoundUpdateMutation();
 
@@ -56,26 +39,14 @@ function OrderRoundModifyDialogBody({
     endedAt: splitIsoToDateTime(data?.endedAt!),
   };
 
+  console.log(currentValues, '수정다이어로그');
   return (
-    <DialogContent
-      onInteractOutside={(e) => {
-        e.preventDefault();
-      }}
-      className="sm:max-w-xl h-fit p-0"
-    >
-      <ScrollArea className="h-[700px] p-6">
-        <DialogHeader>
-          <DialogTitle>주문차수 등록</DialogTitle>
-        </DialogHeader>
-        <DialogDescription hidden>주문차수를 등록해주세요</DialogDescription>
-        <OrderRoundForm
-          setOpen={setOpen}
-          currentValues={currentValues}
-          submitFn={orderRoundUpdateMutation}
-          no={no}
-        />
-      </ScrollArea>
-    </DialogContent>
+    <OrderRoundForm
+      onSuccess={close}
+      currentValues={currentValues}
+      submitFn={orderRoundUpdateMutation}
+      no={no}
+    />
   );
 }
 

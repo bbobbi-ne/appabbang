@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { CookieOptions } from 'express';
 import { ClientPayload } from '@/types/client-payload';
 
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS = 12;
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || '';
 const JWT_ACCESS_EXPIRES_IN = '1h';
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || '';

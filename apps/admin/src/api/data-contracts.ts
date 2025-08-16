@@ -370,6 +370,27 @@ export type OrdersListData = {
    * @example "2024-06-22T12:34:56.000Z"
    */
   updatedAt: string;
+
+  /**
+   * 주소
+   * @example "서울시 강남구"
+   */
+  address: string;
+  /**
+   * 상세 주소
+   * @example "123-45"
+   */
+  addressDetail: string;
+  /**
+   * 배송방법
+   * @example "우체국"
+   */
+  deliveryMethodName: string;
+  /**
+   * 우편번호
+   * @example "12345"
+   */
+  zipcode?: string;
   payment?: {
     /**
      * 입금 확인 여부
@@ -591,12 +612,14 @@ export interface OrdersDetailData {
   /**
    * 송장번호
    * @example ""
+
    */
   trackingNumber: string;
   /**
    * 결제, 환불 약관 동의여부
    * @example true
    */
+
   isPaymentRefundTermsAgreed: boolean;
   /**
    * 주문 생성일시
@@ -611,7 +634,7 @@ export interface OrdersDetailData {
    */
   updatedAt: string;
   /** 주문 아이템 목록 */
-  orderItems?: {
+  orderItems: {
     /**
      * 빵 번호
      * @example 1

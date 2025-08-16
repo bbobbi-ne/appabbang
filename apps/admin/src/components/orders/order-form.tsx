@@ -14,7 +14,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import type { OrdersDetailData } from '@/api/data-contracts';
-import { useOrderAndStatusAndDliveryTypeQuery } from '@/hooks/use-order';
+import { useGetOrderStatusQuery } from '@/hooks/use-common-code';
 
 export const orderScheme = z.object({
   trackingNumber: z.string(),
@@ -27,7 +27,7 @@ function OrderForm({ orderData }: { orderData: OrdersDetailData }) {
       trackingNumber: orderData.trackingNumber,
     },
   });
-  const { ordersStatus } = useOrderAndStatusAndDliveryTypeQuery();
+  const { data: ordersStatus } = useGetOrderStatusQuery();
 
   const ordersStatusName = ordersStatus?.find(({ code }) => code === orderData.orderStatus)?.name;
 
@@ -37,13 +37,13 @@ function OrderForm({ orderData }: { orderData: OrdersDetailData }) {
         <div className="flex-1/2">
           <Label className="font-bold text-xs">주문자</Label>
           <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
-            {orderData.customer.name}
+            {orderData.ordererName}
           </p>
         </div>
         <div className="flex-1/2">
           <Label className="font-bold text-xs">주문자 전화번호</Label>
           <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
-            {orderData.customer.mobileNumber}
+            {orderData.ordererMobile}
           </p>
         </div>
       </div>
@@ -52,13 +52,13 @@ function OrderForm({ orderData }: { orderData: OrdersDetailData }) {
         <div className="flex-1/2">
           <Label className="font-bold text-xs">수령인</Label>
           <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
-            {orderData.address.recipientName}
+            {orderData.recipientName}
           </p>
         </div>
         <div className="flex-1/2">
           <Label className="font-bold text-xs">수령인 전화번호</Label>
           <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
-            {orderData.address.recipientMobile}
+            {orderData.recipientMobile}
           </p>
         </div>
       </div>
@@ -67,13 +67,13 @@ function OrderForm({ orderData }: { orderData: OrdersDetailData }) {
         <div className="flex-3/5">
           <Label className="font-bold text-xs">배송지 주소</Label>
           <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
-            {orderData.address.address}
+            {orderData.address}
           </p>
         </div>
         <div className="flex-2/5">
           <Label className="font-bold text-xs">배송지 상세주소</Label>
           <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
-            {orderData.address.addressDetail} ({orderData.address.zipcode})
+            {orderData.addressDetail} ({orderData.zipcode})
           </p>
         </div>
       </div>
@@ -82,19 +82,19 @@ function OrderForm({ orderData }: { orderData: OrdersDetailData }) {
         <div className="flex-1/4">
           <Label className="font-bold text-xs">은행명</Label>
           <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
-            {orderData.payment.bankCodeName}
+            {orderData?.payment?.bankCodeName}
           </p>
         </div>
         <div className="flex-2/4">
           <Label className="font-bold text-xs">계좌번호</Label>
           <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
-            {orderData.payment.accountNumber}
+            {orderData?.payment?.accountNumber}
           </p>
         </div>
         <div className="flex-1/4">
           <Label className="font-bold text-xs">예금주</Label>
           <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
-            {orderData.payment.accountHolderName}
+            {orderData?.payment?.accountHolderName}
           </p>
         </div>
       </div>
@@ -103,13 +103,13 @@ function OrderForm({ orderData }: { orderData: OrdersDetailData }) {
         <div className="flex-1/4">
           <Label className="font-bold text-xs">배송 방법</Label>
           <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
-            {orderData.deliveryMethod.name}
+            {orderData.deliveryMethodName}
           </p>
         </div>
         <div className="flex-3/4">
           <Label className="font-bold text-xs">배송 메시지</Label>
           <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
-            {orderData.address.message}
+            {orderData.message}
           </p>
         </div>
       </div>

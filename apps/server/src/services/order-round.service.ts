@@ -231,10 +231,16 @@ export const createWithoutImage = async (body: CreateOrderRoundInput) => {
     const result = await prisma.$transaction(async (tx) => {
       const { name, startedAt, endedAt, minOrderQty, maxOrderQty } = body;
 
-      // 1. 주문차수 등록 :: orderRound
-      const orResult = await tx.orderRound.create({
-        data: { name, startedAt, endedAt, minOrderQty, maxOrderQty },
-      });
+    // 1. 주문차수 등록 :: orderRound
+    const orResult = await prisma.orderRound.create({
+      data: {
+      name: body.name,
+      startedAt: body.startedAt,
+      endedAt: body.endedAt,
+      minOrderQty: Number(body.minOrderQty),
+      maxOrderQty: Number(body.maxOrderQty),
+      },
+     });
 
       // 2. 주문차수에 맞는 빵 목록 등록 :: orderRoundBread
       const orderRoundBreads = await Promise.all(
