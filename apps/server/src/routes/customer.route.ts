@@ -11,6 +11,7 @@ import {
   updateAddressValidator,
   validate,
 } from '@/middlewares/validators/validate';
+import { createCustomerValidator } from '@/middlewares/validators/auth-validate';
 
 const router = Router();
 
@@ -25,6 +26,9 @@ router.get('/:no', requireAdmin, asyncHandler(customerController.getOne));
 
 /** DELETE /customers/{no} : 고객 삭제 */
 // router.delete('/:no', requireAdmin, asyncHandler(customerController.remove));
+
+/** POST /auth/customers/join : 고객 회원가입 */
+router.post('/', validate(createCustomerValidator), asyncHandler(customerController.create));
 
 /** GET /customers/{no}/address : 고객 주소 목록 조회 */
 router.get(

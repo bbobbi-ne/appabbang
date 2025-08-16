@@ -16,35 +16,41 @@ import { ClientPayload, ClientType } from '@/types/client-payload';
 export const login = async (req: Request, res: Response) => {
   const { id, pw, type } = req.body;
 
-  const client = await userService.getClientForLogin(id, type);
+  // 1. 사용자 정보 조회 및 검증
+  const client =
+    type === ClientType.USER
+      ? await userService.getByIdForLogin(id)
+      : type === ClientType.CUSTOMER
+        ? await customerService.getByIdForLogin(id)
+        : null;
+
+  if (!client) {
+    throw AppError.unauthorized('아이디 또는 비밀번호를 확인해주세요.');
+  }
+
   const isValid = await comparePassword(pw, client.pw);
 
   if (!isValid) {
     throw AppError.unauthorized('아이디 또는 비밀번호를 확인해주세요.');
   }
 
+  // 2. 토큰 생성 및 쿠키 설정
   const { pw: _, ...payload } = client;
-
-  const accessToken = generateAccessToken(payload);
-  const refreshToken = generateRefreshToken(payload);
+  const accessToken = generateAccessToken({ ...payload, type });
+  const refreshToken = generateRefreshToken({ ...payload, type });
 
   res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
+  // 3. 리프레시토큰 업데이트 및 응답
   if (type === ClientType.USER) {
-    // 관리자인 경우
     await userService.updateRefreshToken(client.id, refreshToken);
     return res.status(200).json({ accessToken });
   } else if (type === ClientType.CUSTOMER) {
-    // 고객인 경우
-    await userService.updateCustomerRefreshToken(client.id, refreshToken);
-
-    // 결과값 전송
-    const result = {
+    await customerService.updateRefreshToken(client.id, refreshToken);
+    return res.status(200).json({
       data: client,
       accessToken,
-    };
-
-    return res.status(200).json(result);
+    });
   }
 };
 
@@ -72,15 +78,15 @@ export const refresh = async (req: Request, res: Response) => {
   }
 };
 
-/** 로그아웃 (어드민, 고객) */
+/** 로그아웃  */
 export const logout = async (req: Request, res: Response) => {
   const user = req.user;
 
   // refreshToken 제거
   if (user.type === ClientType.USER) {
-    await userService.invalidateRefreshToken(user.no, user.id);
+    await userService.updateRefreshToken(user.id, null);
   } else if (user.type === ClientType.CUSTOMER) {
-    await customerService.invalidateRefreshToken(user.no, user.id);
+    await customerService.updateRefreshToken(user.id, null);
   } else {
     throw AppError.badRequest('로그아웃 처리 중 오류가 발생했습니다.');
   }
