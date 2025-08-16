@@ -92,8 +92,6 @@ export default function AddressForm({
 
   // 배송지 등록
   const handleSubmit = async (data: addresssDailogForm) => {
-    console.log('handleSubmit called', data);
-
     if (currentValues?.isDefault && !data.isDefault) {
       toast.error('다른 배송지를 기본 배송지로 추가해주세요.');
       return;

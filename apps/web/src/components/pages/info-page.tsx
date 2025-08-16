@@ -45,7 +45,6 @@ export default function InfoPage() {
     (async () => {
       // 고객 상세정보, 고객의 보유 쿠폰 정보, 주문 총 금액 조회
       const { customer } = await getCustomerInfo();
-      console.log(customer);
       setCustomer(customer);
     })();
   }, []);

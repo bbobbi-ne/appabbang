@@ -44,9 +44,6 @@ export async function create(req: Request, res: Response) {
       '주문차수를 등록할 수 없습니다. (이미 진행중인 주문차수가 존재합니다.)',
     );
 
-  console.log('-- model --');
-  console.log(model);
-
   !image
     ? (orderRound = await OrderRoundService.createWithoutImage(model)) // 이미지 없는 주문차수 등록
     : (orderRound = await OrderRoundService.createWithImage(model, image)); // 이미지 있는 주문차수 등록

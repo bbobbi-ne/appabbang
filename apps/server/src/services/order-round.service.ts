@@ -254,7 +254,6 @@ export const createWithoutImage = async (body: CreateOrderRoundInput) => {
 
     return result;
   } catch (e) {
-    console.log(e);
     return {
       code: 500,
       message: '주문차수 등록 과정에서 문제가 발생했습니다. \n관리자 확인이 필요합니다.',
@@ -401,7 +400,6 @@ export const updateWithoutImage = async (body: UpdateOrderRoundInput) => {
 
     return result;
   } catch (e) {
-    console.log(e);
     return {
       code: 500,
       message: '주문차수 수정 과정에서 문제가 발생했습니다. \n관리자 확인이 필요합니다.',
