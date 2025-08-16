@@ -77,16 +77,16 @@ router.post('/kakao/login', async (req, res, next) => {
   console.log('/login finish');
 });
 
-/** POST /customers/update : 고객 정보 수정 */
-router.post(
+/** PUT /customers/update : 고객 정보 수정 */
+router.put(
   '/customers/update',
   requireCustomer,
   validate(updateCustomerValidator),
   asyncHandler(authController.update),
 );
 
-/** POST /customers/update/pw : 고객 정보 수정 - 비밀번호 변경 */
-router.post(
+/** PUT /customers/update/pw : 고객 정보 수정 - 비밀번호 변경 */
+router.put(
   '/customers/update/pw',
   requireCustomer,
   validate(updateCustomerPwValidator),
