@@ -4,6 +4,7 @@
 
 import useToast from '@/hooks/useToast';
 import { client } from './common-apis';
+import sessionClient from './axios';
 
 const { addToast } = useToast();
 
@@ -32,21 +33,23 @@ class CustomError extends Error {
   }
 }
 
+type CustomerProps = {
+  id: string;
+  pw: string;
+  mobileNumber: string;
+  address: string;
+  addressDetail: string;
+  zipcode: string;
+  isServiceTermsAgreed: boolean;
+  isPrivacyTermsAgreed: boolean;
+  isMarketingTermsAgreed: boolean;
+};
+
 /**
  * 회원가입
  */
 export async function createCustomer(
-  data: {
-    id: string;
-    pw: string;
-    mobileNumber: string;
-    address: string;
-    addressDetail: string;
-    zipcode: string;
-    isServiceTermsAgreed: boolean;
-    isPrivacyTermsAgreed: boolean;
-    isMarketingTermsAgreed: boolean;
-  },
+  data: CustomerProps,
   setAccessToken: (accountToken: string) => void,
   setCustomer: (model: ICustomerProps) => void,
 ) {
@@ -210,14 +213,9 @@ export const logout = async (accessToken: string, reset: (accessToken: string) =
 /**
  * 현재 세션의 고객 정보 조회
  */
-export const getCustomerInfo = async (accessToken: string) => {
+export const getCustomerInfo = async () => {
   try {
-    const response = await client.get('/auth/customers/info', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
+    const response = await sessionClient.get('/auth/customers/info');
     if (response.status === 200) return response.data;
     else throw new CustomError(500, 'fail');
   } catch (e: any) {
@@ -231,26 +229,13 @@ export const getCustomerInfo = async (accessToken: string) => {
 /**
  * 고객정보 수정
  */
-export type CustomerType = {
-  id: string;
-  name: string;
-  mobileNumber: string;
-};
-export const updateCustomer = async (data: CustomerType, accessToken: string) => {
+export const updateCustomer = async (data: { id: string; name: string; mobileNumber: string }) => {
   try {
-    const response = await client.post(
-      '/auth/customers/update',
-      {
-        id: data.id,
-        name: data.name,
-        mobileNumber: data.mobileNumber,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    );
+    const response = await sessionClient.put('/auth/customers/update', {
+      id: data.id,
+      name: data.name,
+      mobileNumber: data.mobileNumber,
+    });
 
     if (response.status === 200) {
       addToast({
@@ -271,22 +256,9 @@ export const updateCustomer = async (data: CustomerType, accessToken: string) =>
 /**
  * 고객정보 수정 : 비밀번호 변경
  */
-export type CustomerPwType = {
-  pw: string;
-  pwModify: string;
-  pwConfirm: string;
-};
-export const updateCustomerPw = async ({ pw, pwModify }: CustomerPwType, accessToken: string) => {
+export const updateCustomerPw = async ({ pw, pwModify }: { pw: string; pwModify: string }) => {
   try {
-    const response = await client.post(
-      '/auth/customers/update/pw',
-      { pw, pwModify },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    );
+    const response = await sessionClient.put('/auth/customers/update/pw', { pw, pwModify });
 
     if (response.status === 200) {
       addToast({

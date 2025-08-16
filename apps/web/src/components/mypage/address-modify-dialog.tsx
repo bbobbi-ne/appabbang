@@ -1,9 +1,17 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@appabbang/ui';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@appabbang/ui';
 import AddressForm, { type addresssDailogForm } from '@/components/mypage/address-form';
 import type { AddressListData } from '../pages/address-page';
+import { MyService } from '@/services/api/my-service';
 
 type Props = {
   children: React.ReactNode;
@@ -13,23 +21,23 @@ type Props = {
 export default function AddressModifyDialog({ children, data }: Props) {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
+  const { updateAddress } = MyService;
 
   const updateMutation = useMutation({
-    mutationFn: (data: addresssDailogForm) => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(data);
-        }, 2000);
-      });
+    mutationFn: (data: addresssDailogForm) => updateAddress(data.no!, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['getAddresses'] });
+      toast.success('변경이 완료되었습니다.');
+      setOpen(false);
     },
   });
 
+  /**
+   * 배송지 수정
+   */
   const update = async (data: addresssDailogForm) => {
     try {
       await updateMutation.mutateAsync(data);
-      toast.success('변경이 완료되었습니다.');
-      queryClient.invalidateQueries({ queryKey: ['address'] });
-      setOpen(false);
     } catch (error) {
       console.error(error);
     }
@@ -59,6 +67,7 @@ export default function AddressModifyDialog({ children, data }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogDescription className="hidden" />
       <DialogContent
         onInteractOutside={(e) => {
           e.preventDefault();

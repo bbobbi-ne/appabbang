@@ -1,3 +1,4 @@
+import type { addresssDailogForm } from '@/components/mypage/address-form';
 import client from '@/services/axios';
 
 export const MyService = {
@@ -9,10 +10,10 @@ export const MyService = {
     const response = await client.get(`/my/addresses/${no}`);
     return response.data;
   },
-  createAddress: async (data: any) => {
+  createAddress: async (data: addresssDailogForm) => {
     await client.post('/my/addresses', data);
   },
-  updateAddress: async (no: number, data: any) => {
+  updateAddress: async (no: number, data: addresssDailogForm) => {
     await client.put(`/my/addresses/${no}`, data);
   },
   deleteAddress: async (no: number) => {
