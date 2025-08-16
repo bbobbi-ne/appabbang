@@ -137,12 +137,12 @@ export const updateCustomerRefreshToken = async (id: string, refreshToken: strin
 };
 
 /**
- * 로그아웃 - refreshToken 초기화
+ * refreshToken 초기화 (어드민)
  */
-export const invalidateRefreshToken = async (id: string) => {
+export const invalidateRefreshToken = async (no: number, id: string) => {
   const result = await prisma.$transaction(async (tx) => {
-    const update = await tx.customer.update({
-      where: { id },
+    const update = await tx.user.update({
+      where: { no, id },
       data: { refreshToken: null },
     });
 

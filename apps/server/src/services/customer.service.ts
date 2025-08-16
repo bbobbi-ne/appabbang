@@ -24,3 +24,19 @@ export const getOne = async (id: string) => {
 
   return customer;
 };
+
+/**
+ * refreshToken 초기화 (고객)
+ */
+export const invalidateRefreshToken = async (no: number, id: string) => {
+  const result = await prisma.$transaction(async (tx) => {
+    const update = await tx.customer.update({
+      where: { no, id },
+      data: { refreshToken: null },
+    });
+
+    return update;
+  });
+
+  return result;
+};
