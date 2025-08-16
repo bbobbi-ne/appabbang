@@ -6,9 +6,6 @@ import { Toaster } from '@appabbang/ui';
 import Header from '@/components/common/header.tsx';
 import Footer from '@/components/common/footer.tsx';
 
-// 웹 시작 시 무조건 초기화
-sessionStorage.removeItem('accessToken');
-
 export interface MyRouterContext {
   queryClient: QueryClient;
 }

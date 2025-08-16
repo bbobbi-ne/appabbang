@@ -53,6 +53,7 @@ export const addressSchema = z.object({
     .min(1, '배송메세지를 입력해주세요')
     .max(30, '최대 30자 이내로 입력해주세요'),
   isDefault: z.boolean().optional(),
+  no: z.number(),
 });
 export type addresssDailogForm = z.infer<typeof addressSchema>;
 
