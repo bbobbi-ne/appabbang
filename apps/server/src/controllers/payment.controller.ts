@@ -31,8 +31,12 @@ export const updatePaid = async (req: Request, res: Response) => {
     paidConfirmedAt: isPaid ? new Date() : null,
   });
 
+  const paymentData = await paymentService.getOneByNo(Number(no));
+
   // 11: 접수 완료
-  // await orderService.update(Number(orderNo), { orderStatus: '11' });
+  if (paymentData?.order.orderStatus === '10') {
+    await orderService.update(Number(orderNo), { orderStatus: '11' });
+  }
   res.status(200).json({ message: '결제 입금 확인 완료' });
 };
 

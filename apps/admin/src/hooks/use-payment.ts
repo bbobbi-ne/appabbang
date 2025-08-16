@@ -3,19 +3,23 @@ import { getOrderStatus } from '@/service/common-api';
 import { getPaymentDetail, getPaymentsList, updatePaid } from '@/service/payment';
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 
-export function usePaymentsListAndOrderStatusQuery() {
+/**
+ * 🔹 결제 리스트와 주문 상태를 동시에 조회
+ * useQueries를 사용하여 여러 쿼리 병렬 실행
+ */
+export function usePaymentsWithOrderStatusQuery() {
   const results = useQueries({
     queries: [
       {
         queryKey: ['payments'],
-        queryFn: getPaymentsList,
+        queryFn: getPaymentsList, // 결제 리스트 조회 API
         staleTime: Infinity,
         retry: 1,
         select: (res) => (res as { data: PaymentsListData }).data,
       },
       {
         queryKey: ['ordersStatus', 'common'],
-        queryFn: getOrderStatus,
+        queryFn: getOrderStatus, // 공통 주문 상태 조회 API
         staleTime: Infinity,
         retry: 1,
         select: (res) => (res as { data: CommonCodeDetailData }).data,
@@ -23,17 +27,20 @@ export function usePaymentsListAndOrderStatusQuery() {
     ],
   });
 
-  const [paymentListsQuery, ordersStatusQuery] = results;
+  const [paymentsQuery, ordersStatusQuery] = results;
 
   return {
-    paymentsList: paymentListsQuery.data,
+    paymentsList: paymentsQuery.data,
     ordersStatus: ordersStatusQuery.data,
-    isLoading: paymentListsQuery.isLoading || ordersStatusQuery.isLoading,
-    isError: paymentListsQuery.isError || ordersStatusQuery.isError,
-    error: paymentListsQuery.error || ordersStatusQuery.error,
+    isLoading: paymentsQuery.isLoading || ordersStatusQuery.isLoading,
+    isError: paymentsQuery.isError || ordersStatusQuery.isError,
+    error: paymentsQuery.error || ordersStatusQuery.error,
   };
 }
 
+/**
+ * 🔹 결제 리스트 조회
+ */
 export function usePaymentsListQuery() {
   return useQuery({
     queryKey: ['payments'],
@@ -44,20 +51,29 @@ export function usePaymentsListQuery() {
   });
 }
 
-export function usePaymenDetailQuery(no: number) {
+/**
+ * 🔹 특정 결제 상세 조회
+ * @param no 결제 번호
+ */
+export function usePaymentDetailQuery(no: number) {
   return useQuery({
     queryKey: ['payment', { no }],
-    queryFn: getPaymentDetail,
+    queryFn: getPaymentDetail, // 결제 상세 API 호출
     staleTime: Infinity,
     retry: 1,
     select: (res) => res.data,
+    enabled: !!no, // no가 존재할 때만 실행
   });
 }
 
+/**
+ * 🔹 입금 상태 업데이트 Mutation
+ * 성공 시 관련 결제, 주문 데이터 캐시 무효화
+ */
 export function usePaidUpdateMutation() {
   const queryClient = useQueryClient();
   const { mutateAsync, error, isError, isSuccess, isPending } = useMutation({
-    mutationFn: updatePaid,
+    mutationFn: updatePaid, // 입금 확인 업데이트 API
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
       queryClient.invalidateQueries({ queryKey: ['payment', { no: variables.no }] });
@@ -65,5 +81,6 @@ export function usePaidUpdateMutation() {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
   });
+
   return { paidUpdateMutation: mutateAsync, isError, error, isSuccess, isPending };
 }

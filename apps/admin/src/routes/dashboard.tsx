@@ -13,14 +13,26 @@ import {
 import { useInitializeAuth } from '@/hooks/use-initialize-auth';
 import { AlertDialog } from '@appabbang/ui';
 import { Sidebar } from '@/components/ui/sidebar';
+import { useSidebarStore } from '@/stores/sidebar-store';
 
 export const Route = createFileRoute('/dashboard')({
   component: DashboardLayout,
 });
 
 export default function DashboardLayout() {
+  const { open, toggleOpen } = useSidebarStore();
+
   return (
-    <SidebarProvider>
+    <SidebarProvider
+      open={open}
+      onOpenChange={toggleOpen}
+      style={
+        {
+          '--sidebar-width': '13rem',
+          '--sidebar-width-mobile': '13rem',
+        } as React.CSSProperties
+      }
+    >
       <DashboardContent />
     </SidebarProvider>
   );
@@ -55,7 +67,7 @@ function DashboardContent() {
 
       <Sidebar />
       {isSuccess && (
-        <main className="w-full p-2">
+        <main className="w-full ">
           <SidebarTrigger className="fixed" />
           <Outlet />
         </main>

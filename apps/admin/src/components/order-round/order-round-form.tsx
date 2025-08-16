@@ -9,12 +9,9 @@ import {
   FormLabel,
   FormMessage,
   Input,
-  ScrollArea,
-  Textarea,
   PopoverTrigger,
   Popover,
   PopoverContent,
-  FormDescription,
   Calendar,
   cn,
   CustomFormMessage,
@@ -27,16 +24,16 @@ import {
   Badge,
 } from '@appabbang/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { CalendarIcon, Check } from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { useGetBreadsAndStatusQuery } from '@/hooks/use-breads';
+import { useGetBreadsQuery } from '@/hooks/use-breads';
 import BreadPreview from './bread-preview';
 import { ImageUpload } from './image-upload';
-import { formatToDateTimeIso } from '@/utils/format';
+import { formatDateTimeToIso } from '@/utils/format';
 
 export const orderRoundSchema = z.object({
   name: z.string().trim().min(1, '메뉴명을 입력해주세요'),
@@ -67,10 +64,10 @@ interface OrderRoundFormProps {
   submitFn: (arg: any) => Promise<any>;
   currentValues?: OrderRoundDailogForm;
   no?: number;
-  setOpen: Dispatch<SetStateAction<boolean>>;
+  onSuccess: () => void;
 }
 
-function OrderRoundForm({ currentValues, no, setOpen, submitFn }: OrderRoundFormProps) {
+function OrderRoundForm({ currentValues, no, onSuccess, submitFn }: OrderRoundFormProps) {
   const form = useForm<OrderRoundDailogForm>({
     resolver: zodResolver(orderRoundSchema),
     defaultValues: currentValues
@@ -83,23 +80,21 @@ function OrderRoundForm({ currentValues, no, setOpen, submitFn }: OrderRoundForm
           endedAt: { date: undefined, time: '00:00:00' },
         },
   });
-
   useEffect(() => {
     if (currentValues) {
       setSelectedBreads(currentValues.orderRoundBreads);
     }
   }, [currentValues]);
 
-  const { breads, isError, isLoading } = useGetBreadsAndStatusQuery();
-
+  const { data: breads, isError, isLoading } = useGetBreadsQuery();
   const [selectedBreads, setSelectedBreads] = useState<{ no: number; name: string }[] | []>([]);
 
   const onSubmit = async (data: OrderRoundDailogForm) => {
     const formData = new FormData();
 
-    const startedAt = formatToDateTimeIso(data.startedAt.date, data.startedAt.time);
-    const endedAt = formatToDateTimeIso(data.endedAt.date, data.endedAt.time);
-    const breadNoList = JSON.stringify(
+    const startedAt = formatDateTimeToIso(data.startedAt.date, data.startedAt.time);
+    const endedAt = formatDateTimeToIso(data.endedAt.date, data.endedAt.time);
+    const orderRoundBreads = JSON.stringify(
       data.orderRoundBreads.map((item) => {
         return { breadNo: item.no };
       }),
@@ -108,7 +103,9 @@ function OrderRoundForm({ currentValues, no, setOpen, submitFn }: OrderRoundForm
     formData.append('name', data.name);
     formData.append('startedAt', startedAt);
     formData.append('endedAt', endedAt);
-    formData.append('breadNoList', breadNoList);
+    formData.append('orderRoundBreads', orderRoundBreads);
+    formData.append('minOrderQty', '1');
+    formData.append('maxOrderQty', '99');
 
     if (data.image instanceof File) {
       formData.append('image', data.image);
@@ -121,7 +118,7 @@ function OrderRoundForm({ currentValues, no, setOpen, submitFn }: OrderRoundForm
     try {
       await submitFn({ formData: formData, no: no || {} });
       form.reset();
-      setOpen(false);
+      onSuccess();
     } catch (error: any) {
       const message = error.message ?? '알 수 없는 에러가 발생했습니다. 잠시 후 다시 시도해주세요.';
       form.setError('root', {
@@ -169,7 +166,6 @@ function OrderRoundForm({ currentValues, no, setOpen, submitFn }: OrderRoundForm
                 <FormControl>
                   <Command className="rounded-lg border shadow-md group relative">
                     {hoverBread && <BreadPreview no={hoverBread} />}
-                    {/* <BreadPreview no={hoverBread} /> */}
                     <CommandInput placeholder="빵 이름을 검색해주세요" />
                     <CommandList className="absolute inset-0 top-full pt-1 h-[150px] z-20 hidden group-focus-within:block bg-background border rounded shadow">
                       <CommandEmpty>일치하는 빵이 없습니다.</CommandEmpty>

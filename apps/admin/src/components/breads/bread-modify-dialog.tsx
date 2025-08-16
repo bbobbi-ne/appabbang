@@ -1,82 +1,48 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  ScrollArea,
-} from '@appabbang/ui';
-import { useBreadsDetailQuery, useBreadsUpdateMutation } from '@/hooks/use-breads';
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import { useState, useEffect } from 'react';
+import { useGetBreadDetailQuery, useUpdateBreadMutation } from '@/hooks/use-breads';
+import { DialogLayout } from '@/components/ui/dialog-layout';
 import BreadForm, { type BreadsDailogForm } from './bread-form';
 
-interface breadModifyDialogProps {
+interface BreadModifyDialogProps {
   children: React.ReactNode;
   no: number;
 }
 
-export function BreadModifyDialog({ children, no }: breadModifyDialogProps) {
-  const [open, setOpen] = useState(false);
-
+export function BreadModifyDialog({ children, no }: BreadModifyDialogProps) {
   return (
-    <Dialog onOpenChange={(open) => setOpen(open)}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      {open && <DialogBody no={no} setOpen={setOpen} />}
-    </Dialog>
+    <DialogLayout trigger={children} title="빵 수정" description="메뉴를 수정해주세요">
+      {({ close }) => <DialogBody no={no} close={close} />}
+    </DialogLayout>
   );
 }
 
-function DialogBody({ no, setOpen }: { no: number; setOpen: Dispatch<SetStateAction<boolean>> }) {
-  const { data: currentData, isSuccess: currentDataIsSuccess } = useBreadsDetailQuery(no);
-  const { breadsUpdateMutation } = useBreadsUpdateMutation();
-  const [currentValues, setCurrentValues] = useState<BreadsDailogForm | undefined>();
+interface DialogBodyProps {
+  no: number;
+  close: () => void;
+}
+
+function DialogBody({ no, close }: DialogBodyProps) {
+  const { data, isSuccess } = useGetBreadDetailQuery(no);
+  const { updateBread } = useUpdateBreadMutation();
+  const [currentValues, setCurrentValues] = useState<BreadsDailogForm>();
 
   useEffect(() => {
-    if (currentDataIsSuccess) {
-      const { breadStatus, images, name, unitPrice, countryOfOrigin, allergyInfo } = currentData;
-
-      const mappedImages = images?.map((img) => ({
-        url: img.url,
-        publicId: img.publicId,
-      }));
-
-      const description = currentData.description ? currentData.description : '';
-
+    if (isSuccess && data) {
       setCurrentValues({
-        breadStatus,
-        description,
-        image: mappedImages,
-        name,
-        countryOfOrigin,
-        allergyInfo,
-        unitPrice: String(unitPrice),
+        breadStatus: data.breadStatus,
+        description: data.description ?? '',
+        image: data.images?.map((img) => ({ url: img.url, publicId: img.publicId })),
+        name: data.name,
+        countryOfOrigin: data.countryOfOrigin,
+        allergyInfo: data.allergyInfo,
+        unitPrice: String(data.unitPrice),
       });
     }
-  }, [currentDataIsSuccess]);
+  }, [isSuccess, data, setCurrentValues]);
+
+  if (!currentValues) return <p>Loading...</p>;
 
   return (
-    <DialogContent
-      onInteractOutside={(e) => {
-        e.preventDefault();
-      }}
-      className="sm:max-w-xl h-fit p-0"
-    >
-      <ScrollArea className="h-[700px] p-6">
-        <DialogHeader>
-          <DialogTitle>빵 수정</DialogTitle>
-        </DialogHeader>
-        <DialogDescription hidden>메뉴를 수정해주세요</DialogDescription>
-
-        {currentValues && (
-          <BreadForm
-            setOpen={setOpen}
-            currentValues={currentValues}
-            submitFn={breadsUpdateMutation}
-            no={no}
-          />
-        )}
-      </ScrollArea>
-    </DialogContent>
+    <BreadForm currentValues={currentValues} submitFn={updateBread} no={no} onSuccess={close} />
   );
 }

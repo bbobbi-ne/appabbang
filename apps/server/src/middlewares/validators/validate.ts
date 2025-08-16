@@ -300,8 +300,8 @@ export const deleteDeliveryMethodValidator = [
 
 //ORDER//////////////////////////////////////////////////////////
 export const createOrderValidator = [
-  body('name').trim().notEmpty().withMessage('name은 필수입니다'),
-  body('mobileNumber').trim().notEmpty().withMessage('mobileNumber는 필수입니다'),
+  body('ordererName').trim().notEmpty().withMessage('ordererName 필수입니다'),
+  body('ordererMobile').trim().notEmpty().withMessage('ordererMobile는 필수입니다'),
   body('address').trim().notEmpty().withMessage('address는 필수입니다'),
   body('addressDetail').trim().notEmpty().withMessage('addressDetail는 필수입니다'),
   body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
@@ -338,13 +338,6 @@ export const createOrderValidator = [
     .isInt()
     .toInt()
     .withMessage('totalPrice는 정수여야 합니다'),
-  body('discountAmount')
-    .trim()
-    .notEmpty()
-    .withMessage('discountAmount는 필수입니다')
-    .isInt()
-    .toInt()
-    .withMessage('discountAmount는 정수여야 합니다'),
   body('bankCode').trim().notEmpty().withMessage('bankCode는 필수입니다'),
   body('accountNumber').trim().notEmpty().withMessage('accountNumber는 필수입니다'),
   body('accountHolderName').trim().notEmpty().withMessage('accountHolderName는 필수입니다'),

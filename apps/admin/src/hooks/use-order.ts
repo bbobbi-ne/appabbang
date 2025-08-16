@@ -1,28 +1,32 @@
 import type { CommonCodeDetailData, OrdersListData } from '@/api/data-contracts';
-import { getOrderdDliveryType, getOrderStatus } from '@/service/common-api';
+import { getOrderDeliveryType, getOrderStatus } from '@/service/common-api';
 import { getOrdersDetail, getOrdersList, updateOrderStatus } from '@/service/order-api';
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 
-export function useOrderAndStatusAndDliveryTypeQuery() {
+/**
+ * 🔹 주문 리스트, 주문 상태, 배송 타입 조회
+ * useQueries를 사용하여 한번에 여러 쿼리 실행
+ */
+export function useOrdersWithStatusAndDeliveryQuery() {
   const results = useQueries({
     queries: [
       {
         queryKey: ['orders'],
-        queryFn: getOrdersList,
+        queryFn: getOrdersList, // 주문 리스트 조회 API
         staleTime: Infinity,
-        select: (res) => (res as { data: OrdersListData }).data,
         retry: 1,
+        select: (res) => (res as { data: OrdersListData }).data, // 응답에서 data만 선택
       },
       {
         queryKey: ['ordersStatus', 'common'],
-        queryFn: getOrderStatus,
+        queryFn: getOrderStatus, // 공통 주문 상태 조회 API
         staleTime: Infinity,
         retry: 1,
         select: (res) => (res as { data: CommonCodeDetailData }).data,
       },
       {
-        queryKey: ['ordersDliveryType', 'common'],
-        queryFn: getOrderdDliveryType,
+        queryKey: ['ordersDeliveryType', 'common'],
+        queryFn: getOrderDeliveryType, // 공통 배송 타입 조회 API (오타 수정)
         staleTime: Infinity,
         retry: 1,
         select: (res) => (res as { data: CommonCodeDetailData }).data,
@@ -30,37 +34,46 @@ export function useOrderAndStatusAndDliveryTypeQuery() {
     ],
   });
 
-  const [ordersQuery, ordersStatusQuery, ordersDliveryTypeQuery] = results;
+  const [ordersQuery, ordersStatusQuery, ordersDeliveryTypeQuery] = results;
 
   return {
     orders: ordersQuery.data,
     ordersStatus: ordersStatusQuery.data,
-    ordersDliveryType: ordersDliveryTypeQuery.data,
+    ordersDeliveryType: ordersDeliveryTypeQuery.data,
     isLoading:
-      ordersQuery.isLoading || ordersStatusQuery.isLoading || ordersDliveryTypeQuery.isLoading,
-    isError: ordersQuery.isError || ordersStatusQuery.isError || ordersDliveryTypeQuery.isError,
-    error: ordersQuery.error || ordersStatusQuery.error || ordersDliveryTypeQuery.error,
+      ordersQuery.isLoading || ordersStatusQuery.isLoading || ordersDeliveryTypeQuery.isLoading,
+    isError: ordersQuery.isError || ordersStatusQuery.isError || ordersDeliveryTypeQuery.isError,
+    error: ordersQuery.error || ordersStatusQuery.error || ordersDeliveryTypeQuery.error,
   };
 }
 
-export function useOrdersDetailQuery(no: number) {
+/**
+ * 🔹 특정 주문 상세 조회
+ * @param no 주문 번호
+ */
+export function useOrderDetailQuery(no: number) {
   return useQuery({
     queryKey: ['order', { no }],
-    queryFn: getOrdersDetail,
+    queryFn: getOrdersDetail, // 주문 상세 API 호출
     staleTime: Infinity,
     retry: 1,
     select: (res) => res.data,
+    enabled: !!no, // no가 존재할 때만 실행
   });
 }
 
+/**
+ * 🔹 주문 상태 업데이트 Mutation
+ * 상태 업데이트 후 관련 캐시 무효화
+ */
 export function useOrderStatusUpdateMutation() {
   const queryClient = useQueryClient();
   const { mutate, isError, isSuccess, error } = useMutation({
-    mutationFn: updateOrderStatus,
+    mutationFn: updateOrderStatus, // 주문 상태 업데이트 API
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-      queryClient.invalidateQueries({ queryKey: ['order', { no: variables.no }] });
-      queryClient.invalidateQueries({ queryKey: ['payments'] });
+      queryClient.invalidateQueries({ queryKey: ['orders'] }); // 주문 리스트 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: ['order', { no: variables.no }] }); // 해당 주문 상세 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: ['payments'] }); // 결제 관련 캐시 무효화
     },
   });
 

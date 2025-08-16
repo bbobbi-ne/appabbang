@@ -1,7 +1,7 @@
 import { TablePagination } from '@/components/ui/table-pagination';
 import TableSkeleton from '@/components/ui/table-skeletion';
 import { customersColumns, type CustomersListItem } from '@/data/columns';
-import { useCustomersListQuery } from '@/hooks/use-customer';
+import { useGetCustomersQuery } from '@/hooks/use-customer';
 import {
   Card,
   CardContent,
@@ -36,7 +36,7 @@ function RouteComponent() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
-  const { data: customers, isLoading, isError } = useCustomersListQuery();
+  const { data: customers, isLoading, isError } = useGetCustomersQuery();
   const columns = customersColumns();
 
   const table = useReactTable<CustomersListItem>({
