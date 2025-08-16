@@ -26,34 +26,26 @@ export async function getOne(req: Request, res: Response) {
  * 주문차수 등록 시 현재 시작일자가 이 전에 등록된 주문차수 중 시작-종료일에 포함되어 있는지 확인한다. 만약 존재하면 등록불가.
  */
 export async function create(req: Request, res: Response) {
-  const {
-    no,
-    seq,
-    name,
-    orderRoundBreads: orderRoundBreadsStr,
-    startedAt,
-    endedAt,
-    minOrderQty,
-    maxOrderQty,
-  } = req.body;
-  let json = JSON.parse(orderRoundBreadsStr); // json parsing
-  // breadNoList에서 breadNo 값만 추출
-  const breadNoList = json.map((bread: { breadNo: number }) => bread.breadNo);
-  const model = { no, seq, name, breadNoList, startedAt, endedAt, minOrderQty, maxOrderQty };
+  const model = {
+    name: req.body.name,
+    orderRoundBreads: JSON.parse(req.body.orderRoundBreads), // json parsing
+    startedAt: new Date(req.body.startedAt),
+    endedAt: new Date(req.body.endedAt),
+    minOrderQty: Number(req.body.minOrderQty),
+    maxOrderQty: Number(req.body.maxOrderQty),
+  };
   const image = req.files?.image as UploadedFile[] | UploadedFile | undefined;
   let orderRound;
 
   // 시작일자가 포함된 주문차수 조회
-  const ingOr = await OrderRoundService.selectStartedAtOrderRound(startedAt);
+  const ingOr = await OrderRoundService.selectStartedAtOrderRound(model.startedAt);
   if (ingOr)
     throw AppError.notFound(
-      `주문차수를 등록할 수 없습니다. (이미 진행중인 주문차수가 존재합니다. ${ingOr.no})`,
-      {
-        no,
-        seq,
-        name,
-      },
+      '주문차수를 등록할 수 없습니다. (이미 진행중인 주문차수가 존재합니다.)',
     );
+
+  console.log('-- model --');
+  console.log(model);
 
   !image
     ? (orderRound = await OrderRoundService.createWithoutImage(model)) // 이미지 없는 주문차수 등록
@@ -73,52 +65,28 @@ export async function create(req: Request, res: Response) {
  * 주문차수 수정 시 현재 시작s일자가 이 전에 등록된 주문차수 중 시작-종료일에 포함되어 있는지 확인한다. 만약 존재하면 수정불가.
  */
 export async function update(req: Request, res: Response) {
-  const {
-    no,
-    seq,
-    name,
-    public_id,
-    breadNoList: breadNoListStr,
-    startedAt,
-    endedAt,
-    minOrderQty,
-    maxOrderQty,
-  } = req.body;
-  let breadNoListJson = JSON.parse(breadNoListStr); // json parsing
-  // breadNoList에서 breadNo 값만 추출
-  const breadNoList = breadNoListJson.map((bread: { breadNo: number }) => bread.breadNo);
   const model = {
-    no: Number(no),
-    seq,
-    name,
-    public_id,
-    breadNoList,
-    startedAt,
-    endedAt,
-    minOrderQty,
-    maxOrderQty,
+    no: Number(req.body.no),
+    name: req.body.name,
+    orderRoundBreads: JSON.parse(req.body.orderRoundBreads), // json parsing
+    startedAt: new Date(req.body.startedAt),
+    endedAt: new Date(req.body.endedAt),
+    minOrderQty: Number(req.body.minOrderQty),
+    maxOrderQty: Number(req.body.maxOrderQty),
   };
   const image = req.files?.image as UploadedFile[] | UploadedFile | undefined;
   let result;
 
   // 주문차수가 현재 존재하는지 확인
-  const findRound = await OrderRoundService.getOrderRound(Number(no));
+  const findRound = await OrderRoundService.getOrderRound(Number(model.no));
   if (!findRound)
-    throw AppError.notFound('주문차수 정보를 찾을 수 없습니다. \n관리자 확인이 필요합니다.', {
-      no,
-      seq,
-      name,
-    });
+    throw AppError.notFound('주문차수 정보를 찾을 수 없습니다. 관리자 확인이 필요합니다.');
 
-  const ingOr = await OrderRoundService.selectStartedAtOrderRound(startedAt);
+  // 시작일자가 포함된 주문차수 조회
+  const ingOr = await OrderRoundService.selectStartedAtOrderRoundUpdate(model.no, model.startedAt);
   if (ingOr)
     throw AppError.notFound(
-      `주문차수를 수정할 수 없습니다. (이미 진행중인 주문차수가 존재합니다. : ${ingOr.no})`,
-      {
-        no,
-        seq,
-        name,
-      },
+      '주문차수를 수정할 수 없습니다. (이미 진행중인 주문차수가 존재합니다.)',
     );
 
   // 이미지 유무에 따른 주문차수 수정

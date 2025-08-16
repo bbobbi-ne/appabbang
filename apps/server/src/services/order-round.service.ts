@@ -8,23 +8,35 @@ import { PrismaClient, Prisma, OrderRound, OrderRoundBread } from '@prisma/clien
 let IMAGE_TARGET_TYPE_CODE: string | null = null;
 const IMAGE_TARGET_TYPE_NAME = 'orderRound';
 
-// OrderRound 등록 타입
+/** 클라우드 이미지 타입 */
+type ImageProps = {
+  url: string;
+  public_id: string;
+};
+
+/** orderRoundBreads : 주문차수-빵 타입 */
+type OrderRoundBreadsProps = {
+  no: number;
+  name: string;
+};
+
+/** OrderRound : 주문차수 등록 타입 */
 type CreateOrderRoundInput = Pick<
   OrderRound,
   'name' | 'startedAt' | 'endedAt' | 'minOrderQty' | 'maxOrderQty'
 > & {
-  breadNoList: number[];
+  orderRoundBreads: OrderRoundBreadsProps[];
 };
 
-// OrderRound 수정 타입
+/** OrderRound : 주문차수 수정 타입 */
 type UpdateOrderRoundInput = Pick<
   OrderRound,
   'no' | 'name' | 'startedAt' | 'endedAt' | 'minOrderQty' | 'maxOrderQty'
 > & {
-  breadNoList: number[];
+  orderRoundBreads: OrderRoundBreadsProps[];
 };
 
-// OrderRouncBread 등록 타입
+/** OrderRouncBread : 주문차수 등록 타입 */
 type CreatOrderRoundBreadInput = Pick<OrderRoundBread, 'no' | 'breadNo'>;
 
 /**
@@ -86,16 +98,11 @@ export const getOrderRoundList = async () => {
 
     if (imageTargetType) {
       images = await tx.image.findMany({
-        where: {
-          imageTargetType,
-          order: 1,
-        },
+        where: { imageTargetType, order: 1 },
         orderBy: [{ no: 'desc' }, { order: 'asc' }],
       });
 
-      images.forEach((img: any) => {
-        imageMap.set(img.imageTargetNo, img.url);
-      });
+      images.forEach((img: any) => imageMap.set(img.imageTargetNo, img.url));
     }
 
     // 3. 데이터 정렬 (or: orderRound)
@@ -122,7 +129,7 @@ export const getOrderRoundList = async () => {
  */
 export const getOrderRound = async (no: number) => {
   const result = await prisma.$transaction(async (tx) => {
-    const or = await prisma.orderRound.findFirst({
+    const or = await tx.orderRound.findFirst({
       where: { no },
       select: {
         no: true,
@@ -150,9 +157,7 @@ export const getOrderRound = async (no: number) => {
     });
 
     if (!or)
-      throw AppError.notFound('주문차수를 찾을 수 없습니다. \n관리자에게 문의 바랍니다.', {
-        no,
-      });
+      throw AppError.notFound('주문차수를 찾을 수 없습니다. \n관리자에게 문의 바랍니다.', { no });
 
     // 주문차수의 이미지 조회
     const imageTargetType = await getImageTargetTypeCode(IMAGE_TARGET_TYPE_NAME);
@@ -168,7 +173,6 @@ export const getOrderRound = async (no: number) => {
         select: {
           publicId: true,
           url: true,
-          // name: true,
           order: true,
         },
       });
@@ -190,9 +194,7 @@ export const getOrderRound = async (no: number) => {
         },
       });
 
-      breadImages.forEach((img: any) => {
-        imageMap.set(img.imageTargetNo, img.url);
-      });
+      breadImages.forEach((img: any) => imageMap.set(img.imageTargetNo, img.url));
     }
 
     /******/
@@ -227,35 +229,32 @@ export const getOrderRound = async (no: number) => {
 export const createWithoutImage = async (body: CreateOrderRoundInput) => {
   try {
     const result = await prisma.$transaction(async (tx) => {
+      const { name, startedAt, endedAt, minOrderQty, maxOrderQty } = body;
+
       // 1. 주문차수 등록 :: orderRound
-      const orResult = await prisma.orderRound.create({
-        data: {
-          name: body.name,
-          startedAt: body.startedAt,
-          endedAt: body.endedAt,
-          minOrderQty: body.minOrderQty,
-          maxOrderQty: body.maxOrderQty,
-        },
+      const orResult = await tx.orderRound.create({
+        data: { name, startedAt, endedAt, minOrderQty, maxOrderQty },
       });
 
       // 2. 주문차수에 맞는 빵 목록 등록 :: orderRoundBread
-      const breadNoList = await Promise.all(
-        body.breadNoList.map(async (breadNo) => {
-          const { breadNo: resultBreadNo } = await createOrderRoundBread(tx, {
+      const orderRoundBreads = await Promise.all(
+        body.orderRoundBreads.map(async (bread) => {
+          const createdBread = await createOrderRoundBread(tx, {
             no: orResult.no,
-            breadNo,
+            breadNo: bread.no,
           });
 
-          return resultBreadNo;
+          return createdBread;
         }),
       );
 
       // 3. return model 생성 :: 주문차수 + (주문차수 + 빵) 목록
-      return { ...orResult, breadNoList, image: [] };
+      return { ...orResult, orderRoundBreads, image: [] };
     });
 
     return result;
   } catch (e) {
+    console.log(e);
     return {
       code: 500,
       message: '주문차수 등록 과정에서 문제가 발생했습니다. \n관리자 확인이 필요합니다.',
@@ -284,24 +283,20 @@ export const createWithImage = async (
       });
 
       // 2. 주문차수에 맞는 빵 목록 등록 :: orderRoundBread
-      const breadNoList = await Promise.all(
-        body.breadNoList.map(async (breadNo) => {
-          const { breadNo: resultBreadNo } = await createOrderRoundBread(tx, {
+      const orderRoundBreads = await Promise.all(
+        body.orderRoundBreads.map(async (bread) => {
+          const createdBread = await createOrderRoundBread(tx, {
             no: orResult.no,
-            breadNo,
+            breadNo: bread.no,
           });
 
-          return resultBreadNo;
+          return createdBread;
         }),
       );
 
       // 3. 이미지 등록
       const imgResult = await ImageService.createCloudinary(image);
-      const {
-        url,
-        public_id: publicId,
-        original_filename: name,
-      } = imgResult[0] as { url: string; public_id: string; original_filename: string };
+      const { url, public_id: publicId } = imgResult[0] as ImageProps;
 
       // 4. 이미지 정보를 데이터베이스에 저장
       const imageTargetType = await getImageTargetTypeCode(IMAGE_TARGET_TYPE_NAME); // return code
@@ -312,7 +307,6 @@ export const createWithImage = async (
             data: {
               url,
               publicId,
-              // name,
               imageTargetType,
               imageTargetNo: orResult.no,
               order: 1,
@@ -321,7 +315,7 @@ export const createWithImage = async (
         }
       }
 
-      return { ...orResult, breadNoList, image: imgResult[0] };
+      return { ...orResult, orderRoundBreads, image: imgResult[0] };
     });
 
     return result;
@@ -335,19 +329,23 @@ export const createWithImage = async (
 
 /**
  * 주문차수 - 빵 매핑 테이블 등록
+ * 그 이후, 빵 정보를 조회하여 리턴한다.
  */
 const createOrderRoundBread = async (
   tx: PrismaClient | Prisma.TransactionClient,
   { no, breadNo }: CreatOrderRoundBreadInput,
 ) => {
-  const result = await tx.orderRoundBread.create({
-    data: {
-      orderRoundNo: no,
-      breadNo,
-    },
+  const orderRoundBread = await tx.orderRoundBread.create({
+    data: { orderRoundNo: no, breadNo },
   });
 
-  return { ...result };
+  if (orderRoundBread.breadNo) {
+    const bread = await tx.bread.findFirst({
+      where: { no: orderRoundBread.breadNo ?? undefined },
+    });
+
+    return bread ? { no: bread.no, name: bread.name } : null;
+  }
 };
 
 /**
@@ -362,10 +360,10 @@ export const updateWithoutImage = async (body: UpdateOrderRoundInput) => {
       const findOr = await selectStartedAtOrderRound(startedAt);
 
       if (findOr && findOr.no !== body.no) {
-        throw AppError.notFound('다른 주문차수 일자에 포함됩니다. 시작~종료일자를 검토하세요.', {
-          no,
-          diffNo: findOr.no,
-        });
+        throw AppError.notFound(
+          '다른 주문차수 일자에 포함됩니다. 시작일자/종료일자를 검토하세요.',
+          { no, diffNo: findOr.no },
+        );
       }
 
       // 1. 주문차수 수정 :: orderRound
@@ -382,30 +380,28 @@ export const updateWithoutImage = async (body: UpdateOrderRoundInput) => {
 
       // 2. 주문차수 - 빵  매핑 테이블 수정
       // 2-1. 기존 빵을 조회하고 다시 수정하는 건 효율이 없으므로 특정 주문차수에 포함된 행은 완전삭제하고 다시 새롭게 등록한다.
-      await tx.orderRoundBread.deleteMany({
-        where: { orderRoundNo: no },
-      });
+      await tx.orderRoundBread.deleteMany({ where: { orderRoundNo: no } });
 
-      // ************ Postman 테스트를 위해서 일단 강제로 number로 변환
-      body.breadNoList = body.breadNoList.map((breadNo) => Number(breadNo));
+      // body.orderRoundBreads = body.orderRoundBreads.map((bread) => bread);
 
       // 2-2. 주문차수에 맞는 빵 목록 등록 :: orderRoundBread
-      const breadNoList = await Promise.all(
-        body.breadNoList.map(async (breadNo) => {
-          const { breadNo: resultBreadNo } = await createOrderRoundBread(tx, {
+      const orderRoundBreads = await Promise.all(
+        body.orderRoundBreads.map(async (bread) => {
+          const createdBread = await createOrderRoundBread(tx, {
             no: body.no,
-            breadNo,
+            breadNo: bread.no,
           });
 
-          return resultBreadNo;
+          return createdBread;
         }),
       );
 
-      return { ...orResult, breadNoList, image: [] };
+      return { ...orResult, orderRoundBreads, image: [] };
     });
 
     return result;
   } catch (e) {
+    console.log(e);
     return {
       code: 500,
       message: '주문차수 수정 과정에서 문제가 발생했습니다. \n관리자 확인이 필요합니다.',
@@ -425,7 +421,7 @@ export const updateWithImage = async (
   try {
     const result = await prisma.$transaction(async (tx) => {
       // 1. 주문차수 수정 :: orderRound
-      const orResult = await prisma.orderRound.update({
+      const orResult = await tx.orderRound.update({
         where: { no },
         data: {
           name,
@@ -438,22 +434,19 @@ export const updateWithImage = async (
 
       // 2. 주문차수 - 빵  매핑 테이블 수정
       // 2-1. 기존 빵을 조회하고 다시 수정하는 건 효율이 없으므로 특정 주문차수에 포함된 행은 완전삭제하고 다시 새롭게 등록한다.
-      await prisma.orderRoundBread.deleteMany({
-        where: { orderRoundNo: orResult.no },
-      });
+      await tx.orderRoundBread.deleteMany({ where: { orderRoundNo: orResult.no } });
 
-      // ************ Postman 테스트를 위해서 일단 강제로 number로 변환
-      body.breadNoList = body.breadNoList.map((breadNo) => Number(breadNo));
+      // body.orderRoundBreads = body.orderRoundBreads.map((bread) => bread);
 
       // 2-2. 주문차수에 맞는 빵 목록 등록 :: orderRoundBread
-      const breadNoList = await Promise.all(
-        body.breadNoList.map(async (breadNo) => {
-          const { breadNo: resultBreadNo } = await createOrderRoundBread(tx, {
+      const orderRoundBreads = await Promise.all(
+        body.orderRoundBreads.map(async (bread) => {
+          const createdBread = await createOrderRoundBread(tx, {
             no: body.no,
-            breadNo,
+            breadNo: bread.no,
           });
 
-          return resultBreadNo;
+          return createdBread;
         }),
       );
 
@@ -463,14 +456,13 @@ export const updateWithImage = async (
       // 기존 이미지의 마지막 순서 조회하여 클라우디너리 이미지 업로드
       let findImg;
       if (imageTargetType) {
-        findImg = await prisma.image.findFirst({
+        findImg = await tx.image.findFirst({
           where: { imageTargetNo: no, imageTargetType },
           orderBy: { order: 'asc' },
           select: {
             order: true,
             publicId: true,
             url: true,
-            // name: true
           },
         });
       }
@@ -478,22 +470,21 @@ export const updateWithImage = async (
       // 클라우디너리에 재업로드
       const lastOrder = findImg?.order || 0;
       const uploadResult = await ImageService.updateCloudinary(lastOrder, image); // update image cloud
-      let returnImg = null;
+      let createImg = null;
 
-      /* 삭제 */
+      /* cloud image 삭제 */
       if (findImg) {
-        await prisma.image.deleteMany({
+        await tx.image.deleteMany({
           where: { publicId: findImg.publicId },
         });
       }
 
-      /* 등록 */
+      /* cloud image 등록 */
       if (uploadResult[0] && imageTargetType) {
-        returnImg = await prisma.image.create({
+        createImg = await tx.image.create({
           data: {
             publicId: uploadResult[0].public_id,
             url: uploadResult[0].secure_url,
-            // name: uploadResult[0].original_filename,
             imageTargetNo: no,
             imageTargetType,
             order: 1,
@@ -501,7 +492,7 @@ export const updateWithImage = async (
         });
       }
 
-      return { ...orResult, breadNoList, image: returnImg };
+      return { ...orResult, orderRoundBreads, image: createImg };
     });
 
     return result;
@@ -518,7 +509,7 @@ export const updateWithImage = async (
  */
 export const getLatest = async () => {
   const result = await prisma.$transaction(async (tx) => {
-    const or = await prisma.orderRound.findFirst({
+    const or = await tx.orderRound.findFirst({
       select: {
         no: true,
         name: true,
@@ -540,9 +531,7 @@ export const getLatest = async () => {
           },
         },
       },
-      orderBy: {
-        no: 'desc',
-      },
+      orderBy: { no: 'desc' },
     });
 
     const imageTargetType = await getImageTargetTypeCode(IMAGE_TARGET_TYPE_NAME);
@@ -558,16 +547,13 @@ export const getLatest = async () => {
         select: {
           publicId: true,
           url: true,
-          // name: true,
           order: true,
         },
       });
+
+      const orderRoundBreads = or.orderRoundBreads.map(({ bread }) => bread);
+      return { ...or, orderRoundBreads, image };
     }
-
-    // 데이터 정렬 (or: orderRound)
-    const orderRoundBreads = or?.orderRoundBreads.map(({ bread }) => bread);
-
-    return { ...or, orderRoundBreads, image };
   });
 
   return result;
@@ -580,7 +566,7 @@ export const getNow = async () => {
   const now = new Date();
 
   const result = await prisma.$transaction(async (tx) => {
-    const data = tx.orderRound.findFirst({
+    const data = await tx.orderRound.findFirst({
       where: {
         startedAt: { lte: now },
         endedAt: { gte: now },
@@ -612,7 +598,7 @@ export const getNow = async () => {
  */
 export const selectStartedAtOrderRound = async (startedAt: Date) => {
   const result = await prisma.$transaction(async (tx) => {
-    const data = tx.orderRound.findFirst({
+    const data = await tx.orderRound.findFirst({
       where: {
         startedAt: { lte: startedAt },
         endedAt: { gte: startedAt },
@@ -634,6 +620,38 @@ export const selectStartedAtOrderRound = async (startedAt: Date) => {
     });
 
     return data;
+  });
+
+  return result;
+};
+
+/**
+ * 현재 시작일자가 포함된 주문차수 조회
+ */
+export const selectStartedAtOrderRoundUpdate = async (no: number, startedAt: Date) => {
+  const result = await prisma.$transaction(async (tx) => {
+    const data = await tx.orderRound.findFirst({
+      where: {
+        startedAt: { lte: startedAt },
+        endedAt: { gte: startedAt },
+      },
+      select: {
+        no: true,
+        name: true,
+        startedAt: true,
+        endedAt: true,
+        minOrderQty: true,
+        maxOrderQty: true,
+        orderRoundBreads: {
+          select: {
+            orderRoundNo: true,
+            breadNo: true,
+          },
+        },
+      },
+    });
+
+    if (data && data.no !== no) return data;
   });
 
   return result;
