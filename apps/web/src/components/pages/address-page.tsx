@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import type { AddressListData as AddressListDataOrigin } from '@/api/data-contracts';
 import AddressCreateDialog from '@/components/mypage/address-create-dialog';
 import AddressModifyDialog from '../mypage/address-modify-dialog';
@@ -8,7 +8,6 @@ import { MyService } from '@/services/api/my-service';
 import { useEffect, useState } from 'react';
 
 export default function AddressPage() {
-  const queryClient = useQueryClient();
   const { getAddressList } = MyService;
   const { data, isLoading } = useQuery({
     queryKey: ['getAddresses'],

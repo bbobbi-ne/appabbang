@@ -53,7 +53,7 @@ export const addressSchema = z.object({
     .min(1, '배송메세지를 입력해주세요')
     .max(30, '최대 30자 이내로 입력해주세요'),
   isDefault: z.boolean().optional(),
-  no: z.number(),
+  no: z.number().optional(),
 });
 export type addresssDailogForm = z.infer<typeof addressSchema>;
 
@@ -92,6 +92,8 @@ export default function AddressForm({
 
   // 배송지 등록
   const handleSubmit = async (data: addresssDailogForm) => {
+    console.log('handleSubmit called', data);
+
     if (currentValues?.isDefault && !data.isDefault) {
       toast.error('다른 배송지를 기본 배송지로 추가해주세요.');
       return;
