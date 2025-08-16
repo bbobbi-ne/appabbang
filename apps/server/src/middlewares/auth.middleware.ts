@@ -2,8 +2,8 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '@/types';
 import { ClientPayload } from '@/types/client-payload';
-import { getOne as getAdminUserOne } from '@/services/user.service';
-import { getOne as getCustomerUserOne } from '@/services/customer.service';
+import { getOneForCheck as getAdminUserOne } from '@/services/user.service';
+import { getOneForCheck as getCustomerUserOne } from '@/services/customer.service';
 
 /** JWT 토큰 검증 공통 함수 */
 const verifyToken = async (req: Request): Promise<ClientPayload> => {

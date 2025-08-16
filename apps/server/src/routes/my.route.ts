@@ -7,9 +7,35 @@ import {
   createMyAddressValidator,
   updateMyAddressValidator,
   deleteMyAddressValidator,
+  validate,
 } from '@/middlewares/validators/validate';
+import {
+  updateCustomerPwValidator,
+  updateCustomerValidator,
+} from '@/middlewares/validators/auth-validate';
 
 const router = Router();
+
+// MY 는 사실상 모두 [고객] 본인으로 봐야할듯..?
+
+/** GET /my : 내 정보 조회 */
+router.get('/', requireCustomerOwner, asyncHandler(myController.getInfo));
+
+/** PUT /my : 내 정보 수정 */
+router.put(
+  '/',
+  requireCustomerOwner,
+  validate(updateCustomerValidator),
+  asyncHandler(myController.update),
+);
+
+/** PUT /my/pw : 내 정보 수정 - 비밀번호 변경 */
+router.put(
+  '/pw',
+  requireCustomerOwner,
+  validate(updateCustomerPwValidator),
+  asyncHandler(myController.updatePw),
+);
 
 // >>>>>> 배송지 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 /** GET /my/addresses : 배송지 목록 조회 */
