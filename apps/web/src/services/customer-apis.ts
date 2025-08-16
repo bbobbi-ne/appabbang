@@ -155,24 +155,13 @@ export const login = async (
       sessionStorage.setItem('accessToken', accessToken);
       setAccessToken(accessToken);
 
-      // success message
-      addToast({
-        type: 'success',
-        message: `${response.data.data.name}님, 환영합니다!`,
-      });
-
-      // 메인페이지 이동
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 1500);
+      return { code: 200, message: 'success', name: response.data.data.name };
     } else {
-      throw new CustomError(500, 'fail');
+      return { code: response.status, message: '로그인 실패되었습니다.' };
     }
   } catch (e: any) {
-    addToast({
-      type: 'error',
-      message: e.response.data.error.message,
-    });
+    addToast({ type: 'error', message: e.response.data.error.message });
+    return { code: 500, message: e.response.data.error.message };
   }
 };
 
@@ -181,11 +170,7 @@ export const login = async (
  */
 export const logout = async (accessToken: string, reset: (accessToken: string) => void) => {
   try {
-    const response = await client.post(
-      '/auth/customers/logout',
-      {},
-      { headers: { Authorization: `Bearer ${accessToken}` } },
-    );
+    const response = await sessionClient.post('/auth/logout');
 
     if (response.status === 204) {
       reset(accessToken);
