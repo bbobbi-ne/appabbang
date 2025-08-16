@@ -5,7 +5,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { User, ScrollText, LogIn, LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import Loading from './loading';
 
 export interface IOrderRoundProps {
   no: number;
@@ -27,11 +26,7 @@ export default function Header() {
   const { addToast } = useToast();
 
   // 현재 진행중인 주문차수 조회
-  const {
-    isLoading,
-    data: getData,
-    error,
-  } = useQuery({
+  const { isLoading, data: getData } = useQuery({
     queryKey: ['getOrderRoundNow'],
     queryFn: getOrderRoundNow,
   });
@@ -60,15 +55,13 @@ export default function Header() {
     navigate({ to: '/mypage/info' });
   };
 
-  if (error || !data) return <Loading />;
-
   return (
     <header className="w-full fixed top-0 left-0 right-0 z-50 bg-background border-b">
       {/* 헤더 전체 가운데 정렬 */}
       <div className="container mx-auto px-2">
         {/* 1 ROW : 아이콘 메뉴 (주문서, 마이페이지, 로그인, 로그아웃) */}
         <nav className="flex items-center justify-end py-2 bg-background">
-          {!isLoading ? (
+          {!isLoading && data ? (
             <ScrollText
               strokeWidth={1}
               size={16}
