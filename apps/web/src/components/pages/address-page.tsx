@@ -5,7 +5,6 @@ import AddressModifyDialog from '../mypage/address-modify-dialog';
 import { Badge, Skeleton } from '@appabbang/ui';
 import { getFormattedMobile } from '@/utils';
 import { MyService } from '@/services/api/my-service';
-import { useEffect, useState } from 'react';
 
 export default function AddressPage() {
   const { getAddressList } = MyService;
