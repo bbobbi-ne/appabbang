@@ -54,7 +54,7 @@ export async function createCustomer(
   setCustomer: (model: ICustomerProps) => void,
 ) {
   try {
-    const response = await client.post('/auth/customers/join', data);
+    const response = await client.post('/auth/login', data);
 
     if (response.status === 201) {
       // 고객 간단정보를 상태관리에 저장
@@ -123,7 +123,7 @@ export const login = async (
   setCustomer: (model: ICustomerProps) => void,
 ) => {
   try {
-    const response = await client.post('/auth/customers/login', data);
+    const response = await client.post('/auth/login', data);
 
     if (response.status === 200) {
       // 고객 간단정보를 상태관리에 저장
