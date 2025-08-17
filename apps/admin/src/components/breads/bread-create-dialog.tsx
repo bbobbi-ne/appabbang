@@ -8,7 +8,7 @@ export function BreadCreateDialog() {
 
   return (
     <DialogLayout
-      trigger={<Button className="ml-auto">빵 추가하기</Button>}
+      trigger={<Button>빵 추가하기</Button>}
       title="빵 등록"
       description="메뉴를 등록해주세요"
     >
