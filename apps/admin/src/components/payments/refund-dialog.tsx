@@ -15,7 +15,7 @@ import { DialogLayout } from '../ui/dialog-layout';
 
 export function RefundDialog({ no }: { no: number }) {
   return (
-    <DialogLayout trigger={<Button>확인</Button>} title="" description="">
+    <DialogLayout height={500} trigger={<Button>확인</Button>} title="" description="">
       {({ close }) => <DialogBody no={no} close={close} />}
     </DialogLayout>
   );
@@ -29,20 +29,16 @@ const DialogBody = ({ no }: { no: number; close: () => void }) => {
 
   const isRefund = paymentDetail?.isPaid ? true : false;
 
-  console.log(ordersDetail?.orderStatus);
-
   return (
     <>
-      <DialogHeader>
+      <DialogHeader className="pb-6">
         <DialogTitle>{isRefund ? '환불' : '취소'} 정보</DialogTitle>
         <DialogDescription>
           <strong>주문번호</strong>({ordersDetail!.orderNumber})
         </DialogDescription>
       </DialogHeader>
-      <ScrollArea className="h-[600px] py-6">
-        <RefundTable ordersDetail={ordersDetail!} paymentDetail={paymentDetail!} />
-      </ScrollArea>
-      <DialogFooter>
+      <RefundTable ordersDetail={ordersDetail!} paymentDetail={paymentDetail!} />
+      <DialogFooter className="py-6">
         {isRefund ? (
           <>
             <DialogClose asChild>
