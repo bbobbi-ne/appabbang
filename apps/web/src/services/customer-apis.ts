@@ -3,8 +3,7 @@
  */
 
 import useToast from '@/hooks/useToast';
-import { client } from './common-apis';
-import sessionClient from './axios';
+import client from './axios';
 
 const { addToast } = useToast();
 
@@ -170,7 +169,7 @@ export const login = async (
  */
 export const logout = async (accessToken: string, reset: (accessToken: string) => void) => {
   try {
-    const response = await sessionClient.post('/auth/logout');
+    const response = await client.post('/auth/logout');
 
     if (response.status === 204) {
       reset(accessToken);
@@ -200,7 +199,7 @@ export const logout = async (accessToken: string, reset: (accessToken: string) =
  */
 export const getCustomerInfo = async () => {
   try {
-    const response = await sessionClient.get('/my');
+    const response = await client.get('/my');
     if (response.status === 200) return response.data;
     else throw new CustomError(500, 'fail');
   } catch (e: any) {
@@ -216,7 +215,7 @@ export const getCustomerInfo = async () => {
  */
 export const updateCustomer = async (data: { id: string; name: string; mobileNumber: string }) => {
   try {
-    const response = await sessionClient.put('/my', {
+    const response = await client.put('/my', {
       id: data.id,
       name: data.name,
       mobileNumber: data.mobileNumber,
@@ -243,7 +242,7 @@ export const updateCustomer = async (data: { id: string; name: string; mobileNum
  */
 export const updateCustomerPw = async ({ pw, pwModify }: { pw: string; pwModify: string }) => {
   try {
-    const response = await sessionClient.put('/my/pw', { pw, pwModify });
+    const response = await client.put('/my/pw', { pw, pwModify });
 
     if (response.status === 200) {
       addToast({
