@@ -200,7 +200,7 @@ export const logout = async (accessToken: string, reset: (accessToken: string) =
  */
 export const getCustomerInfo = async () => {
   try {
-    const response = await sessionClient.get('/auth/customers/info');
+    const response = await sessionClient.get('/my');
     if (response.status === 200) return response.data;
     else throw new CustomError(500, 'fail');
   } catch (e: any) {
@@ -216,7 +216,7 @@ export const getCustomerInfo = async () => {
  */
 export const updateCustomer = async (data: { id: string; name: string; mobileNumber: string }) => {
   try {
-    const response = await sessionClient.put('/auth/customers/update', {
+    const response = await sessionClient.put('/my', {
       id: data.id,
       name: data.name,
       mobileNumber: data.mobileNumber,
@@ -243,7 +243,7 @@ export const updateCustomer = async (data: { id: string; name: string; mobileNum
  */
 export const updateCustomerPw = async ({ pw, pwModify }: { pw: string; pwModify: string }) => {
   try {
-    const response = await sessionClient.put('/auth/customers/update/pw', { pw, pwModify });
+    const response = await sessionClient.put('/my/pw', { pw, pwModify });
 
     if (response.status === 200) {
       addToast({
