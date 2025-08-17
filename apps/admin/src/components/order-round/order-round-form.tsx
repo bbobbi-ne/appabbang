@@ -96,7 +96,7 @@ function OrderRoundForm({ currentValues, no, onSuccess, submitFn }: OrderRoundFo
     const endedAt = formatDateTimeToIso(data.endedAt.date, data.endedAt.time);
     const orderRoundBreads = JSON.stringify(
       data.orderRoundBreads.map((item) => {
-        return { breadNo: item.no };
+        return { no: item.no };
       }),
     );
 

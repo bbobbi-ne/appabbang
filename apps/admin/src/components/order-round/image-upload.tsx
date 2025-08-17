@@ -56,7 +56,7 @@ export function ImageUpload({
       ) : (
         <div onClick={removeImage} className="border rounded overflow-hidden cursor-pointer">
           <img
-            src={value instanceof File ? URL.createObjectURL(value) : value.url}
+            src={value instanceof File ? URL.createObjectURL(value) : value}
             alt="preview"
             className="w-full h-40 rounded object-fill"
           />

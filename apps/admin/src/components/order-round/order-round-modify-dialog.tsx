@@ -16,6 +16,7 @@ function DialogBody({ close, no }: { close: () => void; no: number }) {
   const { data, isLoading } = useOrderRoundDetailQuery(no);
   const { orderRoundUpdateMutation } = useOrderRoundUpdateMutation();
 
+  console.log(data);
   if (isLoading && !data) return;
 
   function splitIsoToDateTime(isoString: string) {
@@ -34,12 +35,11 @@ function DialogBody({ close, no }: { close: () => void; no: number }) {
   const currentValues = {
     ...data!,
     orderRoundBreads,
-    image: data?.image ? data?.image[0]!.url : undefined,
+    image: data?.image ? data?.image.url : undefined,
     startedAt: splitIsoToDateTime(data?.startedAt!),
     endedAt: splitIsoToDateTime(data?.endedAt!),
   };
 
-  console.log(currentValues, '수정다이어로그');
   return (
     <OrderRoundForm
       onSuccess={close}
