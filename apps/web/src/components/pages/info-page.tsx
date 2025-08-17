@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import InfoForm from '../mypage/info-form';
 import { getCustomerInfo } from '@/services/customer-apis';
-import { useCustomerStore } from '@/store/customer';
 
 interface IAddressProps {
   no: number;
