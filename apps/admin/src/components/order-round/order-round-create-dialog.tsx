@@ -8,7 +8,7 @@ function OrderRoundCreateDialog() {
 
   return (
     <DialogLayout
-      trigger={<Button className="ml-auto">등록</Button>}
+      trigger={<Button>등록</Button>}
       description="주문차수를 등록해주세요"
       title="주문차수 등록"
     >
