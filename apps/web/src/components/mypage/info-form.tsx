@@ -21,7 +21,6 @@ import Loading from '../common/loading';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
 import { updateCustomer } from '@/services/customer-apis';
-import { useAccessTokenStore } from '@/store/session';
 import { getFormattedMobile } from '@/utils';
 
 interface InfoFormProps {
@@ -31,8 +30,6 @@ interface InfoFormProps {
 const labelMinWidth = 'min-w-[120px]';
 
 function InfoForm({ customer }: InfoFormProps) {
-  const { accessToken } = useAccessTokenStore();
-
   useEffect(() => {
     if (customer) {
       form.reset({
@@ -69,7 +66,7 @@ function InfoForm({ customer }: InfoFormProps) {
    */
   const onSubmit: SubmitHandler<CustomerFormSchema> = (data) => {
     (async () => {
-      const { mobileNumber } = await updateCustomer(data, accessToken);
+      const { mobileNumber } = await updateCustomer(data);
 
       // 변경된 값으로 form 설정
       form.setValue('mobileNumber', mobileNumber);
