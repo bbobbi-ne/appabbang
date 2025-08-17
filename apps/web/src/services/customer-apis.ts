@@ -210,53 +210,17 @@ export const getCustomerInfo = async () => {
   }
 };
 
-/**
- * 고객정보 수정
- */
-export const updateCustomer = async (data: { id: string; name: string; mobileNumber: string }) => {
-  try {
-    const response = await client.put('/my', {
-      id: data.id,
-      name: data.name,
-      mobileNumber: data.mobileNumber,
-    });
-
-    if (response.status === 200) {
-      addToast({
-        type: 'success',
-        message: '정상적으로 수정되었습니다.',
-      });
-
-      return response.data.customer;
-    } else throw new CustomError(500, 'fail');
-  } catch (e: any) {
-    addToast({
-      type: 'error',
-      message: e.response.data.error.message,
-    });
-  }
+/** 고객정보 수정 타입 */
+type CustomerInfoType = { id: string; name: string; mobileNumber: string };
+/** 고객정보 수정 */
+export const updateCustomer = async ({ id, name, mobileNumber }: CustomerInfoType) => {
+  const body = { id, name, mobileNumber };
+  await client.put('/my', body);
 };
 
-/**
- * 고객정보 수정 : 비밀번호 변경
- */
-export const updateCustomerPw = async ({ pw, pwModify }: { pw: string; pwModify: string }) => {
-  try {
-    const response = await client.put('/my/pw', { pw, pwModify });
-
-    if (response.status === 200) {
-      addToast({
-        type: 'success',
-        message: '정상적으로 수정되었습니다.',
-      });
-
-      // 비밀번호는 민감정보라서 딱히 던지는 데이터가 존재하지 않음.
-      return;
-    } else throw new CustomError(500, 'fail');
-  } catch (e: any) {
-    addToast({
-      type: 'error',
-      message: e.response.data.error.message,
-    });
-  }
+/** 고객정보 수정 타입 */
+export type CustomePwType = { pw: string; pwModify: string };
+/** 고객정보 수정 : 비밀번호 변경 */
+export const updateCustomerPw = async ({ pw, pwModify }: CustomePwType) => {
+  await client.put('/my/pw', { pw, pwModify });
 };

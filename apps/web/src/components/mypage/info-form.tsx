@@ -22,6 +22,8 @@ import dayjs from 'dayjs';
 import { useEffect } from 'react';
 import { updateCustomer } from '@/services/customer-apis';
 import { getFormattedMobile } from '@/utils';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import useToast from '@/hooks/useToast';
 
 interface InfoFormProps {
   customer?: ICustomerProps;
@@ -30,6 +32,26 @@ interface InfoFormProps {
 const labelMinWidth = 'min-w-[120px]';
 
 function InfoForm({ customer }: InfoFormProps) {
+  const { addToast } = useToast();
+  const queryClient = useQueryClient();
+  const updateCustomerMutation = useMutation({
+    mutationFn: (data: CustomerFormSchema) => updateCustomer(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['getCustomerInfo'] });
+
+      addToast({
+        type: 'success',
+        message: '정상적으로 수정되었습니다.',
+      });
+    },
+    onError: (error) => {
+      addToast({
+        type: 'error',
+        message: error.message,
+      });
+    },
+  });
+
   useEffect(() => {
     if (customer) {
       form.reset({
@@ -55,30 +77,20 @@ function InfoForm({ customer }: InfoFormProps) {
   });
 
   /**
-   * form handler
-   */
-  const onFormHandler = async (e: React.FormEvent<HTMLFormElement>) => {
-    form.handleSubmit(onSubmit)(e);
-  };
-
-  /**
    * form submit
    */
-  const onSubmit: SubmitHandler<CustomerFormSchema> = (data) => {
-    (async () => {
-      const { mobileNumber } = await updateCustomer(data);
-
-      // 변경된 값으로 form 설정
-      form.setValue('mobileNumber', mobileNumber);
-    })();
-  };
+  const onSubmit: SubmitHandler<CustomerFormSchema> = async (data) =>
+    await updateCustomerMutation.mutateAsync(data);
 
   if (!customer) return <Loading />;
   return (
     <div className="w-full flex flex-row items-center justify-center">
       <Card className="p-10 flex flex-row items-center justify-center w-2/3">
         <Form {...form}>
-          <form onSubmit={onFormHandler} className="w-2/3 *:m-2 *:has-[.submitBtn]:mt-5">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="w-2/3 *:m-2 *:has-[.submitBtn]:mt-5"
+          >
             <FormField
               control={form.control}
               name="name"
