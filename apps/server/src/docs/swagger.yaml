@@ -568,6 +568,7 @@ paths:
                     - orderNumber
                     - orderStatus
                     - orderStatusName
+                    - ordererMobile
                     - ordererName
                     - recipientName
                     - totalPrice
@@ -591,6 +592,10 @@ paths:
                       type: string
                       description: 주문 상태명
                       example: '접수요청'
+                    ordererMobile:
+                      type: string
+                      description: 주문자 전화번호
+                      example: '010-1234-5678'
                     ordererName:
                       type: string
                       description: 주문자 이름
@@ -1494,14 +1499,20 @@ paths:
                           description: 가격
                           example: 1000
                   image:
-                    type: array
-                    items:
-                      type: object
+                    type: object
                       properties:
-                        url: 
+                        url:
                           type: string
                           description: 이미지 URL
                           example: 'https://example.com/image.jpg'
+                        publicId:
+                          type: string
+                          description: 이미지 식별자
+                          example: 'breads/zvypj6wohag9dghdtdto'
+                        order:
+                          type: number
+                          description: 이미지 순서
+                          example: 1
 
     put:
       tags: [OrderRound]
