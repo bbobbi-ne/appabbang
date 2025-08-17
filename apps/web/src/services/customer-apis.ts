@@ -54,7 +54,7 @@ export async function createCustomer(
   setCustomer: (model: ICustomerProps) => void,
 ) {
   try {
-    const response = await client.post('/auth/login', data);
+    const response = await client.post('/customers', data);
 
     if (response.status === 201) {
       // 고객 간단정보를 상태관리에 저장
