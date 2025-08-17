@@ -22,8 +22,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type Dispatch, type SetStateAction } from 'react';
-import { formatKR } from '@/utils/format';
+import { formatCurrencyKR } from '@/utils/format';
 
 export const schema = z.object({
   name: z
@@ -40,7 +39,7 @@ interface Props {
   submitFn: (arg: any) => Promise<any>;
   currentValues?: FormType;
   no?: number;
-  setOpen: Dispatch<SetStateAction<boolean>>;
+  onSuccess: () => void;
   isRestricted?: boolean;
   deleteFn?: (no: number) => Promise<void>;
   deleteLoading?: boolean;
@@ -50,7 +49,7 @@ export default function BreadForm({
   submitFn,
   currentValues,
   no,
-  setOpen,
+  onSuccess,
   isRestricted,
   deleteFn,
   deleteLoading,
@@ -77,7 +76,7 @@ export default function BreadForm({
       await submitFn(formData);
 
       form.reset();
-      setOpen(false);
+      onSuccess();
     } catch (error: any) {
       const message = error.message ?? '알 수 없는 에러가 발생했습니다. 잠시 후 다시 시도해주세요.';
 
@@ -124,7 +123,7 @@ export default function BreadForm({
                     className="text-left"
                     inputMode="numeric"
                     placeholder="쿠폰 금액을 입력해주세요"
-                    value={formatKR(field.value)}
+                    value={formatCurrencyKR(field.value)}
                     onChange={(e) => {
                       const onlyDigits = e.target.value.replace(/\D/g, '');
                       if (Number(onlyDigits) > 50001) {
