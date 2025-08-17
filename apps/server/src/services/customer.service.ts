@@ -154,9 +154,5 @@ export const getOneForCheck = async (id: string) => {
     },
   });
 
-  if (!customer) {
-    throw AppError.notFound('Customer not found');
-  }
-
   return customer;
 };
