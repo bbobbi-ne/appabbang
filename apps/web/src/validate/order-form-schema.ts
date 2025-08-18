@@ -150,9 +150,6 @@ export const formSchema = z.object({
   discountAmount: z // 할인금액
     .number(),
 
-  agreed: z // 동의여부(화면에서만 사용)
-    .boolean(),
-
   bankCode: z // 은행코드
     .string({ required_error: '은행을 선택 바랍니다.' }),
 
@@ -168,6 +165,18 @@ export const formSchema = z.object({
 
   same: z // 주문자-수령인 동일여부
     .boolean(),
+
+  isServiceTermsAgreed: z.boolean({
+    required_error: '서비스 이용약관 처리방침을 확인 바랍니다.',
+  }),
+
+  isPrivacyTermsAgreed: z.boolean({
+    required_error: '개인정보 수집 및 이용 처리방침을 확인 바랍니다.',
+  }),
+
+  isPaymentRefundTermsAgreed: z.boolean(),
+
+  orderRoundNo: z.number(),
 });
 
 export type FormSchema = z.infer<typeof formSchema>;
@@ -245,10 +254,6 @@ export const customerOrderFormSchema = z.object({
   discountAmount: z // 할인금액
     .number(),
 
-  agreed: z // 동의여부(화면에서만 사용)
-    .boolean()
-    .optional(),
-
   bankCode: z // 은행코드
     .string({ required_error: '은행을 선택 바랍니다.' }),
 
@@ -265,5 +270,17 @@ export const customerOrderFormSchema = z.object({
   same: z // 주문자-수령인 동일여부
     .boolean()
     .optional(),
+
+  isServiceTermsAgreed: z.boolean({
+    required_error: '서비스 이용약관 처리방침을 확인 바랍니다.',
+  }),
+
+  isPrivacyTermsAgreed: z.boolean({
+    required_error: '개인정보 수집 및 이용 처리방침을 확인 바랍니다.',
+  }),
+
+  isPaymentRefundTermsAgreed: z.boolean(),
+
+  orderRoundNo: z.number(),
 });
 export type CustomerOrderFormSchema = z.infer<typeof customerOrderFormSchema>;

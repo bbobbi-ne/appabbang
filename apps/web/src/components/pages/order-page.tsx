@@ -118,11 +118,14 @@ export default function OrderPage() {
       orderItems: [], // 주문목록
       totalPrice: 0, // 최종금액
       discountAmount: 0, // 할인금액
-      agreed: false, // 동의여부(화면단에서만 이용)
       bankCode: '', // 은행코드
       accountNumber: '', // 계좌번호
       accountHolderName: '', // 예금주
       same: false, // 주문자-수령인 동일여부
+      isServiceTermsAgreed: false, // 서비스 이용약관
+      isPrivacyTermsAgreed: false, // 개인정보 이용약관
+      isPaymentRefundTermsAgreed: false, // 결제 및 환불 약관
+      orderRoundNo: Number(orderRoundNo), // 주문차수
     },
   });
 
@@ -140,11 +143,14 @@ export default function OrderPage() {
       orderItems: [], // 주문목록
       totalPrice: 0, // 최종금액
       discountAmount: 0, // 할인금액
-      agreed: false, // 동의여부(화면단에서만 이용)
       bankCode: '', // 은행코드
       accountNumber: '', // 계좌번호
       accountHolderName: '', // 예금주
       same: false, // 주문자-수령인 동일여부
+      isServiceTermsAgreed: false, // 서비스 이용약관
+      isPrivacyTermsAgreed: false, // 개인정보 이용약관
+      isPaymentRefundTermsAgreed: false, // 결제 및 환불 약관
+      orderRoundNo: Number(orderRoundNo), // 주문차수
     },
   });
 
@@ -161,38 +167,41 @@ export default function OrderPage() {
       return;
     }
 
-    // 비회원인 경우, 개인정보 수집 및 이용동의가 필요함.
-    const agreed = nonCustomerForm.getValues('agreed');
-    if (!accessToken && !agreed) {
-      addToast({
-        type: 'error',
-        message: '비회원인 경우, 개인정보 수집 및 이용동의가 필요합니다.',
-      });
-      return;
+    // customerForm / nonCustomerForm totalPrice 설정
+    if (accessToken && accessToken.length > 0) {
+      customerForm.setValue('totalPrice', totalPrice);
+      customerForm.setValue(
+        'orderItems',
+        paymentList.map((bread) => ({
+          breadNo: bread.no,
+          quantity: bread.count,
+        })),
+      );
+      customerForm.setValue('orderRoundNo', 1);
+
+      customerForm.handleSubmit(customerOnSubmit, (error) => console.log(error))();
+    } else {
+      nonCustomerForm.setValue('totalPrice', totalPrice);
+
+      nonCustomerForm.setValue(
+        'orderItems',
+        paymentList.map((bread) => ({
+          breadNo: bread.no,
+          quantity: bread.count,
+        })),
+      );
+
+      nonCustomerForm.handleSubmit(nonCustomerOnSubmit, (error) => console.log(error))();
     }
-
-    // customerForm / nonCustomerForm 현재 값 조회
-    const formData =
-      accessToken && accessToken.length > 0
-        ? customerForm.getValues()
-        : nonCustomerForm.getValues();
-
-    formData.totalPrice = totalPrice; // 총금액 설정
-
-    accessToken && accessToken.length > 0
-      ? customerForm.handleSubmit(customerOnSubmit, (error) => console.log(error))()
-      : nonCustomerForm.handleSubmit(nonCustomerOnSubmit, (error) => console.log(error))();
   };
 
   /** 고객 주문서 저장 */
   const customerOnSubmit: SubmitHandler<CustomerOrderFormSchema> = async (data) => {
-    // makePaymentList(data); // orderItems 생성
     await insertOrder.mutateAsync(data); // 주문서 등록(고객)
   };
 
   /** 비회원 주문서 저장 */
   const nonCustomerOnSubmit: SubmitHandler<FormSchema> = async (data) => {
-    // makePaymentList(data); // orderItems 생성
     await insert.mutateAsync(data); // 주문서 등록(비회원)
   };
 
@@ -237,22 +246,6 @@ export default function OrderPage() {
 
     setTotalCount(count);
     setTotalPrice(price + fee); // 빵 목록 금액의 합 + 배송비
-
-    customerForm.setValue(
-      'orderItems',
-      paymentList.map((bread) => ({
-        breadNo: bread.no,
-        quantity: bread.count,
-      })),
-    );
-
-    nonCustomerForm.setValue(
-      'orderItems',
-      paymentList.map((bread) => ({
-        breadNo: bread.no,
-        quantity: bread.count,
-      })),
-    );
   }, [paymentList, fee]);
 
   /**********************************************************************************/

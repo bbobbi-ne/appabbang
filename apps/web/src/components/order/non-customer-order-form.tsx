@@ -24,8 +24,10 @@ import {
 } from '@appabbang/ui';
 import { type UseFormReturn } from 'react-hook-form';
 import DaumPostApi from '../common/daum-post-api';
-import GuestPrivacyAgreement from './guest-privacy-agreement';
 import { useState } from 'react';
+import PaymentRefundTermsAgreedDialog from './payment-refund-terms-agreed-dialog';
+import ServiceIsAgreedDialog from '../join/service-terms-agreed-dialog';
+import PrivacyTermsAgreedDialog from '../join/privacy-terms-agreed-dialog';
 
 interface NonCustomerOrderFormProp {
   form: UseFormReturn<FormSchema>;
@@ -68,9 +70,6 @@ function NonCustomerOrderForm({
       setDisabledAddrDtl(false);
     }
   };
-
-  /** 비회원 개인정보처리방침 동의 flag 처리 */
-  const onAgreed = (flag: boolean) => form.setValue('agreed', flag); // onSubmit에서 사용하기 위해 정의함.
 
   /** 주문자-수령인 정보가 동일하지 않을 때 */
   const checkedRecipient = (_: React.ChangeEvent<HTMLInputElement>) => {
@@ -489,33 +488,109 @@ function NonCustomerOrderForm({
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="agreed"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel hidden htmlFor="agreed" errorCheck={false}>
-                <span className="text-red-700">*</span> 동의여부
-              </FormLabel>
-              <FormControl>
-                <Checkbox
-                  id="agreed"
-                  className="w-full"
-                  hidden
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  {...form.register('agreed')}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
+        <div className="flex flex-col gap-0 items-center">
+          {/* 서비스 이용약관 동의여부 */}
+          <FormField
+            control={form.control}
+            name="isServiceTermsAgreed"
+            render={({ field }) => (
+              <FormItem className="w-2/3 pl-10 pr-10">
+                <div className="flex items-center">
+                  <div className="flex items-center gap-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="mb-0"
+                      />
+                    </FormControl>
 
-        <GuestPrivacyAgreement
-          onAgreed={onAgreed}
-          agreed={form.watch('agreed')}
-          setAgreed={(flag: boolean) => form.setValue('agreed', flag)}
-        />
+                    <FormLabel
+                      errorCheck={false}
+                      className="whitespace-nowrap cursor-pointer text-xs"
+                    >
+                      아빠빵 서비스 이용약관 처리방침에 동의합니다.
+                    </FormLabel>
+                  </div>
+
+                  <ServiceIsAgreedDialog>
+                    <Button type="button" variant="link" className="text-xs ml-auto pr-2">
+                      약관보기
+                    </Button>
+                  </ServiceIsAgreedDialog>
+                </div>
+              </FormItem>
+            )}
+          />
+
+          {/* 개인정보 수집, 이용 동의여부 */}
+          <FormField
+            control={form.control}
+            name="isPrivacyTermsAgreed"
+            render={({ field }) => (
+              <FormItem className="w-2/3 pl-10 pr-10">
+                <div className="flex items-center">
+                  <div className="flex items-center gap-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="mb-0"
+                      />
+                    </FormControl>
+
+                    <FormLabel
+                      errorCheck={false}
+                      className="whitespace-nowrap cursor-pointer text-xs"
+                    >
+                      아빠빵 개인정보 수집 및 이용 처리방침에 동의합니다.
+                    </FormLabel>
+                  </div>
+
+                  <PrivacyTermsAgreedDialog>
+                    <Button type="button" variant="link" className="text-xs ml-auto pr-2">
+                      약관보기
+                    </Button>
+                  </PrivacyTermsAgreedDialog>
+                </div>
+              </FormItem>
+            )}
+          />
+
+          {/* 결제/환불 약관 동의여부 */}
+          <FormField
+            control={form.control}
+            name="isPaymentRefundTermsAgreed"
+            render={({ field }) => (
+              <FormItem className="w-2/3 pl-10 pr-10">
+                <div className="flex items-center">
+                  <div className="flex items-center gap-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="mb-0"
+                      />
+                    </FormControl>
+
+                    <FormLabel
+                      errorCheck={false}
+                      className="whitespace-nowrap cursor-pointer text-xs"
+                    >
+                      아빠빵 결제 및 환불 처리방침에 동의합니다.
+                    </FormLabel>
+                  </div>
+
+                  <PaymentRefundTermsAgreedDialog>
+                    <Button type="button" variant="link" className="text-xs ml-auto pr-2">
+                      약관보기
+                    </Button>
+                  </PaymentRefundTermsAgreedDialog>
+                </div>
+              </FormItem>
+            )}
+          />
+        </div>
 
         <div className="m-10">
           <Button type="submit" className="text-2xl h-15 w-full" disabled={save}>
