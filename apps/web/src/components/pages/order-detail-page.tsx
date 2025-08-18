@@ -3,29 +3,65 @@
  */
 
 import { Button, Card, CardContent } from '@appabbang/ui';
-import { orders } from '../mypage/meta-data';
 import { useEffect, useState } from 'react';
-import type { IOrderItem } from '../mypage/order-item';
 import OrderItem from '../mypage/order-item';
 import { ArrowRight } from 'lucide-react';
 import AddressModifyDialog from '../mypage/address-modify-dialog';
 import { useNavigate } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
+import { MyService } from '@/services/api/my-service';
 
-interface IDataProps {
+type OrderItemsType = {
   no: number;
-  orderNumber: string;
-  orderStatus: string;
+  breadNo: number;
+  breadImageUrl: string;
+  allergyInfo: string;
+  breadName: string;
+  countryOfOrigin: string;
+  quantity: number;
+
   totalPrice: number;
-  deliveryMethodFee: number;
-  recipientName: string;
-  recipientMobile: string;
-  address: string;
-  addressDetail: string;
-  zipcode: string;
-  message: string;
-  orderItem: IOrderItem[];
+  unitPrice: number;
+
   createdAt: string;
-}
+  updatedAt: string;
+
+  orderNo: number;
+  order: {
+    no: number;
+
+    address: string;
+    addressDetail: string;
+    zipcode: string;
+
+    deliveryMethodFee: number;
+    deliveryMethodName: string;
+    discountAmount: number;
+    totalPrice: number;
+    trackingNumber: string;
+    message: string;
+    orderStatus: string;
+
+    isPaymentRefundTermsAgreed: boolean;
+    isPrivacyTermsAgreed: boolean;
+    isServiceTermsAgreed: boolean;
+    memo: string;
+    orderNumber: string;
+    orderPw: string;
+
+    ordererName: string;
+    ordererMobile: string;
+    recipientMobile: string;
+    recipientName: string;
+
+    customerNo: number;
+    couponNo: number;
+    orderRoundNo: number;
+
+    createdAt: string;
+    updatedAt: string;
+  };
+};
 
 interface IAddressProps {
   no: number;
@@ -39,45 +75,71 @@ interface IAddressProps {
 }
 
 function OrderDetailPage({ orderNo }: { orderNo: number }) {
-  const [data, setData] = useState<IDataProps | null>(null);
   const [address, setAddress] = useState<IAddressProps>();
+  const [amount, setAmount] = useState<number>(0);
   const navigate = useNavigate();
+  const { getOrder, getOrderStatus } = MyService;
 
+  const { isLoading, data: order } = useQuery({
+    queryKey: ['getOrder'],
+    queryFn: () => getOrder(Number(orderNo)),
+    enabled: !!orderNo,
+  });
+
+  const { isLoading: orderStatusLoading, data: orderStatus } = useQuery({
+    queryKey: ['getOrderStatus'],
+    queryFn: () => getOrderStatus(),
+  });
+
+  /** 상품금액 계산 */
   useEffect(() => {
-    const result = orders.find((data) => data.no === orderNo) || null;
-    setData(result);
+    if (order) {
+      let unitPrice = 0;
+      order.orderItems.map((item: OrderItemsType) => {
+        unitPrice += item.unitPrice;
+      });
 
-    if (result) {
+      setAmount(unitPrice);
+    }
+  }, [order]);
+
+  /** 주소 설정 */
+  useEffect(() => {
+    if (order) {
       const address = {
         no: 1,
-        address: result.address,
-        addressDetail: result.addressDetail,
-        zipcode: result.zipcode,
-        message: result.message,
-        recipientName: result.recipientName,
-        recipientMobile: result.recipientMobile,
+        address: order.address,
+        addressDetail: order.addressDetail,
+        zipcode: order.zipcode,
+        message: order.message,
+        recipientName: order.recipientName,
+        recipientMobile: order.recipientMobile,
         isDefault: true,
       };
 
       setAddress(address);
     }
-  }, [orderNo]);
+  }, [order]);
 
   // 배송현황 이동
   const onDeliveryMove = (no: number) => navigate({ to: `/mypage/order-delivery/${no}` });
 
-  if (!data) return <div>주문정보를 조회중입니다...</div>;
+  if (isLoading || orderStatusLoading) return <div>주문정보를 조회중입니다...</div>;
   else
     return (
       <div className="w-full flex flex-col justify-center items-center mt-10 mb-30">
         <Card className="mt-2 mb-5 flex flex-col w-2/3">
           <CardContent className="mt-4 flex gap-3">
             <div className="font-bold">
-              {new Date(data.createdAt).toISOString().split('T')[0]} 주문
+              {new Date(order.createdAt).toISOString().split('T')[0]} 주문
             </div>
-            <div>{data.orderNumber}</div>
+            <div>{order.orderNumber}</div>
             <div className="text-blue-600 font-bold">
-              [{data.orderStatus === '10' ? '입금대기' : data.orderStatus === '30' ? '배송중' : ''}]
+              [
+              {orderStatus.map((status: { code: string; name: string }) => {
+                return status.code === order.orderStatus && status.name;
+              })}
+              ]
             </div>
           </CardContent>
 
@@ -86,22 +148,22 @@ function OrderDetailPage({ orderNo }: { orderNo: number }) {
             <div className="flex flex-col gap-1">
               <div className="flex flex-row justify-between">
                 <div>상품금액</div>
-                <div>{data.totalPrice.toLocaleString()}원</div>
+                <div>{amount.toLocaleString()}원</div>
               </div>
               <div className="flex flex-row justify-between">
                 <div>배송비</div>
-                <div>{data.deliveryMethodFee.toLocaleString()}원</div>
+                <div>{order.deliveryMethodFee.toLocaleString()}원</div>
               </div>
               <div className="flex flex-row justify-between">
                 <div>최종결제금액</div>
-                <div>{(data.totalPrice + data.deliveryMethodFee).toLocaleString()}원</div>
+                <div>{order.totalPrice.toLocaleString()}원</div>
               </div>
             </div>
 
             <div className="border mt-5 mb-5"></div>
 
             <div className="font-bold text-2xl mt-2 mb-4">주문상품 내역</div>
-            {data.orderItem.map((item, i) => (
+            {order.orderItems.map((item: OrderItemsType, i: number) => (
               <OrderItem key={i} item={item} />
             ))}
 
@@ -110,10 +172,10 @@ function OrderDetailPage({ orderNo }: { orderNo: number }) {
             <div className="mt-2 mb-4 flex flex-col">
               <div className="flex flex-row mb-5">
                 <div className="font-bold text-2xl mr-5">배송정보</div>
-                {data.orderStatus == '30' ? (
+                {order.orderStatus == '30' ? (
                   <div
                     className="text-[14px] text-gray-500 flex flex-row items-center cursor-pointer"
-                    onClick={() => onDeliveryMove(data.no)}
+                    onClick={() => onDeliveryMove(order.no)}
                   >
                     수령현황 보기
                     <ArrowRight />
@@ -122,15 +184,15 @@ function OrderDetailPage({ orderNo }: { orderNo: number }) {
               </div>
 
               <div>
-                <div>{data.recipientName}</div>
+                <div>{order.recipientName}</div>
                 <div className="flex gap-2 items-center">
-                  {data.address} {data.addressDetail}{' '}
-                  <AddressModifyDialog data={address}>
+                  {order.address} {order.addressDetail}{' '}
+                  <AddressModifyDialog data={address} ORDER_DETAIL={true}>
                     <Button className="text-[12px] h-5">배송지 변경</Button>
                   </AddressModifyDialog>
                 </div>
-                <div>{data.recipientMobile}</div>
-                <div className="mt-3 text-gray-400">{data.message}</div>
+                <div>{order.recipientMobile}</div>
+                <div className="mt-3 text-gray-400">{order.message}</div>
               </div>
             </div>
           </CardContent>

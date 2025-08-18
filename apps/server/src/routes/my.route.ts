@@ -74,5 +74,10 @@ router.delete(
 );
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+/** GET /my/orders : 내 주문내역 조회 */
+router.get('/orders', requireCustomerOwner, asyncHandler(myController.getOrders));
+
+/** GET /my/order/{no} : 내 상세주문 조회 */
+router.get('/order/:no', requireCustomerOwner, asyncHandler(myController.getOrder));
 
 export default router;

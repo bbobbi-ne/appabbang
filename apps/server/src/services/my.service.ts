@@ -210,3 +210,44 @@ export const deleteAddress = async (no: number, customerNo: number) => {
 
   await prisma.address.delete({ where: { no, customerNo } });
 };
+
+/** 내 주문내역 목록 */
+export const getOrders = async (customerNo: number) => {
+  const result = await prisma.$transaction(async (tx) => {
+    const now = new Date();
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(now.getFullYear() - 1);
+
+    const list = await tx.order.findMany({
+      where: {
+        customerNo,
+        createdAt: {
+          gte: oneYearAgo, // 1년 전 이후부터
+          lte: now, // 현재일자까지
+        },
+      },
+      include: { orderItems: true },
+      orderBy: { no: 'desc' },
+    });
+
+    return list;
+  });
+
+  return result;
+};
+
+/** 내 주문 조회 */
+export const getOrder = async (no: number) => {
+  const result = await prisma.$transaction(async (tx) => {
+    const data = await tx.order.findFirst({
+      where: { no },
+      include: {
+        orderItems: true,
+      },
+    });
+
+    return data;
+  });
+
+  return result;
+};

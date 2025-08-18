@@ -125,3 +125,17 @@ export const removeAddress = async (req: Request, res: Response) => {
 
   res.sendStatus(204);
 };
+
+/** 내 주문내역 조회 */
+export const getOrders = async (req: Request, res: Response) => {
+  const customerNo = req.user.no;
+  const list = await myService.getOrders(customerNo);
+  res.status(200).json(list);
+};
+
+/** 내 주문 조회 */
+export const getOrder = async (req: Request, res: Response) => {
+  const orderNo = Number(req.params.no);
+  const order = await myService.getOrder(orderNo);
+  res.status(200).json(order);
+};
