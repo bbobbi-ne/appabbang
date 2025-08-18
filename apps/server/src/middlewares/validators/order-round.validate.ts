@@ -204,6 +204,6 @@ export const deleteOrderRoundImageValidator = [
     .withMessage(PUBLICID_VALIDATION.empty.message)
     .isString()
     .withMessage(PUBLICID_VALIDATION.string.message)
-    .trim()
-    .escape(),
+    .trim(),
+  // .escape(),
 ];
