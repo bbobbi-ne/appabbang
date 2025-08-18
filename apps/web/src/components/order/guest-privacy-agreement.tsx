@@ -13,6 +13,7 @@ import {
   CardTitle,
   AlertDialogAction,
   AlertDialogCancel,
+  AlertDialogDescription,
 } from '@appabbang/ui';
 import React from 'react';
 import clsx from 'clsx';
@@ -137,6 +138,7 @@ function GuestPrivacyAgreement({ onAgreed, agreed, setAgreed }: AgreedProps) {
           </Button>
         </Card>
       </AlertDialogTrigger>
+      <AlertDialogDescription className="hidden" />
 
       <AlertDialogContent className="h-[600px] max-h-[80vh] overflow-y-auto">
         <AlertDialogCancel className="relative top-1 -right-11/12 cursor-pointer w-10">

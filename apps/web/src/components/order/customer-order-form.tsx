@@ -1,9 +1,5 @@
-/**
- * 비회원 주문서 폼
- */
-
 import type { BankCodeProps, DeliveryProps } from '@/interface/bread-interface';
-import type { FormSchema } from '@/validate/order-form-schema';
+import type { CustomerOrderFormSchema } from '@/validate/order-form-schema';
 import {
   Button,
   Checkbox,
@@ -22,13 +18,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@appabbang/ui';
-import { type UseFormReturn } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import type { UseFormReturn } from 'react-hook-form';
 import DaumPostApi from '../common/daum-post-api';
-import GuestPrivacyAgreement from './guest-privacy-agreement';
-import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { getCustomerInfo } from '@/services/customer-apis';
+import { useAccessTokenStore } from '@/store/session';
+import Loading from '../common/loading';
 
-interface NonCustomerOrderFormProp {
-  form: UseFormReturn<FormSchema>;
+interface CustomerOrderFormProp {
+  form: UseFormReturn<CustomerOrderFormSchema>;
   onSelectedDeliveryTp: (delivery: string) => void;
   bank: {
     bankLoading: boolean;
@@ -42,21 +41,51 @@ interface NonCustomerOrderFormProp {
   save: boolean;
 }
 
-/** Main Function */
-function NonCustomerOrderForm({
+function CustomerOrderForm({
   form,
   onSelectedDeliveryTp,
   bank,
   delivery,
   handleOrderSubmit,
   save,
-}: NonCustomerOrderFormProp) {
+}: CustomerOrderFormProp) {
   const [deliveryMethodNo, setDeliveryMethodNo] = useState<string>('');
   const [same, setSame] = useState<boolean>(false);
   const { bankLoading, bankData } = bank;
   const { deliveryLoading, deliveryData } = delivery;
   const [checked, setChecked] = useState<boolean>(false); // 주문자-수령인 동일인물 체크여부
   const [disabledAddrDtl, setDisabledAddrDtl] = useState<boolean>(true);
+  const { accessToken } = useAccessTokenStore();
+
+  /** 고객정보 조회 */
+  const { isLoading, data } = useQuery({
+    queryKey: ['getCustomer'],
+    queryFn: getCustomerInfo,
+    enabled: !!accessToken,
+  });
+
+  useEffect(() => {
+    if (data) {
+      form.reset({
+        ordererName: data.customer.name ?? '',
+        ordererMobile: data.customer.mobileNumber ?? '',
+        recipientName: data.customer.address?.[0]?.recipientName ?? '',
+        recipientMobile: data.customer.address?.[0]?.recipientMobile ?? '',
+        address: data.customer.address?.[0]?.address ?? '',
+        addressDetail: data.customer.address?.[0]?.addressDetail ?? '',
+        zipcode: data.customer.address?.[0]?.zipcode ?? '',
+        message: data.customer.address?.[0]?.message ?? '',
+        bankCode: '',
+        accountNumber: '',
+        accountHolderName: '',
+        deliveryMethodNo: '',
+        same: false,
+        agreed: false,
+        totalPrice: 0,
+        discountAmount: 0,
+      });
+    }
+  }, [data, form]);
 
   /** 주소 API로 받아온 결과값을 상태값과 form value값에 대입한다. */
   const setFormAddress = (newAddrList: string[]) => {
@@ -69,14 +98,13 @@ function NonCustomerOrderForm({
     }
   };
 
-  /** 비회원 개인정보처리방침 동의 flag 처리 */
-  const onAgreed = (flag: boolean) => form.setValue('agreed', flag); // onSubmit에서 사용하기 위해 정의함.
-
   /** 주문자-수령인 정보가 동일하지 않을 때 */
   const checkedRecipient = (_: React.ChangeEvent<HTMLInputElement>) => {
     checked && setSame(false);
     form.setValue('same', false);
   };
+
+  if (isLoading) return <Loading />;
 
   return (
     <Form {...form}>
@@ -96,6 +124,7 @@ function NonCustomerOrderForm({
                     id="ordererName"
                     placeholder="주문자 이름 입력"
                     {...field}
+                    value={field.value ?? ''}
                     onChange={(e) => {
                       field.onChange(e);
                       checkedRecipient(e);
@@ -121,6 +150,7 @@ function NonCustomerOrderForm({
                     id="ordererMobile"
                     {...field}
                     {...form.register('ordererMobile')}
+                    value={field.value ?? ''}
                     placeholder="주문자 전화번호 입력"
                   />
                 </FormControl>
@@ -183,6 +213,7 @@ function NonCustomerOrderForm({
                     disabled={same ? true : false}
                     {...field}
                     {...form.register('recipientName')}
+                    value={field.value ?? ''}
                   />
                 </FormControl>
                 <FormMessage />
@@ -205,6 +236,7 @@ function NonCustomerOrderForm({
                     disabled={same ? true : false}
                     {...field}
                     {...form.register('recipientMobile')}
+                    value={field.value ?? ''}
                     placeholder="수령인 전화번호 입력"
                   />
                 </FormControl>
@@ -232,6 +264,7 @@ function NonCustomerOrderForm({
                     placeholder="배송지 주소 입력"
                     {...field}
                     {...form.register('address')}
+                    value={field.value ?? ''}
                   />
                 </FormControl>
                 <FormMessage />
@@ -257,6 +290,7 @@ function NonCustomerOrderForm({
                     disabled={disabledAddrDtl}
                     {...field}
                     {...form.register('addressDetail')}
+                    value={field.value ?? ''}
                   />
                 </FormControl>
                 <FormMessage />
@@ -282,6 +316,7 @@ function NonCustomerOrderForm({
                   placeholder="우편번호 입력"
                   {...field}
                   {...form.register('zipcode')}
+                  value={field.value ?? ''}
                 />
               </FormControl>
               <FormMessage />
@@ -458,6 +493,7 @@ function NonCustomerOrderForm({
                     disabled={deliveryMethodNo !== '10'}
                     {...field}
                     {...form.register('message')}
+                    value={field.value ?? ''}
                   />
                 </FormControl>
                 <FormMessage />
@@ -465,29 +501,6 @@ function NonCustomerOrderForm({
             )}
           />
         </div>
-
-        <FormField
-          control={form.control}
-          name="orderPw"
-          render={({ field }) => (
-            <FormItem className="mt-5 mb-5 pl-10 pr-10 w-full">
-              <FormLabel htmlFor="orderPw" errorCheck={false}>
-                <span className="text-red-700">*</span> 주문 비밀번호
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="text"
-                  id="orderPw"
-                  className="w-full"
-                  placeholder="주문 비밀번호 입력"
-                  {...field}
-                  {...form.register('orderPw')}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         <FormField
           control={form.control}
@@ -511,12 +524,6 @@ function NonCustomerOrderForm({
           )}
         />
 
-        <GuestPrivacyAgreement
-          onAgreed={onAgreed}
-          agreed={form.watch('agreed')}
-          setAgreed={(flag: boolean) => form.setValue('agreed', flag)}
-        />
-
         <div className="m-10">
           <Button type="submit" className="text-2xl h-15 w-full" disabled={save}>
             주문하기
@@ -527,4 +534,4 @@ function NonCustomerOrderForm({
   );
 }
 
-export default NonCustomerOrderForm;
+export default CustomerOrderForm;

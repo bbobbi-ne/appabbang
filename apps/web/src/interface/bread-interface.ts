@@ -46,7 +46,7 @@ export interface DeliveryProps {
   memo: string;
   fee: number;
   isActive: boolean;
-  deliveryType: string;
+  deliveryTypeCode: string;
   deliveryTypeName: string;
   createdAt: string;
   updatedAt: string;
