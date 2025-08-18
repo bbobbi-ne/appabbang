@@ -27,12 +27,13 @@ export function ImageUpload({
     }
   };
 
-  const removeImage = () => {
+  const removeImage = async () => {
     if (value instanceof File) {
       inputRef.current?.click();
       return;
     }
-    orderRoundImageDeleteMutation({ no: no!, publicId: value.publicId });
+
+    await orderRoundImageDeleteMutation({ no: no!, publicId: value.publicId });
     onChange(null);
   };
 
@@ -56,7 +57,7 @@ export function ImageUpload({
       ) : (
         <div onClick={removeImage} className="border rounded overflow-hidden cursor-pointer">
           <img
-            src={value instanceof File ? URL.createObjectURL(value) : value}
+            src={value instanceof File ? URL.createObjectURL(value) : value.url}
             alt="preview"
             className="w-full h-40 rounded object-fill"
           />
