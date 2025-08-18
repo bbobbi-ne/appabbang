@@ -10,7 +10,7 @@ export const Route = createFileRoute('/_sub-page/mypage/order-list/')({
 function RouteComponent() {
   return (
     <SubLayout title="마이페이지">
-      <CustomerInfoCard id={'test1234'} name={'김가나'} />
+      <CustomerInfoCard />
       <OrderListPage />
     </SubLayout>
   );

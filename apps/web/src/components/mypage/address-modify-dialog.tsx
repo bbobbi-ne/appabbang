@@ -17,12 +17,13 @@ import type { addresssDailogForm } from '@/validate/address-form.schema';
 type Props = {
   children: React.ReactNode;
   data: AddressListData[number] | undefined;
+  ORDER_DETAIL?: boolean;
 };
 
-export default function AddressModifyDialog({ children, data }: Props) {
+export default function AddressModifyDialog({ children, data, ORDER_DETAIL }: Props) {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
-  const { updateAddress, deleteAddress } = MyService;
+  const { updateAddress, deleteAddress, updateOrderAddr } = MyService;
 
   /** 배송지 수정 Mutation */
   const updateMutation = useMutation({
@@ -35,8 +36,23 @@ export default function AddressModifyDialog({ children, data }: Props) {
     onError: (error) => toast.error(error.message),
   });
 
+  /** 주문상세내역 : 배송지 수정 */
+  const updateOrderAddrMutation = useMutation({
+    mutationFn: (data: addresssDailogForm) => updateOrderAddr(data.no!, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['getAddresses'] });
+      toast.success('변경이 완료되었습니다.');
+      setOpen(false);
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
   /** 배송지 수정 */
-  const update = async (data: addresssDailogForm) => await updateMutation.mutateAsync(data);
+  const update = async (data: addresssDailogForm) => {
+    ORDER_DETAIL
+      ? await updateOrderAddrMutation.mutateAsync(data)
+      : await updateMutation.mutateAsync(data);
+  };
 
   /** 배송지 삭제 Mutation  */
   const deleteMutation = useMutation({
@@ -50,7 +66,9 @@ export default function AddressModifyDialog({ children, data }: Props) {
   });
 
   /** 배송지 삭제  */
-  const deleteAddr = async (no: number) => await deleteMutation.mutateAsync(no);
+  const deleteAddr = async (no: number) => {
+    await deleteMutation.mutateAsync(no); // 배송지변경에서 온 배송지 삭제
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
