@@ -27,7 +27,7 @@ export function useOrderRoundsQuery() {
  */
 export function useOrderRoundDetailQuery(no: number) {
   return useQuery({
-    queryKey: ['order-round', no], // 주문차수 단일 조회 키
+    queryKey: ['order-round', { no }], // 주문차수 단일 조회 키
     queryFn: () => getDetailOrderRoundsList(no), // 상세 API 호출
     staleTime: Infinity,
     retry: 1,
