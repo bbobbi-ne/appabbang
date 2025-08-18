@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import InfoForm from '../mypage/info-form';
 import { getCustomerInfo } from '@/services/customer-apis';
-import { useCustomerStore } from '@/store/customer';
+import { useQuery } from '@tanstack/react-query';
 
 interface IAddressProps {
   no: number;
@@ -42,13 +42,14 @@ export default function InfoPage() {
   /**
    * 고객 상세정보 조회
    */
+  const { isLoading, data } = useQuery({
+    queryKey: ['getCustomerInfo'],
+    queryFn: getCustomerInfo,
+  });
+
   useEffect(() => {
-    (async () => {
-      // 고객 상세정보, 고객의 보유 쿠폰 정보, 주문 총 금액 조회
-      const { customer } = await getCustomerInfo();
-      setCustomer(customer);
-    })();
-  }, []);
+    !isLoading && setCustomer(data.customer);
+  }, [data]);
 
   return <InfoForm customer={customer} />;
 }

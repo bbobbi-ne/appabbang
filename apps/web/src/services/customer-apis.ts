@@ -3,8 +3,7 @@
  */
 
 import useToast from '@/hooks/useToast';
-import { client } from './common-apis';
-import sessionClient from './axios';
+import client from './axios';
 
 const { addToast } = useToast();
 
@@ -54,7 +53,7 @@ export async function createCustomer(
   setCustomer: (model: ICustomerProps) => void,
 ) {
   try {
-    const response = await client.post('/auth/login', data);
+    const response = await client.post('/customers', data);
 
     if (response.status === 201) {
       // 고객 간단정보를 상태관리에 저장
@@ -170,7 +169,7 @@ export const login = async (
  */
 export const logout = async (accessToken: string, reset: (accessToken: string) => void) => {
   try {
-    const response = await sessionClient.post('/auth/logout');
+    const response = await client.post('/auth/logout');
 
     if (response.status === 204) {
       reset(accessToken);
@@ -200,7 +199,7 @@ export const logout = async (accessToken: string, reset: (accessToken: string) =
  */
 export const getCustomerInfo = async () => {
   try {
-    const response = await sessionClient.get('/my');
+    const response = await client.get('/my');
     if (response.status === 200) return response.data;
     else throw new CustomError(500, 'fail');
   } catch (e: any) {
@@ -211,53 +210,17 @@ export const getCustomerInfo = async () => {
   }
 };
 
-/**
- * 고객정보 수정
- */
-export const updateCustomer = async (data: { id: string; name: string; mobileNumber: string }) => {
-  try {
-    const response = await sessionClient.put('/my', {
-      id: data.id,
-      name: data.name,
-      mobileNumber: data.mobileNumber,
-    });
-
-    if (response.status === 200) {
-      addToast({
-        type: 'success',
-        message: '정상적으로 수정되었습니다.',
-      });
-
-      return response.data.customer;
-    } else throw new CustomError(500, 'fail');
-  } catch (e: any) {
-    addToast({
-      type: 'error',
-      message: e.response.data.error.message,
-    });
-  }
+/** 고객정보 수정 타입 */
+type CustomerInfoType = { id: string; name: string; mobileNumber: string };
+/** 고객정보 수정 */
+export const updateCustomer = async ({ id, name, mobileNumber }: CustomerInfoType) => {
+  const body = { id, name, mobileNumber };
+  await client.put('/my', body);
 };
 
-/**
- * 고객정보 수정 : 비밀번호 변경
- */
-export const updateCustomerPw = async ({ pw, pwModify }: { pw: string; pwModify: string }) => {
-  try {
-    const response = await sessionClient.put('/my/pw', { pw, pwModify });
-
-    if (response.status === 200) {
-      addToast({
-        type: 'success',
-        message: '정상적으로 수정되었습니다.',
-      });
-
-      // 비밀번호는 민감정보라서 딱히 던지는 데이터가 존재하지 않음.
-      return;
-    } else throw new CustomError(500, 'fail');
-  } catch (e: any) {
-    addToast({
-      type: 'error',
-      message: e.response.data.error.message,
-    });
-  }
+/** 고객정보 수정 타입 */
+export type CustomePwType = { pw: string; pwModify: string };
+/** 고객정보 수정 : 비밀번호 변경 */
+export const updateCustomerPw = async ({ pw, pwModify }: CustomePwType) => {
+  await client.put('/my/pw', { pw, pwModify });
 };

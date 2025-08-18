@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle, CardContent, AlertDialog } from '@appabbang/ui';
 import BreadCard from '@/components/common/bread-card';
 import type { BreadProps } from '@/interface/bread-interface';
@@ -8,13 +8,15 @@ import CardComment from '@/components/common/card-comment';
 import Payment from '@/components/order/Payment';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { formSchema } from '@/validate/order-form-schema';
+import { customerOrderFormSchema, formSchema } from '@/validate/order-form-schema';
 import NonCustomerOrderForm from '@/components/order/non-customer-order-form';
 import { insertOrders, searchBankList, searchDeliveryList } from '@/services/order-apis';
 import { getOrderRound } from '@/services/order-round-apis';
-import type { FormSchema } from '@/validate/order-form-schema';
+import type { CustomerOrderFormSchema, FormSchema } from '@/validate/order-form-schema';
 import useToast from '@/hooks/useToast';
 import { useParams } from '@tanstack/react-router';
+import { useAccessTokenStore } from '@/store/session';
+import CustomerOrderForm from '../order/customer-order-form';
 
 /** Main Function */
 export default function OrderPage() {
@@ -28,6 +30,9 @@ export default function OrderPage() {
   const [max, setMax] = useState<number>(0); // 최대주문수량
   // 메인페이지에서 넘어온 주문차수 파라미터
   const { orderRoundNo } = useParams({ from: '/_sub-page/order/$orderRoundNo' });
+  const { accessToken } = useAccessTokenStore();
+  const { addToast } = useToast();
+  const [save, setSave] = useState<boolean>(false); // 저장여부
 
   /**********************************************************************************/
   /** Functions */
@@ -68,10 +73,9 @@ export default function OrderPage() {
     [onCountChange, onRemove],
   );
 
-  /** 우체국 한정으로 배송비 3,000원 추가 */
-  const onSelectedDeliveryTp = (value: string) => {
-    value === '10' ? setFee(4000) : setFee(0);
-  };
+  /** 우체국 한정으로 배송비 4,000원 추가 */
+  const onSelectedDeliveryTp = (value: string) => (value === '10' ? setFee(4000) : setFee(0));
+
   /**********************************************************************************/
   /** APIs */
   /** 배송방법 목록 API */
@@ -95,89 +99,132 @@ export default function OrderPage() {
     queryKey: ['getOrderRound'],
     queryFn: () => getOrderRound(Number(orderRoundNo)),
   });
-
   /**********************************************************************************/
   /** form submit */
-
-  /** Form 기본값 설정 */
-  const defaultValues: FormSchema = {
-    name: '', // 주문자명
-    mobileNumber: '', // 주문자 전화번호
-    recipientName: '', // 수령인명
-    recipientMobile: '', // 수령인 전화번호
-    zipcode: '', // 우편번호
-    deliveryMethodNo: '', // 배송방법
-    address: '', // 주소
-    addressDetail: '', // 상세주소
-    message: '', // 배송메세지
-    orderPw: '', // 주문 비밀번호
-    orderItems: [], // 주문목록
-    totalPrice: 0, // 최종금액
-    discountAmount: 0, // 할인금액
-    agreed: false, // 동의여부(화면단에서만 이용)
-    bankCode: '', // 은행코드
-    accountNumber: '', // 계좌번호
-    accountHolderName: '', // 예금주
-    same: false, // 주문자-수령인 동일여부
-  };
-
-  /** form과 schema 연결 */
-  const form = useForm({
+  /** 비회원 form : form과 schema 연결 */
+  const nonCustomerForm = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues: {
+      ordererName: '', // 주문자명
+      ordererMobile: '', // 주문자 전화번호
+      recipientName: '', // 수령인명
+      recipientMobile: '', // 수령인 전화번호
+      zipcode: '', // 우편번호
+      deliveryMethodNo: '', // 배송방법
+      address: '', // 주소
+      addressDetail: '', // 상세주소
+      message: '', // 배송메세지
+      orderPw: '', // 주문 비밀번호
+      orderItems: [], // 주문목록
+      totalPrice: 0, // 최종금액
+      discountAmount: 0, // 할인금액
+      bankCode: '', // 은행코드
+      accountNumber: '', // 계좌번호
+      accountHolderName: '', // 예금주
+      same: false, // 주문자-수령인 동일여부
+      isServiceTermsAgreed: false, // 서비스 이용약관
+      isPrivacyTermsAgreed: false, // 개인정보 이용약관
+      isPaymentRefundTermsAgreed: false, // 결제 및 환불 약관
+      orderRoundNo: Number(orderRoundNo), // 주문차수
+    },
   });
 
-  /** form onSubmit 핸들러 */
+  /** 고객 form */
+  const customerForm = useForm({
+    resolver: zodResolver(customerOrderFormSchema),
+    defaultValues: {
+      ordererName: '', // 주문자명
+      recipientName: '', // 수령인명
+      recipientMobile: '', // 수령인 전화번호
+      zipcode: '', // 우편번호
+      deliveryMethodNo: '', // 배송방법
+      address: '', // 주소
+      addressDetail: '', // 상세주소
+      orderItems: [], // 주문목록
+      totalPrice: 0, // 최종금액
+      discountAmount: 0, // 할인금액
+      bankCode: '', // 은행코드
+      accountNumber: '', // 계좌번호
+      accountHolderName: '', // 예금주
+      same: false, // 주문자-수령인 동일여부
+      isServiceTermsAgreed: false, // 서비스 이용약관
+      isPrivacyTermsAgreed: false, // 개인정보 이용약관
+      isPaymentRefundTermsAgreed: false, // 결제 및 환불 약관
+      orderRoundNo: Number(orderRoundNo), // 주문차수
+    },
+  });
+
+  /**
+   * form onSubmit 핸들러
+   * 조건 1. 비회원은 accessToken이 존재하지 않으면서, 개인정보 수집 이용 동의가 되어야 함.
+   * 조건 2. 주문 건이 1건 이상 존재해야 함. (고객/비회원 둘다)
+   */
   const handleOrderSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (paymentList.length === 0) {
-      addToast({
-        message: '빵 결제목록이 1개 이상 선택돼야 주문이 가능합니다.',
-        type: 'error',
-      });
-
+      addToast({ message: '빵 결제목록이 1개 이상 선택돼야 주문이 가능합니다.', type: 'error' });
       return;
     }
 
-    form.handleSubmit(onSubmit)(e);
-  };
-
-  /**
-   * 유효성 검증 끝난 후 비회원 주문 건 저장
-   * 조건 1. 주문 건이 1건 이상 존재해야 함.
-   * 조건 2. 개인정보 수집 이용 동의가 되어야 함.
-   */
-  const onSubmit: SubmitHandler<FormSchema> = (data) => {
-    const orderItems = Array();
-
-    try {
-      if (!data.agreed) throw new Error('비회원인 경우, 개인정보 수집 및 이용 동의가 필요합니다.');
-      if (paymentList.length === 0)
-        throw new Error('결제목록이 1건 이상 존재해야 주문이 가능합니다.');
-
-      /** orderItems 생성 */
-      paymentList.map((bread, _) => {
-        orderItems.push({
+    // customerForm / nonCustomerForm totalPrice 설정
+    if (accessToken && accessToken.length > 0) {
+      customerForm.setValue('totalPrice', totalPrice);
+      customerForm.setValue(
+        'orderItems',
+        paymentList.map((bread) => ({
           breadNo: bread.no,
           quantity: bread.count,
-        });
-      });
+        })),
+      );
+      customerForm.setValue('orderRoundNo', 1);
 
-      data.orderItems = orderItems;
-      data.totalPrice = totalPrice;
+      customerForm.handleSubmit(customerOnSubmit, (error) => console.log(error))();
+    } else {
+      nonCustomerForm.setValue('totalPrice', totalPrice);
 
-      insertOrders(data); // 비회원 주문서 저장
-    } catch (e: any) {
-      addToast({
-        message: e.message,
-        type: 'error',
-      });
+      nonCustomerForm.setValue(
+        'orderItems',
+        paymentList.map((bread) => ({
+          breadNo: bread.no,
+          quantity: bread.count,
+        })),
+      );
+
+      nonCustomerForm.handleSubmit(nonCustomerOnSubmit, (error) => console.log(error))();
     }
   };
+
+  /** 고객 주문서 저장 */
+  const customerOnSubmit: SubmitHandler<CustomerOrderFormSchema> = async (data) => {
+    await insertOrder.mutateAsync(data); // 주문서 등록(고객)
+  };
+
+  /** 비회원 주문서 저장 */
+  const nonCustomerOnSubmit: SubmitHandler<FormSchema> = async (data) => {
+    await insert.mutateAsync(data); // 주문서 등록(비회원)
+  };
+
+  /** mutation : 주문서 등록(고객) */
+  const insertOrder = useMutation({
+    mutationFn: (data: CustomerOrderFormSchema) => insertOrders(data),
+    onSuccess: () => {
+      addToast({ message: '주문이 등록되었습니다.', type: 'success' });
+      setSave(true);
+    },
+    onError: (error) => addToast({ message: error.message, type: 'error' }),
+  });
+
+  /** mutation : 주문서 등록(비회원) */
+  const insert = useMutation({
+    mutationFn: (data: FormSchema) => insertOrders(data),
+    onSuccess: () => {
+      addToast({ message: '주문이 등록되었습니다.', type: 'success' });
+      setSave(true);
+    },
+    onError: (error) => addToast({ message: error.message, type: 'error' }),
+  });
   /**********************************************************************************/
-  /** React Hooks */
-  const { addToast } = useToast();
 
   /** 주문차수 빵 목록 조회 및 설정 */
   useEffect(() => {
@@ -199,17 +246,11 @@ export default function OrderPage() {
 
     setTotalCount(count);
     setTotalPrice(price + fee); // 빵 목록 금액의 합 + 배송비
-
-    form.setValue(
-      'orderItems',
-      paymentList.map((bread) => ({
-        breadNo: bread.no,
-        quantity: bread.count,
-      })),
-    );
   }, [paymentList, fee]);
 
   /**********************************************************************************/
+
+  // if (isLoading) return <Loading />;
 
   return orderRoundLoading ? (
     <OrderFormSkeleton />
@@ -269,20 +310,42 @@ export default function OrderPage() {
 
           <div className="mt-20 m-5">
             <CardContent>
-              <CardComment
-                title="2. 비회원 정보를 입력 해주세요."
-                comment="필수항목을 입력해야 주문이 진행됩니다."
-              />
+              {accessToken && accessToken.length > 0 ? (
+                <CardComment
+                  title="2. 고객 정보를 입력 해주세요."
+                  comment="필수항목을 입력해야 주문이 진행됩니다."
+                />
+              ) : (
+                <CardComment
+                  title="2. 비회원 정보를 입력 해주세요."
+                  comment="필수항목을 입력해야 주문이 진행됩니다."
+                />
+              )}
             </CardContent>
 
-            {/* 비회원 정보 입력 form */}
-            <NonCustomerOrderForm
-              form={form}
-              onSelectedDeliveryTp={onSelectedDeliveryTp}
-              bank={{ bankLoading, bankData: bankData?.data }}
-              delivery={{ deliveryLoading, deliveryData: deliveryData?.data }}
-              handleOrderSubmit={handleOrderSubmit}
-            />
+            <div className="flex justify-center w-full">
+              {accessToken && accessToken.length > 0 ? (
+                // 고객 전용 폼
+                <CustomerOrderForm
+                  form={customerForm}
+                  onSelectedDeliveryTp={onSelectedDeliveryTp}
+                  bank={{ bankLoading, bankData: bankData?.data }}
+                  delivery={{ deliveryLoading, deliveryData: deliveryData?.data }}
+                  handleOrderSubmit={handleOrderSubmit}
+                  save={save}
+                />
+              ) : (
+                // 비회원 전용 폼
+                <NonCustomerOrderForm
+                  form={nonCustomerForm}
+                  onSelectedDeliveryTp={onSelectedDeliveryTp}
+                  bank={{ bankLoading, bankData: bankData?.data }}
+                  delivery={{ deliveryLoading, deliveryData: deliveryData?.data }}
+                  handleOrderSubmit={handleOrderSubmit}
+                  save={save}
+                />
+              )}
+            </div>
           </div>
         </Card>
       </div>

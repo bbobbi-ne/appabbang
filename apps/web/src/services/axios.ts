@@ -19,7 +19,7 @@ client.interceptors.response.use(
   (response) => response,
   (error) => {
     // 리프레시 토큰 발급
-    if (error.response.status === 401) {
+    if (error.response.status === 403) {
       sessionStorage.removeItem('accessToken');
       window.location.href = '/login';
     }

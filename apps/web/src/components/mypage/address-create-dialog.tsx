@@ -10,8 +10,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@appabbang/ui';
-import AddressForm, { type addresssDailogForm } from '@/components/mypage/address-form';
 import { MyService } from '@/services/api/my-service';
+import type { addresssDailogForm } from '@/validate/address-form.schema';
+import AddressForm from './address-form';
 
 export default function AddressCreateDialog() {
   const [open, setOpen] = useState(false);
@@ -25,17 +26,14 @@ export default function AddressCreateDialog() {
       queryClient.invalidateQueries({ queryKey: ['getAddresses'] });
       setOpen(false);
     },
+    onError: (error) => toast.error(error.message),
   });
 
   /**
    * 배송지 저장
    */
   const create = async (data: addresssDailogForm) => {
-    try {
-      await createMutation.mutateAsync(data);
-    } catch (error) {
-      toast.error('배송지 저장과정에서 오류가 발생했습니다.');
-    }
+    await createMutation.mutateAsync(data);
   };
 
   return (

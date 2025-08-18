@@ -1,4 +1,4 @@
-import { client } from './common-apis';
+import client from './axios';
 
 /** 최신 주문차수 조회 */
 export async function getLatest() {

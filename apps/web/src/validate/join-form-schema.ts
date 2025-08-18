@@ -55,7 +55,7 @@ const ADDRESS_DETAIL_VALIDATION = {
 
 const ZIPCODE_VALIDATION = {
   min: { value: 1, message: '우편번호는 1자 이상 입력 바랍니다.' },
-  max: { value: 10, message: '우편번호는는 10자 이내로 입력 바랍니다.' },
+  max: { value: 10, message: '우편번호는 10자 이내로 입력 바랍니다.' },
   required: { message: '우편번호를 입력하세요.' },
 };
 
