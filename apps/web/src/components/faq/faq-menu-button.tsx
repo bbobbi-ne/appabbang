@@ -1,48 +1,48 @@
 import type { IFacMenuButtonProps } from '@/interface/faq-interface';
-import { Button } from '@appabbang/ui';
+import { Button, cn } from '@appabbang/ui';
 
 // Custom CSS
 export const btnCssStr = `bg-[#ffffff] text-[#202020] hover:bg-[#644a40] hover:text-[#ffffff]`;
 
 function FaqMenuButton({ activeMenu, onChangeActiveMenu }: IFacMenuButtonProps) {
   return (
-    <div className="flex flex-row gap-10 mt-15 mb-5 m-auto">
-      <div>
+    <div className="flex flex-row gap-2 my-4 overflow-x-auto">
+      <div className="flex-1">
         <Button
           onClick={() => onChangeActiveMenu('all')}
-          className={activeMenu === 'all' ? '' : btnCssStr}
+          className={cn('w-full', activeMenu !== 'all' && btnCssStr)}
         >
           전체
         </Button>
       </div>
-      <div>
+      <div className="flex-1">
         <Button
           onClick={() => onChangeActiveMenu('product')}
-          className={activeMenu === 'product' ? '' : btnCssStr}
+          className={cn('w-full', activeMenu !== 'product' && btnCssStr)}
         >
           제품문의
         </Button>
       </div>
-      <div>
+      <div className="flex-1">
         <Button
           onClick={() => onChangeActiveMenu('orderPayment')}
-          className={activeMenu === 'orderPayment' ? '' : btnCssStr}
+          className={cn('w-full', activeMenu !== 'orderPayment' && btnCssStr)}
         >
           주문 및 결제
         </Button>
       </div>
-      <div>
+      <div className="flex-1">
         <Button
           onClick={() => onChangeActiveMenu('deliveryPackage')}
-          className={activeMenu === 'deliveryPackage' ? '' : btnCssStr}
+          className={cn('w-full', activeMenu !== 'deliveryPackage' && btnCssStr)}
         >
           배송 및 포장
         </Button>
       </div>
-      <div>
+      <div className="flex-1">
         <Button
           onClick={() => onChangeActiveMenu('etc')}
-          className={activeMenu === 'etc' ? '' : btnCssStr}
+          className={cn('w-full', activeMenu !== 'etc' && btnCssStr)}
         >
           기타
         </Button>

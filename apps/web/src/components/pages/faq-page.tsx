@@ -3,14 +3,15 @@
  */
 
 import { useEffect, useState } from 'react';
-import FaqMenuButton from '../faq/faq-menu-button';
-import { faqList } from '../faq/faq-data';
+import FaqMenuButton from '@/components/faq/faq-menu-button';
+import { faqList } from '@/components/faq/faq-data';
 import type { IFaq } from '@/interface/faq-interface';
-import FaqAccordion from '../faq/faq-accordion';
+import FaqAccordion from '@/components/faq/faq-accordion';
 
 export default function FaqPage() {
   const [activeMenu, setActiveMenu] = useState<string>('all'); // 현재 보고 있는 메뉴
   const [list, setList] = useState<IFaq[]>([]);
+  const [value, setValue] = useState<string>('');
 
   // activeMenu값에 따라 데이터 세팅
   useEffect(() => {
@@ -25,12 +26,15 @@ export default function FaqPage() {
   }, [activeMenu]);
 
   // 카테고리 명칭 변경
-  const onChangeActiveMenu = (category: string) => setActiveMenu(category);
+  const onChangeActiveMenu = (category: string) => {
+    setActiveMenu(category);
+    setValue('');
+  };
 
   return (
-    <div className="flex flex-col mb-30">
+    <div className="pb-40">
       <FaqMenuButton activeMenu={activeMenu} onChangeActiveMenu={onChangeActiveMenu} />
-      <FaqAccordion list={list} />
+      <FaqAccordion list={list} value={value} onValueChange={(value: string) => setValue(value)} />
     </div>
   );
 }

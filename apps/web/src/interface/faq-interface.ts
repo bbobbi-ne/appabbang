@@ -10,4 +10,6 @@ export interface IFaq {
 
 export interface IFaqAccordionProps {
   list: IFaq[];
+  value: string;
+  onValueChange: (value: string) => void;
 }
