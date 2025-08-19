@@ -1,12 +1,13 @@
 import { Link } from '@tanstack/react-router';
 import { Card, CardDescription, CardTitle } from '@appabbang/ui';
+import Title from '@/components/common/title';
 
 export default function Infomation() {
   return (
     <>
       <div className="bg-secondary pt-20 pb-40">
         <div className="container mx-auto px-2">
-          <h3 className="text-2xl sm:text-4xl font-bold text-primary py-4 ml-8">정보</h3>
+          <Title title="정보" className="ml-8 text-left" />
           {/* 내용 */}
           <div className="flex flex-row gap-4 mx-8">
             <Link to="/brand">

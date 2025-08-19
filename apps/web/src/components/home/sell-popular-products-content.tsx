@@ -2,6 +2,7 @@ import { Card, CardContent } from '@appabbang/ui';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Slider from 'react-slick';
+import Title from '@/components/common/title';
 
 export default function SellPopularProducts() {
   let list = [
@@ -101,7 +102,7 @@ export default function SellPopularProducts() {
   return (
     <div className="bg-secondary pt-20 pb-30">
       <div className="container mx-auto px-2">
-        <h3 className="text-2xl sm:text-4xl font-bold text-primary py-4 ml-8">인기 판매 상품</h3>
+        <Title title="인기 판매 상품" className="ml-8 text-left" />
         {/* 내용 */}
         <Slider {...settings} className="mx-8">
           {list.map((item) => (
