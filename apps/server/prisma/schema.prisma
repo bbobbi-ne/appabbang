@@ -242,6 +242,7 @@ model Payment {
 
   createdAt           DateTime            @default(now()) @map("created_at")      // 등록시간
   updatedAt           DateTime            @updatedAt @map("updated_at")           // 수정시간
+  refundConfirmedAt   DateTime?           @default(now()) @map("refund_confirmed_at")      // 환불시간
 
   orderNo             Int                 @unique @map("order_no") 
   order               Order               @relation(fields: [orderNo], references: [no])
