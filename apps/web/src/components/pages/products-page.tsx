@@ -1,18 +1,16 @@
 import { useEffect, useState } from 'react';
-import BreadSearch from '../projects/bread-search';
-import type { BreadProps, OrderRoundBreads } from '@/interface/bread-interface';
+import BreadSearch from '../products/bread-search';
+import type { BreadProps } from '@/interface/bread-interface';
 import { useQuery } from '@tanstack/react-query';
 import { getOrderRoundNow } from '@/services/order-round-apis';
 import { searchBreadList } from '@/services/order-apis';
-import ProductsLoading from '../projects/products-loading';
-import BreadCardDetail from '../projects/bread-card-detail';
-import { AlertDialog } from '@appabbang/ui';
+import ProductsLoading from '@/components/products/products-loading';
+import BreadCardDetail from '@/components/products/bread-card-detail';
 
 export default function ProductsPage() {
   const [keyword, setKeyword] = useState<string>('');
   const [breadList, setBreadList] = useState<BreadProps[]>([]);
   const [originBreadList, setOriginBreadList] = useState<BreadProps[]>([]);
-  const [orderRoundBreads, setOrderRoundBreads] = useState<OrderRoundBreads[]>([]);
 
   /** 빵 목록 조회 API */
   const { isLoading, data, error } = useQuery({
@@ -36,7 +34,7 @@ export default function ProductsPage() {
       setOriginBreadList(data.data);
     }
 
-    nowData && setOrderRoundBreads(nowData.data.orderRoundBreads);
+    // nowData && setOrderRoundBreads(nowData.data.orderRoundBreads);
   }, [data, error, nowData, nowErr]);
 
   /** enter key 누를때 빵 검색 기능 수행 */
@@ -66,12 +64,10 @@ export default function ProductsPage() {
     setKeyword(e.target.value);
   };
 
-  const onClick = () => {};
-
   return isLoading && nowLoading ? (
     <ProductsLoading />
   ) : (
-    <div className="flex flex-col items-center justify-center">
+    <div>
       <BreadSearch
         keyword={keyword}
         onChange={keywordSetting}
@@ -80,13 +76,13 @@ export default function ProductsPage() {
       />
 
       {/* 주문차수 빵 목록 */}
-      <div className="flex flex-row flex-wrap gap-10 justify-center">
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 w-full">
         {breadList.map((bread, i) => (
-          <AlertDialog key={i}>
-            <BreadCardDetail bread={bread} orderRoundBreads={orderRoundBreads} onClick={onClick} />
-          </AlertDialog>
+          <BreadCardDetail key={i} bread={bread} />
         ))}
       </div>
+
+      <div className="pt-40" />
     </div>
   );
 }
