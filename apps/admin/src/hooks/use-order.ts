@@ -68,7 +68,7 @@ export function useOrderDetailQuery(no: number) {
  */
 export function useOrderStatusUpdateMutation() {
   const queryClient = useQueryClient();
-  const { mutate, isError, isSuccess, error } = useMutation({
+  const { mutateAsync, isError, isSuccess, error } = useMutation({
     mutationFn: updateOrderStatus, // 주문 상태 업데이트 API
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] }); // 주문 리스트 캐시 무효화
@@ -77,5 +77,5 @@ export function useOrderStatusUpdateMutation() {
     },
   });
 
-  return { orderStatusUpdateMutation: mutate, isError, isSuccess, error };
+  return { orderStatusUpdateMutation: mutateAsync, isError, isSuccess, error };
 }
