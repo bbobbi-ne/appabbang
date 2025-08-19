@@ -1,3 +1,5 @@
+import { format } from 'date-fns';
+
 /** 연락처 하이픈 추가  */
 export const getFormattedMobile = (value: string) => {
   // 입력값에서 숫자만 추출
@@ -16,3 +18,12 @@ export const getFormattedMobile = (value: string) => {
   // 변환된 값
   return formattedValue;
 };
+
+/**
+ * 📅 Date 객체를 'yyyy-MM-dd' 형식으로 변환
+ * @param date Date 객체
+ * @returns '2025-08-14' 형태 문자열
+ */
+export function formatDate(date: Date): string {
+  return format(date, 'yyyy-MM-dd');
+}
