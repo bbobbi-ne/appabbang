@@ -20,8 +20,8 @@ import type {
   OrderRoundListData,
   OrderRoundUpdateData,
   OrderRoundUpdatePayload,
-} from './data-contracts';
-import { ContentType, HttpClient, type RequestParams } from './http-client';
+} from "./data-contracts";
+import { ContentType, HttpClient, type RequestParams } from "./http-client";
 
 export class OrderRound<SecurityDataType = unknown> {
   http: HttpClient<SecurityDataType>;
@@ -43,9 +43,9 @@ export class OrderRound<SecurityDataType = unknown> {
   orderRoundList = (params: RequestParams = {}) =>
     this.http.request<OrderRoundListData, any>({
       path: `/order-round`,
-      method: 'GET',
+      method: "GET",
       secure: true,
-      format: 'json',
+      format: "json",
       ...params,
     });
   /**
@@ -59,10 +59,13 @@ export class OrderRound<SecurityDataType = unknown> {
    * @response `201` `OrderRoundCreateData` 주문차수 등록 성공
    * @response `500` `void` 주문차수 등록 실패(등록과정 중 오류가 발생할 경우)
    */
-  orderRoundCreate = (data: OrderRoundCreatePayload, params: RequestParams = {}) =>
+  orderRoundCreate = (
+    data: OrderRoundCreatePayload,
+    params: RequestParams = {},
+  ) =>
     this.http.request<OrderRoundCreateData, void>({
       path: `/order-round`,
-      method: 'POST',
+      method: "POST",
       body: data,
       secure: true,
       type: ContentType.FormData,
@@ -81,9 +84,9 @@ export class OrderRound<SecurityDataType = unknown> {
   latestList = (params: RequestParams = {}) =>
     this.http.request<LatestListData, any>({
       path: `/order-round/latest`,
-      method: 'GET',
+      method: "GET",
       secure: true,
-      format: 'json',
+      format: "json",
       ...params,
     });
   /**
@@ -99,9 +102,9 @@ export class OrderRound<SecurityDataType = unknown> {
   getOrderRound = (params: RequestParams = {}) =>
     this.http.request<GetOrderRoundData, any>({
       path: `/order-round/now`,
-      method: 'GET',
+      method: "GET",
       secure: true,
-      format: 'json',
+      format: "json",
       ...params,
     });
   /**
@@ -117,9 +120,9 @@ export class OrderRound<SecurityDataType = unknown> {
   orderRoundDetail = (no: number, params: RequestParams = {}) =>
     this.http.request<OrderRoundDetailData, any>({
       path: `/order-round/${no}`,
-      method: 'GET',
+      method: "GET",
       secure: true,
-      format: 'json',
+      format: "json",
       ...params,
     });
   /**
@@ -133,10 +136,14 @@ export class OrderRound<SecurityDataType = unknown> {
    * @response `200` `OrderRoundUpdateData` 주문차수 수정 성공
    * @response `500` `void` 주문차수 수정 실패(수정과정 중 오류가 발생함)
    */
-  orderRoundUpdate = (no: number, data: OrderRoundUpdatePayload, params: RequestParams = {}) =>
+  orderRoundUpdate = (
+    no: number,
+    data: OrderRoundUpdatePayload,
+    params: RequestParams = {},
+  ) =>
     this.http.request<OrderRoundUpdateData, void>({
       path: `/order-round/${no}`,
-      method: 'PUT',
+      method: "PUT",
       body: data,
       secure: true,
       type: ContentType.FormData,
@@ -154,7 +161,7 @@ export class OrderRound<SecurityDataType = unknown> {
   imageDelete = (data: ImageDeleteBody, params: RequestParams = {}) =>
     this.http.request<any, any>({
       path: `/order-round/image`,
-      method: 'DELETE',
+      method: "DELETE",
       body: data,
       secure: true,
       type: ContentType.Json,
