@@ -1,4 +1,4 @@
-import { useOrderDetailQuery } from '@/hooks/use-order';
+import { useOrderDetailQuery, useOrderStatusUpdateMutation } from '@/hooks/use-order';
 import {
   Button,
   DialogDescription,
@@ -6,11 +6,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogClose,
-  ScrollArea,
 } from '@appabbang/ui';
 
 import RefundTable from './refund-table';
-import { usePaymentDetailQuery } from '@/hooks/use-payment';
+import { usePaymentDetailQuery, useRefundUpdateMutation } from '@/hooks/use-payment';
 import { DialogLayout } from '../ui/dialog-layout';
 
 export function RefundDialog({ no }: { no: number }) {
@@ -24,10 +23,21 @@ export function RefundDialog({ no }: { no: number }) {
 const DialogBody = ({ no }: { no: number; close: () => void }) => {
   const { data: paymentDetail, isLoading: paymentDetailLoading } = usePaymentDetailQuery(no);
   const { data: ordersDetail, isLoading: ordersDetailLoading } = useOrderDetailQuery(no);
+  const { refundUpdateMutation } = useRefundUpdateMutation();
+  const { orderStatusUpdateMutation } = useOrderStatusUpdateMutation();
 
   if (ordersDetailLoading || paymentDetailLoading) return;
 
   const isRefund = paymentDetail?.isPaid ? true : false;
+
+  const onClickRefund = async () => {
+    await refundUpdateMutation({ no, data: { isRefunded: true, orderNo: ordersDetail!.no } });
+    await orderStatusUpdateMutation({ no, orderStatus: { orderStatus: '52' } });
+  };
+  const onClickCancle = async () => {
+    await refundUpdateMutation({ no, data: { isRefunded: false, orderNo: ordersDetail!.no } });
+    await orderStatusUpdateMutation({ no, orderStatus: { orderStatus: '51' } });
+  };
 
   return (
     <>
@@ -46,7 +56,9 @@ const DialogBody = ({ no }: { no: number; close: () => void }) => {
                 닫기
               </Button>
             </DialogClose>
-            <Button disabled={ordersDetail?.orderStatus === '52'}>환불완료</Button>
+            <Button onClick={onClickRefund} disabled={ordersDetail?.orderStatus === '52'}>
+              환불완료
+            </Button>
           </>
         ) : (
           <>
@@ -55,7 +67,9 @@ const DialogBody = ({ no }: { no: number; close: () => void }) => {
                 닫기
               </Button>
             </DialogClose>
-            <Button disabled={ordersDetail?.orderStatus === '51'}>취소완료</Button>
+            <Button onClick={onClickCancle} disabled={ordersDetail?.orderStatus === '51'}>
+              취소완료
+            </Button>
           </>
         )}
       </DialogFooter>
