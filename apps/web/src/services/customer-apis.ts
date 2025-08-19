@@ -3,7 +3,7 @@
  */
 
 import useToast from '@/hooks/useToast';
-import { client } from './common-apis';
+import client from './axios';
 
 const { addToast } = useToast();
 
@@ -32,26 +32,28 @@ class CustomError extends Error {
   }
 }
 
+type CustomerProps = {
+  id: string;
+  pw: string;
+  mobileNumber: string;
+  address: string;
+  addressDetail: string;
+  zipcode: string;
+  isServiceTermsAgreed: boolean;
+  isPrivacyTermsAgreed: boolean;
+  isMarketingTermsAgreed: boolean;
+};
+
 /**
  * 회원가입
  */
 export async function createCustomer(
-  data: {
-    id: string;
-    pw: string;
-    mobileNumber: string;
-    address: string;
-    addressDetail: string;
-    zipcode: string;
-    isServiceTermsAgreed: boolean;
-    isPrivacyTermsAgreed: boolean;
-    isMarketingTermsAgreed: boolean;
-  },
+  data: CustomerProps,
   setAccessToken: (accountToken: string) => void,
   setCustomer: (model: ICustomerProps) => void,
 ) {
   try {
-    const response = await client.post('/auth/customers/join', data);
+    const response = await client.post('/customers', data);
 
     if (response.status === 201) {
       // 고객 간단정보를 상태관리에 저장
@@ -120,7 +122,7 @@ export const login = async (
   setCustomer: (model: ICustomerProps) => void,
 ) => {
   try {
-    const response = await client.post('/auth/customers/login', data);
+    const response = await client.post('/auth/login', data);
 
     if (response.status === 200) {
       // 고객 간단정보를 상태관리에 저장
@@ -152,24 +154,13 @@ export const login = async (
       sessionStorage.setItem('accessToken', accessToken);
       setAccessToken(accessToken);
 
-      // success message
-      addToast({
-        type: 'success',
-        message: `${response.data.data.name}님, 환영합니다!`,
-      });
-
-      // 메인페이지 이동
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 1500);
+      return { code: 200, message: 'success', name: response.data.data.name };
     } else {
-      throw new CustomError(500, 'fail');
+      return { code: response.status, message: '로그인 실패되었습니다.' };
     }
   } catch (e: any) {
-    addToast({
-      type: 'error',
-      message: e.response.data.error.message,
-    });
+    addToast({ type: 'error', message: e.response.data.error.message });
+    return { code: 500, message: e.response.data.error.message };
   }
 };
 
@@ -178,11 +169,7 @@ export const login = async (
  */
 export const logout = async (accessToken: string, reset: (accessToken: string) => void) => {
   try {
-    const response = await client.post(
-      '/auth/customers/logout',
-      {},
-      { headers: { Authorization: `Bearer ${accessToken}` } },
-    );
+    const response = await client.post('/auth/logout');
 
     if (response.status === 204) {
       reset(accessToken);
@@ -210,14 +197,9 @@ export const logout = async (accessToken: string, reset: (accessToken: string) =
 /**
  * 현재 세션의 고객 정보 조회
  */
-export const getCustomerInfo = async (accessToken: string) => {
+export const getCustomerInfo = async () => {
   try {
-    const response = await client.get('/auth/customers/info', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
+    const response = await client.get('/my');
     if (response.status === 200) return response.data;
     else throw new CustomError(500, 'fail');
   } catch (e: any) {
@@ -228,79 +210,17 @@ export const getCustomerInfo = async (accessToken: string) => {
   }
 };
 
-/**
- * 고객정보 수정
- */
-export type CustomerType = {
-  id: string;
-  name: string;
-  mobileNumber: string;
-};
-export const updateCustomer = async (data: CustomerType, accessToken: string) => {
-  try {
-    const response = await client.post(
-      '/auth/customers/update',
-      {
-        id: data.id,
-        name: data.name,
-        mobileNumber: data.mobileNumber,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    );
-
-    if (response.status === 200) {
-      addToast({
-        type: 'success',
-        message: '정상적으로 수정되었습니다.',
-      });
-
-      return response.data.customer;
-    } else throw new CustomError(500, 'fail');
-  } catch (e: any) {
-    addToast({
-      type: 'error',
-      message: e.response.data.error.message,
-    });
-  }
+/** 고객정보 수정 타입 */
+type CustomerInfoType = { id: string; name: string; mobileNumber: string };
+/** 고객정보 수정 */
+export const updateCustomer = async ({ id, name, mobileNumber }: CustomerInfoType) => {
+  const body = { id, name, mobileNumber };
+  await client.put('/my', body);
 };
 
-/**
- * 고객정보 수정 : 비밀번호 변경
- */
-export type CustomerPwType = {
-  pw: string;
-  pwModify: string;
-  pwConfirm: string;
-};
-export const updateCustomerPw = async ({ pw, pwModify }: CustomerPwType, accessToken: string) => {
-  try {
-    const response = await client.post(
-      '/auth/customers/update/pw',
-      { pw, pwModify },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    );
-
-    if (response.status === 200) {
-      addToast({
-        type: 'success',
-        message: '정상적으로 수정되었습니다.',
-      });
-
-      // 비밀번호는 민감정보라서 딱히 던지는 데이터가 존재하지 않음.
-      return;
-    } else throw new CustomError(500, 'fail');
-  } catch (e: any) {
-    addToast({
-      type: 'error',
-      message: e.response.data.error.message,
-    });
-  }
+/** 고객정보 수정 타입 */
+export type CustomePwType = { pw: string; pwModify: string };
+/** 고객정보 수정 : 비밀번호 변경 */
+export const updateCustomerPw = async ({ pw, pwModify }: CustomePwType) => {
+  await client.put('/my/pw', { pw, pwModify });
 };

@@ -2,8 +2,8 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '@/types';
 import { ClientPayload } from '@/types/client-payload';
-import { getOne as getAdminUserOne } from '@/services/user.service';
-import { getOne as getCustomerUserOne } from '@/services/customer.service';
+import { getOneForCheck as getAdminUserOne } from '@/services/user.service';
+import { getOneForCheck as getCustomerUserOne } from '@/services/customer.service';
 
 /** JWT 토큰 검증 공통 함수 */
 const verifyToken = async (req: Request): Promise<ClientPayload> => {
@@ -120,11 +120,13 @@ export const requireOwner = async (req: Request, _: Response, next: NextFunction
     } else if (user.type === 'customer') {
       // 고객
       const customerUser = await getCustomerUserOne(user.id);
-      if (user.id !== customerUser.id) {
-        throw AppError.forbidden('Access denied: 본인 소유 리소스가 아닙니다.');
-      } else {
-        req.user = user;
-        return next();
+      if (customerUser) {
+        if (user.id !== customerUser.id) {
+          throw AppError.forbidden('Access denied: 본인 소유 리소스가 아닙니다.');
+        } else {
+          req.user = user;
+          return next();
+        }
       }
     } else {
       throw AppError.forbidden('Access denied: 관리자 또는 고객만 접근 가능합니다.');
@@ -168,7 +170,7 @@ export const requireCustomerOwner = async (req: Request, _: Response, next: Next
 
     // 고객
     const customerUser = await getCustomerUserOne(user.id);
-    if (customerUser.id && user.id !== customerUser.id) {
+    if (customerUser && customerUser.id && user.id !== customerUser.id) {
       throw AppError.forbidden('Access denied: 본인 소유 리소스가 아닙니다.');
     } else {
       req.user = user;

@@ -1,3 +1,4 @@
+import useToast from '@/hooks/useToast';
 import { login } from '@/services/customer-apis';
 import { useCustomerStore } from '@/store/customer';
 import { useAccessTokenStore } from '@/store/session';
@@ -22,6 +23,7 @@ function LoginForm() {
   const navigate = useNavigate();
   const { set: setAccessToken } = useAccessTokenStore();
   const { set: setCustomer } = useCustomerStore();
+  const { addToast } = useToast();
 
   const form = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
@@ -31,13 +33,17 @@ function LoginForm() {
   /**
    * 로그인
    */
-  const onSubmit = (data: { id: string; pw: string }) => {
-    login(data, setAccessToken, setCustomer);
+  const onSubmit = async (data: { id: string; pw: string }) => {
+    const { code, name } = await login(data, setAccessToken, setCustomer);
+    if (code === 200) {
+      addToast({ type: 'success', message: `${name}님, 환영합니다!` });
+      navigate({ to: '/' });
+    }
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit((data: any) => onSubmit(data))} className="space-y-2">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
         <FormField
           control={form.control}
           name="id"

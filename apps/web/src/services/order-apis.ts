@@ -1,43 +1,25 @@
-import useToast from '@/hooks/useToast';
-import { client } from './common-apis';
+import type { CustomerOrderFormSchema, FormSchema } from '@/validate/order-form-schema';
+import client from './axios';
 
 /** 전체 빵 목록 조회 */
 export async function searchBreadList() {
   const breadStatus = 10; // 판매중
-  return client.get(`/breads?breadStatus=${breadStatus}`);
+  return await client.get(`/breads?breadStatus=${breadStatus}`);
 }
 
 /** 배송방법 목록 조회 */
 export async function searchDeliveryList() {
-  return client.get(`/delivery-methods/active`);
+  return await client.get(`/delivery-methods/active`);
 }
 
 /** 은행코드 목록 */
 export async function searchBankList() {
-  return client.get(`/common-code/bank_code`);
+  return await client.get(`/common-code/bank_code`);
 }
 
 /** 주문서 등록 */
-const { addToast } = useToast();
-export async function insertOrders(data: any) {
-  client
-    .post('/orders', data)
-    .then(({ status }) => {
-      status === 201
-        ? addToast({
-            message: '주문이 등록되었습니다.',
-            type: 'success',
-          })
-        : addToast({
-            message: '주문이 실패되었습니다.',
-            type: 'error',
-          });
-    })
-    .catch(({ status }) => {
-      status === 400 &&
-        addToast({
-          message: '주문 등록하는 과정에서 문제가 발생했습다. 관리자 확인이 필요합니다.',
-          type: 'error',
-        });
-    });
+export async function insertOrders(data: FormSchema | CustomerOrderFormSchema) {
+  await client.post('/orders', data).catch((error) => {
+    console.log(error);
+  });
 }

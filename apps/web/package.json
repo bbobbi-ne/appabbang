@@ -31,7 +31,8 @@
     "slick-carousel": "^1.8.1",
     "sonner": "^2.0.6",
     "styled-components": "^6.1.19",
-    "zustand": "^5.0.5"
+    "zustand": "^5.0.5",
+    "date-fns": "^4.1.0"
   },
   "devDependencies": {
     "swagger-typescript-api": "^13.2.7"

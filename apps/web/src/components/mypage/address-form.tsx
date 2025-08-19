@@ -1,5 +1,4 @@
 import { useForm } from 'react-hook-form';
-import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   AlertDialog,
@@ -26,35 +25,7 @@ import DaumPostApi from '@/components/common/daum-post-api';
 import type { AddressListData } from '../pages/address-page';
 import { toast } from 'sonner';
 import { getFormattedMobile } from '@/utils';
-
-export const addressSchema = z.object({
-  recipientName: z
-    .string()
-    .trim()
-    .min(1, '받으실 분의 성함을 입력해주세요')
-    .max(10, '최대 10자 이내로 입력해주세요'),
-  recipientMobile: z
-    .string()
-    .trim()
-    .min(1, '받으실 분의 연락처를 입력해주세요')
-    .refine((val) => /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/.test(val), {
-      message: '휴대폰번호 형식이 올바르지 않습니다.',
-    }),
-  address: z.string().trim().min(1, '주소를 입력해주세요'),
-  addressDetail: z
-    .string()
-    .trim()
-    .min(1, '주소를 입력해주세요')
-    .max(30, '최대 30자 이내로 입력해주세요'),
-  zipcode: z.string().trim().min(1, '주소를 입력해주세요'),
-  message: z
-    .string()
-    .trim()
-    .min(1, '배송메세지를 입력해주세요')
-    .max(30, '최대 30자 이내로 입력해주세요'),
-  isDefault: z.boolean().optional(),
-});
-export type addresssDailogForm = z.infer<typeof addressSchema>;
+import { addressSchema, type addresssDailogForm } from '@/validate/address-form.schema';
 
 const labelMinWidth = 'min-w-[120px]';
 

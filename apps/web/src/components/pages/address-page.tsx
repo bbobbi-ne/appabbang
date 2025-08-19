@@ -4,17 +4,13 @@ import AddressCreateDialog from '@/components/mypage/address-create-dialog';
 import AddressModifyDialog from '../mypage/address-modify-dialog';
 import { Badge, Skeleton } from '@appabbang/ui';
 import { getFormattedMobile } from '@/utils';
+import { MyService } from '@/services/api/my-service';
 
 export default function AddressPage() {
+  const { getAddressList } = MyService;
   const { data, isLoading } = useQuery({
-    queryKey: ['address'],
-    queryFn: (): Promise<AddressListData> => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(testData as AddressListData);
-        }, 5000);
-      });
-    },
+    queryKey: ['getAddresses'],
+    queryFn: getAddressList,
   });
 
   return (
@@ -72,35 +68,3 @@ const AddressList = ({ data }: { data: AddressListData | undefined }) => {
 };
 
 export type AddressListData = (Partial<AddressListDataOrigin[number]> & { isDefault: boolean })[];
-const testData: AddressListData = [
-  {
-    no: 1,
-    address: '서울특별시 강남구 역삼동 123-123',
-    addressDetail: '101동 101호',
-    zipcode: '12345',
-    message: '배송 전 연락 주세요',
-    recipientName: '김가나',
-    recipientMobile: '010-3020-1010',
-    isDefault: true,
-  },
-  {
-    no: 2,
-    address: '서울특별시 강남구 역삼동 123-123',
-    addressDetail: '101동 101호',
-    zipcode: '12345',
-    message: '배송 전 연락 주세요',
-    recipientName: '김가나',
-    recipientMobile: '010-3020-1010',
-    isDefault: false,
-  },
-  {
-    no: 3,
-    address: '서울특별시 강남구 역삼동 123-123',
-    addressDetail: '101동 101호',
-    zipcode: '12345',
-    message: '배송 전 연락 주세요',
-    recipientName: '김가나',
-    recipientMobile: '01030201010',
-    isDefault: false,
-  },
-];

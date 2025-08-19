@@ -1,5 +1,5 @@
-import { updateCustomerPw, type CustomerPwType } from '@/services/customer-apis';
-import { useAccessTokenStore } from '@/store/session';
+import useToast from '@/hooks/useToast';
+import { updateCustomerPw, type CustomePwType } from '@/services/customer-apis';
 import {
   passwordModifyFormSchema,
   type PasswordModifyFormSchema,
@@ -16,13 +16,27 @@ import {
   PasswordInput,
 } from '@appabbang/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 
 const labelMinWidth = 'min-w-[120px]';
 
 // 비밀번호 변경 페이지
 export default function PasswordPage() {
-  const { accessToken } = useAccessTokenStore();
+  const { addToast } = useToast();
+  const updateCustomerPwMutation = useMutation({
+    mutationFn: (data: CustomePwType) => updateCustomerPw(data),
+    onSuccess: () =>
+      addToast({
+        type: 'success',
+        message: '정상적으로 수정되었습니다.',
+      }),
+    onError: (error) =>
+      addToast({
+        type: 'error',
+        message: error.message,
+      }),
+  });
 
   /** default form values */
   const defaultValues: PasswordModifyFormSchema = {
@@ -38,31 +52,20 @@ export default function PasswordPage() {
   });
 
   /**
-   * form handler
-   */
-  const onFormHandler = async (e: React.FormEvent<HTMLFormElement>) => {
-    form.handleSubmit(onSubmit)(e);
-  };
-
-  /**
    * form submit - 비밀번호 변경
    */
-  const onSubmit: SubmitHandler<PasswordModifyFormSchema> = (data: CustomerPwType) => {
-    (async () => {
-      await updateCustomerPw(data, accessToken);
-
-      // 비밀번호는 민감정보이므로 세팅하지 않고 빈값으로 처리
-      form.setValue('pw', '');
-      form.setValue('pwModify', '');
-      form.setValue('pwConfirm', '');
-    })();
+  const onSubmit: SubmitHandler<PasswordModifyFormSchema> = async (data: CustomePwType) => {
+    await updateCustomerPwMutation.mutateAsync(data);
   };
 
   return (
     <div className="w-full flex flex-row items-center justify-center">
       <Card className="p-10 flex flex-row items-center justify-center w-2/3">
         <Form {...form}>
-          <form onSubmit={onFormHandler} className="w-2/3 *:m-2 *:has-[.submitBtn]:mt-5">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="w-2/3 *:m-2 *:has-[.submitBtn]:mt-5"
+          >
             <FormField
               control={form.control}
               name="pw"

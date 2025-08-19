@@ -164,6 +164,26 @@ paths:
                     type: string
                     description: 새로운 액세스 토큰
                     example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: 로그아웃
+      description: 현재 로그인한 사용자를 로그아웃 처리합니다. (권한: 로그인 필요 - 관리자/고객 모두)
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: 로그아웃 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: 성공 메시지
+                    example: '로그아웃되었습니다.'
   /breads:
     get:
       tags: [Breads]
@@ -1653,58 +1673,138 @@ paths:
 
     post:
       tags: [Customers]
-      summary: 고객 생성
-      description: 새로운 고객을 생성합니다. (권한: 관리자만)
-      security:
-        - bearerAuth: []
-      # requestBody:
-      #   required: true
-      #   content:
-      #     application/json:
-      #       schema:
-      #         type: object
-      #         required:
-      #           - name
-      #           - mobileNumber
-      #         properties:
-      #           name:
-      #             type: string
-      #             description: 고객명
-      #             example: '홍길동'
-      #           mobileNumber:
-      #             type: string
-      #             description: 전화번호
-      #             example: '010-1234-5678'
+      summary: 고객 생성 (회원가입)
+      description: 새로운 고객을 생성합니다. (권한: 없음 - 누구나 접근 가능)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - pw
+                - name
+                - mobileNumber
+                - address
+                - addressDetail
+                - zipcode
+                - isServiceTermsAgreed
+                - isPrivacyTermsAgreed
+                - isMarketingTermsAgreed
+              properties:
+                id:
+                  type: string
+                  description: 고객 ID
+                  example: 'customer123'
+                pw:
+                  type: string
+                  description: 비밀번호
+                  example: 'test1234!'
+                name:
+                  type: string
+                  description: 고객명
+                  example: '홍길동'
+                mobileNumber:
+                  type: string
+                  description: 전화번호
+                  example: '010-1234-5678'
+                address:
+                  type: string
+                  description: 주소
+                  example: '서울시 강남구'
+                addressDetail:
+                  type: string
+                  description: 상세주소
+                  example: '123-45'
+                zipcode:
+                  type: string
+                  description: 우편번호
+                  example: '12345'
+                isServiceTermsAgreed:
+                  type: boolean
+                  description: 서비스 이용약관 동의여부
+                  example: true
+                isPrivacyTermsAgreed:
+                  type: boolean
+                  description: 개인정보 수집, 이용 동의여부
+                  example: true
+                isMarketingTermsAgreed:
+                  type: boolean
+                  description: 마케팅 정보 수신 동의여부
+                  example: true
       responses:
         '201':
           description: 고객 생성 성공
-          # content:
-          #   application/json:
-          #     schema:
-          #       type: object
-          #       properties:
-          #         no:
-          #           type: integer
-          #           description: 생성된 고객 번호
-          #           example: 1
-          #         name:
-          #           type: string
-          #           description: 고객명
-          #           example: '홍길동'
-          #         mobileNumber:
-          #           type: string
-          #           description: 전화번호
-          #           example: '010-1234-5678'
-          #         createdAt:
-          #           type: string
-          #           format: date-time
-          #           description: '생성일시'
-          #           example: '2024-01-01T00:00:00.000Z'
-          #         updatedAt:
-          #           type: string
-          #           format: date-time
-          #           description: '수정일시'
-          #           example: '2024-01-01T00:00:00.000Z'
+          headers:
+            Set-Cookie:
+              description: 리프레시 토큰이 쿠키로 설정됩니다
+              schema:
+                type: string
+                example: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; HttpOnly; Secure; SameSite=Strict
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - accessToken
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - no
+                      - id
+                      - name
+                      - mobileNumber
+                      - isServiceTermsAgreed
+                      - isPrivacyTermsAgreed
+                      - isMarketingTermsAgreed
+                      - createdAt
+                      - updatedAt
+                    properties:
+                      no:
+                        type: integer
+                        description: 생성된 고객 번호
+                        example: 1
+                      id:
+                        type: string
+                        description: 고객 ID
+                        example: 'customer123'
+                      name:
+                        type: string
+                        description: 고객명
+                        example: '홍길동'
+                      mobileNumber:
+                        type: string
+                        description: 전화번호
+                        example: '010-1234-5678'
+                      isServiceTermsAgreed:
+                        type: boolean
+                        description: 서비스 이용약관 동의여부
+                        example: true
+                      isPrivacyTermsAgreed:
+                        type: boolean
+                        description: 개인정보 수집, 이용 동의여부
+                        example: true
+                      isMarketingTermsAgreed:
+                        type: boolean
+                        description: 마케팅 정보 수신 동의여부
+                        example: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: '생성일시'
+                        example: '2024-01-01T00:00:00.000Z'
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        description: '수정일시'
+                        example: '2024-01-01T00:00:00.000Z'
+                  accessToken:
+                    type: string
+                    description: 액세스 토큰
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
   /customers/{no}:
     get:
@@ -3219,6 +3319,233 @@ paths:
         '200':
           description: 결제 환불 취소 완료
 
+  /my:
+    get:
+      tags: [My]
+      summary: 내 정보 조회
+      description: 현재 로그인한 고객의 정보를 조회합니다. (권한: 고객만)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 내 정보 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - customer
+                  - coupon
+                  - totalAmount
+                properties:
+                  customer:
+                    type: object
+                    required:
+                      - no
+                      - id
+                      - name
+                      - mobileNumber
+                      - defaultAddressNo
+                      - createdAt
+                      - address
+                      - customerCoupon
+                    properties:
+                      no:
+                        type: integer
+                        description: 고객 번호
+                        example: 1
+                      id:
+                        type: string
+                        description: 고객 ID
+                        example: 'customer123'
+                      name:
+                        type: string
+                        description: 고객명
+                        example: '홍길동'
+                      mobileNumber:
+                        type: string
+                        description: 전화번호
+                        example: '010-1234-5678'
+                      defaultAddressNo:
+                        type: integer
+                        description: 기본 배송지 번호
+                        example: 1
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: '생성일시'
+                        example: '2024-01-01T00:00:00.000Z'
+                      address:
+                        type: array
+                        description: 배송지 목록
+                        items:
+                          type: object
+                          properties:
+                            no:
+                              type: integer
+                              description: 배송지 번호
+                              example: 1
+                            address:
+                              type: string
+                              description: 주소
+                              example: '서울시 강남구'
+                            addressDetail:
+                              type: string
+                              description: 상세주소
+                              example: '123-45'
+                      customerCoupon:
+                        type: array
+                        description: 고객 쿠폰 목록
+                        items:
+                          type: object
+                          properties:
+                            no:
+                              type: integer
+                              description: 고객 쿠폰 번호
+                              example: 1
+                            coupon:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                  description: 쿠폰명
+                                  example: '첫 로그인 쿠폰'
+                                amount:
+                                  type: integer
+                                  description: 할인 금액
+                                  example: 3000
+                  coupon:
+                    type: array
+                    description: 할인 정보
+                    items:
+                      type: object
+                      properties:
+                        no:
+                          type: integer
+                          description: 고객 쿠폰 번호
+                          example: 1
+                        coupon:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: 쿠폰명
+                              example: '첫 로그인 쿠폰'
+                            amount:
+                              type: integer
+                              description: 할인 금액
+                              example: 3000
+                  totalAmount:
+                    type: integer
+                    description: 주문 누적 금액
+                    example: 150000
+
+    put:
+      tags: [My]
+      summary: 내 정보 수정
+      description: 현재 로그인한 고객의 정보를 수정합니다. (권한: 고객만)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 고객명
+                  example: '홍길동'
+                mobileNumber:
+                  type: string
+                  description: 전화번호
+                  example: '010-1234-5678'
+      responses:
+        '200':
+          description: 내 정보 수정 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - no
+                  - id
+                  - name
+                  - mobileNumber
+                  - pw
+                  - createdAt
+                  - updatedAt
+                properties:
+                  no:
+                    type: integer
+                    description: 고객 번호
+                    example: 1
+                  id:
+                    type: string
+                    description: 고객 ID
+                    example: 'customer123'
+                  name:
+                    type: string
+                    description: 고객명
+                    example: '홍길동'
+                  mobileNumber:
+                    type: string
+                    description: 전화번호
+                    example: '010-1234-5678'
+                  pw:
+                    type: string
+                    description: 비밀번호 (해시된 값)
+                    example: 'hashedPassword123'
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: '생성일시'
+                    example: '2024-01-01T00:00:00.000Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: '수정일시'
+                    example: '2024-01-01T00:00:00.000Z'
+
+  /my/pw:
+    put:
+      tags: [My]
+      summary: 비밀번호 변경
+      description: 현재 로그인한 고객의 비밀번호를 변경합니다. (권한: 고객만)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - pw
+                - pwModify
+              properties:
+                pw:
+                  type: string
+                  description: 현재 비밀번호
+                  example: 'old1234!'
+                pwModify:
+                  type: string
+                  description: 새로운 비밀번호
+                  example: 'new1234!'
+      responses:
+        '200':
+          description: 비밀번호 변경 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: 성공 메시지
+                    example: '비밀번호가 변경되었습니다.'
+
   /my/addresses:
     get:
       tags: [My]
@@ -3285,10 +3612,10 @@ paths:
                       format: date-time
                       description: 수정일시
                       example: '2024-01-01T00:00:00.000Z'
-                  isDefault:
-                    type: boolean
-                    description: 기본 배송지 여부
-                    example: true
+                    isDefault:
+                      type: boolean
+                      description: 기본 배송지 여부
+                      example: true
     post:
       tags: [My]
       summary: 배송지 등록

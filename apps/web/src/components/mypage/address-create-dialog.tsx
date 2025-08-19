@@ -5,35 +5,35 @@ import {
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@appabbang/ui';
-import AddressForm, { type addresssDailogForm } from '@/components/mypage/address-form';
+import { MyService } from '@/services/api/my-service';
+import type { addresssDailogForm } from '@/validate/address-form.schema';
+import AddressForm from './address-form';
 
 export default function AddressCreateDialog() {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
+  const { createAddress } = MyService;
 
   const createMutation = useMutation({
-    mutationFn: (data: addresssDailogForm) => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(data);
-        }, 2000);
-      });
+    mutationFn: (data: addresssDailogForm) => createAddress(data),
+    onSuccess: () => {
+      toast.success('배송지가 추가되었습니다.');
+      queryClient.invalidateQueries({ queryKey: ['getAddresses'] });
+      setOpen(false);
     },
+    onError: (error) => toast.error(error.message),
   });
 
+  /**
+   * 배송지 저장
+   */
   const create = async (data: addresssDailogForm) => {
-    try {
-      await createMutation.mutateAsync(data);
-      toast.success('배송지가 추가되었습니다.');
-      queryClient.invalidateQueries({ queryKey: ['address'] });
-      setOpen(false);
-    } catch (error) {
-      console.error(error);
-    }
+    await createMutation.mutateAsync(data);
   };
 
   return (
@@ -41,6 +41,7 @@ export default function AddressCreateDialog() {
       <DialogTrigger asChild>
         <Button className="ml-auto">배송지 추가</Button>
       </DialogTrigger>
+      <DialogDescription className="hidden" />
       <DialogContent
         onInteractOutside={(e) => {
           e.preventDefault();

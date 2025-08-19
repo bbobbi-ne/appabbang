@@ -185,11 +185,11 @@ async function main() {
   await prisma.orderRound.createMany({
     data: [
       {
-        name: '주문 1차',
-        startedAt: '2025-09-01T09:36:15.992Z',
-        endedAt: '2025-09-07T20:36:15.992Z',
+        name: '주문 25년 8월',
+        startedAt: '2025-08-01T09:36:15.992Z',
+        endedAt: '2025-08-31T20:36:15.992Z',
         minOrderQty: 1,
-        maxOrderQty: 99,
+        maxOrderQty: 999,
       },
     ],
   });

@@ -5,11 +5,13 @@ const client = axios.create({
   timeout: 10000,
 });
 
+/**
+ * API 요청 시 accessToken이 필요한 경우
+ * sessionStorage에서 관리
+ */
 client.interceptors.request.use((config) => {
-  // const token = localStorage.getItem('token');
-  // if (token) {
-  //   config.headers.Authorization = `Bearer ${token}`;
-  // }
+  const token = sessionStorage.getItem('accessToken');
+  token && (config.headers.Authorization = `Bearer ${token}`);
   return config;
 });
 
@@ -17,8 +19,8 @@ client.interceptors.response.use(
   (response) => response,
   (error) => {
     // 리프레시 토큰 발급
-    if (error.response.status === 401) {
-      // localStorage.removeItem('token');
+    if (error.response.status === 403) {
+      sessionStorage.removeItem('accessToken');
       window.location.href = '/login';
     }
     return Promise.reject(error);
