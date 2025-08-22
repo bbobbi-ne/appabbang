@@ -6,6 +6,7 @@ import {
   DialogTitle,
   DialogDescription,
   ScrollArea,
+  cn,
 } from '@appabbang/ui';
 import { useState, type ReactNode } from 'react';
 
@@ -21,6 +22,7 @@ export interface DialogLayoutProps {
   title: string;
   description: string;
   children: (props: { close: () => void }) => ReactNode;
+  height?: number;
 }
 
 /**
@@ -31,7 +33,7 @@ export interface DialogLayoutProps {
  * - ScrollArea로 내용 스크롤 가능
  * - children에 close 함수를 전달하여 다이얼로그 닫기 가능
  */
-export function DialogLayout({ trigger, title, description, children }: DialogLayoutProps) {
+export function DialogLayout({ trigger, title, description, children, height }: DialogLayoutProps) {
   const [open, setOpen] = useState(false); // 다이얼로그 오픈 상태
   const close = () => setOpen(false); // 다이얼로그 닫기 함수
 
@@ -56,7 +58,9 @@ export function DialogLayout({ trigger, title, description, children }: DialogLa
           </DialogHeader>
 
           {/* 스크롤 가능한 영역에 children 렌더링 */}
-          <ScrollArea className="h-[700px] pr-6">{children({ close })}</ScrollArea>
+          <ScrollArea className={cn('pr-6', height ? `h-[${height}px]` : 'h-[700px]')}>
+            {children({ close })}
+          </ScrollArea>
         </DialogContent>
       )}
     </Dialog>

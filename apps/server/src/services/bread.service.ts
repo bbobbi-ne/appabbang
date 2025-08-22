@@ -131,9 +131,11 @@ export const update = async (
   images?: UploadedFile[] | UploadedFile,
 ) => {
   await prisma.$transaction(async (tx) => {
+    const updateData: Partial<UpdateBreadRequestBody> = { ...body };
+    delete (updateData as any).no;
     await tx.bread.update({
       where: { no },
-      data: body,
+      data: updateData,
     });
 
     if (images) {

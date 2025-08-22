@@ -1,4 +1,5 @@
 import { format, parse } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 /**
  * 💰 KRW 통화 형식으로 숫자 변환
@@ -30,7 +31,7 @@ export function formatDate(date: Date): string {
  * @returns '2025-08-14 13:45:30' 형태 문자열
  */
 export function formatDateTime(date: Date): string {
-  return format(date, 'yyyy-MM-dd HH:mm:ss');
+  return format(date, 'yyyy년 MM월 dd일 HH시mm분ss초', { locale: ko });
 }
 
 /**
@@ -39,11 +40,9 @@ export function formatDateTime(date: Date): string {
  * @param time 'HH:mm:ss' 형태 문자열
  * @returns '2025-08-14T13:45:30.000Z' ISO 문자열
  */
-export function formatDateTimeToIso(date: Date, time: string): string {
-  const dateString = format(date, 'yyyy-MM-dd');
-  const dateTimeString = `${dateString} ${time}`;
-  const combined = parse(dateTimeString, 'yyyy-MM-dd HH:mm:ss', new Date());
-  return combined.toISOString();
+export function formatDateTimeToIso(date: Date): string {
+  const isoString = date.toISOString();
+  return isoString;
 }
 
 /**

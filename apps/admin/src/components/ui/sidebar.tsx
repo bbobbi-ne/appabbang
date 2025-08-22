@@ -9,14 +9,24 @@ import {
 } from '@appabbang/ui';
 import { Link, useRouterState } from '@tanstack/react-router';
 import ThemeToggleBtn from './theme-toggle-btn';
-import { HouseIcon, Receipt, Scroll, ScrollText, Store, Users } from 'lucide-react';
+
+import {
+  Home,
+  Receipt,
+  ClipboardList, // 주문관리
+  CreditCard, // 결제관리
+  BadgePercent, // 할인관리
+  Calendar,
+  Users,
+} from 'lucide-react';
 
 const items = [
-  { title: '홈', url: '/dashboard', icon: <HouseIcon /> },
-  { title: '빵관리', url: '/dashboard/breads', icon: <Store /> },
-  { title: '주문관리', url: '/dashboard/orders', icon: <ScrollText /> },
-  { title: '결제관리', url: '/dashboard/payment', icon: <Receipt /> },
-  { title: '주문차수', url: '/dashboard/orderRound', icon: <Scroll /> },
+  { title: '홈', url: '/dashboard', icon: <Home /> },
+  { title: '빵관리', url: '/dashboard/breads', icon: <Receipt /> },
+  { title: '주문관리', url: '/dashboard/orders', icon: <ClipboardList /> },
+  { title: '결제관리', url: '/dashboard/payment', icon: <CreditCard /> },
+  { title: '할인관리', url: '/dashboard/coupons', icon: <BadgePercent /> },
+  { title: '주문차수', url: '/dashboard/orderRound', icon: <Calendar /> },
   { title: '고객관리', url: '/dashboard/customers', icon: <Users /> },
 ];
 

@@ -344,6 +344,11 @@ export type OrdersListData = {
    */
   orderStatusName: string;
   /**
+   * 주문자 전화번호
+   * @example "010-1234-5678"
+   */
+  ordererMobile: string;
+  /**
    * 주문자 이름
    * @example "홍길동"
    */
@@ -370,7 +375,6 @@ export type OrdersListData = {
    * @example "2024-06-22T12:34:56.000Z"
    */
   updatedAt: string;
-
   /**
    * 주소
    * @example "서울시 강남구"
@@ -612,14 +616,12 @@ export interface OrdersDetailData {
   /**
    * 송장번호
    * @example ""
-
    */
   trackingNumber: string;
   /**
    * 결제, 환불 약관 동의여부
    * @example true
    */
-
   isPaymentRefundTermsAgreed: boolean;
   /**
    * 주문 생성일시
@@ -767,19 +769,19 @@ export type OrderRoundListData = {
 export interface OrderRoundCreatePayload {
   /**
    * 주문차수명
-   * @example "주문 1차"
+   * @example "주문 1월"
    */
   name: string;
   /**
    * 시작일시
    * @format date-time
-   * @example "2025-07-01T11:00:00.000Z"
+   * @example "2025-01-01T11:00:00.000Z"
    */
   startedAt: string;
   /**
    * 종료일시
    * @format date-time
-   * @example "2025-07-31T11:00:00.000Z"
+   * @example "2025-01-31T11:00:00.000Z"
    */
   endedAt: string;
   /**
@@ -794,15 +796,9 @@ export interface OrderRoundCreatePayload {
   maxOrderQty: number;
   /**
    * 빵 번호 목록 (JSON 문자열 형태로 전송)
-   * @example "[{"breadNo": 1}, {"breadNo": 2}, {"breadNo": 3}]"
+   * @example "[{"no": 1, "name": "판매빵"}, {"no": 5, "name": "출시예정빵"}]"
    */
-  orderRoundBreads: {
-    /**
-     * 빵 번호
-     * @example 1
-     */
-    breadNo: number;
-  }[];
+  orderRoundBreads: any[];
   /**
    * 주문차수 이미지(선택사항)
    * @format binary
@@ -845,7 +841,7 @@ export interface LatestListData {
    * @example 1
    */
   maxOrderQty: number;
-  orderRoundBread: {
+  orderRoundBreads: {
     /**
      * 빵 번호
      * @example 1
@@ -897,7 +893,7 @@ export interface GetOrderRoundData {
    * @example 1
    */
   maxOrderQty: number;
-  orderRoundBread: {
+  orderRoundBreads: {
     /**
      * 빵 번호
      * @example 1
@@ -993,13 +989,7 @@ export interface OrderRoundDetailData {
      */
     unitPrice: number;
   }[];
-  image: {
-    /**
-     * 이미지 URL
-     * @example "https://example.com/image.jpg"
-     */
-    url?: string;
-  }[];
+  image: objectPropertiesUrlTypeStringDescription이미지UrlExampleHttpsExampleComImageJpgPublicIdTypeStringDescription이미지식별자ExampleBreadsZvypj6Wohag9DghdtdtoOrderTypeNumberDescription이미지순서Example1;
 }
 
 export interface OrderRoundUpdatePayload {
@@ -1042,9 +1032,9 @@ export interface OrderRoundUpdatePayload {
   maxOrderQty: number;
   /**
    * 빵 번호 목록 (JSON 문자열 형태로 전송)
-   * @example "[{"breadNo": 1}, {"breadNo": 2}, {"breadNo": 3}]"
+   * @example "[{"no": 1, "name": "판매빵"}, {"no": 5, "name": "출시예정빵"}]"
    */
-  orderRoundBreads: string;
+  orderRoundBreads: any[];
   /**
    * 주문차수 이미지(선택사항)
    * @format binary

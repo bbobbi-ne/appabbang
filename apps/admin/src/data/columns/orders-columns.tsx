@@ -12,6 +12,7 @@ import { SortAsc, SortDesc } from 'lucide-react';
 import { formatCurrencyKR, formatDateTime } from '@/utils/format';
 import { useOrderStatusUpdateMutation } from '@/hooks/use-order';
 import { useGetOrderStatusQuery } from '@/hooks/use-common-code';
+import { renderSortButton } from '@/components/ui/rebder-sort-button';
 
 export type OrdersListItem = OrdersListData[number];
 
@@ -22,81 +23,90 @@ export const ordersColumns = () => {
 
   const columns: ColumnDef<OrdersListItem, any>[] = [
     columnHelper.accessor('no', {
-      maxSize: 0,
-      header: ({ column }) => {
-        const isSorted = column.getIsSorted() === 'asc';
-        return (
-          <Button
-            className={`p-0 ${isSorted ? 'text-blue-500' : ''} hover:text-primary gap-0`}
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            {isSorted ? <SortAsc /> : <SortDesc />} 번호
-          </Button>
-        );
-      },
+      maxSize: 1,
+      header: ({ column }) => renderSortButton(column, '번호'),
       cell: (info) => {
         const index = info.table.getPrePaginationRowModel().rows.length - info.row.index;
         return <p className="text-center">{index}</p>;
       },
     }),
     columnHelper.accessor('orderNumber', {
-      maxSize: 15,
-      header: ({ column }) => (
+      maxSize: 5,
+      header: () => (
         <Button className="p-0" variant="ghost">
           주문번호
         </Button>
       ),
-      cell: (info) => {
-        return <p className="line-clamp-3 whitespace-normal break-words">{info.getValue()}</p>;
-      },
+      cell: (info) => (
+        <p className="line-clamp-3 whitespace-normal break-words">{info.getValue()}</p>
+      ),
     }),
-    // columnHelper.accessor('customer.name', {
-    //   maxSize: 5,
-    //   header: ({ column }) => (
-    //     <Button className="p-0" variant="ghost">
-    //       이름
-    //     </Button>
-    //   ),
-    //   cell: (info) => {
-    //     return info.getValue();
-    //   },
-    // }),
-    // columnHelper.accessor('customer.mobileNumber', {
-    //   maxSize: 10,
-    //   header: ({ column }) => (
-    //     <Button className="p-0" variant="ghost">
-    //       전화번호
-    //     </Button>
-    //   ),
-    //   cell: (info) => {
-    //     return <p className="line-clamp-3 whitespace-normal break-words">{info.getValue()}</p>;
-    //   },
-    // }),
-    columnHelper.accessor('payment.isPaid', {
-      maxSize: 5,
-      header: ({ column }) => (
+    columnHelper.accessor('ordererName', {
+      maxSize: 1,
+      header: () => (
         <Button className="p-0" variant="ghost">
-          입금확인
+          이름
         </Button>
       ),
-      cell: (info) => {
-        const value = info.getValue() ? '완료' : '미완료';
-        return <p className={`${info.getValue() ? '' : 'text-red-500'} font-semibold`}>{value}</p>;
-      },
+      cell: (info) => info.getValue(),
     }),
-    columnHelper.accessor('orderStatus', {
-      maxSize: 5,
+    columnHelper.accessor('ordererMobile', {
+      maxSize: 3,
+      header: () => (
+        <Button className="p-0" variant="ghost">
+          전화번호
+        </Button>
+      ),
+      cell: (info) => (
+        <p className="line-clamp-3 whitespace-normal break-words">{info.getValue()}</p>
+      ),
+    }),
+    columnHelper.accessor('payment.isPaid', {
+      maxSize: 1,
       header: ({ column }) => {
         const rawValue = column.getFilterValue();
         const value = typeof rawValue === 'string' ? rawValue : 'all';
-
         return (
           <Select
             value={value}
-            onValueChange={(val) => {
-              column.setFilterValue(val === 'all' ? undefined : val);
-            }}
+            onValueChange={(val) => column.setFilterValue(val === 'all' ? undefined : val)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="입금확인" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">전체</SelectItem>
+              <SelectItem value="true">완료</SelectItem>
+              <SelectItem value="false">미완료</SelectItem>
+            </SelectContent>
+          </Select>
+        );
+      },
+      cell: (info) => {
+        const isPaid = info.getValue<boolean>();
+        return (
+          <p className={`${isPaid ? '' : 'text-red-500'} font-semibold`}>
+            {isPaid ? '완료' : '미완료'}
+          </p>
+        );
+      },
+      filterFn: (row, columnId, filterValue) => {
+        if (filterValue === undefined) return true; // 전체
+        const isPaid = row.getValue<boolean>(columnId);
+        if (filterValue === 'true') return !!isPaid;
+        if (filterValue === 'false') return isPaid === false;
+        return true;
+      },
+    }),
+    columnHelper.accessor('orderStatus', {
+      maxSize: 1,
+      header: ({ column }) => {
+        const rawValue = column.getFilterValue();
+        const value = typeof rawValue === 'string' ? rawValue : 'all';
+        return (
+          <Select
+            value={value}
+            onValueChange={(val) => column.setFilterValue(val === 'all' ? undefined : val)}
           >
             <SelectTrigger>
               <SelectValue />
@@ -112,18 +122,16 @@ export const ordersColumns = () => {
           </Select>
         );
       },
-
       cell: (info) => {
         const value = info.getValue();
         const found = ordersStatus?.find((item) => item.code === value);
         const no = info.row.original.no;
-
         return (
           <Select
             value={value}
-            onValueChange={(val: '10' | '20' | '30' | '40' | '50') => {
-              orderStatusUpdateMutation({ no, orderStatus: { orderStatus: val } });
-            }}
+            onValueChange={(val: '10' | '20' | '30' | '40' | '50') =>
+              orderStatusUpdateMutation({ no, orderStatus: { orderStatus: val } })
+            }
           >
             <SelectTrigger>
               <SelectValue>{found?.name}</SelectValue>
@@ -138,33 +146,31 @@ export const ordersColumns = () => {
           </Select>
         );
       },
-
       filterFn: (row, columnId, filterValue) => {
         const columnValue = ordersStatus?.find((item) => item.code === row.getValue(columnId));
         return columnValue?.code === filterValue;
       },
     }),
     columnHelper.accessor('deliveryMethodName', {
-      maxSize: 5,
-      header: ({ column }) => (
+      maxSize: 1,
+      header: () => (
         <Button className="p-0" variant="ghost">
           배송방법
         </Button>
       ),
-      cell: (info) => {
-        return info.getValue();
-      },
+      cell: (info) => info.getValue(),
     }),
-    columnHelper.accessor('address', {
-      maxSize: 20,
-      header: ({ column }) => (
+
+    columnHelper.accessor((row) => `${row.address} ${row.addressDetail} (${row.zipcode})`, {
+      id: 'address',
+      maxSize: 5,
+      header: () => (
         <Button className="p-0" variant="ghost">
           배송지
         </Button>
       ),
       cell: (info) => {
         const { address, addressDetail, zipcode } = info.row.original;
-
         return (
           <p className="line-clamp-3 whitespace-normal break-words">
             {address} {addressDetail} ({zipcode})
@@ -172,47 +178,29 @@ export const ordersColumns = () => {
         );
       },
     }),
-    columnHelper.accessor('totalPrice', {
-      maxSize: 10,
-      header: ({ column }) => (
-        <Button className="p-0" variant="ghost">
-          결제금액
-        </Button>
-      ),
-      cell: (info) => {
-        return <p>{formatCurrencyKR(info.getValue())}원</p>;
-      },
-    }),
 
+    columnHelper.accessor('totalPrice', {
+      maxSize: 2,
+      header: ({ column }) => renderSortButton(column, '결제금액'),
+      cell: (info) => <p>{formatCurrencyKR(info.getValue())}원</p>,
+    }),
     columnHelper.accessor('createdAt', {
-      maxSize: 5,
-      header: ({ column }) => (
-        <Button className="p-0" variant="ghost">
-          주문등록일시
-        </Button>
+      maxSize: 3,
+      header: ({ column }) => renderSortButton(column, '주문등록일시'),
+      cell: (info) => (
+        <div className="line-clamp-3 whitespace-normal break-words">
+          {formatDateTime(info.getValue())}
+        </div>
       ),
-      cell: (info) => {
-        return (
-          <div className="line-clamp-3 whitespace-normal break-words">
-            {formatDateTime(info.getValue())}
-          </div>
-        );
-      },
     }),
     columnHelper.accessor('updatedAt', {
-      maxSize: 5,
-      header: ({ column }) => (
-        <Button className="p-0" variant="ghost">
-          주문수정일시
-        </Button>
+      maxSize: 3,
+      header: ({ column }) => renderSortButton(column, '주문수정일시'),
+      cell: (info) => (
+        <div className="line-clamp-3 whitespace-normal break-words">
+          {formatDateTime(info.getValue())}
+        </div>
       ),
-      cell: (info) => {
-        return (
-          <div className="line-clamp-3 whitespace-normal break-words">
-            {formatDateTime(info.getValue())}
-          </div>
-        );
-      },
     }),
   ];
 
