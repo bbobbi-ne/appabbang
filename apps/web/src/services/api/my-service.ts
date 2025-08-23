@@ -101,6 +101,10 @@ export const MyService = {
     const response = await client.get(`/my/order/${no}`);
     return response.data;
   },
+  /** 내 주문 취소 */
+  cancelOrder: async (no: number, data: { canceledReason: string }) => {
+    await client.post(`/my/order/${no}/cancel`, data);
+  },
   /** 주문내역의 배송지 조회 */
   getOrderAddress: async (no: number) => {
     const response = await client.get(`/my/order/${no}/address`);

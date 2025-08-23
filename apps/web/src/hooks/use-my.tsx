@@ -108,6 +108,18 @@ export function useGetOrderQuery(no: number) {
   });
 }
 
+/** 내 주문 취소 */
+export function useCancelOrderMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ no, data }: { no: number; data: { canceledReason: string } }) =>
+      MyService.cancelOrder(no, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/my/orders', '내 주문 목록 조회'] });
+    },
+  });
+}
+
 /** 주문내역의 배송지 조회 */
 export function useGetOrderAddressQuery(no: number, enabled: boolean) {
   return useQuery({
