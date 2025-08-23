@@ -2,7 +2,7 @@
  * 마이페이지 - 주문내역 - 주문상세내역
  */
 
-import OrderDetailPage from '@/components/pages/order-detail-page';
+import MyOrderDetailPage from '@/components/pages/my-order-detail-page';
 import SubLayout from '@/components/templates/sub-layout';
 import MypageLayout from '@/components/templates/mypage-layout';
 import { createFileRoute, useParams } from '@tanstack/react-router';
@@ -17,7 +17,7 @@ function RouteComponent() {
   return (
     <SubLayout title="마이페이지">
       <MypageLayout>
-        <OrderDetailPage orderNo={Number(orderNo)} />
+        <MyOrderDetailPage orderNo={Number(orderNo)} />
       </MypageLayout>
     </SubLayout>
   );

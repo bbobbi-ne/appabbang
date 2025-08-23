@@ -4,11 +4,11 @@ import OrderItem from '@/components/mypage/order-item';
 import OrderCalcenDialog from '@/components/mypage/order-cancel-dialog';
 import Loading from '@/components/common/loading';
 import { useGetOrdersQuery } from '@/hooks/use-my';
-import OrderAddressModifyDialog from '@/components/mypage/order-address-modify-dialog';
 
 const CANCEL_ORDER_STATUS = ['50', '51', '52'];
+const AVALIABLE_DELIVERY_ORDER_STATUS = ['11', '20', '30', '31', '40'];
 
-export default function OrderListPage() {
+export default function MyOrderListPage() {
   const navigate = useNavigate();
 
   const { data: orders, isLoading } = useGetOrdersQuery();
@@ -19,8 +19,8 @@ export default function OrderListPage() {
   };
 
   // 배송(수령)현황
-  const moveToDeliveryDetail = () => {
-    navigate({ to: '/' });
+  const moveToDeliveryDetail = (orderNo: number) => {
+    navigate({ to: `/mypage/order-list/${orderNo}/delivery` });
   };
 
   if (isLoading) return <Loading />;
@@ -32,13 +32,10 @@ export default function OrderListPage() {
       <div className="space-y-2">
         {orders?.map((order, i: number) => (
           <Card key={i}>
-            <CardContent className="pt-6 flex justify-between">
+            <CardContent className="pt-6 flex flex-col md:flex-row justify-between gap-2">
               <div className="space-y-2">
-                <div className="flex flex-col gap-2">
-                  <div className="flex flex-row gap-2">
-                    <span>
-                      <b>{new Date(order.createdAt).toISOString().split('T')[0]} 주문</b>
-                    </span>
+                <div className="flex flex-col md:flex-row-reverse md:items-center gap-2">
+                  <div className="space-x-2">
                     <Badge variant="outline">{order.orderNumber}</Badge>
                     {CANCEL_ORDER_STATUS.includes(order.orderStatus) ? (
                       <Badge variant="destructive">{order.orderStatusName}</Badge>
@@ -46,6 +43,9 @@ export default function OrderListPage() {
                       <Badge variant="secondary">{order.orderStatusName}</Badge>
                     )}
                   </div>
+                  <h3>
+                    <b>{new Date(order.createdAt).toISOString().split('T')[0]} 주문</b>
+                  </h3>
                 </div>
 
                 <div className="flex flex-col gap-2">
@@ -56,28 +56,29 @@ export default function OrderListPage() {
               </div>
 
               {/* 버튼 영역 */}
-              <div className="flex flex-col justify-center gap-2">
+              <div className="flex flex-row justify-end md:flex-col md:justify-center gap-2">
                 <Button variant="outline" onClick={() => moveToOrderDetail(order.no)}>
                   주문상세보기
                 </Button>
-                <Button variant="outline" onClick={moveToDeliveryDetail}>
-                  배송(수령)현황
-                </Button>
+                {!CANCEL_ORDER_STATUS.includes(order.orderStatus) &&
+                  AVALIABLE_DELIVERY_ORDER_STATUS.includes(order.orderStatus) && (
+                    <Button variant="outline" onClick={() => moveToDeliveryDetail(order.no)}>
+                      배송(수령)현황
+                    </Button>
+                  )}
                 {Number(order.orderStatus) < 20 ? (
                   <OrderCalcenDialog no={order.no}>
                     <Button variant="outline">주문취소</Button>
                   </OrderCalcenDialog>
                 ) : null}
-
-                {(order.orderStatus === '10' || order.orderStatus === '11') && (
-                  <OrderAddressModifyDialog no={order.no}>
-                    <Button variant="outline">배송지 수정</Button>
-                  </OrderAddressModifyDialog>
-                )}
               </div>
             </CardContent>
           </Card>
         ))}
+
+        {orders?.length === 0 && (
+          <div className="p-8 bg-primary-foreground">등록된 주문이 없어요 🥲</div>
+        )}
       </div>
     </div>
   );

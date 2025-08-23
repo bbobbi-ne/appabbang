@@ -120,6 +120,14 @@ export function useCancelOrderMutation() {
   });
 }
 
+/** 내 주문 배송(수령) 조회 */
+export function useGetOrderDeliveryQuery(no: number) {
+  return useQuery({
+    queryKey: [`/my/order/${no}/delivery`, '내 주문 배송(수령) 조회'],
+    queryFn: () => MyService.getOrderDelivery(no),
+  });
+}
+
 /** 주문내역의 배송지 조회 */
 export function useGetOrderAddressQuery(no: number, enabled: boolean) {
   return useQuery({

@@ -41,7 +41,6 @@ export default function OrderAddressModifyDialog({ children, no }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogDescription className="hidden" />
       <DialogContent
         onInteractOutside={(e) => {
           e.preventDefault();
@@ -51,6 +50,9 @@ export default function OrderAddressModifyDialog({ children, no }: Props) {
         <DialogHeader>
           <DialogTitle>주문 배송지 수정</DialogTitle>
         </DialogHeader>
+        <DialogDescription className="text-xs">
+          접수중인 주문의 배송지를 수정할 수 있습니다.
+        </DialogDescription>
         <AddressForm
           currentValues={data}
           onSubmit={updateOrderAddress}

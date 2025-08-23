@@ -10,24 +10,24 @@
 
 // Import Routes
 
-import { Route as rootRoute } from './routes/__root';
-import { Route as LogoutImport } from './routes/logout';
-import { Route as LoginImport } from './routes/login';
-import { Route as JoinImport } from './routes/join';
-import { Route as IndexImport } from './routes/index';
-import { Route as CallbackKakaoImport } from './routes/callback.kakao';
-import { Route as SubPageProductsImport } from './routes/_sub-page/products';
-import { Route as SubPageOrderImport } from './routes/_sub-page/order';
-import { Route as SubPageFaqImport } from './routes/_sub-page/faq';
-import { Route as SubPageBrandImport } from './routes/_sub-page/brand';
-import { Route as SubPageMypageIndexImport } from './routes/_sub-page/mypage/index';
-import { Route as SubPageOrderOrderRoundNoImport } from './routes/_sub-page/order/$orderRoundNo';
-import { Route as SubPageMypagePasswordIndexImport } from './routes/_sub-page/mypage/password/index';
-import { Route as SubPageMypageOrderListIndexImport } from './routes/_sub-page/mypage/order-list/index';
-import { Route as SubPageMypageInfoIndexImport } from './routes/_sub-page/mypage/info/index';
-import { Route as SubPageMypageAddressIndexImport } from './routes/_sub-page/mypage/address/index';
-import { Route as SubPageMypageOrderListOrderNoImport } from './routes/_sub-page/mypage/order-list/$orderNo';
-import { Route as SubPageMypageOrderDeliveryOrderNoImport } from './routes/_sub-page/mypage/order-delivery/$orderNo';
+import { Route as rootRoute } from './routes/__root'
+import { Route as LogoutImport } from './routes/logout'
+import { Route as LoginImport } from './routes/login'
+import { Route as JoinImport } from './routes/join'
+import { Route as IndexImport } from './routes/index'
+import { Route as CallbackKakaoImport } from './routes/callback.kakao'
+import { Route as SubPageProductsImport } from './routes/_sub-page/products'
+import { Route as SubPageOrderImport } from './routes/_sub-page/order'
+import { Route as SubPageFaqImport } from './routes/_sub-page/faq'
+import { Route as SubPageBrandImport } from './routes/_sub-page/brand'
+import { Route as SubPageMypageIndexImport } from './routes/_sub-page/mypage/index'
+import { Route as SubPageOrderOrderRoundNoImport } from './routes/_sub-page/order/$orderRoundNo'
+import { Route as SubPageMypagePasswordIndexImport } from './routes/_sub-page/mypage/password/index'
+import { Route as SubPageMypageOrderListIndexImport } from './routes/_sub-page/mypage/order-list/index'
+import { Route as SubPageMypageInfoIndexImport } from './routes/_sub-page/mypage/info/index'
+import { Route as SubPageMypageAddressIndexImport } from './routes/_sub-page/mypage/address/index'
+import { Route as SubPageMypageOrderListOrderNoImport } from './routes/_sub-page/mypage/order-list/$orderNo'
+import { Route as SubPageMypageOrderListOrderNoDeliveryImport } from './routes/_sub-page/mypage/order-list_/$orderNo/delivery'
 
 // Create/Update Routes
 
@@ -35,305 +35,312 @@ const LogoutRoute = LogoutImport.update({
   id: '/logout',
   path: '/logout',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const LoginRoute = LoginImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const JoinRoute = JoinImport.update({
   id: '/join',
   path: '/join',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const CallbackKakaoRoute = CallbackKakaoImport.update({
   id: '/callback/kakao',
   path: '/callback/kakao',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const SubPageProductsRoute = SubPageProductsImport.update({
   id: '/_sub-page/products',
   path: '/products',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const SubPageOrderRoute = SubPageOrderImport.update({
   id: '/_sub-page/order',
   path: '/order',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const SubPageFaqRoute = SubPageFaqImport.update({
   id: '/_sub-page/faq',
   path: '/faq',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const SubPageBrandRoute = SubPageBrandImport.update({
   id: '/_sub-page/brand',
   path: '/brand',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const SubPageMypageIndexRoute = SubPageMypageIndexImport.update({
   id: '/_sub-page/mypage/',
   path: '/mypage/',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const SubPageOrderOrderRoundNoRoute = SubPageOrderOrderRoundNoImport.update({
   id: '/$orderRoundNo',
   path: '/$orderRoundNo',
   getParentRoute: () => SubPageOrderRoute,
-} as any);
+} as any)
 
-const SubPageMypagePasswordIndexRoute = SubPageMypagePasswordIndexImport.update({
-  id: '/_sub-page/mypage/password/',
-  path: '/mypage/password/',
-  getParentRoute: () => rootRoute,
-} as any);
+const SubPageMypagePasswordIndexRoute = SubPageMypagePasswordIndexImport.update(
+  {
+    id: '/_sub-page/mypage/password/',
+    path: '/mypage/password/',
+    getParentRoute: () => rootRoute,
+  } as any,
+)
 
-const SubPageMypageOrderListIndexRoute = SubPageMypageOrderListIndexImport.update({
-  id: '/_sub-page/mypage/order-list/',
-  path: '/mypage/order-list/',
-  getParentRoute: () => rootRoute,
-} as any);
+const SubPageMypageOrderListIndexRoute =
+  SubPageMypageOrderListIndexImport.update({
+    id: '/_sub-page/mypage/order-list/',
+    path: '/mypage/order-list/',
+    getParentRoute: () => rootRoute,
+  } as any)
 
 const SubPageMypageInfoIndexRoute = SubPageMypageInfoIndexImport.update({
   id: '/_sub-page/mypage/info/',
   path: '/mypage/info/',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const SubPageMypageAddressIndexRoute = SubPageMypageAddressIndexImport.update({
   id: '/_sub-page/mypage/address/',
   path: '/mypage/address/',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
-const SubPageMypageOrderListOrderNoRoute = SubPageMypageOrderListOrderNoImport.update({
-  id: '/_sub-page/mypage/order-list/$orderNo',
-  path: '/mypage/order-list/$orderNo',
-  getParentRoute: () => rootRoute,
-} as any);
+const SubPageMypageOrderListOrderNoRoute =
+  SubPageMypageOrderListOrderNoImport.update({
+    id: '/_sub-page/mypage/order-list/$orderNo',
+    path: '/mypage/order-list/$orderNo',
+    getParentRoute: () => rootRoute,
+  } as any)
 
-const SubPageMypageOrderDeliveryOrderNoRoute = SubPageMypageOrderDeliveryOrderNoImport.update({
-  id: '/_sub-page/mypage/order-delivery/$orderNo',
-  path: '/mypage/order-delivery/$orderNo',
-  getParentRoute: () => rootRoute,
-} as any);
+const SubPageMypageOrderListOrderNoDeliveryRoute =
+  SubPageMypageOrderListOrderNoDeliveryImport.update({
+    id: '/_sub-page/mypage/order-list_/$orderNo/delivery',
+    path: '/mypage/order-list/$orderNo/delivery',
+    getParentRoute: () => rootRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/': {
-      id: '/';
-      path: '/';
-      fullPath: '/';
-      preLoaderRoute: typeof IndexImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
     '/join': {
-      id: '/join';
-      path: '/join';
-      fullPath: '/join';
-      preLoaderRoute: typeof JoinImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinImport
+      parentRoute: typeof rootRoute
+    }
     '/login': {
-      id: '/login';
-      path: '/login';
-      fullPath: '/login';
-      preLoaderRoute: typeof LoginImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginImport
+      parentRoute: typeof rootRoute
+    }
     '/logout': {
-      id: '/logout';
-      path: '/logout';
-      fullPath: '/logout';
-      preLoaderRoute: typeof LogoutImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/logout'
+      path: '/logout'
+      fullPath: '/logout'
+      preLoaderRoute: typeof LogoutImport
+      parentRoute: typeof rootRoute
+    }
     '/_sub-page/brand': {
-      id: '/_sub-page/brand';
-      path: '/brand';
-      fullPath: '/brand';
-      preLoaderRoute: typeof SubPageBrandImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/_sub-page/brand'
+      path: '/brand'
+      fullPath: '/brand'
+      preLoaderRoute: typeof SubPageBrandImport
+      parentRoute: typeof rootRoute
+    }
     '/_sub-page/faq': {
-      id: '/_sub-page/faq';
-      path: '/faq';
-      fullPath: '/faq';
-      preLoaderRoute: typeof SubPageFaqImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/_sub-page/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof SubPageFaqImport
+      parentRoute: typeof rootRoute
+    }
     '/_sub-page/order': {
-      id: '/_sub-page/order';
-      path: '/order';
-      fullPath: '/order';
-      preLoaderRoute: typeof SubPageOrderImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/_sub-page/order'
+      path: '/order'
+      fullPath: '/order'
+      preLoaderRoute: typeof SubPageOrderImport
+      parentRoute: typeof rootRoute
+    }
     '/_sub-page/products': {
-      id: '/_sub-page/products';
-      path: '/products';
-      fullPath: '/products';
-      preLoaderRoute: typeof SubPageProductsImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/_sub-page/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof SubPageProductsImport
+      parentRoute: typeof rootRoute
+    }
     '/callback/kakao': {
-      id: '/callback/kakao';
-      path: '/callback/kakao';
-      fullPath: '/callback/kakao';
-      preLoaderRoute: typeof CallbackKakaoImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/callback/kakao'
+      path: '/callback/kakao'
+      fullPath: '/callback/kakao'
+      preLoaderRoute: typeof CallbackKakaoImport
+      parentRoute: typeof rootRoute
+    }
     '/_sub-page/order/$orderRoundNo': {
-      id: '/_sub-page/order/$orderRoundNo';
-      path: '/$orderRoundNo';
-      fullPath: '/order/$orderRoundNo';
-      preLoaderRoute: typeof SubPageOrderOrderRoundNoImport;
-      parentRoute: typeof SubPageOrderImport;
-    };
+      id: '/_sub-page/order/$orderRoundNo'
+      path: '/$orderRoundNo'
+      fullPath: '/order/$orderRoundNo'
+      preLoaderRoute: typeof SubPageOrderOrderRoundNoImport
+      parentRoute: typeof SubPageOrderImport
+    }
     '/_sub-page/mypage/': {
-      id: '/_sub-page/mypage/';
-      path: '/mypage';
-      fullPath: '/mypage';
-      preLoaderRoute: typeof SubPageMypageIndexImport;
-      parentRoute: typeof rootRoute;
-    };
-    '/_sub-page/mypage/order-delivery/$orderNo': {
-      id: '/_sub-page/mypage/order-delivery/$orderNo';
-      path: '/mypage/order-delivery/$orderNo';
-      fullPath: '/mypage/order-delivery/$orderNo';
-      preLoaderRoute: typeof SubPageMypageOrderDeliveryOrderNoImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/_sub-page/mypage/'
+      path: '/mypage'
+      fullPath: '/mypage'
+      preLoaderRoute: typeof SubPageMypageIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/_sub-page/mypage/order-list/$orderNo': {
-      id: '/_sub-page/mypage/order-list/$orderNo';
-      path: '/mypage/order-list/$orderNo';
-      fullPath: '/mypage/order-list/$orderNo';
-      preLoaderRoute: typeof SubPageMypageOrderListOrderNoImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/_sub-page/mypage/order-list/$orderNo'
+      path: '/mypage/order-list/$orderNo'
+      fullPath: '/mypage/order-list/$orderNo'
+      preLoaderRoute: typeof SubPageMypageOrderListOrderNoImport
+      parentRoute: typeof rootRoute
+    }
     '/_sub-page/mypage/address/': {
-      id: '/_sub-page/mypage/address/';
-      path: '/mypage/address';
-      fullPath: '/mypage/address';
-      preLoaderRoute: typeof SubPageMypageAddressIndexImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/_sub-page/mypage/address/'
+      path: '/mypage/address'
+      fullPath: '/mypage/address'
+      preLoaderRoute: typeof SubPageMypageAddressIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/_sub-page/mypage/info/': {
-      id: '/_sub-page/mypage/info/';
-      path: '/mypage/info';
-      fullPath: '/mypage/info';
-      preLoaderRoute: typeof SubPageMypageInfoIndexImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/_sub-page/mypage/info/'
+      path: '/mypage/info'
+      fullPath: '/mypage/info'
+      preLoaderRoute: typeof SubPageMypageInfoIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/_sub-page/mypage/order-list/': {
-      id: '/_sub-page/mypage/order-list/';
-      path: '/mypage/order-list';
-      fullPath: '/mypage/order-list';
-      preLoaderRoute: typeof SubPageMypageOrderListIndexImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/_sub-page/mypage/order-list/'
+      path: '/mypage/order-list'
+      fullPath: '/mypage/order-list'
+      preLoaderRoute: typeof SubPageMypageOrderListIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/_sub-page/mypage/password/': {
-      id: '/_sub-page/mypage/password/';
-      path: '/mypage/password';
-      fullPath: '/mypage/password';
-      preLoaderRoute: typeof SubPageMypagePasswordIndexImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/_sub-page/mypage/password/'
+      path: '/mypage/password'
+      fullPath: '/mypage/password'
+      preLoaderRoute: typeof SubPageMypagePasswordIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/_sub-page/mypage/order-list_/$orderNo/delivery': {
+      id: '/_sub-page/mypage/order-list_/$orderNo/delivery'
+      path: '/mypage/order-list/$orderNo/delivery'
+      fullPath: '/mypage/order-list/$orderNo/delivery'
+      preLoaderRoute: typeof SubPageMypageOrderListOrderNoDeliveryImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
 // Create and export the route tree
 
 interface SubPageOrderRouteChildren {
-  SubPageOrderOrderRoundNoRoute: typeof SubPageOrderOrderRoundNoRoute;
+  SubPageOrderOrderRoundNoRoute: typeof SubPageOrderOrderRoundNoRoute
 }
 
 const SubPageOrderRouteChildren: SubPageOrderRouteChildren = {
   SubPageOrderOrderRoundNoRoute: SubPageOrderOrderRoundNoRoute,
-};
+}
 
-const SubPageOrderRouteWithChildren = SubPageOrderRoute._addFileChildren(SubPageOrderRouteChildren);
+const SubPageOrderRouteWithChildren = SubPageOrderRoute._addFileChildren(
+  SubPageOrderRouteChildren,
+)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute;
-  '/join': typeof JoinRoute;
-  '/login': typeof LoginRoute;
-  '/logout': typeof LogoutRoute;
-  '/brand': typeof SubPageBrandRoute;
-  '/faq': typeof SubPageFaqRoute;
-  '/order': typeof SubPageOrderRouteWithChildren;
-  '/products': typeof SubPageProductsRoute;
-  '/callback/kakao': typeof CallbackKakaoRoute;
-  '/order/$orderRoundNo': typeof SubPageOrderOrderRoundNoRoute;
-  '/mypage': typeof SubPageMypageIndexRoute;
-  '/mypage/order-delivery/$orderNo': typeof SubPageMypageOrderDeliveryOrderNoRoute;
-  '/mypage/order-list/$orderNo': typeof SubPageMypageOrderListOrderNoRoute;
-  '/mypage/address': typeof SubPageMypageAddressIndexRoute;
-  '/mypage/info': typeof SubPageMypageInfoIndexRoute;
-  '/mypage/order-list': typeof SubPageMypageOrderListIndexRoute;
-  '/mypage/password': typeof SubPageMypagePasswordIndexRoute;
+  '/': typeof IndexRoute
+  '/join': typeof JoinRoute
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
+  '/brand': typeof SubPageBrandRoute
+  '/faq': typeof SubPageFaqRoute
+  '/order': typeof SubPageOrderRouteWithChildren
+  '/products': typeof SubPageProductsRoute
+  '/callback/kakao': typeof CallbackKakaoRoute
+  '/order/$orderRoundNo': typeof SubPageOrderOrderRoundNoRoute
+  '/mypage': typeof SubPageMypageIndexRoute
+  '/mypage/order-list/$orderNo': typeof SubPageMypageOrderListOrderNoRoute
+  '/mypage/address': typeof SubPageMypageAddressIndexRoute
+  '/mypage/info': typeof SubPageMypageInfoIndexRoute
+  '/mypage/order-list': typeof SubPageMypageOrderListIndexRoute
+  '/mypage/password': typeof SubPageMypagePasswordIndexRoute
+  '/mypage/order-list/$orderNo/delivery': typeof SubPageMypageOrderListOrderNoDeliveryRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute;
-  '/join': typeof JoinRoute;
-  '/login': typeof LoginRoute;
-  '/logout': typeof LogoutRoute;
-  '/brand': typeof SubPageBrandRoute;
-  '/faq': typeof SubPageFaqRoute;
-  '/order': typeof SubPageOrderRouteWithChildren;
-  '/products': typeof SubPageProductsRoute;
-  '/callback/kakao': typeof CallbackKakaoRoute;
-  '/order/$orderRoundNo': typeof SubPageOrderOrderRoundNoRoute;
-  '/mypage': typeof SubPageMypageIndexRoute;
-  '/mypage/order-delivery/$orderNo': typeof SubPageMypageOrderDeliveryOrderNoRoute;
-  '/mypage/order-list/$orderNo': typeof SubPageMypageOrderListOrderNoRoute;
-  '/mypage/address': typeof SubPageMypageAddressIndexRoute;
-  '/mypage/info': typeof SubPageMypageInfoIndexRoute;
-  '/mypage/order-list': typeof SubPageMypageOrderListIndexRoute;
-  '/mypage/password': typeof SubPageMypagePasswordIndexRoute;
+  '/': typeof IndexRoute
+  '/join': typeof JoinRoute
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
+  '/brand': typeof SubPageBrandRoute
+  '/faq': typeof SubPageFaqRoute
+  '/order': typeof SubPageOrderRouteWithChildren
+  '/products': typeof SubPageProductsRoute
+  '/callback/kakao': typeof CallbackKakaoRoute
+  '/order/$orderRoundNo': typeof SubPageOrderOrderRoundNoRoute
+  '/mypage': typeof SubPageMypageIndexRoute
+  '/mypage/order-list/$orderNo': typeof SubPageMypageOrderListOrderNoRoute
+  '/mypage/address': typeof SubPageMypageAddressIndexRoute
+  '/mypage/info': typeof SubPageMypageInfoIndexRoute
+  '/mypage/order-list': typeof SubPageMypageOrderListIndexRoute
+  '/mypage/password': typeof SubPageMypagePasswordIndexRoute
+  '/mypage/order-list/$orderNo/delivery': typeof SubPageMypageOrderListOrderNoDeliveryRoute
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute;
-  '/': typeof IndexRoute;
-  '/join': typeof JoinRoute;
-  '/login': typeof LoginRoute;
-  '/logout': typeof LogoutRoute;
-  '/_sub-page/brand': typeof SubPageBrandRoute;
-  '/_sub-page/faq': typeof SubPageFaqRoute;
-  '/_sub-page/order': typeof SubPageOrderRouteWithChildren;
-  '/_sub-page/products': typeof SubPageProductsRoute;
-  '/callback/kakao': typeof CallbackKakaoRoute;
-  '/_sub-page/order/$orderRoundNo': typeof SubPageOrderOrderRoundNoRoute;
-  '/_sub-page/mypage/': typeof SubPageMypageIndexRoute;
-  '/_sub-page/mypage/order-delivery/$orderNo': typeof SubPageMypageOrderDeliveryOrderNoRoute;
-  '/_sub-page/mypage/order-list/$orderNo': typeof SubPageMypageOrderListOrderNoRoute;
-  '/_sub-page/mypage/address/': typeof SubPageMypageAddressIndexRoute;
-  '/_sub-page/mypage/info/': typeof SubPageMypageInfoIndexRoute;
-  '/_sub-page/mypage/order-list/': typeof SubPageMypageOrderListIndexRoute;
-  '/_sub-page/mypage/password/': typeof SubPageMypagePasswordIndexRoute;
+  __root__: typeof rootRoute
+  '/': typeof IndexRoute
+  '/join': typeof JoinRoute
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
+  '/_sub-page/brand': typeof SubPageBrandRoute
+  '/_sub-page/faq': typeof SubPageFaqRoute
+  '/_sub-page/order': typeof SubPageOrderRouteWithChildren
+  '/_sub-page/products': typeof SubPageProductsRoute
+  '/callback/kakao': typeof CallbackKakaoRoute
+  '/_sub-page/order/$orderRoundNo': typeof SubPageOrderOrderRoundNoRoute
+  '/_sub-page/mypage/': typeof SubPageMypageIndexRoute
+  '/_sub-page/mypage/order-list/$orderNo': typeof SubPageMypageOrderListOrderNoRoute
+  '/_sub-page/mypage/address/': typeof SubPageMypageAddressIndexRoute
+  '/_sub-page/mypage/info/': typeof SubPageMypageInfoIndexRoute
+  '/_sub-page/mypage/order-list/': typeof SubPageMypageOrderListIndexRoute
+  '/_sub-page/mypage/password/': typeof SubPageMypagePasswordIndexRoute
+  '/_sub-page/mypage/order-list_/$orderNo/delivery': typeof SubPageMypageOrderListOrderNoDeliveryRoute
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
+  fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/join'
@@ -346,13 +353,13 @@ export interface FileRouteTypes {
     | '/callback/kakao'
     | '/order/$orderRoundNo'
     | '/mypage'
-    | '/mypage/order-delivery/$orderNo'
     | '/mypage/order-list/$orderNo'
     | '/mypage/address'
     | '/mypage/info'
     | '/mypage/order-list'
-    | '/mypage/password';
-  fileRoutesByTo: FileRoutesByTo;
+    | '/mypage/password'
+    | '/mypage/order-list/$orderNo/delivery'
+  fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/join'
@@ -365,12 +372,12 @@ export interface FileRouteTypes {
     | '/callback/kakao'
     | '/order/$orderRoundNo'
     | '/mypage'
-    | '/mypage/order-delivery/$orderNo'
     | '/mypage/order-list/$orderNo'
     | '/mypage/address'
     | '/mypage/info'
     | '/mypage/order-list'
-    | '/mypage/password';
+    | '/mypage/password'
+    | '/mypage/order-list/$orderNo/delivery'
   id:
     | '__root__'
     | '/'
@@ -384,32 +391,32 @@ export interface FileRouteTypes {
     | '/callback/kakao'
     | '/_sub-page/order/$orderRoundNo'
     | '/_sub-page/mypage/'
-    | '/_sub-page/mypage/order-delivery/$orderNo'
     | '/_sub-page/mypage/order-list/$orderNo'
     | '/_sub-page/mypage/address/'
     | '/_sub-page/mypage/info/'
     | '/_sub-page/mypage/order-list/'
-    | '/_sub-page/mypage/password/';
-  fileRoutesById: FileRoutesById;
+    | '/_sub-page/mypage/password/'
+    | '/_sub-page/mypage/order-list_/$orderNo/delivery'
+  fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  JoinRoute: typeof JoinRoute;
-  LoginRoute: typeof LoginRoute;
-  LogoutRoute: typeof LogoutRoute;
-  SubPageBrandRoute: typeof SubPageBrandRoute;
-  SubPageFaqRoute: typeof SubPageFaqRoute;
-  SubPageOrderRoute: typeof SubPageOrderRouteWithChildren;
-  SubPageProductsRoute: typeof SubPageProductsRoute;
-  CallbackKakaoRoute: typeof CallbackKakaoRoute;
-  SubPageMypageIndexRoute: typeof SubPageMypageIndexRoute;
-  SubPageMypageOrderDeliveryOrderNoRoute: typeof SubPageMypageOrderDeliveryOrderNoRoute;
-  SubPageMypageOrderListOrderNoRoute: typeof SubPageMypageOrderListOrderNoRoute;
-  SubPageMypageAddressIndexRoute: typeof SubPageMypageAddressIndexRoute;
-  SubPageMypageInfoIndexRoute: typeof SubPageMypageInfoIndexRoute;
-  SubPageMypageOrderListIndexRoute: typeof SubPageMypageOrderListIndexRoute;
-  SubPageMypagePasswordIndexRoute: typeof SubPageMypagePasswordIndexRoute;
+  IndexRoute: typeof IndexRoute
+  JoinRoute: typeof JoinRoute
+  LoginRoute: typeof LoginRoute
+  LogoutRoute: typeof LogoutRoute
+  SubPageBrandRoute: typeof SubPageBrandRoute
+  SubPageFaqRoute: typeof SubPageFaqRoute
+  SubPageOrderRoute: typeof SubPageOrderRouteWithChildren
+  SubPageProductsRoute: typeof SubPageProductsRoute
+  CallbackKakaoRoute: typeof CallbackKakaoRoute
+  SubPageMypageIndexRoute: typeof SubPageMypageIndexRoute
+  SubPageMypageOrderListOrderNoRoute: typeof SubPageMypageOrderListOrderNoRoute
+  SubPageMypageAddressIndexRoute: typeof SubPageMypageAddressIndexRoute
+  SubPageMypageInfoIndexRoute: typeof SubPageMypageInfoIndexRoute
+  SubPageMypageOrderListIndexRoute: typeof SubPageMypageOrderListIndexRoute
+  SubPageMypagePasswordIndexRoute: typeof SubPageMypagePasswordIndexRoute
+  SubPageMypageOrderListOrderNoDeliveryRoute: typeof SubPageMypageOrderListOrderNoDeliveryRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -423,17 +430,18 @@ const rootRouteChildren: RootRouteChildren = {
   SubPageProductsRoute: SubPageProductsRoute,
   CallbackKakaoRoute: CallbackKakaoRoute,
   SubPageMypageIndexRoute: SubPageMypageIndexRoute,
-  SubPageMypageOrderDeliveryOrderNoRoute: SubPageMypageOrderDeliveryOrderNoRoute,
   SubPageMypageOrderListOrderNoRoute: SubPageMypageOrderListOrderNoRoute,
   SubPageMypageAddressIndexRoute: SubPageMypageAddressIndexRoute,
   SubPageMypageInfoIndexRoute: SubPageMypageInfoIndexRoute,
   SubPageMypageOrderListIndexRoute: SubPageMypageOrderListIndexRoute,
   SubPageMypagePasswordIndexRoute: SubPageMypagePasswordIndexRoute,
-};
+  SubPageMypageOrderListOrderNoDeliveryRoute:
+    SubPageMypageOrderListOrderNoDeliveryRoute,
+}
 
 export const routeTree = rootRoute
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
 
 /* ROUTE_MANIFEST_START
 {
@@ -451,12 +459,12 @@ export const routeTree = rootRoute
         "/_sub-page/products",
         "/callback/kakao",
         "/_sub-page/mypage/",
-        "/_sub-page/mypage/order-delivery/$orderNo",
         "/_sub-page/mypage/order-list/$orderNo",
         "/_sub-page/mypage/address/",
         "/_sub-page/mypage/info/",
         "/_sub-page/mypage/order-list/",
-        "/_sub-page/mypage/password/"
+        "/_sub-page/mypage/password/",
+        "/_sub-page/mypage/order-list_/$orderNo/delivery"
       ]
     },
     "/": {
@@ -496,9 +504,6 @@ export const routeTree = rootRoute
     "/_sub-page/mypage/": {
       "filePath": "_sub-page/mypage/index.tsx"
     },
-    "/_sub-page/mypage/order-delivery/$orderNo": {
-      "filePath": "_sub-page/mypage/order-delivery/$orderNo.tsx"
-    },
     "/_sub-page/mypage/order-list/$orderNo": {
       "filePath": "_sub-page/mypage/order-list/$orderNo.tsx"
     },
@@ -513,6 +518,9 @@ export const routeTree = rootRoute
     },
     "/_sub-page/mypage/password/": {
       "filePath": "_sub-page/mypage/password/index.tsx"
+    },
+    "/_sub-page/mypage/order-list_/$orderNo/delivery": {
+      "filePath": "_sub-page/mypage/order-list_/$orderNo/delivery.tsx"
     }
   }
 }
