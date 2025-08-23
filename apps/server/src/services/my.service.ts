@@ -254,6 +254,14 @@ export const getOrder = async (no: number) => {
   return { ...order, orderStatusName: getCodeName(order.orderStatus) };
 };
 
+/** 내 주문 취소 */
+export const cancelOrder = async (no: number, canceledReason: string) => {
+  await prisma.$transaction(async (tx) => {
+    await tx.order.update({ where: { no }, data: { orderStatus: '50' } });
+    await tx.payment.update({ where: { orderNo: no }, data: { canceledReason } });
+  });
+};
+
 /** 내 주문 배송지 조회 */
 export const getOrderAddress = async (no: number) => {
   const order = await prisma.order.findUnique({ where: { no } });

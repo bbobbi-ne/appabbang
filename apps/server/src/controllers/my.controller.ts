@@ -126,6 +126,7 @@ export const removeAddress = async (req: Request, res: Response) => {
   res.sendStatus(204);
 };
 
+// >>>>>> 주문 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 /** 내 주문내역 조회 */
 export const getOrders = async (req: Request, res: Response) => {
   const customerNo = req.user.no;
@@ -138,6 +139,23 @@ export const getOrder = async (req: Request, res: Response) => {
   const orderNo = Number(req.params.no);
   const order = await myService.getOrder(orderNo);
   res.status(200).json(order);
+};
+
+/** 내 주문 취소 */
+export const cancelOrder = async (req: Request, res: Response) => {
+  const orderNo = Number(req.params.no);
+  const { canceledReason } = req.body;
+
+  const order = await myService.getOrder(orderNo);
+  if (!order) throw AppError.notFound('주문을 찾을 수 없습니다.');
+
+  if (Number(order.orderStatus) !== 10 && Number(order.orderStatus) !== 11) {
+    throw AppError.badRequest('현재는 주문을 취소할 수 없습니다.');
+  }
+
+  await myService.cancelOrder(orderNo, canceledReason);
+
+  res.status(200).json({ message: '주문이 취소되었습니다.' });
 };
 
 /** 내 주문 배송지 조회 */
