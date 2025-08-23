@@ -43,8 +43,10 @@ export default function InfoPage() {
    * 고객 상세정보 조회
    */
   const { isLoading, data } = useQuery({
-    queryKey: ['getCustomerInfo'],
+    queryKey: ['/my', '내 정보 조회'],
     queryFn: getCustomerInfo,
+    staleTime: 1000 * 60 * 10, // 10분
+    gcTime: 1000 * 60 * 30, // 30분
   });
 
   useEffect(() => {

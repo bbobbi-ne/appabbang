@@ -37,7 +37,7 @@ function InfoForm({ customer }: InfoFormProps) {
   const updateCustomerMutation = useMutation({
     mutationFn: (data: CustomerFormSchema) => updateCustomer(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['getCustomerInfo'] });
+      queryClient.invalidateQueries({ queryKey: ['/my', '내 정보 조회'] });
 
       addToast({
         type: 'success',

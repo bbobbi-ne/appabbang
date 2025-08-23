@@ -1,6 +1,6 @@
-import CustomerInfoCard from '@/components/mypage/customer-info-card';
 import OrderDeliveryPage from '@/components/pages/order-delivery-page';
 import SubLayout from '@/components/templates/sub-layout';
+import MypageLayout from '@/components/templates/mypage-layout';
 import { createFileRoute, useParams } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_sub-page/mypage/order-delivery/$orderNo')({
@@ -12,8 +12,9 @@ function RouteComponent() {
 
   return (
     <SubLayout title="마이페이지">
-      <CustomerInfoCard id={'test1234'} name={'김가나'} />
-      <OrderDeliveryPage orderNo={Number(orderNo)} />
+      <MypageLayout>
+        <OrderDeliveryPage orderNo={Number(orderNo)} />
+      </MypageLayout>
     </SubLayout>
   );
 }
