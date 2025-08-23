@@ -21,9 +21,9 @@ import {
   DialogTitle,
   Form,
   DialogDescription,
+  cn,
 } from '@appabbang/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
-import clsx from 'clsx';
 import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 
@@ -107,7 +107,7 @@ function OrderCalcenDialog({ children }: Props) {
               <Button
                 type="button"
                 onClick={() => setOpen(false)}
-                className={clsx('w-full submitBtn', btnCssStr)}
+                className={cn('w-full submitBtn', btnCssStr)}
               >
                 주문취소
               </Button>

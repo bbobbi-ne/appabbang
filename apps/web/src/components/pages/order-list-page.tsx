@@ -1,5 +1,4 @@
-import { Button, Card, CardContent } from '@appabbang/ui';
-import clsx from 'clsx';
+import { Button, Card, CardContent, cn } from '@appabbang/ui';
 import { useNavigate } from '@tanstack/react-router';
 import OrderItem from '../mypage/order-item';
 import OrderCalcenDialog from '../mypage/order-cancel-dialog';
@@ -122,15 +121,15 @@ function OrderListPage() {
 
               {/* 버튼 영역 */}
               <div className="flex flex-col justify-center gap-2 ml-[45%]">
-                <Button className={clsx(btnCssStr)} onClick={() => showDetail(data.no)}>
+                <Button className={cn(btnCssStr)} onClick={() => showDetail(data.no)}>
                   주문상세보기
                 </Button>
-                <Button className={clsx(btnCssStr)} onClick={deliveryDetail}>
+                <Button className={cn(btnCssStr)} onClick={deliveryDetail}>
                   배송(수령)현황
                 </Button>
                 {Number(data.orderStatus) < 30 ? (
                   <OrderCalcenDialog>
-                    <Button className={clsx(btnCssStr)}>주문취소</Button>
+                    <Button className={cn(btnCssStr)}>주문취소</Button>
                   </OrderCalcenDialog>
                 ) : null}
               </div>

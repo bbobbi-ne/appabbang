@@ -2,12 +2,11 @@
  * 배송현황 페이지
  */
 
-import { Card, CardContent } from '@appabbang/ui';
+import { Card, CardContent, cn } from '@appabbang/ui';
 import { useEffect, useState } from 'react';
 import type { IOrderItem } from '../mypage/order-item';
 import { orders } from '../mypage/meta-data';
 import OrderItem from '../mypage/order-item';
-import clsx from 'clsx';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 
@@ -84,7 +83,7 @@ function OrderDeliveryPage({ orderNo }: { orderNo: number }) {
               return (
                 <div className="w-1/4" key={step.code}>
                   <div
-                    className={clsx(
+                    className={cn(
                       'h-2 border',
                       isCompleted && 'bg-[#FF9E42] border-[#FF9E42]',
                       isCurrent && 'bg-[#FFE6C0] border-[#FFE6C0]',

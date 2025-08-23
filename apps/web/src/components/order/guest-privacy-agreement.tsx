@@ -14,9 +14,9 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogDescription,
+  cn,
 } from '@appabbang/ui';
 import React from 'react';
-import clsx from 'clsx';
 import { X } from 'lucide-react';
 
 interface AgreedProps {
@@ -129,7 +129,7 @@ function GuestPrivacyAgreement({ onAgreed, agreed, setAgreed }: AgreedProps) {
           </CardContent>
           <Button
             type="button"
-            className={clsx(
+            className={cn(
               'cursor-pointer hover:bg-[#e5caaf]',
               agreed ? 'bg-[#E8CBB1] text-[#393028]' : 'bg-[#ffe0c2] text-[#393028]',
             )}

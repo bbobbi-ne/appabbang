@@ -1,12 +1,11 @@
-import { Card, CardHeader } from '@appabbang/ui';
+import { Card, CardHeader, cn } from '@appabbang/ui';
 import type { BreadCardProps } from '@/interface/bread-interface';
-import clsx from 'clsx';
 
 /** Main Function :: 빵 카드 클릭 시 onClick 콜백 prop 받음 */
 function ProductsBreadCard({ bread, openBread, onClick }: BreadCardProps) {
   return (
     <Card
-      className={clsx('mt-4 mb-4 w-50 cursor-pointer', 'min-w-[200px] max-w-[300px]')}
+      className={cn('mt-4 mb-4 w-50 cursor-pointer', 'min-w-[200px] max-w-[300px]')}
       onClick={() => onClick(bread)}
     >
       <div>
