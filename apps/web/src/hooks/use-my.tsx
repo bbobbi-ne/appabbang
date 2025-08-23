@@ -1,6 +1,33 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { MyService } from '@/services/api/my-service';
 
+/** 고객 정보 조회 */
+export function useGetCustomerInfoQuery() {
+  return useQuery({
+    queryKey: ['/my', '내 정보 조회'],
+    queryFn: MyService.getCustomerInfo,
+  });
+}
+
+/** 고객 정보 수정 */
+export function useUpdateCustomerMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { mobileNumber: string }) => MyService.updateCustomer(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/my', '내 정보 조회'] });
+    },
+  });
+}
+
+/** 고객 비밀번호 수정 */
+export function useUpdateCustomerPwMutation() {
+  return useMutation({
+    mutationFn: (data: { pw: string; pwModify: string }) => MyService.updateCustomerPw(data),
+  });
+}
+
 /** 배송지 목록 조회 */
 export function useGetAddressListQuery() {
   return useQuery({

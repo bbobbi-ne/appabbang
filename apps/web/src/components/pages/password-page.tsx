@@ -1,5 +1,6 @@
+import { useUpdateCustomerPwMutation } from '@/hooks/use-my';
 import useToast from '@/hooks/useToast';
-import { updateCustomerPw, type CustomePwType } from '@/services/customer-apis';
+import { type CustomePwType } from '@/services/customer-apis';
 import {
   passwordModifyFormSchema,
   type PasswordModifyFormSchema,
@@ -7,6 +8,7 @@ import {
 import {
   Button,
   Card,
+  CardContent,
   Form,
   FormControl,
   FormField,
@@ -16,7 +18,6 @@ import {
   PasswordInput,
 } from '@appabbang/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 
 const labelMinWidth = 'min-w-[120px]';
@@ -24,19 +25,7 @@ const labelMinWidth = 'min-w-[120px]';
 // 비밀번호 변경 페이지
 export default function PasswordPage() {
   const { addToast } = useToast();
-  const updateCustomerPwMutation = useMutation({
-    mutationFn: (data: CustomePwType) => updateCustomerPw(data),
-    onSuccess: () =>
-      addToast({
-        type: 'success',
-        message: '정상적으로 수정되었습니다.',
-      }),
-    onError: (error) =>
-      addToast({
-        type: 'error',
-        message: error.message,
-      }),
-  });
+  const updateMutation = useUpdateCustomerPwMutation();
 
   /** default form values */
   const defaultValues: PasswordModifyFormSchema = {
@@ -51,21 +40,27 @@ export default function PasswordPage() {
     defaultValues,
   });
 
-  /**
-   * form submit - 비밀번호 변경
-   */
   const onSubmit: SubmitHandler<PasswordModifyFormSchema> = async (data: CustomePwType) => {
-    await updateCustomerPwMutation.mutateAsync(data);
+    try {
+      await updateMutation.mutateAsync(data);
+
+      addToast({
+        type: 'success',
+        message: '변경되었습니다.',
+      });
+    } catch (error: any) {
+      addToast({
+        type: 'error',
+        message: error.message,
+      });
+    }
   };
 
   return (
-    <div className="w-full flex flex-row items-center justify-center">
-      <Card className="p-10 flex flex-row items-center justify-center w-2/3">
+    <Card>
+      <CardContent className="pt-6">
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="w-2/3 *:m-2 *:has-[.submitBtn]:mt-5"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto max-w-lg space-y-4">
             <FormField
               control={form.control}
               name="pw"
@@ -154,14 +149,14 @@ export default function PasswordPage() {
               )}
             />
 
-            <div>
-              <Button type="submit" className="rounded-2xl h-10 w-full font-bold submitBtn">
+            <div className="pt-8">
+              <Button type="submit" className="w-full" disabled={updateMutation.isPending}>
                 수정
               </Button>
             </div>
           </form>
         </Form>
-      </Card>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

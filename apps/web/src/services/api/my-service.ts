@@ -2,6 +2,19 @@ import type { addresssDailogForm } from '@/validate/address-form.schema';
 import client from '@/services/axios';
 
 export const MyService = {
+  /** 내 정보 조회 */
+  getCustomerInfo: async () => {
+    const response = await client.get('/my');
+    return response.data;
+  },
+  /** 내 정보 수정 */
+  updateCustomer: async (data: { mobileNumber: string }) => {
+    await client.put('/my', data);
+  },
+  /** 내 비밀번호 수정 */
+  updateCustomerPw: async (data: { pw: string; pwModify: string }) => {
+    await client.put('/my/pw', data);
+  },
   /** 내 배송지 목록 조회 */
   getAddressList: async () => {
     const response = await client.get('/my/addresses');
