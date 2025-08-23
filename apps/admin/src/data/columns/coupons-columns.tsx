@@ -1,7 +1,7 @@
 import { Button } from '@appabbang/ui';
 import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
 import { SortAsc, SortDesc } from 'lucide-react';
-import { formatCurrencyKR, formatDateTime } from '@/utils/format';
+import { formatCurrencyKR, formatDateTime } from '@appabbang/utils';
 import type { CouponsListData } from '@/api/data-contracts';
 import { useNavigate } from '@tanstack/react-router';
 import { renderSortButton } from '@/components/ui/rebder-sort-button';

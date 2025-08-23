@@ -14,7 +14,7 @@ import {
   type ColumnFiltersState,
   type SortingState,
 } from '@tanstack/react-table';
-import { useDebounce } from '@/utils/debounce';
+import { useDebounce } from '@appabbang/utils';
 import { TableSearchBar } from '@/components/ui/table-search-bar';
 
 export const Route = createFileRoute('/dashboard/orderRound/')({

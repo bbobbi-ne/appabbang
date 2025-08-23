@@ -1,6 +1,6 @@
 import { CustomHttpClient } from '@/service/instance';
 import { Customers } from '@/api/Customers';
-import { toast } from 'sonner';
+import { toast } from '@appabbang/ui';
 
 // 고객 API 인스턴스 생성
 const customerApi = new Customers(new CustomHttpClient());

@@ -3,7 +3,7 @@ import { Button, Card } from '@appabbang/ui';
 import { useNavigate } from '@tanstack/react-router';
 import useCountDownTimer from '@/hooks/useCountDownTimer';
 import { AlarmClock } from 'lucide-react';
-import { formatDate } from '@/utils';
+import { formatDate } from '@appabbang/utils';
 interface IOrderRoundProps {
   data: {
     no: number;

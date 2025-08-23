@@ -18,6 +18,11 @@ import type {
   AddressesListData,
   AddressesUpdateData,
   AddressesUpdatePayload,
+  GetMyData,
+  PutMy2Data,
+  PutMy2Payload,
+  PutMyData,
+  PutMyPayload,
 } from "./data-contracts";
 import { ContentType, HttpClient, type RequestParams } from "./http-client";
 
@@ -28,6 +33,66 @@ export class My<SecurityDataType = unknown> {
     this.http = http;
   }
 
+  /**
+   * @description 현재 로그인한 고객의 정보를 조회합니다. (권한: 고객만)
+   *
+   * @tags My
+   * @name GetMy
+   * @summary 내 정보 조회
+   * @request GET:/my
+   * @secure
+   * @response `200` `GetMyData` 내 정보 조회 성공
+   */
+  getMy = (params: RequestParams = {}) =>
+    this.http.request<GetMyData, any>({
+      path: `/my`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 현재 로그인한 고객의 정보를 수정합니다. (권한: 고객만)
+   *
+   * @tags My
+   * @name PutMy
+   * @summary 내 정보 수정
+   * @request PUT:/my
+   * @secure
+   * @response `200` `PutMyData` 내 정보 수정 성공
+   */
+  putMy = (data: PutMyPayload, params: RequestParams = {}) =>
+    this.http.request<PutMyData, any>({
+      path: `/my`,
+      method: "PUT",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 현재 로그인한 고객의 비밀번호를 변경합니다. (권한: 고객만)
+   *
+   * @tags My
+   * @name PutMy2
+   * @summary 비밀번호 변경
+   * @request PUT:/my/pw
+   * @originalName putMy
+   * @duplicate
+   * @secure
+   * @response `200` `PutMy2Data` 비밀번호 변경 성공
+   */
+  putMy2 = (data: PutMy2Payload, params: RequestParams = {}) =>
+    this.http.request<PutMy2Data, any>({
+      path: `/my/pw`,
+      method: "PUT",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
   /**
    * @description 배송지 목록을 조회합니다. (권한: 고객만)
    *

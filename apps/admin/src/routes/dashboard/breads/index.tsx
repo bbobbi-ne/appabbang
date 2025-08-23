@@ -4,7 +4,7 @@ import { BreadCreateDialog } from '@/components/breads/bread-create-dialog';
 import { BreadModifyDialog } from '@/components/breads/bread-modify-dialog';
 import { useDeleteBreadMutation, useGetBreadsQuery } from '@/hooks/use-breads';
 import { createFileRoute } from '@tanstack/react-router';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import {
   getCoreRowModel,
   getFilteredRowModel,
@@ -14,7 +14,7 @@ import {
   type SortingState,
 } from '@tanstack/react-table';
 import { TableSearchBar } from '@/components/ui/table-search-bar';
-import { useDebounce } from '@/utils/debounce';
+import { useDebounce } from '@appabbang/utils';
 
 export const Route = createFileRoute('/dashboard/breads/')({
   component: RouteComponent,

@@ -20,8 +20,8 @@ import {
   DialogTitle,
   DialogTrigger,
   Label,
+  cn,
 } from '@appabbang/ui';
-import clsx from 'clsx';
 import { Info } from 'lucide-react';
 import { btnCssStr } from './faq-menu-button';
 import { useState } from 'react';
@@ -103,11 +103,7 @@ function FaqUnregisterDialog({ children }: Props) {
 
         {/* 하단 버튼 */}
         <div className="mt-15 flex flex-row gap-5">
-          <Button
-            type="button"
-            onClick={() => setOpen(false)}
-            className={clsx('w-full', btnCssStr)}
-          >
+          <Button type="button" onClick={() => setOpen(false)} className={cn('w-full', btnCssStr)}>
             뒤로가기
           </Button>
           <AlertDialog>

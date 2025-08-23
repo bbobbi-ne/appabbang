@@ -3,7 +3,7 @@ import type { AddressListData as AddressListDataOrigin } from '@/api/data-contra
 import AddressCreateDialog from '@/components/mypage/address-create-dialog';
 import AddressModifyDialog from '../mypage/address-modify-dialog';
 import { Badge, Skeleton } from '@appabbang/ui';
-import { getFormattedMobile } from '@/utils';
+import { formatMobile } from '@appabbang/utils';
 import { MyService } from '@/services/api/my-service';
 
 export default function AddressPage() {
@@ -59,7 +59,7 @@ const AddressList = ({ data }: { data: AddressListData | undefined }) => {
             <p>
               {item.address},&nbsp;{item.addressDetail}({item.zipcode})
             </p>
-            <p className="text-sm">{getFormattedMobile(item.recipientMobile ?? '')}</p>
+            <p className="text-sm">{formatMobile(item.recipientMobile ?? '')}</p>
           </div>
         </AddressModifyDialog>
       ))}

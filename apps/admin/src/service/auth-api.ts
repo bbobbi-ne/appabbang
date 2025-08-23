@@ -1,4 +1,4 @@
-import { toast } from 'sonner';
+import { toast } from '@appabbang/ui';
 import { CustomHttpClient } from '@/service/instance';
 import { Auth } from '@/api/Auth';
 import { useAuthStore } from '@/stores/auth-store';

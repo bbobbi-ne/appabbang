@@ -17,7 +17,7 @@ import { useForm } from 'react-hook-form';
 import { ImageUploadField } from './Image-upload-field';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { formatCurrencyKR } from '@/utils/format';
+import { formatCurrencyKR } from '@appabbang/utils';
 
 export const breadSchema = z.object({
   name: z.string().trim().min(1, '메뉴명을 입력해주세요'),

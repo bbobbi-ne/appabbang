@@ -1,4 +1,3 @@
-import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@appabbang/ui';
 import { useEffect, useState } from 'react';
 import CouponForm, { type FormType } from './coupon-form';
 import {
@@ -6,7 +5,7 @@ import {
   useCouponDetailQuery,
   useCouponUpdateMutation,
 } from '@/hooks/use-coupon';
-import { toast } from 'sonner';
+import { toast } from '@appabbang/ui';
 import { DialogLayout } from '../ui/dialog-layout';
 
 interface breadModifyDialogProps {

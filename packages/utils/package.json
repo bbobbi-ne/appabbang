@@ -1,5 +1,14 @@
 {
-    "name": "@appabbang/utils",
-    "version": "0.0.1",
-    "private": true
+  "name": "@appabbang/utils",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./index.ts"
+  },
+  "dependencies": {
+    "@appabbang/eslint": "workspace:*",
+    "@appabbang/typescript": "workspace:*",
+    "date-fns": "^4.1.0"
+  }
 }
