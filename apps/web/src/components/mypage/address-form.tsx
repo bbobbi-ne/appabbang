@@ -35,6 +35,7 @@ type Props = {
   isLoading: boolean;
   deleteAddress?: (no: number) => Promise<void>;
   deleteLoading?: boolean;
+  isHidden?: boolean; // 주문배송지수정에는 기본배송지여부와 삭제버튼을 숨길 수 있도록 추가됨.
 };
 
 export default function AddressForm({
@@ -43,6 +44,7 @@ export default function AddressForm({
   isLoading,
   deleteAddress,
   deleteLoading,
+  isHidden,
 }: Props) {
   // 폼 선언
   const form = useForm<addresssDailogForm>({
@@ -214,7 +216,7 @@ export default function AddressForm({
         />
 
         {/* 기본 배송지 여부  */}
-        {!currentValues?.isDefault && (
+        {!currentValues?.isDefault && !isHidden && (
           <FormField
             control={form.control}
             name="isDefault"
@@ -239,7 +241,7 @@ export default function AddressForm({
         )}
 
         <div className="mt-8 flex gap-2">
-          {currentValues && !currentValues?.isDefault && (
+          {currentValues && !currentValues?.isDefault && !isHidden && (
             <>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
