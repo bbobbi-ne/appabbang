@@ -41,7 +41,10 @@
     "express-fileupload": "^1.5.1",
     "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
-    "prisma": "^6.8.2"
+    "prisma": "^6.8.2",
+    "axios": "^1.9.0",
+    "lucide-react": "^0.511.0",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@appabbang/prettier": "workspace:*",
