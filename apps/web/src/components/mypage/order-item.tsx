@@ -19,7 +19,7 @@ function OrderItem({ item }: { item: IOrderItem }) {
         {item.breadImageUrl ? (
           <img className="w-20 h-20" src={item.breadImageUrl} alt="빵 이미지" />
         ) : (
-          <img className="w-20 h-20" src="/images/no_image.jpg" alt="빵 이미지" />
+          <img className="w-20 h-20" src="/images/no-image.png" alt="빵 이미지" />
         )}
         <div className="mt-2">
           <p>{item.breadName}</p>
