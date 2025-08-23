@@ -1,5 +1,5 @@
 import { CustomHttpClient } from './instance';
-import { toast } from 'sonner';
+import { toast } from '@appabbang/ui';
 import { Coupons } from '@/api/Coupons';
 import type { CouponsCreatePayload, CouponsUpdatePayload } from '@/api/data-contracts';
 

@@ -1,5 +1,5 @@
 import type { OrdersDetailData } from '@/api/data-contracts';
-import { formatCurrencyKR } from '@/utils/format';
+import { formatCurrencyKR } from '@appabbang/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@appabbang/ui';
 
 type OrderItem = OrdersDetailData['orderItems'][number];

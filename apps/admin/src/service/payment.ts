@@ -1,5 +1,5 @@
 import { CustomHttpClient } from './instance';
-import { toast } from 'sonner';
+import { toast } from '@appabbang/ui';
 import { Payments } from '@/api/Payments';
 import type { PaidUpdatePayload, RefundUpdatePayload } from '@/api/data-contracts';
 import type { QueryFunctionContext } from '@tanstack/react-query';

@@ -24,7 +24,7 @@ import {
   type Table as TableType,
 } from '@tanstack/react-table';
 import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
-import { toast } from 'sonner';
+import { toast } from '@appabbang/ui';
 
 export const CouponDetailPage = () => {
   const { no } = useParams({ from: '/dashboard/coupons/$no' });

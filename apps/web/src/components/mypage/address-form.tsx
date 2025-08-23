@@ -23,8 +23,8 @@ import {
 } from '@appabbang/ui';
 import DaumPostApi from '@/components/common/daum-post-api';
 import type { AddressListData } from '../pages/address-page';
-import { toast } from 'sonner';
-import { getFormattedMobile } from '@/utils';
+import { toast } from '@appabbang/ui';
+import { formatMobile } from '@appabbang/utils';
 import { addressSchema, type addresssDailogForm } from '@/validate/address-form.schema';
 
 const labelMinWidth = 'min-w-[120px]';
@@ -108,7 +108,7 @@ export default function AddressForm({
                     {...field}
                     placeholder="받으실분의 연락처를 입력해주세요"
                     onChange={(e) => {
-                      const formattedValue = getFormattedMobile(e.target.value);
+                      const formattedValue = formatMobile(e.target.value);
                       field.onChange(formattedValue);
                     }}
                     maxLength={13}

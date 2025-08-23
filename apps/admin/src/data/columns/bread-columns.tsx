@@ -2,7 +2,7 @@ import type { BreadsListData } from '@/api/data-contracts';
 import { AspectRatio, Button, Checkbox } from '@appabbang/ui';
 import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
 import { SortAsc, SortDesc } from 'lucide-react';
-import { formatDate } from '@/utils/format';
+import { formatDate } from '@appabbang/utils';
 import { renderSortButton } from '@/components/ui/rebder-sort-button';
 
 export type BreadListItem = BreadsListData[number];

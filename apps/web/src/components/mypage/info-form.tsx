@@ -21,7 +21,7 @@ import Loading from '../common/loading';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
 import { updateCustomer } from '@/services/customer-apis';
-import { getFormattedMobile } from '@/utils';
+import { formatMobile } from '@appabbang/utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useToast from '@/hooks/useToast';
 
@@ -158,7 +158,7 @@ function InfoForm({ customer }: InfoFormProps) {
                         {...field}
                         placeholder="휴대번호 입력"
                         onChange={(e) => {
-                          const formattedValue = getFormattedMobile(e.target.value);
+                          const formattedValue = formatMobile(e.target.value);
                           field.onChange(formattedValue);
                         }}
                         maxLength={13}

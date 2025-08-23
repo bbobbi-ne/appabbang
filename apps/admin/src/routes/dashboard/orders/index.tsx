@@ -3,7 +3,7 @@ import { TableContainer } from '@/components/ui/table-container';
 import { TableSearchBar } from '@/components/ui/table-search-bar';
 import { ordersColumns, type OrdersListItem } from '@/data/columns/orders-columns';
 import { useOrdersWithStatusAndDeliveryQuery } from '@/hooks/use-order';
-import { useDebounce } from '@/utils/debounce';
+import { useDebounce } from '@appabbang/utils';
 
 import { createFileRoute } from '@tanstack/react-router';
 import {

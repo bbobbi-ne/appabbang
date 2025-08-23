@@ -22,7 +22,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { formatCurrencyKR } from '@/utils/format';
+import { formatCurrencyKR } from '@appabbang/utils';
 
 export const schema = z.object({
   name: z

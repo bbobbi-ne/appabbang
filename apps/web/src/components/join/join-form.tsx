@@ -18,7 +18,7 @@ import {
   PasswordInput,
 } from '@appabbang/ui';
 import DaumPostApi from '@/components/common/daum-post-api';
-import { getFormattedMobile } from '@/utils';
+import { formatMobile } from '@appabbang/utils';
 import { joinSchema, type JoinSchemaType } from '@/validate/join-form-schema';
 import ServiceIsAgreedDialog from './service-terms-agreed-dialog';
 import PrivacyTermsAgreedDialog from './privacy-terms-agreed-dialog';
@@ -180,7 +180,7 @@ export default function JoinForm() {
                     {...field}
                     placeholder="휴대번호 입력"
                     onChange={(e) => {
-                      const formattedValue = getFormattedMobile(e.target.value);
+                      const formattedValue = formatMobile(e.target.value);
                       field.onChange(formattedValue);
                     }}
                     maxLength={13}

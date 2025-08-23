@@ -2,7 +2,7 @@ import { TableContainer } from '@/components/ui/table-container';
 import { TableSearchBar } from '@/components/ui/table-search-bar';
 import { paymentsColumns, type PaymentsListItem } from '@/data/columns/payments-columns';
 import { usePaymentsWithOrderStatusQuery } from '@/hooks/use-payment';
-import { useDebounce } from '@/utils/debounce';
+import { useDebounce } from '@appabbang/utils';
 import { createFileRoute } from '@tanstack/react-router';
 import {
   getCoreRowModel,

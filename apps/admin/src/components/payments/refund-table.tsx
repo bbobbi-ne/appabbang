@@ -1,5 +1,5 @@
 import type { OrdersDetailData, PaymentsDetailData } from '@/api/data-contracts';
-import { formatIsoToDateTime, formatCurrencyKR } from '@/utils/format';
+import { formatIsoToDateTime, formatCurrencyKR } from '@appabbang/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@appabbang/ui';
 
 function RefundTable({
