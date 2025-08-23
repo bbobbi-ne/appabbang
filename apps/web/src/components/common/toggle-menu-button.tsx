@@ -1,7 +1,4 @@
-import { Button, cn } from '@appabbang/ui';
-
-// Custom CSS
-const btnCssStr = `bg-white text-black hover:bg-primary hover:text-white`;
+import { Button } from '@appabbang/ui';
 
 interface IToggleMenuButtonProps {
   activeMenu: string;
@@ -16,7 +13,8 @@ export function ToggleMenuButton({ activeMenu, onChangeActiveMenu, list }: ITogg
         <Button
           key={item.value}
           onClick={() => onChangeActiveMenu(item.value)}
-          className={cn('w-full', activeMenu !== item.value && btnCssStr)}
+          className="w-full"
+          variant={activeMenu === item.value ? 'default' : 'outline'}
         >
           {item.label}
         </Button>
