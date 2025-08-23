@@ -17,10 +17,7 @@
     "@appabbang/tailwind": "workspace:*",
     "@appabbang/typescript": "workspace:*",
     "@appabbang/ui": "workspace:*",
-    "@appabbang/utils": "workspace:*",
-    "axios": "^1.9.0",
-    "lucide-react": "^0.511.0",
-    "zustand": "^5.0.5"
+    "@appabbang/utils": "workspace:*"
   },
   "devDependencies": {
     "swagger-typescript-api": "^13.2.7"
