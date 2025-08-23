@@ -29,7 +29,7 @@ export default function MypageLayout({ children }: { children: React.ReactNode }
   };
 
   return (
-    <>
+    <div className="pb-20">
       <Card className="mb-10">
         <CardContent className="pt-6 flex flex-row justify-between items-center">
           <p>
@@ -56,6 +56,6 @@ export default function MypageLayout({ children }: { children: React.ReactNode }
       />
 
       {children}
-    </>
+    </div>
   );
 }
