@@ -2,16 +2,23 @@
  * 자주묻는질문
  */
 
-import { useEffect, useState } from 'react';
-import FaqMenuButton from '@/components/faq/faq-menu-button';
+import { useEffect, useMemo, useState } from 'react';
 import { faqList } from '@/components/faq/faq-data';
 import type { IFaq } from '@/interface/faq-interface';
 import FaqAccordion from '@/components/faq/faq-accordion';
+import { ToggleMenuButton } from '@/components/common/toggle-menu-button';
 
 export default function FaqPage() {
   const [activeMenu, setActiveMenu] = useState<string>('all'); // 현재 보고 있는 메뉴
   const [list, setList] = useState<IFaq[]>([]);
   const [value, setValue] = useState<string>('');
+
+  const categoryList = useMemo(() => {
+    const list = faqList.map((faq) => {
+      return { label: faq.name, value: faq.category };
+    });
+    return [{ label: '전체', value: 'all' }, ...list];
+  }, []);
 
   // activeMenu값에 따라 데이터 세팅
   useEffect(() => {
@@ -33,7 +40,11 @@ export default function FaqPage() {
 
   return (
     <div className="pb-40">
-      <FaqMenuButton activeMenu={activeMenu} onChangeActiveMenu={onChangeActiveMenu} />
+      <ToggleMenuButton
+        list={categoryList}
+        activeMenu={activeMenu}
+        onChangeActiveMenu={onChangeActiveMenu}
+      />
       <FaqAccordion list={list} value={value} onValueChange={(value: string) => setValue(value)} />
     </div>
   );

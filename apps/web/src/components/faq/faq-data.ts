@@ -6,6 +6,7 @@
 export const faqList = [
   {
     category: 'product',
+    name: '제품문의',
     data: [
       {
         question: '알레르기 유발 성분이 포함되어 있나요?',
@@ -35,6 +36,7 @@ export const faqList = [
   },
   {
     category: 'orderPayment',
+    name: '주문 및 결제',
     data: [
       {
         question: '어떤 결제 수단을 지원하나요?',
@@ -54,6 +56,7 @@ export const faqList = [
   },
   {
     category: 'deliveryPackage',
+    name: '배송 및 포장',
     data: [
       {
         question: '배송은 어떻게 이루어지나요?',
@@ -69,6 +72,7 @@ export const faqList = [
   },
   {
     category: 'etc',
+    name: '기타',
     data: [
       {
         question: '제품에 문제가 있을 경우 어떻게 하나요?',
