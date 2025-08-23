@@ -54,7 +54,7 @@ export function useCreateAddressMutation() {
   const createAddressMutation = useMutation({
     mutationFn: (data: any) => MyService.createAddress(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/my/addresses'] });
+      queryClient.invalidateQueries({ queryKey: ['/my/addresses', '마이페이지 > 배송지관리'] });
     },
     onError: (error) => {
       console.error(error);
@@ -65,12 +65,12 @@ export function useCreateAddressMutation() {
 }
 
 /** 배송지 수정 */
-export function useUpdateAddressMutation(no: number) {
+export function useUpdateAddressMutation() {
   const queryClient = useQueryClient();
   const updateAddressMutation = useMutation({
-    mutationFn: (data: any) => MyService.updateAddress(no, data),
+    mutationFn: ({ no, data }: { no: number; data: any }) => MyService.updateAddress(no, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/my/addresses'] });
+      queryClient.invalidateQueries({ queryKey: ['/my/addresses', '마이페이지 > 배송지관리'] });
     },
     onError: (error) => {
       console.error(error);
@@ -81,10 +81,10 @@ export function useUpdateAddressMutation(no: number) {
 }
 
 /** 배송지 삭제 */
-export function useDeleteAddressMutation(no: number) {
+export function useDeleteAddressMutation() {
   const queryClient = useQueryClient();
   const deleteAddressMutation = useMutation({
-    mutationFn: () => MyService.deleteAddress(no),
+    mutationFn: (no: number) => MyService.deleteAddress(no),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/my/addresses'] });
     },

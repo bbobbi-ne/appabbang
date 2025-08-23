@@ -22,7 +22,7 @@ import {
   Label,
 } from '@appabbang/ui';
 import DaumPostApi from '@/components/common/daum-post-api';
-import type { AddressListData } from '../pages/address-page';
+import type { AddressesListData } from '@/api/data-contracts';
 import { toast } from 'sonner';
 import { getFormattedMobile } from '@/utils';
 import { addressSchema, type addresssDailogForm } from '@/validate/address-form.schema';
@@ -30,9 +30,9 @@ import { addressSchema, type addresssDailogForm } from '@/validate/address-form.
 const labelMinWidth = 'min-w-[120px]';
 
 type Props = {
-  onSubmit: (data: addresssDailogForm) => Promise<void>;
+  currentValues?: AddressesListData[number] | undefined;
+  onSubmit: (body: addresssDailogForm) => Promise<void>;
   isLoading: boolean;
-  currentValues?: AddressListData[number];
   deleteAddress?: (no: number) => Promise<void>;
   deleteLoading?: boolean;
 };
@@ -239,7 +239,7 @@ export default function AddressForm({
         )}
 
         <div className="mt-8 flex gap-2">
-          {!currentValues?.isDefault && (
+          {currentValues && !currentValues?.isDefault && (
             <>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
