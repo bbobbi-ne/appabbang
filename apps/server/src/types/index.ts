@@ -106,6 +106,15 @@ export class AppError extends Error {
     });
   }
 
+  static tokenExpired(message: string, details?: any): AppError {
+    return new AppError({
+      statusCode: 401,
+      errorType: ErrorType.TOKEN_EXPIRED,
+      message,
+      details,
+    });
+  }
+
   static forbidden(message: string, details?: any): AppError {
     return new AppError({
       statusCode: 403,

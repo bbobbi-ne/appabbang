@@ -35,7 +35,7 @@ const verifyToken = async (req: Request): Promise<ClientPayload> => {
     return user;
   } catch (err: any) {
     if (err.name === 'TokenExpiredError') {
-      throw AppError.unauthorized('Token has expired');
+      throw AppError.tokenExpired('Token has expired');
     }
     throw AppError.forbidden('Invalid token');
   }

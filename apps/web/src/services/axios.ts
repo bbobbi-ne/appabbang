@@ -18,8 +18,8 @@ client.interceptors.request.use((config) => {
 client.interceptors.response.use(
   (response) => response,
   (error) => {
-    // 리프레시 토큰 발급
-    if (error.response.status === 403) {
+    // TODO: 리프레시 토큰 발급
+    if (error?.response?.data?.error?.type === 'TOKEN_EXPIRED') {
       sessionStorage.removeItem('accessToken');
       window.location.href = '/login';
     }
