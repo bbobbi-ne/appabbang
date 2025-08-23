@@ -147,6 +147,7 @@ export const create = async (no: number | undefined, body: CreateOrderRequestBod
         message,
         deliveryMethodName: deliveryMethod.name,
         deliveryMethodFee: deliveryMethod.fee,
+        deliveryTypeCode: deliveryMethod.deliveryTypeCode,
         discountAmount: 0, // 일단 0 유지
         totalPrice,
         isPaymentRefundTermsAgreed,

@@ -72,7 +72,7 @@ async function main() {
       { code: '30', groupName: 'purchase_status', name: '발주완료', remarkTxt: '발주완료' },
       { code: '10', groupName: 'delivery_type', name: '택배배송', remarkTxt: '택배배송' },
       { code: '20', groupName: 'delivery_type', name: '직접수령', remarkTxt: '직접수령' },
-      { code: '90', groupName: 'delivery_type', name: '기타', remarkTxt: '기타' },
+      // { code: '90', groupName: 'delivery_type', name: '기타', remarkTxt: '기타' },
       { code: '10', groupName: 'image_target_type', name: 'breads', remarkTxt: '빵 이미지' },
       {
         code: '20',
@@ -124,7 +124,7 @@ async function main() {
         name: 'CJ대한통운',
       },
       { deliveryTypeCode: '20', fee: 0, isActive: true, memo: '직접수령', name: '직접수령' },
-      { deliveryTypeCode: '90', fee: 0, isActive: true, memo: '기타', name: '기타' },
+      // { deliveryTypeCode: '90', fee: 0, isActive: true, memo: '기타', name: '기타' },
     ],
   });
 

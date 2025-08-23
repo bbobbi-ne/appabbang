@@ -443,26 +443,6 @@ export const updateMyAddressValidator = [
     .withMessage('boolean 타입이어야 합니다.'),
 ];
 
-/** 배송지 삭제 validate */
-export const deleteMyAddressValidator = [
-  param('no')
-    .exists()
-    .withMessage('no는 필수입니다')
-    .isInt()
-    .toInt()
-    .withMessage('no 를 올바르게 입력해주세요.'),
-];
-
-/** 주문 배송지 조회 validate */
-export const getOrderAddressValidator = [
-  param('no')
-    .exists()
-    .withMessage('no는 필수입니다')
-    .isInt()
-    .toInt()
-    .withMessage('no 를 올바르게 입력해주세요.'),
-];
-
 /** 주문 배송지 수정 validate */
 export const updateOrderAddressValidator = [
   param('no')

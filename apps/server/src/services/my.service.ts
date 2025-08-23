@@ -217,7 +217,7 @@ export const deleteAddress = async (no: number, customerNo: number) => {
   await prisma.address.delete({ where: { no, customerNo } });
 };
 
-/** 내 주문내역 목록 */
+/** 내 주문 목록 */
 export const getOrders = async (customerNo: number) => {
   const result = await prisma.$transaction(async (tx) => {
     const now = new Date();
@@ -225,6 +225,21 @@ export const getOrders = async (customerNo: number) => {
     oneYearAgo.setFullYear(now.getFullYear() - 1);
 
     const list = await tx.order.findMany({
+      select: {
+        no: true,
+        orderNumber: true,
+        orderStatus: true,
+        createdAt: true,
+        orderItems: {
+          select: {
+            no: true,
+            breadImageUrl: true,
+            breadName: true,
+            unitPrice: true,
+            quantity: true,
+          },
+        },
+      },
       where: {
         customerNo,
         createdAt: {
@@ -232,7 +247,7 @@ export const getOrders = async (customerNo: number) => {
           lte: now, // 현재일자까지
         },
       },
-      include: { orderItems: true },
+      // include: { orderItems: true },
       orderBy: { no: 'desc' },
     });
 
@@ -247,7 +262,37 @@ export const getOrders = async (customerNo: number) => {
 
 /** 내 주문 조회 */
 export const getOrder = async (no: number) => {
-  const order = await prisma.order.findUnique({ where: { no }, include: { orderItems: true } });
+  const order = await prisma.order.findUnique({
+    where: { no },
+    select: {
+      no: true,
+      orderNumber: true,
+      orderStatus: true,
+      createdAt: true,
+      totalPrice: true,
+      deliveryMethodFee: true,
+      discountAmount: true,
+      orderItems: {
+        select: {
+          no: true,
+          breadName: true,
+          breadImageUrl: true,
+          unitPrice: true,
+          totalPrice: true,
+          quantity: true,
+        },
+      },
+      address: true,
+      addressDetail: true,
+      zipcode: true,
+      message: true,
+      recipientName: true,
+      recipientMobile: true,
+      ordererName: true,
+      ordererMobile: true,
+      deliveryTypeCode: true,
+    },
+  });
 
   if (!order) throw AppError.notFound('주문을 찾을 수 없습니다.');
 
@@ -260,6 +305,41 @@ export const cancelOrder = async (no: number, canceledReason: string) => {
     await tx.order.update({ where: { no }, data: { orderStatus: '50' } });
     await tx.payment.update({ where: { orderNo: no }, data: { canceledReason } });
   });
+};
+
+/** 내 주문 배송(수령) 조회 */
+export const getOrderDelivery = async (no: number) => {
+  const order = await prisma.order.findUnique({
+    where: { no },
+    select: {
+      no: true,
+      orderNumber: true,
+      orderStatus: true,
+      createdAt: true,
+      orderItems: {
+        select: {
+          no: true,
+          breadName: true,
+          breadImageUrl: true,
+          unitPrice: true,
+          quantity: true,
+        },
+      },
+      address: true,
+      addressDetail: true,
+      zipcode: true,
+      message: true,
+      recipientName: true,
+      recipientMobile: true,
+      deliveryMethodName: true,
+      deliveryTypeCode: true,
+      trackingNumber: true,
+    },
+  });
+
+  if (!order) throw AppError.notFound('주문을 찾을 수 없습니다.');
+
+  return { ...order, orderStatusName: getCodeName(order.orderStatus) };
 };
 
 /** 내 주문 배송지 조회 */

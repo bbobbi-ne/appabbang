@@ -158,6 +158,13 @@ export const cancelOrder = async (req: Request, res: Response) => {
   res.status(200).json({ message: '주문이 취소되었습니다.' });
 };
 
+/** 내 주문 배송(수령) 조회 */
+export const getOrderDelivery = async (req: Request, res: Response) => {
+  const orderNo = Number(req.params.no);
+  const orderDelivery = await myService.getOrderDelivery(orderNo);
+  res.status(200).json(orderDelivery);
+};
+
 /** 내 주문 배송지 조회 */
 export const getOrderAddress = async (req: Request, res: Response) => {
   const orderNo = Number(req.params.no);
