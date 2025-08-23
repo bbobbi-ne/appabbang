@@ -82,6 +82,14 @@ export interface RefreshCreateData {
   accessToken: string;
 }
 
+export interface LogoutCreateData {
+  /**
+   * 성공 메시지
+   * @example "로그아웃되었습니다."
+   */
+  message?: string;
+}
+
 export type BreadsListData = {
   /**
    * 빵 번호
@@ -1054,7 +1062,115 @@ export interface ImageDeleteBody {
 
 export type CustomersListData = any;
 
-export type CustomersCreateData = any;
+export interface CustomersCreatePayload {
+  /**
+   * 고객 ID
+   * @example "customer123"
+   */
+  id: string;
+  /**
+   * 비밀번호
+   * @example "test1234!"
+   */
+  pw: string;
+  /**
+   * 고객명
+   * @example "홍길동"
+   */
+  name: string;
+  /**
+   * 전화번호
+   * @example "010-1234-5678"
+   */
+  mobileNumber: string;
+  /**
+   * 주소
+   * @example "서울시 강남구"
+   */
+  address: string;
+  /**
+   * 상세주소
+   * @example "123-45"
+   */
+  addressDetail: string;
+  /**
+   * 우편번호
+   * @example "12345"
+   */
+  zipcode: string;
+  /**
+   * 서비스 이용약관 동의여부
+   * @example true
+   */
+  isServiceTermsAgreed: boolean;
+  /**
+   * 개인정보 수집, 이용 동의여부
+   * @example true
+   */
+  isPrivacyTermsAgreed: boolean;
+  /**
+   * 마케팅 정보 수신 동의여부
+   * @example true
+   */
+  isMarketingTermsAgreed: boolean;
+}
+
+export interface CustomersCreateData {
+  data: {
+    /**
+     * 생성된 고객 번호
+     * @example 1
+     */
+    no: number;
+    /**
+     * 고객 ID
+     * @example "customer123"
+     */
+    id: string;
+    /**
+     * 고객명
+     * @example "홍길동"
+     */
+    name: string;
+    /**
+     * 전화번호
+     * @example "010-1234-5678"
+     */
+    mobileNumber: string;
+    /**
+     * 서비스 이용약관 동의여부
+     * @example true
+     */
+    isServiceTermsAgreed: boolean;
+    /**
+     * 개인정보 수집, 이용 동의여부
+     * @example true
+     */
+    isPrivacyTermsAgreed: boolean;
+    /**
+     * 마케팅 정보 수신 동의여부
+     * @example true
+     */
+    isMarketingTermsAgreed: boolean;
+    /**
+     * 생성일시
+     * @format date-time
+     * @example "2024-01-01T00:00:00.000Z"
+     */
+    createdAt: string;
+    /**
+     * 수정일시
+     * @format date-time
+     * @example "2024-01-01T00:00:00.000Z"
+     */
+    updatedAt: string;
+  };
+  /**
+   * 액세스 토큰
+   * @example "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+   */
+  accessToken: string;
+}
 
 export type CustomersDetailData = any;
 
@@ -1877,6 +1993,179 @@ export interface RefundUpdatePayload {
 
 export type RefundUpdateData = any;
 
+export interface GetMyData {
+  customer: {
+    /**
+     * 고객 번호
+     * @example 1
+     */
+    no: number;
+    /**
+     * 고객 ID
+     * @example "customer123"
+     */
+    id: string;
+    /**
+     * 고객명
+     * @example "홍길동"
+     */
+    name: string;
+    /**
+     * 전화번호
+     * @example "010-1234-5678"
+     */
+    mobileNumber: string;
+    /**
+     * 기본 배송지 번호
+     * @example 1
+     */
+    defaultAddressNo: number;
+    /**
+     * 생성일시
+     * @format date-time
+     * @example "2024-01-01T00:00:00.000Z"
+     */
+    createdAt: string;
+    /** 배송지 목록 */
+    address: {
+      /**
+       * 배송지 번호
+       * @example 1
+       */
+      no?: number;
+      /**
+       * 주소
+       * @example "서울시 강남구"
+       */
+      address?: string;
+      /**
+       * 상세주소
+       * @example "123-45"
+       */
+      addressDetail?: string;
+    }[];
+    /** 고객 쿠폰 목록 */
+    customerCoupon: {
+      /**
+       * 고객 쿠폰 번호
+       * @example 1
+       */
+      no?: number;
+      coupon?: {
+        /**
+         * 쿠폰명
+         * @example "첫 로그인 쿠폰"
+         */
+        name?: string;
+        /**
+         * 할인 금액
+         * @example 3000
+         */
+        amount?: number;
+      };
+    }[];
+  };
+  /** 할인 정보 */
+  coupon: {
+    /**
+     * 고객 쿠폰 번호
+     * @example 1
+     */
+    no?: number;
+    coupon?: {
+      /**
+       * 쿠폰명
+       * @example "첫 로그인 쿠폰"
+       */
+      name?: string;
+      /**
+       * 할인 금액
+       * @example 3000
+       */
+      amount?: number;
+    };
+  }[];
+  /**
+   * 주문 누적 금액
+   * @example 150000
+   */
+  totalAmount: number;
+}
+
+export interface PutMyPayload {
+  /**
+   * 고객명
+   * @example "홍길동"
+   */
+  name?: string;
+  /**
+   * 전화번호
+   * @example "010-1234-5678"
+   */
+  mobileNumber?: string;
+}
+
+export interface PutMyData {
+  /**
+   * 고객 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 고객 ID
+   * @example "customer123"
+   */
+  id: string;
+  /**
+   * 고객명
+   * @example "홍길동"
+   */
+  name: string;
+  /**
+   * 전화번호
+   * @example "010-1234-5678"
+   */
+  mobileNumber: string;
+  /**
+   * 비밀번호 (해시된 값)
+   * @example "hashedPassword123"
+   */
+  pw: string;
+  /**
+   * 생성일시
+   * @format date-time
+   * @example "2024-01-01T00:00:00.000Z"
+   */
+  createdAt: string;
+  /**
+   * 수정일시
+   * @format date-time
+   * @example "2024-01-01T00:00:00.000Z"
+   */
+  updatedAt: string;
+}
+
+export interface PutMy2Payload {
+  /**
+   * 현재 비밀번호
+   * @example "old1234!"
+   */
+  pw: string;
+  /**
+   * 새로운 비밀번호
+   * @example "new1234!"
+   */
+  pwModify: string;
+}
+
+export interface PutMy2Data {
+  /**
+   * 성공 메시지
+   * @example "비밀번호가 변경되었습니다."
+   */
+  message?: string;
+}
+
 export type AddressesListData = {
   /**
    * 배송지 번호
@@ -1925,6 +2214,11 @@ export type AddressesListData = {
    * @example "2024-01-01T00:00:00.000Z"
    */
   updatedAt: string;
+  /**
+   * 기본 배송지 여부
+   * @example true
+   */
+  isDefault: boolean;
 }[];
 
 export type AddressesCreatePayload = object;

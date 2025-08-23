@@ -14,6 +14,7 @@ import type {
   GetAuthData,
   LoginCreateData,
   LoginCreatePayload,
+  LogoutCreateData,
   RefreshCreateData,
 } from "./data-contracts";
 import { ContentType, HttpClient, type RequestParams } from "./http-client";
@@ -74,6 +75,24 @@ export class Auth<SecurityDataType = unknown> {
     this.http.request<RefreshCreateData, any>({
       path: `/auth/refresh`,
       method: "POST",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 현재 로그인한 사용자를 로그아웃 처리합니다. (권한: 로그인 필요 - 관리자/고객 모두)
+   *
+   * @tags Auth
+   * @name LogoutCreate
+   * @summary 로그아웃
+   * @request POST:/auth/logout
+   * @secure
+   * @response `204` `LogoutCreateData` 로그아웃 성공
+   */
+  logoutCreate = (params: RequestParams = {}) =>
+    this.http.request<LogoutCreateData, any>({
+      path: `/auth/logout`,
+      method: "POST",
+      secure: true,
       format: "json",
       ...params,
     });
