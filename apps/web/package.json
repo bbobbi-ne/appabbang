@@ -17,6 +17,7 @@
     "@appabbang/tailwind": "workspace:*",
     "@appabbang/typescript": "workspace:*",
     "@appabbang/ui": "workspace:*",
+    "@appabbang/utils": "workspace:*",
     "@faker-js/faker": "^9.6.0",
     "@ramonak/react-progress-bar": "^5.4.0",
     "@types/react-slick": "^0.23.13",
@@ -29,10 +30,8 @@
     "react-daum-postcode": "^3.2.0",
     "react-slick": "^0.30.3",
     "slick-carousel": "^1.8.1",
-    "sonner": "^2.0.6",
     "styled-components": "^6.1.19",
-    "zustand": "^5.0.5",
-    "date-fns": "^4.1.0"
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "swagger-typescript-api": "^13.2.7"
