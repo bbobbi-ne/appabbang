@@ -23,7 +23,6 @@ import {
 } from '@appabbang/ui';
 import clsx from 'clsx';
 import { Info } from 'lucide-react';
-import { btnCssStr } from './faq-menu-button';
 import { useState } from 'react';
 import useToast from '@/hooks/useToast';
 import { useNavigate } from '@tanstack/react-router';
@@ -111,7 +110,8 @@ function FaqUnregisterDialog({ children }: Props) {
           <Button
             type="button"
             onClick={() => setOpen(false)}
-            className={clsx('w-full', btnCssStr)}
+            className={clsx('w-full')}
+            variant="outline"
           >
             뒤로가기
           </Button>
