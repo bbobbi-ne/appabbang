@@ -14,7 +14,7 @@ export function ToggleMenuButton({ activeMenu, onChangeActiveMenu, list }: ITogg
           key={item.value}
           onClick={() => onChangeActiveMenu(item.value)}
           className="w-full"
-          variant={activeMenu === item.value ? 'default' : 'outline'}
+          variant={activeMenu.includes(item.value) ? 'default' : 'outline'}
         >
           {item.label}
         </Button>
