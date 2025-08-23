@@ -24,7 +24,7 @@ export const update = async (req: Request, res: Response) => {
       '고객정보 조회 과정에서 오류가 발생했습니다. 관리자 확인이 필요합니다.',
     );
 
-  const customer = await myService.update(req.body);
+  const customer = await myService.update(req.user.no, req.body);
   res.status(200).json({ customer });
 };
 

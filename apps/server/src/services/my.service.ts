@@ -75,15 +75,15 @@ export const getOrderAccumulatedAmount = async (no: number) => {
 /**
  * 내 정보 수정
  */
-export const update = async (data: {
-  id: string;
-  name: string;
-  mobileNumber: string;
-  createdAt: string;
-}) => {
+export const update = async (
+  no: number,
+  data: {
+    mobileNumber: string;
+  },
+) => {
   const result = await prisma.$transaction(async (tx) => {
     const updateCustomer = await tx.customer.update({
-      where: { id: data.id },
+      where: { no },
       data: { mobileNumber: data.mobileNumber },
     });
 
