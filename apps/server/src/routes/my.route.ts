@@ -8,6 +8,8 @@ import {
   updateMyAddressValidator,
   deleteMyAddressValidator,
   validate,
+  updateOrderAddressValidator,
+  getOrderAddressValidator,
 } from '@/middlewares/validators/validate';
 import {
   updateCustomerPwValidator,
@@ -79,5 +81,21 @@ router.get('/orders', requireCustomerOwner, asyncHandler(myController.getOrders)
 
 /** GET /my/order/{no} : 내 상세주문 조회 */
 router.get('/order/:no', requireCustomerOwner, asyncHandler(myController.getOrder));
+
+/** GET /my/order/{no}/address : 내 주문 배송지 조회 */
+router.get(
+  '/order/:no/address',
+  requireCustomerOwner,
+  getOrderAddressValidator,
+  asyncHandler(myController.getOrderAddress),
+);
+
+/** PUT /my/order/{no}/address : 내 주문 배송지 수정 */
+router.put(
+  '/order/:no/address',
+  requireCustomerOwner,
+  updateOrderAddressValidator,
+  asyncHandler(myController.updateOrderAddress),
+);
 
 export default router;

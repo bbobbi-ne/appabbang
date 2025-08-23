@@ -453,6 +453,32 @@ export const deleteMyAddressValidator = [
     .withMessage('no 를 올바르게 입력해주세요.'),
 ];
 
+/** 주문 배송지 조회 validate */
+export const getOrderAddressValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+];
+
+/** 주문 배송지 수정 validate */
+export const updateOrderAddressValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  body('address').trim().notEmpty().withMessage('address는 필수입니다'),
+  body('addressDetail').trim().notEmpty().withMessage('addressDetail는 필수입니다'),
+  body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
+  body('message').trim().notEmpty().withMessage('message는 필수입니다'),
+  body('recipientName').trim().notEmpty().withMessage('recipientName은 필수입니다'),
+  body('recipientMobile').trim().notEmpty().withMessage('recipientMobile은 필수입니다'),
+];
+
 /** 쿠폰 생성 validate */
 export const createCouponValidator = [
   body('name').trim().notEmpty().withMessage('이름은 필수입니다'),

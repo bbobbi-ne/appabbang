@@ -139,3 +139,36 @@ export const getOrder = async (req: Request, res: Response) => {
   const order = await myService.getOrder(orderNo);
   res.status(200).json(order);
 };
+
+/** 내 주문 배송지 조회 */
+export const getOrderAddress = async (req: Request, res: Response) => {
+  const orderNo = Number(req.params.no);
+  const address = await myService.getOrderAddress(orderNo);
+
+  res.status(200).json(address);
+};
+
+/** 내 주문 배송지 수정 */
+export const updateOrderAddress = async (req: Request, res: Response) => {
+  const orderNo = Number(req.params.no);
+  const { address, addressDetail, zipcode, message, recipientName, recipientMobile } = req.body;
+
+  const order = await myService.getOrder(orderNo);
+  if (!order) throw AppError.notFound('주문을 찾을 수 없습니다.');
+
+  // 10 또는 11 일때만 수정 가능
+  if (Number(order.orderStatus) !== 10 && Number(order.orderStatus) !== 11) {
+    throw AppError.badRequest('현재는 주문 배송지를 수정할 수 없습니다.');
+  }
+
+  await myService.updateOrderAddress(orderNo, {
+    address,
+    addressDetail,
+    zipcode,
+    message,
+    recipientName,
+    recipientMobile,
+  });
+
+  res.status(200).json({ message: '주문 배송지가 변경되었습니다.' });
+};

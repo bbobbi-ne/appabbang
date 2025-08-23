@@ -1,6 +1,12 @@
 import { prisma } from '@/lib/prisma';
 import { AppError } from '@/types';
 import { Address } from '@prisma/client';
+import { commonCodeMap } from './common-code.service';
+
+/** 코드 조회 */
+export const getCodeName = (code: string): string => {
+  return commonCodeMap.orderStatusMap.get(code) || '-';
+};
 
 /** 내 정보 상세정보 조회 */
 export const getMyInfo = async (no: number) => {
@@ -230,7 +236,10 @@ export const getOrders = async (customerNo: number) => {
       orderBy: { no: 'desc' },
     });
 
-    return list;
+    return list.map((item) => ({
+      ...item,
+      orderStatusName: getCodeName(item.orderStatus),
+    }));
   });
 
   return result;
@@ -238,16 +247,42 @@ export const getOrders = async (customerNo: number) => {
 
 /** 내 주문 조회 */
 export const getOrder = async (no: number) => {
-  const result = await prisma.$transaction(async (tx) => {
-    const data = await tx.order.findFirst({
-      where: { no },
-      include: {
-        orderItems: true,
-      },
-    });
+  const order = await prisma.order.findUnique({ where: { no }, include: { orderItems: true } });
 
-    return data;
-  });
+  if (!order) throw AppError.notFound('주문을 찾을 수 없습니다.');
+
+  return { ...order, orderStatusName: getCodeName(order.orderStatus) };
+};
+
+/** 내 주문 배송지 조회 */
+export const getOrderAddress = async (no: number) => {
+  const order = await prisma.order.findUnique({ where: { no } });
+
+  if (!order) throw AppError.notFound('주문을 찾을 수 없습니다.');
+
+  const result = {
+    address: order.address,
+    addressDetail: order.addressDetail,
+    zipcode: order.zipcode,
+    message: order.message,
+    recipientName: order.recipientName,
+    recipientMobile: order.recipientMobile,
+  };
 
   return result;
+};
+
+/** 내 주문 배송지 수정 */
+export const updateOrderAddress = async (
+  no: number,
+  data: {
+    address: string;
+    addressDetail: string;
+    zipcode: string;
+    message: string;
+    recipientName: string;
+    recipientMobile: string;
+  },
+) => {
+  await prisma.order.update({ where: { no }, data });
 };
