@@ -1685,6 +1685,7 @@ paths:
                 - id
                 - pw
                 - name
+                - email
                 - mobileNumber
                 - address
                 - addressDetail
@@ -1705,6 +1706,10 @@ paths:
                   type: string
                   description: 고객명
                   example: '홍길동'
+                email:
+                  type: string
+                  description: 이메일
+                  example: 'test1231@naver.com'
                 mobileNumber:
                   type: string
                   description: 전화번호
@@ -1756,6 +1761,7 @@ paths:
                       - no
                       - id
                       - name
+                      - email
                       - mobileNumber
                       - isServiceTermsAgreed
                       - isPrivacyTermsAgreed
@@ -1775,6 +1781,10 @@ paths:
                         type: string
                         description: 고객명
                         example: '홍길동'
+                      email: 
+                        type: string
+                        description: 이메일
+                        example: 'test1231@naver.com'
                       mobileNumber:
                         type: string
                         description: 전화번호

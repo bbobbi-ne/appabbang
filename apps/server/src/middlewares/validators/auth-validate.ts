@@ -57,6 +57,21 @@ const NAME_VALIDATION = {
   empty: { message: '이름을 입력하세요.' },
 };
 
+const EMAIL_VALIDATION = {
+  key: 'email',
+  length: {
+    min: 1,
+    max: 50,
+    message: '이메일은 1~50자 이내로 입력해야 합니다.',
+  },
+  matches: {
+    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/g,
+    message: '유효하는 이메일 형식이 아닙니다.',
+  },
+  string: { message: '이메일은 문자열로 입력해야 합니다.' },
+  empty: { message: '이메일을 입력하세요.' },
+};
+
 const PASSWORD_VALIDATION = {
   key: 'pw',
   length: { min: 10, max: 30, message: '비밀번호는 10~30자 이내로 입력해야 합니다.' },
@@ -149,6 +164,17 @@ export const createCustomerValidator = [
     .withMessage(NAME_VALIDATION.length.message)
     .trim()
     .escape(),
+
+  body(EMAIL_VALIDATION.key)
+    .notEmpty()
+    .withMessage(EMAIL_VALIDATION.empty.message)
+    .matches(EMAIL_VALIDATION.matches.value)
+    .withMessage(EMAIL_VALIDATION.matches.message)
+    .isString()
+    .withMessage(EMAIL_VALIDATION.string.message)
+    .isLength({ min: EMAIL_VALIDATION.length.min, max: EMAIL_VALIDATION.length.max })
+    .withMessage(EMAIL_VALIDATION.length.message)
+    .trim(),
 
   body(PASSWORD_VALIDATION.key)
     .notEmpty()

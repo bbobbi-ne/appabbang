@@ -25,6 +25,16 @@ const NAME_VALIDATION = {
   required: { message: '이름을 입력하세요.' },
 };
 
+const EMAIL_VALIDATION = {
+  min: { value: 1, message: '이메일은 1자 이상 입력 바랍니다.' },
+  max: { value: 50, message: '이메일은 50자 이내로 입력 바랍니다.' },
+  regex: {
+    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/g,
+    message: '유효한 이메일 형식이 아닙니다.',
+  },
+  required: { message: '이메일을 입력하세요.' },
+};
+
 const PASSWORD_VALIDATION = {
   min: { value: 10, message: '비밀번호는 10자 이상 입력 바랍니다.' },
   max: { value: 30, message: '비밀번호는 30자 이내로 입력 바랍니다.' },
@@ -74,6 +84,12 @@ export const joinSchema = z
       .min(NAME_VALIDATION.min.value, NAME_VALIDATION.min.message)
       .max(NAME_VALIDATION.max.value, NAME_VALIDATION.max.message)
       .regex(NAME_VALIDATION.regex.value, { message: NAME_VALIDATION.regex.message }),
+    email: z
+      .string({ required_error: EMAIL_VALIDATION.required.message })
+      .trim()
+      .min(EMAIL_VALIDATION.min.value, EMAIL_VALIDATION.min.message)
+      .max(EMAIL_VALIDATION.max.value, EMAIL_VALIDATION.max.message)
+      .regex(EMAIL_VALIDATION.regex.value, EMAIL_VALIDATION.regex.message),
     pw: z
       .string({ required_error: PASSWORD_VALIDATION.required.message })
       .trim()

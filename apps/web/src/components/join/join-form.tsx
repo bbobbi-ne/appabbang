@@ -64,6 +64,7 @@ export default function JoinForm() {
     defaultValues: {
       id: '',
       name: '',
+      email: '',
       pw: '',
       pwConfirm: '',
       mobileNumber: '',
@@ -140,6 +141,25 @@ export default function JoinForm() {
               <div className="w-full space-y-1">
                 <FormControl>
                   <Input type="text" {...field} placeholder="이름 입력" maxLength={30} />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </div>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem className="flex items-center">
+              <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
+                <span className="text-red-700">*</span> 이메일
+              </FormLabel>
+
+              <div className="w-full space-y-1">
+                <FormControl>
+                  <Input type="email" {...field} placeholder="이메일 입력" maxLength={50} />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>

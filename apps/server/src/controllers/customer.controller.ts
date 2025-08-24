@@ -24,6 +24,7 @@ export const create = async (req: Request, res: Response) => {
   const {
     id,
     name,
+    email,
     pw,
     mobileNumber,
     address,
@@ -41,6 +42,7 @@ export const create = async (req: Request, res: Response) => {
   const model = {
     id,
     name,
+    email,
     pw,
     mobileNumber,
     address,

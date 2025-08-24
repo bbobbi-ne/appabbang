@@ -37,6 +37,7 @@ export type CreateCustomerInput = Pick<
   Customer,
   | 'id'
   | 'name'
+  | 'email'
   | 'pw'
   | 'mobileNumber'
   | 'isServiceTermsAgreed'
@@ -57,6 +58,7 @@ export const createCustomerInfo = async (data: CreateCustomerInput) => {
       const {
         id,
         name,
+        email,
         pw,
         mobileNumber,
         address,
@@ -74,6 +76,7 @@ export const createCustomerInfo = async (data: CreateCustomerInput) => {
         data: {
           id,
           name,
+          email,
           pw: hashedPw,
           mobileNumber,
           isServiceTermsAgreed,
