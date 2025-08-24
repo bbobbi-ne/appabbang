@@ -3,7 +3,7 @@ import SubLayout from '@/components/templates/sub-layout';
 import OrderRoundDetailPage from '@/components/pages/order-round-detail-page';
 import { useGetOrderRoundNowQuery } from '@/hooks/use-order-round';
 import { useEffect } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@appabbang/ui';
 
 /** TODO: 주문서 오픈 시점에만 접근이 가능해야함. 마감시 접근 불가 */
 export const Route = createFileRoute('/_sub-page/order-round/$orderRoundNo')({

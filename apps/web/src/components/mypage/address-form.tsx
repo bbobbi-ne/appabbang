@@ -23,7 +23,7 @@ import {
 } from '@appabbang/ui';
 import DaumPostApi from '@/components/common/daum-post-api';
 import type { AddressesListData } from '@/api/data-contracts';
-import { toast } from 'sonner';
+import { toast } from '@appabbang/ui';
 import { formatMobile } from '@appabbang/utils';
 import { addressSchema, type addresssDailogForm } from '@/validate/address-form.schema';
 

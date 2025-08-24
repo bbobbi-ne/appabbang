@@ -1685,6 +1685,7 @@ paths:
                 - id
                 - pw
                 - name
+                - email
                 - mobileNumber
                 - address
                 - addressDetail
@@ -1705,6 +1706,10 @@ paths:
                   type: string
                   description: 고객명
                   example: '홍길동'
+                email:
+                  type: string
+                  description: 이메일
+                  example: 'test1231@naver.com'
                 mobileNumber:
                   type: string
                   description: 전화번호
@@ -1756,6 +1761,7 @@ paths:
                       - no
                       - id
                       - name
+                      - email
                       - mobileNumber
                       - isServiceTermsAgreed
                       - isPrivacyTermsAgreed
@@ -1775,6 +1781,10 @@ paths:
                         type: string
                         description: 고객명
                         example: '홍길동'
+                      email: 
+                        type: string
+                        description: 이메일
+                        example: 'test1231@naver.com'
                       mobileNumber:
                         type: string
                         description: 전화번호
@@ -1805,6 +1815,40 @@ paths:
                     type: string
                     description: 액세스 토큰
                     example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+  /customers/send-email:
+    post:
+      tags: [Customers]
+      summary: 이메일 인증번호 전송
+      description: 요청한 이메일로 서버에서 만든 인증번호를 전달합니다. (권한: 없음 - 누구나 접근가능)
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  description: 이메일(테스트시, 실제 이메일을 작성하세요.)
+                  example: test1231@naver.com
+      responses:
+        '200':
+          description: 이메일 전송 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - code
+                properties:
+                  code:
+                    type: string
+                    description: 생성된 인증번호
+                    example: 123456
+
 
   /customers/{no}:
     get:
