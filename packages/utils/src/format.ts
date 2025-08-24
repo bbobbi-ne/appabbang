@@ -76,3 +76,5 @@ export const formatMobile = (value: string) => {
   // 변환된 값
   return formattedValue;
 };
+
+export { ko };
