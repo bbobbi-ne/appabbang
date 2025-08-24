@@ -36,7 +36,6 @@ function RouteComponent() {
     { label: '판매리스트', value: 'orderRoundBreads' },
   ];
 
-  console.log(orderRounds);
   const table = useReactTable<OrderRoundListItem>({
     data: orderRounds || [],
     columns: orderRoundColumns(),

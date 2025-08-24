@@ -1,9 +1,10 @@
 import { CustomHttpClient } from '@/service/instance';
 import { Customers } from '@/api/Customers';
 import { toast } from '@appabbang/ui';
+import { refreshCreate } from './auth-api';
 
 // 고객 API 인스턴스 생성
-const customerApi = new Customers(new CustomHttpClient());
+const customerApi = new Customers(new CustomHttpClient({}, refreshCreate));
 
 /**
  * 고객(유저) 목록 조회

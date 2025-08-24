@@ -81,18 +81,18 @@ export function TableContainer<TData>({
 
       {/* 테이블 본문 */}
       <CardContent>
-        <ScrollArea className="h-[550px] w-full border-1 rounded-lg">
-          <div className="min-w-[1000px]">
+        <ScrollArea className="border-1 rounded-lg">
+          <div className="max-h-[550px] w-full ">
             <Table>
               {/* 컬럼 헤더 */}
-              <TableHeader className="sticky top-0 bg-background shadow border-b-0">
+              <TableHeader className="sticky z-5 top-0 bg-background shadow border-b-0">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => {
                       const max = header.column.columnDef.maxSize;
                       return (
                         <TableHead
-                          className=""
+                          className="text-center"
                           style={{ width: max ? `${max}%` : undefined }}
                           key={header.id}
                         >
@@ -117,7 +117,7 @@ export function TableContainer<TData>({
                     <TableRow key={row.id}>
                       {row.getVisibleCells().map((cell) => {
                         const content = (
-                          <TableCell key={cell.id}>
+                          <TableCell className="text-center" key={cell.id}>
                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                           </TableCell>
                         );

@@ -37,8 +37,9 @@ export function GlobalLoading() {
 
   // 포탈을 사용하여 body 최상단에 로딩 UI 렌더링
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/20">
-      <Loader2 className="w-10 h-10 text-white animate-spin" /> {/* 로딩 스피너 */}
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/20 pointer-events-auto">
+      <Loader2 className="w-10 h-10 text-white animate-spin pointer-events-none" />
+      {/* 로딩 스피너 */}
     </div>,
     document.body,
   );

@@ -23,9 +23,7 @@ export const orderRoundColumns = () => {
       maxSize: 1,
       header: ({ column }) => <p>주문차수 이미지</p>,
       cell: (info) => {
-        const src = info.getValue()[0]
-          ? info.getValue()[0].url
-          : 'https://cdn.imweb.me/upload/S202206178ecd8851ac794/cd0f057a7035b.jpg';
+        const src = info.getValue()[0] ? info.getValue()[0].url : '/images/no_image.png';
 
         return (
           <AspectRatio ratio={9 / 5}>

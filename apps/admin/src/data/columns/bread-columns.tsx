@@ -49,9 +49,7 @@ export const BreadsColumns = () => {
       header: '대표이미지',
       cell: ({ row }) => {
         const url = (row.getValue('images') as { url: string }[]) || [];
-        const src = url[0]?.url
-          ? url[0].url
-          : 'https://cdn.imweb.me/upload/S202206178ecd8851ac794/cd0f057a7035b.jpg';
+        const src = url[0]?.url ? url[0].url : '/images/no_image.png';
 
         return (
           <AspectRatio ratio={9 / 5}>

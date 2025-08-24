@@ -7,9 +7,10 @@ import type {
   BreadsDeletePayload,
   ImageDeletePayload,
 } from '@/api/data-contracts';
+import { refreshCreate } from './auth-api';
 
 // Breads API 인스턴스 생성
-const breadsApi = new Breads(new CustomHttpClient());
+const breadsApi = new Breads(new CustomHttpClient({}, refreshCreate));
 
 /**
  * 빵 전체 목록 조회

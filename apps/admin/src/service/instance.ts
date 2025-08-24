@@ -1,65 +1,59 @@
+// src/service/instance.ts
 import { HttpClient, type ApiConfig } from '@/api/http-client';
 import { useAuthStore } from '@/stores/auth-store';
-import { refreshCreate } from '@/service/auth-api';
 
 /**
  * CustomHttpClient
  *
- * - 기본 HttpClient를 확장한 커스텀 클라이언트
- * - 요청 시 accessToken을 Authorization 헤더에 자동 첨부
- * - 응답에서 403(Forbidden) 발생 시 refresh token을 사용해 accessToken 재발급 후 재시도
+ * - HttpClient를 확장하여 토큰 자동 추가 & 403 시 refresh 재시도 기능
+ * - refreshFn을 생성자 주입으로 받아 순환 참조 방지
  */
 export class CustomHttpClient extends HttpClient {
-  constructor(config: ApiConfig = {}) {
+  constructor(
+    config: ApiConfig = {},
+    private refreshFn?: () => Promise<{ data: string }>,
+  ) {
     super({
       ...config,
-      withCredentials: true, // 쿠키 자동 포함
-      // ✅ 요청 시 실행되는 securityWorker
+      withCredentials: true,
       securityWorker: () => {
         const { accessToken } = useAuthStore.getState();
-        if (!accessToken) return; // 토큰이 없으면 아무 것도 안 함
+        if (!accessToken) return;
         return {
           headers: {
-            Authorization: `Bearer ${accessToken}`, // Bearer 토큰 헤더 추가
+            Authorization: `Bearer ${accessToken}`,
           },
         };
       },
     });
 
-    // ✅ 응답 인터셉터
     this.instance.interceptors.response.use(
-      // 정상 응답은 그대로 반환
       (response) => response,
-      // 에러 응답 처리
       async (error) => {
         const originalRequest = error.config;
 
-        // 403 에러이면서 아직 재시도 안 한 경우
         if (error.response?.status === 403 && !originalRequest._retry) {
           originalRequest._retry = true;
 
-          try {
-            // refresh token으로 새 accessToken 발급
-            const { data: newAccessToken } = await refreshCreate();
+          if (!this.refreshFn) {
+            throw new Error('refresh 함수가 설정되지 않음');
+          }
 
-            // 스토어에 새로운 accessToken 저장
+          try {
+            const { data: newAccessToken } = await this.refreshFn();
             useAuthStore.getState().setAccessToken(newAccessToken);
 
-            // 재요청 시 Authorization 헤더에 새 토큰 적용
             originalRequest.headers = {
               ...originalRequest.headers,
               Authorization: `Bearer ${newAccessToken}`,
             };
 
-            // 실패했던 요청 재시도
             return this.instance(originalRequest);
           } catch (e) {
-            // refresh token도 만료되었거나 실패 시
             throw new Error('accessToken 재발급 실패');
           }
         }
 
-        // 다른 에러는 그대로 throw
         return Promise.reject(error);
       },
     );

@@ -1,5 +1,18 @@
 import { useOrderRoundImageDeleteMutation } from '@/hooks/use-order-round';
-import { Input } from '@appabbang/ui';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  Button,
+  Input,
+} from '@appabbang/ui';
+import { X } from 'lucide-react';
 import { useRef } from 'react';
 import type { ControllerRenderProps } from 'react-hook-form';
 
@@ -27,9 +40,14 @@ export function ImageUpload({
     }
   };
 
-  const removeImage = async () => {
+  const onChangeImage = async () => {
+    inputRef.current?.click();
+  };
+
+  const removeImage = async (e: any) => {
+    e.stopPropagation();
     if (value instanceof File) {
-      inputRef.current?.click();
+      onChange(null);
       return;
     }
 
@@ -55,12 +73,48 @@ export function ImageUpload({
           이미지 파일을 추가해주세요
         </div>
       ) : (
-        <div onClick={removeImage} className="border rounded overflow-hidden cursor-pointer">
+        <div
+          onClick={onChangeImage}
+          className="relative border rounded group overflow-hidden cursor-pointer"
+        >
           <img
             src={value instanceof File ? URL.createObjectURL(value) : value.url}
             alt="preview"
             className="w-full h-40 rounded object-fill"
           />
+          {value instanceof File ? (
+            <Button
+              onClick={removeImage}
+              type="button"
+              size="icon"
+              className="absolute z-5 top-1 right-1 bg-black/60 text-white rounded opacity-0 group-hover:opacity-100 transition"
+            >
+              <X size={16} />
+            </Button>
+          ) : (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  onClick={(e) => e.stopPropagation()}
+                  type="button"
+                  size="icon"
+                  className="absolute top-1 right-1 bg-black/60 text-white rounded opacity-0 group-hover:opacity-100 transition"
+                >
+                  <X size={16} />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>저장된 이미지를 삭제하시겠습니까?</AlertDialogTitle>
+                  <AlertDialogDescription>삭제시 복구가 어렵습니다.</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>취소</AlertDialogCancel>
+                  <AlertDialogAction onClick={removeImage}>확인</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
       )}
     </div>
