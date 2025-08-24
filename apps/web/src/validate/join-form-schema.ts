@@ -116,6 +116,7 @@ export const joinSchema = z
     isMarketingTermsAgreed: z.boolean({
       required_error: '마케팅 목적 개인정보 이용 및 광고 수신 동의 처리방침을 확인 바랍니다.',
     }),
+    allAgreed: z.boolean(),
   })
   .superRefine(({ pw, pwConfirm }, ctx) => {
     // 비밀번호 확인 :: 틀리면 오류

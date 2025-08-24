@@ -34,6 +34,30 @@ export default function JoinForm() {
   const { set: setAccessToken } = useAccessTokenStore();
   const { set: setCustomer } = useCustomerStore();
 
+  /** 전체동의 체크박스 */
+  const allCheck = (allAgreed: boolean) => {
+    if (allAgreed) {
+      form.setValue('isServiceTermsAgreed', true);
+      form.setValue('isPrivacyTermsAgreed', true);
+      form.setValue('isMarketingTermsAgreed', true);
+    } else {
+      form.setValue('isServiceTermsAgreed', false);
+      form.setValue('isPrivacyTermsAgreed', false);
+      form.setValue('isMarketingTermsAgreed', false);
+    }
+  };
+
+  /** 개별 체크박스 처리 시 전체동의 처리 */
+  const individualCheck = () => {
+    const service = form.getValues('isServiceTermsAgreed');
+    const privacy = form.getValues('isPrivacyTermsAgreed');
+    const marketing = form.getValues('isMarketingTermsAgreed');
+
+    service && privacy && marketing
+      ? form.setValue('allAgreed', true)
+      : form.setValue('allAgreed', false);
+  };
+
   // 폼 선언
   const form = useForm<JoinSchemaType>({
     resolver: zodResolver(joinSchema),
@@ -49,6 +73,7 @@ export default function JoinForm() {
       isServiceTermsAgreed: false,
       isPrivacyTermsAgreed: false,
       isMarketingTermsAgreed: false,
+      allAgreed: false,
     },
   });
 
@@ -59,16 +84,12 @@ export default function JoinForm() {
     e.preventDefault();
 
     // 아빠빵 처리방침 3가지 true 확인
-    if (
-      !(
-        form.getValues('isServiceTermsAgreed') &&
-        form.getValues('isPrivacyTermsAgreed') &&
-        form.getValues('isMarketingTermsAgreed')
-      )
-    ) {
+    const service = form.getValues('isServiceTermsAgreed');
+    const privacy = form.getValues('isPrivacyTermsAgreed');
+    if (!(service && privacy)) {
       addToast({
         type: 'error',
-        message: '아빠빵 처리방침 약관을 확인 바랍니다.',
+        message: '아빠빵 필수 이용약관을 확인 바랍니다.',
       });
 
       return;
@@ -265,18 +286,52 @@ export default function JoinForm() {
         </div>
 
         <div className="flex flex-col gap-0">
+          {/* 전체동의 */}
+          <FormField
+            control={form.control}
+            name="allAgreed"
+            render={({ field }) => (
+              <FormItem className="mt-2 mb-2">
+                <div className="flex justify-between items-center gap-2">
+                  <div className="flex items-center gap-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={(checked: boolean) => {
+                          field.onChange(checked);
+                          allCheck(checked);
+                        }}
+                        className="mb-0"
+                      />
+                    </FormControl>
+
+                    <FormLabel
+                      errorCheck={false}
+                      className={`${labelMinWidth} whitespace-nowrap cursor-pointer text-xs`}
+                    >
+                      아래 이용약관을 전체 동의합니다.
+                    </FormLabel>
+                  </div>
+                </div>
+              </FormItem>
+            )}
+          />
+
           {/* 서비스 이용약관 동의여부 */}
           <FormField
             control={form.control}
             name="isServiceTermsAgreed"
             render={({ field }) => (
               <FormItem>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center w-full">
                   <div className="flex items-center gap-2">
                     <FormControl>
                       <Checkbox
                         checked={field.value}
-                        onCheckedChange={field.onChange}
+                        onCheckedChange={(checked: boolean) => {
+                          field.onChange(checked);
+                          individualCheck();
+                        }}
                         className="mb-0"
                       />
                     </FormControl>
@@ -289,11 +344,13 @@ export default function JoinForm() {
                     </FormLabel>
                   </div>
 
-                  <ServiceIsAgreedDialog>
-                    <Button type="button" variant="link" className="text-xs p-o">
-                      약관보기
-                    </Button>
-                  </ServiceIsAgreedDialog>
+                  <div className="flex-shrink-0">
+                    <ServiceIsAgreedDialog>
+                      <Button type="button" variant="link" className="text-xs p-o">
+                        약관보기
+                      </Button>
+                    </ServiceIsAgreedDialog>
+                  </div>
                 </div>
               </FormItem>
             )}
@@ -310,7 +367,10 @@ export default function JoinForm() {
                     <FormControl>
                       <Checkbox
                         checked={field.value}
-                        onCheckedChange={field.onChange}
+                        onCheckedChange={(checked: boolean) => {
+                          field.onChange(checked);
+                          individualCheck();
+                        }}
                         className="mb-0"
                       />
                     </FormControl>
@@ -344,7 +404,10 @@ export default function JoinForm() {
                     <FormControl>
                       <Checkbox
                         checked={field.value}
-                        onCheckedChange={field.onChange}
+                        onCheckedChange={(checked: boolean) => {
+                          field.onChange(checked);
+                          individualCheck();
+                        }}
                         className="mb-0"
                       />
                     </FormControl>
@@ -353,7 +416,7 @@ export default function JoinForm() {
                       errorCheck={false}
                       className={`${labelMinWidth} whitespace-nowrap cursor-pointer text-xs`}
                     >
-                      마케팅, 광고 목적 개인정보 이용 처리방침에 동의합니다.
+                      마케팅 목적 개인정보 이용 처리방침에 동의합니다. (선택)
                     </FormLabel>
                   </div>
 
