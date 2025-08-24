@@ -10,8 +10,8 @@ export const sendEmail = async (email: string) => {
       port: 465,
       secure: true,
       auth: {
-        user: 'info@appabbang.com',
-        pass: 'jvdopxgkimgykiam',
+        user: process.env.GMAIL_ID,
+        pass: process.env.GMAIL_PASSKEY,
       },
     });
 
