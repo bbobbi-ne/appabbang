@@ -58,7 +58,7 @@ export function DialogLayout({ trigger, title, description, children, height }: 
           </DialogHeader>
 
           {/* 스크롤 가능한 영역에 children 렌더링 */}
-          <ScrollArea className={cn('pr-6', height ? `h-[${height}px]` : 'h-[700px]')}>
+          <ScrollArea className={cn('pr-6', height ? `max-h-[${height}px]` : 'max-h-[700px]')}>
             {children({ close })}
           </ScrollArea>
         </DialogContent>
