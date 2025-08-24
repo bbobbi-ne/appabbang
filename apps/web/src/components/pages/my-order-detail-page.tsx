@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 import { Badge, Button, Card, CardContent } from '@appabbang/ui';
-import { getFormattedMobile } from '@/utils';
+import { formatMobile } from '@appabbang/utils';
 import { useGetOrderQuery } from '@/hooks/use-my';
 import OrderItem from '@/components/mypage/order-item';
 import OrderAddressModifyDialog from '@/components/mypage/order-address-modify-dialog';
@@ -176,7 +176,7 @@ export default function MyOrderDetailPage({ orderNo }: { orderNo: number }) {
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="min-w-28">수령인 전화번호</span>
-                  <p className="text-sm">{getFormattedMobile(order.recipientMobile ?? '')}</p>
+                  <p className="text-sm">{formatMobile(order.recipientMobile ?? '')}</p>
                 </div>
               </div>
 
@@ -200,7 +200,7 @@ export default function MyOrderDetailPage({ orderNo }: { orderNo: number }) {
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="min-w-28">주문인 전화번호</span>
-                  <p className="text-sm">{getFormattedMobile(order.ordererMobile ?? '')}</p>
+                  <p className="text-sm">{formatMobile(order.ordererMobile ?? '')}</p>
                 </div>
               </div>
             </div>
