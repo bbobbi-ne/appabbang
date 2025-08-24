@@ -47,6 +47,17 @@ export default function JoinForm() {
     }
   };
 
+  /** 개별 체크박스 처리 시 전체동의 처리 */
+  const individualCheck = () => {
+    const service = form.getValues('isServiceTermsAgreed');
+    const privacy = form.getValues('isPrivacyTermsAgreed');
+    const marketing = form.getValues('isMarketingTermsAgreed');
+
+    service && privacy && marketing
+      ? form.setValue('allAgreed', true)
+      : form.setValue('allAgreed', false);
+  };
+
   // 폼 선언
   const form = useForm<JoinSchemaType>({
     resolver: zodResolver(joinSchema),
@@ -321,7 +332,10 @@ export default function JoinForm() {
                     <FormControl>
                       <Checkbox
                         checked={field.value}
-                        onCheckedChange={field.onChange}
+                        onCheckedChange={(checked: boolean) => {
+                          field.onChange(checked);
+                          individualCheck();
+                        }}
                         className="mb-0"
                       />
                     </FormControl>
@@ -355,7 +369,10 @@ export default function JoinForm() {
                     <FormControl>
                       <Checkbox
                         checked={field.value}
-                        onCheckedChange={field.onChange}
+                        onCheckedChange={(checked: boolean) => {
+                          field.onChange(checked);
+                          individualCheck();
+                        }}
                         className="mb-0"
                       />
                     </FormControl>
@@ -389,7 +406,10 @@ export default function JoinForm() {
                     <FormControl>
                       <Checkbox
                         checked={field.value}
-                        onCheckedChange={field.onChange}
+                        onCheckedChange={(checked: boolean) => {
+                          field.onChange(checked);
+                          individualCheck();
+                        }}
                         className="mb-0"
                       />
                     </FormControl>
