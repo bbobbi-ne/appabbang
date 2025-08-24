@@ -33,35 +33,50 @@ import { CalendarIcon, Check } from 'lucide-react';
 import { useGetBreadsQuery } from '@/hooks/use-breads';
 import BreadPreview from './bread-preview';
 import { ImageUpload } from './image-upload';
-import { formatDateTime, formatDateTimeToIso } from '@appabbang/utils';
+import { formatDateTime, formatDateTimeToIso, ko } from '@appabbang/utils';
+import { useOrderRoundsQuery } from '@/hooks/use-order-round';
 
-export const orderRoundSchema = z.object({
-  name: z.string().trim().min(1, '메뉴명을 입력해주세요'),
-  startedAt: z.date({ required_error: '시작일은 필수입니다.' }),
-  endedAt: z.date({ required_error: '종료일은 필수입니다.' }),
-  orderRoundBreads: z
-    .array(
-      z.object({
-        no: z.number(),
-        name: z.string(),
+export const orderRoundSchema = z
+  .object({
+    name: z.string().trim().min(1, '메뉴명을 입력해주세요'),
+    startedAt: z.date({ required_error: '시작일은 필수입니다.' }),
+    endedAt: z.date({ required_error: '종료일은 필수입니다.' }),
+    orderRoundBreads: z
+      .array(
+        z.object({
+          no: z.number(),
+          name: z.string(),
+        }),
+      )
+      .refine((arr) => arr.length > 0, {
+        message: '하나 이상의 항목을 선택해주세요.',
       }),
-    )
-    .refine((arr) => arr.length > 0, {
-      message: '하나 이상의 항목을 선택해주세요.',
-    }),
-  image: z
-    .union([
-      z.instanceof(File),
-      z.string(),
-      z.null(),
-      z.object({
-        url: z.string(),
-        publicId: z.string(),
-        order: z.number(),
-      }),
-    ])
-    .optional(),
-});
+    image: z
+      .union([
+        z.instanceof(File),
+        z.string(),
+        z.null(),
+        z.object({
+          url: z.string(),
+          publicId: z.string(),
+          order: z.number(),
+        }),
+      ])
+      .optional(),
+  })
+  .refine(
+    (data) => {
+      if (!data.startedAt || !data.endedAt) return true; // 비워있으면 패스
+      const start = new Date(data.startedAt);
+      const end = new Date(data.endedAt);
+      // 날짜만 비교
+      return start.setHours(0, 0, 0, 0) !== end.setHours(0, 0, 0, 0);
+    },
+    {
+      message: '시작일과 종료일은 같을 수 없습니다.',
+      path: ['endedAt'], // 에러를 endedAt에 표시
+    },
+  );
 export type OrderRoundDailogForm = z.infer<typeof orderRoundSchema>;
 
 interface OrderRoundFormProps {
@@ -93,6 +108,7 @@ function OrderRoundForm({ currentValues, no, onSuccess, submitFn }: OrderRoundFo
   const startedAt = form.watch('startedAt');
   const { data: breads, isError, isLoading } = useGetBreadsQuery();
   const [selectedBreads, setSelectedBreads] = useState<{ no: number; name: string }[] | []>([]);
+  const { data: orderRoundsList } = useOrderRoundsQuery();
 
   const onSubmit = async (data: OrderRoundDailogForm) => {
     const formData = new FormData();
@@ -142,7 +158,7 @@ function OrderRoundForm({ currentValues, no, onSuccess, submitFn }: OrderRoundFo
     value: string,
     name: 'startedAt' | 'endedAt',
   ) {
-    const currentDate = form.getValues('startedAt') || new Date();
+    const currentDate = form.getValues(name) || new Date();
     let newDate = new Date(currentDate);
 
     if (type === 'hour') {
@@ -271,7 +287,7 @@ function OrderRoundForm({ currentValues, no, onSuccess, submitFn }: OrderRoundFo
           control={form.control}
           name="startedAt"
           render={({ field }) => (
-            <FormItem className="flex">
+            <FormItem className="flex flex-wrap">
               <FormLabel className="whitespace-nowrap pr-2 py-3 flex-1/4">
                 <strong className="text-red-500">*</strong> 시작일
               </FormLabel>
@@ -298,10 +314,36 @@ function OrderRoundForm({ currentValues, no, onSuccess, submitFn }: OrderRoundFo
                   <PopoverContent className="w-auto p-0">
                     <div className="sm:flex">
                       <Calendar
+                        locale={ko}
                         disabled={(date) => {
                           const today = new Date();
                           today.setHours(0, 0, 0, 0);
-                          return date <= today;
+
+                          return (
+                            date <= today || // 오늘 이전 날짜
+                            orderRoundsList!.some(({ startedAt, endedAt }) => {
+                              const start = new Date(startedAt);
+                              start.setHours(0, 0, 0, 0);
+                              const end = new Date(endedAt);
+                              end.setHours(0, 0, 0, 0);
+
+                              // currentValues가 있을 경우, 해당 구간은 제외
+                              if (currentValues) {
+                                const currentStart = new Date(currentValues.startedAt!);
+                                const currentEnd = new Date(currentValues.endedAt!);
+                                currentStart.setHours(0, 0, 0, 0);
+                                currentEnd.setHours(0, 0, 0, 0);
+
+                                // 편집 중인 구간이면 disabled 아님
+                                if (date >= currentStart && date <= currentEnd) {
+                                  return false;
+                                }
+                              }
+
+                              // 기존 예약 구간과 겹치면 disabled
+                              return date >= start && date <= end;
+                            })
+                          );
                         }}
                         mode="single"
                         selected={field.value}
@@ -380,7 +422,7 @@ function OrderRoundForm({ currentValues, no, onSuccess, submitFn }: OrderRoundFo
                   </PopoverContent>
                 </Popover>
               </div>
-              <FormMessage />
+              <FormMessage className="ml-auto" />
             </FormItem>
           )}
         />
@@ -388,7 +430,7 @@ function OrderRoundForm({ currentValues, no, onSuccess, submitFn }: OrderRoundFo
           control={form.control}
           name="endedAt"
           render={({ field }) => (
-            <FormItem className="flex">
+            <FormItem className="flex flex-wrap">
               <FormLabel className="whitespace-nowrap pr-2 py-3 flex-1/4">
                 <strong className="text-red-500">*</strong> 종료일
               </FormLabel>
@@ -416,6 +458,7 @@ function OrderRoundForm({ currentValues, no, onSuccess, submitFn }: OrderRoundFo
                   <PopoverContent className="w-auto p-0">
                     <div className="sm:flex">
                       <Calendar
+                        locale={ko}
                         disabled={(date) => {
                           const startDate = form.getValues().startedAt;
                           if (!startDate) return true;
@@ -505,7 +548,7 @@ function OrderRoundForm({ currentValues, no, onSuccess, submitFn }: OrderRoundFo
                   </PopoverContent>
                 </Popover>
               </div>
-              <FormMessage />
+              <FormMessage className="ml-auto" />
             </FormItem>
           )}
         />
