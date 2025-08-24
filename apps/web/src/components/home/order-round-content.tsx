@@ -20,14 +20,14 @@ interface IOrderRoundProps {
   };
 }
 
-export default function OrderContent({ data }: IOrderRoundProps) {
+export default function OrderRoundContent({ data }: IOrderRoundProps) {
   const navigate = useNavigate();
   const { addToast } = useToast();
 
   // 주문차수 진행여부(run), 남는시간정보(remaningTime)
   const { run: isRun, remaningTime } = useCountDownTimer(
-    data?.startedAt?.toString(),
-    data?.endedAt?.toString(),
+    data?.startedAt?.toString() ?? '',
+    data?.endedAt?.toString() ?? '',
   );
 
   /**
@@ -46,7 +46,7 @@ export default function OrderContent({ data }: IOrderRoundProps) {
 
     // 주문차수 파라미터와 함께 전달
     navigate({
-      to: '/order/$orderRoundNo',
+      to: '/order-round/$orderRoundNo',
       params: { orderRoundNo: String(data.no) },
     });
   };

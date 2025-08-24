@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import BreadSearch from '../products/bread-search';
 import type { BreadProps } from '@/interface/bread-interface';
 import { useQuery } from '@tanstack/react-query';
-import { getOrderRoundNow } from '@/services/order-round-apis';
 import { searchBreadList } from '@/services/order-apis';
 import ProductsLoading from '@/components/products/products-loading';
 import BreadCardDetail from '@/components/products/bread-card-detail';
+import { useGetOrderRoundNowQuery } from '@/hooks/use-order-round';
 
 export default function ProductsPage() {
   const [keyword, setKeyword] = useState<string>('');
@@ -18,14 +18,7 @@ export default function ProductsPage() {
     queryFn: searchBreadList,
   });
 
-  const {
-    isLoading: nowLoading,
-    data: nowData,
-    error: nowErr,
-  } = useQuery({
-    queryKey: ['getNowDateOrderRound'],
-    queryFn: getOrderRoundNow,
-  });
+  const { data: nowData, isLoading: nowLoading, isError: nowErr } = useGetOrderRoundNowQuery();
 
   /** 주문차수 빵 목록 조회 및 설정 */
   useEffect(() => {

@@ -1,10 +1,9 @@
-import useToast from '@/hooks/useToast';
-import { getOrderRoundNow } from '@/services/order-round-apis';
-import { useAccessTokenStore } from '@/store/session';
-import { useQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { User, NotepadText, LogIn, LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Link, useNavigate } from '@tanstack/react-router';
+import useToast from '@/hooks/useToast';
+import { useAccessTokenStore } from '@/store/session';
+import { User, NotepadText, LogIn, LogOut } from 'lucide-react';
+import { useGetOrderRoundNowQuery } from '@/hooks/use-order-round';
 
 export interface IOrderRoundProps {
   no: number;
@@ -26,23 +25,20 @@ export default function Header() {
   const { addToast } = useToast();
 
   // 현재 진행중인 주문차수 조회
-  const { isLoading, data: getData } = useQuery({
-    queryKey: ['getOrderRoundNow'],
-    queryFn: getOrderRoundNow,
-  });
+  const { isLoading, data: getData } = useGetOrderRoundNowQuery();
 
   useEffect(() => {
     getData && setData(getData.data);
   }, [getData]);
 
-  const onOrderMove = (no: number) => {
+  const moveToOrderRoundDetail = (no: number) => {
     navigate({
-      to: '/order/$orderRoundNo',
+      to: '/order-round/$orderRoundNo',
       params: { orderRoundNo: String(no) },
     });
   };
 
-  const onMypage = () => {
+  const moveToMypage = () => {
     if (!accessToken) {
       addToast({
         type: 'warning',
@@ -66,13 +62,13 @@ export default function Header() {
               size={20}
               strokeWidth={1}
               className="cursor-pointer"
-              onClick={() => onOrderMove(data.no)}
+              onClick={() => moveToOrderRoundDetail(data.no)}
             />
           ) : null}
 
           {accessToken ? (
             <>
-              <User strokeWidth={1} size={20} className="cursor-pointer" onClick={onMypage} />
+              <User strokeWidth={1} size={20} className="cursor-pointer" onClick={moveToMypage} />
               <Link to="/logout">
                 <LogOut strokeWidth={1} size={20} />
               </Link>

@@ -17,11 +17,11 @@ import { Route as JoinImport } from './routes/join'
 import { Route as IndexImport } from './routes/index'
 import { Route as CallbackKakaoImport } from './routes/callback.kakao'
 import { Route as SubPageProductsImport } from './routes/_sub-page/products'
-import { Route as SubPageOrderImport } from './routes/_sub-page/order'
 import { Route as SubPageFaqImport } from './routes/_sub-page/faq'
 import { Route as SubPageBrandImport } from './routes/_sub-page/brand'
+import { Route as SubPageOrderRoundIndexImport } from './routes/_sub-page/order-round/index'
 import { Route as SubPageMypageIndexImport } from './routes/_sub-page/mypage/index'
-import { Route as SubPageOrderOrderRoundNoImport } from './routes/_sub-page/order/$orderRoundNo'
+import { Route as SubPageOrderRoundOrderRoundNoImport } from './routes/_sub-page/order-round/$orderRoundNo'
 import { Route as SubPageMypagePasswordIndexImport } from './routes/_sub-page/mypage/password/index'
 import { Route as SubPageMypageOrderListIndexImport } from './routes/_sub-page/mypage/order-list/index'
 import { Route as SubPageMypageInfoIndexImport } from './routes/_sub-page/mypage/info/index'
@@ -67,12 +67,6 @@ const SubPageProductsRoute = SubPageProductsImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const SubPageOrderRoute = SubPageOrderImport.update({
-  id: '/_sub-page/order',
-  path: '/order',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const SubPageFaqRoute = SubPageFaqImport.update({
   id: '/_sub-page/faq',
   path: '/faq',
@@ -85,17 +79,24 @@ const SubPageBrandRoute = SubPageBrandImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const SubPageOrderRoundIndexRoute = SubPageOrderRoundIndexImport.update({
+  id: '/_sub-page/order-round/',
+  path: '/order-round/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const SubPageMypageIndexRoute = SubPageMypageIndexImport.update({
   id: '/_sub-page/mypage/',
   path: '/mypage/',
   getParentRoute: () => rootRoute,
 } as any)
 
-const SubPageOrderOrderRoundNoRoute = SubPageOrderOrderRoundNoImport.update({
-  id: '/$orderRoundNo',
-  path: '/$orderRoundNo',
-  getParentRoute: () => SubPageOrderRoute,
-} as any)
+const SubPageOrderRoundOrderRoundNoRoute =
+  SubPageOrderRoundOrderRoundNoImport.update({
+    id: '/_sub-page/order-round/$orderRoundNo',
+    path: '/order-round/$orderRoundNo',
+    getParentRoute: () => rootRoute,
+  } as any)
 
 const SubPageMypagePasswordIndexRoute = SubPageMypagePasswordIndexImport.update(
   {
@@ -184,13 +185,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SubPageFaqImport
       parentRoute: typeof rootRoute
     }
-    '/_sub-page/order': {
-      id: '/_sub-page/order'
-      path: '/order'
-      fullPath: '/order'
-      preLoaderRoute: typeof SubPageOrderImport
-      parentRoute: typeof rootRoute
-    }
     '/_sub-page/products': {
       id: '/_sub-page/products'
       path: '/products'
@@ -205,18 +199,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CallbackKakaoImport
       parentRoute: typeof rootRoute
     }
-    '/_sub-page/order/$orderRoundNo': {
-      id: '/_sub-page/order/$orderRoundNo'
-      path: '/$orderRoundNo'
-      fullPath: '/order/$orderRoundNo'
-      preLoaderRoute: typeof SubPageOrderOrderRoundNoImport
-      parentRoute: typeof SubPageOrderImport
+    '/_sub-page/order-round/$orderRoundNo': {
+      id: '/_sub-page/order-round/$orderRoundNo'
+      path: '/order-round/$orderRoundNo'
+      fullPath: '/order-round/$orderRoundNo'
+      preLoaderRoute: typeof SubPageOrderRoundOrderRoundNoImport
+      parentRoute: typeof rootRoute
     }
     '/_sub-page/mypage/': {
       id: '/_sub-page/mypage/'
       path: '/mypage'
       fullPath: '/mypage'
       preLoaderRoute: typeof SubPageMypageIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/_sub-page/order-round/': {
+      id: '/_sub-page/order-round/'
+      path: '/order-round'
+      fullPath: '/order-round'
+      preLoaderRoute: typeof SubPageOrderRoundIndexImport
       parentRoute: typeof rootRoute
     }
     '/_sub-page/mypage/order-list/$orderNo': {
@@ -266,18 +267,6 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
-interface SubPageOrderRouteChildren {
-  SubPageOrderOrderRoundNoRoute: typeof SubPageOrderOrderRoundNoRoute
-}
-
-const SubPageOrderRouteChildren: SubPageOrderRouteChildren = {
-  SubPageOrderOrderRoundNoRoute: SubPageOrderOrderRoundNoRoute,
-}
-
-const SubPageOrderRouteWithChildren = SubPageOrderRoute._addFileChildren(
-  SubPageOrderRouteChildren,
-)
-
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/join': typeof JoinRoute
@@ -285,11 +274,11 @@ export interface FileRoutesByFullPath {
   '/logout': typeof LogoutRoute
   '/brand': typeof SubPageBrandRoute
   '/faq': typeof SubPageFaqRoute
-  '/order': typeof SubPageOrderRouteWithChildren
   '/products': typeof SubPageProductsRoute
   '/callback/kakao': typeof CallbackKakaoRoute
-  '/order/$orderRoundNo': typeof SubPageOrderOrderRoundNoRoute
+  '/order-round/$orderRoundNo': typeof SubPageOrderRoundOrderRoundNoRoute
   '/mypage': typeof SubPageMypageIndexRoute
+  '/order-round': typeof SubPageOrderRoundIndexRoute
   '/mypage/order-list/$orderNo': typeof SubPageMypageOrderListOrderNoRoute
   '/mypage/address': typeof SubPageMypageAddressIndexRoute
   '/mypage/info': typeof SubPageMypageInfoIndexRoute
@@ -305,11 +294,11 @@ export interface FileRoutesByTo {
   '/logout': typeof LogoutRoute
   '/brand': typeof SubPageBrandRoute
   '/faq': typeof SubPageFaqRoute
-  '/order': typeof SubPageOrderRouteWithChildren
   '/products': typeof SubPageProductsRoute
   '/callback/kakao': typeof CallbackKakaoRoute
-  '/order/$orderRoundNo': typeof SubPageOrderOrderRoundNoRoute
+  '/order-round/$orderRoundNo': typeof SubPageOrderRoundOrderRoundNoRoute
   '/mypage': typeof SubPageMypageIndexRoute
+  '/order-round': typeof SubPageOrderRoundIndexRoute
   '/mypage/order-list/$orderNo': typeof SubPageMypageOrderListOrderNoRoute
   '/mypage/address': typeof SubPageMypageAddressIndexRoute
   '/mypage/info': typeof SubPageMypageInfoIndexRoute
@@ -326,11 +315,11 @@ export interface FileRoutesById {
   '/logout': typeof LogoutRoute
   '/_sub-page/brand': typeof SubPageBrandRoute
   '/_sub-page/faq': typeof SubPageFaqRoute
-  '/_sub-page/order': typeof SubPageOrderRouteWithChildren
   '/_sub-page/products': typeof SubPageProductsRoute
   '/callback/kakao': typeof CallbackKakaoRoute
-  '/_sub-page/order/$orderRoundNo': typeof SubPageOrderOrderRoundNoRoute
+  '/_sub-page/order-round/$orderRoundNo': typeof SubPageOrderRoundOrderRoundNoRoute
   '/_sub-page/mypage/': typeof SubPageMypageIndexRoute
+  '/_sub-page/order-round/': typeof SubPageOrderRoundIndexRoute
   '/_sub-page/mypage/order-list/$orderNo': typeof SubPageMypageOrderListOrderNoRoute
   '/_sub-page/mypage/address/': typeof SubPageMypageAddressIndexRoute
   '/_sub-page/mypage/info/': typeof SubPageMypageInfoIndexRoute
@@ -348,11 +337,11 @@ export interface FileRouteTypes {
     | '/logout'
     | '/brand'
     | '/faq'
-    | '/order'
     | '/products'
     | '/callback/kakao'
-    | '/order/$orderRoundNo'
+    | '/order-round/$orderRoundNo'
     | '/mypage'
+    | '/order-round'
     | '/mypage/order-list/$orderNo'
     | '/mypage/address'
     | '/mypage/info'
@@ -367,11 +356,11 @@ export interface FileRouteTypes {
     | '/logout'
     | '/brand'
     | '/faq'
-    | '/order'
     | '/products'
     | '/callback/kakao'
-    | '/order/$orderRoundNo'
+    | '/order-round/$orderRoundNo'
     | '/mypage'
+    | '/order-round'
     | '/mypage/order-list/$orderNo'
     | '/mypage/address'
     | '/mypage/info'
@@ -386,11 +375,11 @@ export interface FileRouteTypes {
     | '/logout'
     | '/_sub-page/brand'
     | '/_sub-page/faq'
-    | '/_sub-page/order'
     | '/_sub-page/products'
     | '/callback/kakao'
-    | '/_sub-page/order/$orderRoundNo'
+    | '/_sub-page/order-round/$orderRoundNo'
     | '/_sub-page/mypage/'
+    | '/_sub-page/order-round/'
     | '/_sub-page/mypage/order-list/$orderNo'
     | '/_sub-page/mypage/address/'
     | '/_sub-page/mypage/info/'
@@ -407,10 +396,11 @@ export interface RootRouteChildren {
   LogoutRoute: typeof LogoutRoute
   SubPageBrandRoute: typeof SubPageBrandRoute
   SubPageFaqRoute: typeof SubPageFaqRoute
-  SubPageOrderRoute: typeof SubPageOrderRouteWithChildren
   SubPageProductsRoute: typeof SubPageProductsRoute
   CallbackKakaoRoute: typeof CallbackKakaoRoute
+  SubPageOrderRoundOrderRoundNoRoute: typeof SubPageOrderRoundOrderRoundNoRoute
   SubPageMypageIndexRoute: typeof SubPageMypageIndexRoute
+  SubPageOrderRoundIndexRoute: typeof SubPageOrderRoundIndexRoute
   SubPageMypageOrderListOrderNoRoute: typeof SubPageMypageOrderListOrderNoRoute
   SubPageMypageAddressIndexRoute: typeof SubPageMypageAddressIndexRoute
   SubPageMypageInfoIndexRoute: typeof SubPageMypageInfoIndexRoute
@@ -426,10 +416,11 @@ const rootRouteChildren: RootRouteChildren = {
   LogoutRoute: LogoutRoute,
   SubPageBrandRoute: SubPageBrandRoute,
   SubPageFaqRoute: SubPageFaqRoute,
-  SubPageOrderRoute: SubPageOrderRouteWithChildren,
   SubPageProductsRoute: SubPageProductsRoute,
   CallbackKakaoRoute: CallbackKakaoRoute,
+  SubPageOrderRoundOrderRoundNoRoute: SubPageOrderRoundOrderRoundNoRoute,
   SubPageMypageIndexRoute: SubPageMypageIndexRoute,
+  SubPageOrderRoundIndexRoute: SubPageOrderRoundIndexRoute,
   SubPageMypageOrderListOrderNoRoute: SubPageMypageOrderListOrderNoRoute,
   SubPageMypageAddressIndexRoute: SubPageMypageAddressIndexRoute,
   SubPageMypageInfoIndexRoute: SubPageMypageInfoIndexRoute,
@@ -455,10 +446,11 @@ export const routeTree = rootRoute
         "/logout",
         "/_sub-page/brand",
         "/_sub-page/faq",
-        "/_sub-page/order",
         "/_sub-page/products",
         "/callback/kakao",
+        "/_sub-page/order-round/$orderRoundNo",
         "/_sub-page/mypage/",
+        "/_sub-page/order-round/",
         "/_sub-page/mypage/order-list/$orderNo",
         "/_sub-page/mypage/address/",
         "/_sub-page/mypage/info/",
@@ -485,24 +477,20 @@ export const routeTree = rootRoute
     "/_sub-page/faq": {
       "filePath": "_sub-page/faq.tsx"
     },
-    "/_sub-page/order": {
-      "filePath": "_sub-page/order.tsx",
-      "children": [
-        "/_sub-page/order/$orderRoundNo"
-      ]
-    },
     "/_sub-page/products": {
       "filePath": "_sub-page/products.tsx"
     },
     "/callback/kakao": {
       "filePath": "callback.kakao.tsx"
     },
-    "/_sub-page/order/$orderRoundNo": {
-      "filePath": "_sub-page/order/$orderRoundNo.tsx",
-      "parent": "/_sub-page/order"
+    "/_sub-page/order-round/$orderRoundNo": {
+      "filePath": "_sub-page/order-round/$orderRoundNo.tsx"
     },
     "/_sub-page/mypage/": {
       "filePath": "_sub-page/mypage/index.tsx"
+    },
+    "/_sub-page/order-round/": {
+      "filePath": "_sub-page/order-round/index.tsx"
     },
     "/_sub-page/mypage/order-list/$orderNo": {
       "filePath": "_sub-page/mypage/order-list/$orderNo.tsx"

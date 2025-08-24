@@ -24,6 +24,7 @@ export const getFormattedMobile = (value: string) => {
  * @param date Date 객체
  * @returns '2025-08-14' 형태 문자열
  */
-export function formatDate(date: Date): string {
+export function formatDate(date?: Date): string {
+  if (!date) return '';
   return format(date, 'yyyy-MM-dd');
 }
