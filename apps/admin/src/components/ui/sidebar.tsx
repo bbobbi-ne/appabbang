@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 const items = [
-  { title: '홈', url: '/dashboard', icon: <Home /> },
+  // { title: '홈', url: '/dashboard', icon: <Home /> },
   { title: '빵관리', url: '/dashboard/breads', icon: <Receipt /> },
   { title: '주문관리', url: '/dashboard/orders', icon: <ClipboardList /> },
   { title: '결제관리', url: '/dashboard/payment', icon: <CreditCard /> },
