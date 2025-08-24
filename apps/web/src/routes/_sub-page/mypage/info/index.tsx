@@ -5,7 +5,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import SubLayout from '@/components/templates/sub-layout';
 import InfoPage from '@/components/pages/info-page';
-import CustomerInfoCard from '@/components/mypage/customer-info-card';
+import MypageLayout from '@/components/templates/mypage-layout';
 
 export const Route = createFileRoute('/_sub-page/mypage/info/')({
   component: RouteComponent,
@@ -14,8 +14,9 @@ export const Route = createFileRoute('/_sub-page/mypage/info/')({
 function RouteComponent() {
   return (
     <SubLayout title="마이페이지">
-      <CustomerInfoCard />
-      <InfoPage />
+      <MypageLayout>
+        <InfoPage />
+      </MypageLayout>
     </SubLayout>
   );
 }

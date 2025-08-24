@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { toast } from '@appabbang/ui';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import {
   Button,
   Dialog,
@@ -10,30 +9,25 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@appabbang/ui';
-import { MyService } from '@/services/api/my-service';
 import type { addresssDailogForm } from '@/validate/address-form.schema';
 import AddressForm from './address-form';
+import { useCreateAddressMutation } from '@/hooks/use-my';
 
 export default function AddressCreateDialog() {
   const [open, setOpen] = useState(false);
-  const queryClient = useQueryClient();
-  const { createAddress } = MyService;
-
-  const createMutation = useMutation({
-    mutationFn: (data: addresssDailogForm) => createAddress(data),
-    onSuccess: () => {
-      toast.success('배송지가 추가되었습니다.');
-      queryClient.invalidateQueries({ queryKey: ['getAddresses'] });
-      setOpen(false);
-    },
-    onError: (error) => toast.error(error.message),
-  });
+  const createMutation = useCreateAddressMutation();
 
   /**
    * 배송지 저장
    */
   const create = async (data: addresssDailogForm) => {
-    await createMutation.mutateAsync(data);
+    try {
+      await createMutation.mutateAsync(data);
+      toast.success('배송지가 추가되었습니다.');
+      setOpen(false);
+    } catch (error: any) {
+      toast.error(error.message);
+    }
   };
 
   return (

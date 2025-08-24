@@ -1,17 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
-import type { AddressListData as AddressListDataOrigin } from '@/api/data-contracts';
+import type { AddressesListData } from '@/api/data-contracts';
 import AddressCreateDialog from '@/components/mypage/address-create-dialog';
 import AddressModifyDialog from '../mypage/address-modify-dialog';
 import { Badge, Skeleton } from '@appabbang/ui';
+import {
+  useDeleteAddressMutation,
+  useGetAddressListQuery,
+  useUpdateAddressMutation,
+} from '@/hooks/use-my';
 import { formatMobile } from '@appabbang/utils';
-import { MyService } from '@/services/api/my-service';
 
 export default function AddressPage() {
-  const { getAddressList } = MyService;
-  const { data, isLoading } = useQuery({
-    queryKey: ['getAddresses'],
-    queryFn: getAddressList,
-  });
+  const { data, isLoading } = useGetAddressListQuery();
 
   return (
     <>
@@ -45,11 +44,25 @@ export default function AddressPage() {
   );
 }
 
-const AddressList = ({ data }: { data: AddressListData | undefined }) => {
+const AddressList = ({ data }: { data: AddressesListData | undefined }) => {
+  const updateMutation = useUpdateAddressMutation();
+  const deleteMutation = useDeleteAddressMutation();
+
   return (
     <>
       {data?.map((item) => (
-        <AddressModifyDialog key={item.no} data={item}>
+        <AddressModifyDialog
+          key={item.no}
+          data={item}
+          update={{
+            mutationAsync: updateMutation.mutateAsync,
+            isSubmitting: updateMutation.isPending,
+          }}
+          remove={{
+            mutationAsync: deleteMutation.mutateAsync,
+            isSubmitting: deleteMutation.isPending,
+          }}
+        >
           <div className="border-b p-2 cursor-pointer flex flex-col gap-2 hover:bg-muted">
             <div className="flex items-center gap-4">
               <p className="font-bold">{item.recipientName}</p>
@@ -66,5 +79,3 @@ const AddressList = ({ data }: { data: AddressListData | undefined }) => {
     </>
   );
 };
-
-export type AddressListData = (Partial<AddressListDataOrigin[number]> & { isDefault: boolean })[];

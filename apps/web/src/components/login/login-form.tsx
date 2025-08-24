@@ -15,8 +15,10 @@ import {
   PasswordInput,
 } from '@appabbang/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
+
+const labelMinWidth = 'min-w-[100px]';
 
 /** 로그인 폼 */
 function LoginForm() {
@@ -49,7 +51,10 @@ function LoginForm() {
           name="id"
           render={({ field }) => (
             <FormItem className="flex items-center">
-              <FormLabel errorCheck={false} className={`whitespace-nowrap px-2 py-3 flex-1/4`}>
+              <FormLabel
+                errorCheck={false}
+                className={`${labelMinWidth} whitespace-nowrap px-2 py-3 flex-1/4`}
+              >
                 아이디
               </FormLabel>
 
@@ -68,7 +73,10 @@ function LoginForm() {
           name="pw"
           render={({ field }) => (
             <FormItem className="flex items-center">
-              <FormLabel errorCheck={false} className={`whitespace-nowrap px-2 py-3 flex-1/4 `}>
+              <FormLabel
+                errorCheck={false}
+                className={`${labelMinWidth} whitespace-nowrap px-2 py-3 flex-1/4 `}
+              >
                 비밀번호
               </FormLabel>
 
@@ -101,12 +109,19 @@ function LoginForm() {
           )}
         />
 
-        <div
-          className="text-gray-500 text-[15px] text-right mt-10 mb-3 cursor-pointer"
-          onClick={() => navigate({ to: '/join' })}
-        >
-          아직 회원이 아니신가요? 회원가입 이동하기
-        </div>
+        <p className="text-right pt-2 pb-4 flex flex-col gap-2">
+          <Link className="text-gray-500 text-xs hover:underline" to="/join">
+            아직 회원이 아니신가요? 회원가입하러가기
+          </Link>
+          {/* <div className="flex justify-end gap-2">
+            <Link className="text-gray-500 text-xs hover:underline" to="/find-id">
+              아이디찾기
+            </Link>
+            <Link className="text-gray-500 text-xs hover:underline" to="/find-pw">
+              비밀번호찾기
+            </Link>
+          </div> */}
+        </p>
         <Button className="w-full" type="submit">
           로그인
         </Button>

@@ -443,14 +443,20 @@ export const updateMyAddressValidator = [
     .withMessage('boolean 타입이어야 합니다.'),
 ];
 
-/** 배송지 삭제 validate */
-export const deleteMyAddressValidator = [
+/** 주문 배송지 수정 validate */
+export const updateOrderAddressValidator = [
   param('no')
     .exists()
     .withMessage('no는 필수입니다')
     .isInt()
     .toInt()
     .withMessage('no 를 올바르게 입력해주세요.'),
+  body('address').trim().notEmpty().withMessage('address는 필수입니다'),
+  body('addressDetail').trim().notEmpty().withMessage('addressDetail는 필수입니다'),
+  body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
+  body('message').trim().notEmpty().withMessage('message는 필수입니다'),
+  body('recipientName').trim().notEmpty().withMessage('recipientName은 필수입니다'),
+  body('recipientMobile').trim().notEmpty().withMessage('recipientMobile은 필수입니다'),
 ];
 
 /** 쿠폰 생성 validate */
@@ -514,4 +520,25 @@ export const issueCouponValidator = [
     .isArray({ min: 1 })
     .withMessage('noList는 하나 이상의 요소를 가진 배열이어야 합니다.'),
   body('noList.*').isInt().toInt().withMessage('noList 안의 값은 정수여야 합니다.'),
+];
+
+/** 파라미터 조회 validate */
+export const paramsNoValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+];
+
+/** 주문 취소 validate */
+export const cancelOrderValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  body('canceledReason').trim().notEmpty().withMessage('canceledReason는 필수입니다'),
 ];

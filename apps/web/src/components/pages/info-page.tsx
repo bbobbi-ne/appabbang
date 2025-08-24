@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
-import InfoForm from '../mypage/info-form';
-import { getCustomerInfo } from '@/services/customer-apis';
-import { useQuery } from '@tanstack/react-query';
+import InfoForm from '@/components/mypage/info-form';
+import { useGetCustomerInfoQuery, useUpdateCustomerMutation } from '@/hooks/use-my';
+import Loading from '@/components/common/loading';
 
 interface IAddressProps {
   no: number;
@@ -37,19 +36,16 @@ export interface ICustomerProps {
 
 // 마이페이지 정보 페이지
 export default function InfoPage() {
-  const [customer, setCustomer] = useState();
+  const { data, isSuccess } = useGetCustomerInfoQuery();
+  const updateCustomerMutation = useUpdateCustomerMutation();
 
-  /**
-   * 고객 상세정보 조회
-   */
-  const { isLoading, data } = useQuery({
-    queryKey: ['getCustomerInfo'],
-    queryFn: getCustomerInfo,
-  });
+  if (!isSuccess) return <Loading />;
 
-  useEffect(() => {
-    !isLoading && setCustomer(data.customer);
-  }, [data]);
-
-  return <InfoForm customer={customer} />;
+  return (
+    <InfoForm
+      customer={data?.customer}
+      updateMutation={updateCustomerMutation.mutateAsync}
+      isSubmitting={updateCustomerMutation.isPending}
+    />
+  );
 }

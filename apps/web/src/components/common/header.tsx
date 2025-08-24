@@ -1,10 +1,9 @@
-import useToast from '@/hooks/useToast';
-import { getOrderRoundNow } from '@/services/order-round-apis';
-import { useAccessTokenStore } from '@/store/session';
-import { useQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { User, ScrollText, LogIn, LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Link, useNavigate } from '@tanstack/react-router';
+import useToast from '@/hooks/useToast';
+import { useAccessTokenStore } from '@/store/session';
+import { User, NotepadText, LogIn, LogOut } from 'lucide-react';
+import { useGetOrderRoundNowQuery } from '@/hooks/use-order-round';
 
 export interface IOrderRoundProps {
   no: number;
@@ -20,29 +19,21 @@ export interface IOrderRoundProps {
 }
 
 export default function Header() {
-  const [data, setData] = useState<IOrderRoundProps>();
   const navigate = useNavigate();
   const { accessToken } = useAccessTokenStore();
   const { addToast } = useToast();
 
   // 현재 진행중인 주문차수 조회
-  const { isLoading, data: getData } = useQuery({
-    queryKey: ['getOrderRoundNow'],
-    queryFn: getOrderRoundNow,
-  });
+  const { isLoading, data } = useGetOrderRoundNowQuery();
 
-  useEffect(() => {
-    getData && setData(getData.data);
-  }, [getData]);
-
-  const onOrderMove = (no: number) => {
+  const moveToOrderRoundDetail = (no: number) => {
     navigate({
-      to: '/order/$orderRoundNo',
+      to: '/order-round/$orderRoundNo',
       params: { orderRoundNo: String(no) },
     });
   };
 
-  const onMypage = () => {
+  const moveToMypage = () => {
     if (!accessToken) {
       addToast({
         type: 'warning',
@@ -60,27 +51,26 @@ export default function Header() {
       {/* 헤더 전체 가운데 정렬 */}
       <div className="container mx-auto px-2">
         {/* 1 ROW : 아이콘 메뉴 (주문서, 마이페이지, 로그인, 로그아웃) */}
-        <nav className="flex items-center justify-end py-2 bg-background">
+        <nav className="flex items-center justify-end gap-2 lg:gap-4 py-2 bg-background">
           {!isLoading && data ? (
-            <ScrollText
+            <NotepadText
+              size={20}
               strokeWidth={1}
-              size={16}
-              className="text-primary hover:text-foreground cursor-pointer"
-              onClick={() => onOrderMove(data.no)}
+              className="cursor-pointer"
+              onClick={() => moveToOrderRoundDetail(data.no)}
             />
           ) : null}
 
-          <div className="px-2 text-xs cursor-pointer" onClick={onMypage}>
-            <User strokeWidth={1} size={16} className="text-primary hover:text-foreground" />
-          </div>
-
           {accessToken ? (
-            <Link to="/logout" className="px-2 text-xs">
-              <LogOut strokeWidth={1} size={16} className="text-primary hover:text-foreground" />
-            </Link>
+            <>
+              <User strokeWidth={1} size={20} className="cursor-pointer" onClick={moveToMypage} />
+              <Link to="/logout">
+                <LogOut strokeWidth={1} size={20} />
+              </Link>
+            </>
           ) : (
-            <Link to="/login" className="px-2 text-xs">
-              <LogIn strokeWidth={1} size={16} className="text-primary hover:text-foreground" />
+            <Link to="/login">
+              <LogIn strokeWidth={1} size={20} />
             </Link>
           )}
         </nav>
@@ -98,24 +88,27 @@ export default function Header() {
           />
 
           {/* 메뉴 */}
-          <nav>
+          <nav className="flex items-center gap-4 lg:gap-8">
             <Link
               to="/brand"
-              className="px-2 text-sm text-primary hover:text-foreground whitespace-nowrap"
+              className="text-sm lg:text-base whitespace-nowrap relative transition-all duration-300 ease-in-out group"
             >
-              브랜드 소개
+              아빠빵 소개
+              <span className="absolute bottom-[-4px] left-0 w-0 h-1 bg-secondary rounded-sm transition-all duration-300 ease-in-out group-hover:w-full"></span>
             </Link>
             <Link
               to="/products"
-              className="px-2 text-sm text-primary hover:text-foreground whitespace-nowrap"
+              className="text-sm lg:text-base whitespace-nowrap relative transition-all duration-300 ease-in-out group"
             >
               제품 소개
+              <span className="absolute bottom-[-4px] left-0 w-0 h-1 bg-secondary rounded-sm transition-all duration-300 ease-in-out group-hover:w-full"></span>
             </Link>
             <Link
               to="/faq"
-              className="px-2 text-sm text-primary hover:text-foreground whitespace-nowrap"
+              className="text-sm lg:text-base whitespace-nowrap relative transition-all duration-300 ease-in-out group"
             >
               자주묻는질문
+              <span className="absolute bottom-[-4px] left-0 w-0 h-1 bg-secondary rounded-sm transition-all duration-300 ease-in-out group-hover:w-full"></span>
             </Link>
           </nav>
         </div>

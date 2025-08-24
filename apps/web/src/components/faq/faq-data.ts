@@ -6,6 +6,7 @@
 export const faqList = [
   {
     category: 'product',
+    name: '제품문의',
     data: [
       {
         question: '알레르기 유발 성분이 포함되어 있나요?',
@@ -35,6 +36,7 @@ export const faqList = [
   },
   {
     category: 'orderPayment',
+    name: '주문 및 결제',
     data: [
       {
         question: '어떤 결제 수단을 지원하나요?',
@@ -54,25 +56,23 @@ export const faqList = [
   },
   {
     category: 'deliveryPackage',
+    name: '배송 및 포장',
     data: [
       {
         question: '배송은 어떻게 이루어지나요?',
         answer:
-          '주문하신 제품은 신선도 유지를 위해 개별 포장 후 안전 완충재와 함께 포장되어 택배 발송됩니다. 일반적으로 발송일로부터 1~2일 내 수령이 가능합니다.',
+          '주문하신 제품은 신선도 유지를 위해 개별 포장 후 안전 완충재와 함께 포장되어 택배 발송됩니다. 일반적으로 발송일로부터 영업일기준 1~2일 내 수령이 가능합니다.',
       },
       {
         question: '원하는 날짜에 받을 수 있나요?',
         answer:
           '예약 주문 시스템은 현재 준비 중이며, 특정 날짜 수령을 원하시는 경우 문의를 통해 가능 여부를 확인해 주세요.',
       },
-      {
-        question: '배송비는 얼마인가요?',
-        answer: 'asdf',
-      },
     ],
   },
   {
     category: 'etc',
+    name: '기타',
     data: [
       {
         question: '제품에 문제가 있을 경우 어떻게 하나요?',

@@ -1,6 +1,12 @@
 import { prisma } from '@/lib/prisma';
 import { AppError } from '@/types';
 import { Address } from '@prisma/client';
+import { commonCodeMap } from './common-code.service';
+
+/** 코드 조회 */
+export const getCodeName = (code: string): string => {
+  return commonCodeMap.orderStatusMap.get(code) || '-';
+};
 
 /** 내 정보 상세정보 조회 */
 export const getMyInfo = async (no: number) => {
@@ -75,15 +81,15 @@ export const getOrderAccumulatedAmount = async (no: number) => {
 /**
  * 내 정보 수정
  */
-export const update = async (data: {
-  id: string;
-  name: string;
-  mobileNumber: string;
-  createdAt: string;
-}) => {
+export const update = async (
+  no: number,
+  data: {
+    mobileNumber: string;
+  },
+) => {
   const result = await prisma.$transaction(async (tx) => {
     const updateCustomer = await tx.customer.update({
-      where: { id: data.id },
+      where: { no },
       data: { mobileNumber: data.mobileNumber },
     });
 
@@ -211,7 +217,7 @@ export const deleteAddress = async (no: number, customerNo: number) => {
   await prisma.address.delete({ where: { no, customerNo } });
 };
 
-/** 내 주문내역 목록 */
+/** 내 주문 목록 */
 export const getOrders = async (customerNo: number) => {
   const result = await prisma.$transaction(async (tx) => {
     const now = new Date();
@@ -219,6 +225,21 @@ export const getOrders = async (customerNo: number) => {
     oneYearAgo.setFullYear(now.getFullYear() - 1);
 
     const list = await tx.order.findMany({
+      select: {
+        no: true,
+        orderNumber: true,
+        orderStatus: true,
+        createdAt: true,
+        orderItems: {
+          select: {
+            no: true,
+            breadImageUrl: true,
+            breadName: true,
+            unitPrice: true,
+            quantity: true,
+          },
+        },
+      },
       where: {
         customerNo,
         createdAt: {
@@ -226,11 +247,14 @@ export const getOrders = async (customerNo: number) => {
           lte: now, // 현재일자까지
         },
       },
-      include: { orderItems: true },
+      // include: { orderItems: true },
       orderBy: { no: 'desc' },
     });
 
-    return list;
+    return list.map((item) => ({
+      ...item,
+      orderStatusName: getCodeName(item.orderStatus),
+    }));
   });
 
   return result;
@@ -238,16 +262,115 @@ export const getOrders = async (customerNo: number) => {
 
 /** 내 주문 조회 */
 export const getOrder = async (no: number) => {
-  const result = await prisma.$transaction(async (tx) => {
-    const data = await tx.order.findFirst({
-      where: { no },
-      include: {
-        orderItems: true,
+  const order = await prisma.order.findUnique({
+    where: { no },
+    select: {
+      no: true,
+      orderNumber: true,
+      orderStatus: true,
+      createdAt: true,
+      totalPrice: true,
+      deliveryMethodFee: true,
+      discountAmount: true,
+      orderItems: {
+        select: {
+          no: true,
+          breadName: true,
+          breadImageUrl: true,
+          unitPrice: true,
+          totalPrice: true,
+          quantity: true,
+        },
       },
-    });
-
-    return data;
+      address: true,
+      addressDetail: true,
+      zipcode: true,
+      message: true,
+      recipientName: true,
+      recipientMobile: true,
+      ordererName: true,
+      ordererMobile: true,
+      deliveryTypeCode: true,
+    },
   });
 
+  if (!order) throw AppError.notFound('주문을 찾을 수 없습니다.');
+
+  return { ...order, orderStatusName: getCodeName(order.orderStatus) };
+};
+
+/** 내 주문 취소 */
+export const cancelOrder = async (no: number, canceledReason: string) => {
+  await prisma.$transaction(async (tx) => {
+    await tx.order.update({ where: { no }, data: { orderStatus: '50' } });
+    await tx.payment.update({ where: { orderNo: no }, data: { canceledReason } });
+  });
+};
+
+/** 내 주문 배송(수령) 조회 */
+export const getOrderDelivery = async (no: number) => {
+  const order = await prisma.order.findUnique({
+    where: { no },
+    select: {
+      no: true,
+      orderNumber: true,
+      orderStatus: true,
+      createdAt: true,
+      orderItems: {
+        select: {
+          no: true,
+          breadName: true,
+          breadImageUrl: true,
+          unitPrice: true,
+          quantity: true,
+        },
+      },
+      address: true,
+      addressDetail: true,
+      zipcode: true,
+      message: true,
+      recipientName: true,
+      recipientMobile: true,
+      deliveryMethodName: true,
+      deliveryTypeCode: true,
+      trackingNumber: true,
+    },
+  });
+
+  if (!order) throw AppError.notFound('주문을 찾을 수 없습니다.');
+
+  return { ...order, orderStatusName: getCodeName(order.orderStatus) };
+};
+
+/** 내 주문 배송지 조회 */
+export const getOrderAddress = async (no: number) => {
+  const order = await prisma.order.findUnique({ where: { no } });
+
+  if (!order) throw AppError.notFound('주문을 찾을 수 없습니다.');
+
+  const result = {
+    address: order.address,
+    addressDetail: order.addressDetail,
+    zipcode: order.zipcode,
+    message: order.message,
+    recipientName: order.recipientName,
+    recipientMobile: order.recipientMobile,
+  };
+
   return result;
+};
+
+/** 내 주문 배송지 수정 */
+export const updateOrderAddress = async (
+  no: number,
+  data: {
+    address: string;
+    addressDetail: string;
+    zipcode: string;
+    message: string;
+    recipientName: string;
+    recipientMobile: string;
+  },
+) => {
+  await prisma.order.update({ where: { no }, data });
 };

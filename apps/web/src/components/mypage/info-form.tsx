@@ -6,6 +6,7 @@ import { customerFormSchema, type CustomerFormSchema } from '@/validate/info-for
 import {
   Button,
   Card,
+  CardContent,
   Form,
   FormControl,
   FormField,
@@ -17,40 +18,37 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import type { ICustomerProps } from '../pages/info-page';
-import Loading from '../common/loading';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
-import { updateCustomer } from '@/services/customer-apis';
 import { formatMobile } from '@appabbang/utils';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import useToast from '@/hooks/useToast';
 
 interface InfoFormProps {
   customer?: ICustomerProps;
+  updateMutation: (data: CustomerFormSchema) => Promise<void>;
+  isSubmitting: boolean;
 }
 
 const labelMinWidth = 'min-w-[120px]';
 
-function InfoForm({ customer }: InfoFormProps) {
+export default function InfoForm({ customer, updateMutation, isSubmitting }: InfoFormProps) {
   const { addToast } = useToast();
-  const queryClient = useQueryClient();
-  const updateCustomerMutation = useMutation({
-    mutationFn: (data: CustomerFormSchema) => updateCustomer(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['getCustomerInfo'] });
+
+  const onSubmit: SubmitHandler<CustomerFormSchema> = async (data) => {
+    try {
+      await updateMutation(data);
 
       addToast({
         type: 'success',
-        message: '정상적으로 수정되었습니다.',
+        message: '변경되었습니다.',
       });
-    },
-    onError: (error) => {
+    } catch (error: any) {
       addToast({
         type: 'error',
         message: error.message,
       });
-    },
-  });
+    }
+  };
 
   useEffect(() => {
     if (customer) {
@@ -76,28 +74,18 @@ function InfoForm({ customer }: InfoFormProps) {
       : undefined,
   });
 
-  /**
-   * form submit
-   */
-  const onSubmit: SubmitHandler<CustomerFormSchema> = async (data) =>
-    await updateCustomerMutation.mutateAsync(data);
-
-  if (!customer) return <Loading />;
   return (
-    <div className="w-full flex flex-row items-center justify-center">
-      <Card className="p-10 flex flex-row items-center justify-center w-2/3">
+    <Card>
+      <CardContent className="pt-6">
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="w-2/3 *:m-2 *:has-[.submitBtn]:mt-5"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto max-w-lg space-y-4">
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem className="flex items-center">
                   <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
-                    <span className="text-red-700">*</span> 이름
+                    이름
                   </FormLabel>
 
                   <div className="w-full space-y-1">
@@ -123,7 +111,7 @@ function InfoForm({ customer }: InfoFormProps) {
               render={({ field }) => (
                 <FormItem className="flex items-center">
                   <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
-                    <span className="text-red-700">*</span> 아이디
+                    아이디
                   </FormLabel>
 
                   <div className="w-full space-y-1">
@@ -150,7 +138,7 @@ function InfoForm({ customer }: InfoFormProps) {
               render={({ field }) => (
                 <FormItem className="flex items-center">
                   <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
-                    <span className="text-red-700">*</span> 휴대번호
+                    <span className="text-destructive">*</span> 휴대번호
                   </FormLabel>
                   <div className="w-full space-y-1">
                     <FormControl>
@@ -177,7 +165,7 @@ function InfoForm({ customer }: InfoFormProps) {
               render={({ field }) => (
                 <FormItem className="flex items-center">
                   <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
-                    <span className="text-red-700 ml-2"></span> 가입일자
+                    가입일자
                   </FormLabel>
 
                   <div className="w-full space-y-1">
@@ -197,16 +185,14 @@ function InfoForm({ customer }: InfoFormProps) {
               )}
             />
 
-            <div>
-              <Button type="submit" className="rounded-2xl h-10 w-full font-bold submitBtn">
+            <div className="pt-8">
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
                 수정
               </Button>
             </div>
           </form>
         </Form>
-      </Card>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
-
-export default InfoForm;

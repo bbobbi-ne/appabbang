@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import PasswordPage from '@/components/pages/password-page';
 import SubLayout from '@/components/templates/sub-layout';
-import CustomerInfoCard from '@/components/mypage/customer-info-card';
+import MypageLayout from '@/components/templates/mypage-layout';
 
 export const Route = createFileRoute('/_sub-page/mypage/password/')({
   component: RouteComponent,
@@ -10,8 +10,9 @@ export const Route = createFileRoute('/_sub-page/mypage/password/')({
 function RouteComponent() {
   return (
     <SubLayout title="마이페이지">
-      <CustomerInfoCard />
-      <PasswordPage />
+      <MypageLayout>
+        <PasswordPage />
+      </MypageLayout>
     </SubLayout>
   );
 }

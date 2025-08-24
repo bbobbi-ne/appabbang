@@ -24,7 +24,7 @@ export const update = async (req: Request, res: Response) => {
       '고객정보 조회 과정에서 오류가 발생했습니다. 관리자 확인이 필요합니다.',
     );
 
-  const customer = await myService.update(req.body);
+  const customer = await myService.update(req.user.no, req.body);
   res.status(200).json({ customer });
 };
 
@@ -126,6 +126,7 @@ export const removeAddress = async (req: Request, res: Response) => {
   res.sendStatus(204);
 };
 
+// >>>>>> 주문 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 /** 내 주문내역 조회 */
 export const getOrders = async (req: Request, res: Response) => {
   const customerNo = req.user.no;
@@ -138,4 +139,61 @@ export const getOrder = async (req: Request, res: Response) => {
   const orderNo = Number(req.params.no);
   const order = await myService.getOrder(orderNo);
   res.status(200).json(order);
+};
+
+/** 내 주문 취소 */
+export const cancelOrder = async (req: Request, res: Response) => {
+  const orderNo = Number(req.params.no);
+  const { canceledReason } = req.body;
+
+  const order = await myService.getOrder(orderNo);
+  if (!order) throw AppError.notFound('주문을 찾을 수 없습니다.');
+
+  if (Number(order.orderStatus) !== 10 && Number(order.orderStatus) !== 11) {
+    throw AppError.badRequest('현재는 주문을 취소할 수 없습니다.');
+  }
+
+  await myService.cancelOrder(orderNo, canceledReason);
+
+  res.status(200).json({ message: '주문이 취소되었습니다.' });
+};
+
+/** 내 주문 배송(수령) 조회 */
+export const getOrderDelivery = async (req: Request, res: Response) => {
+  const orderNo = Number(req.params.no);
+  const orderDelivery = await myService.getOrderDelivery(orderNo);
+  res.status(200).json(orderDelivery);
+};
+
+/** 내 주문 배송지 조회 */
+export const getOrderAddress = async (req: Request, res: Response) => {
+  const orderNo = Number(req.params.no);
+  const address = await myService.getOrderAddress(orderNo);
+
+  res.status(200).json(address);
+};
+
+/** 내 주문 배송지 수정 */
+export const updateOrderAddress = async (req: Request, res: Response) => {
+  const orderNo = Number(req.params.no);
+  const { address, addressDetail, zipcode, message, recipientName, recipientMobile } = req.body;
+
+  const order = await myService.getOrder(orderNo);
+  if (!order) throw AppError.notFound('주문을 찾을 수 없습니다.');
+
+  // 10 또는 11 일때만 수정 가능
+  if (Number(order.orderStatus) !== 10 && Number(order.orderStatus) !== 11) {
+    throw AppError.badRequest('현재는 주문 배송지를 수정할 수 없습니다.');
+  }
+
+  await myService.updateOrderAddress(orderNo, {
+    address,
+    addressDetail,
+    zipcode,
+    message,
+    recipientName,
+    recipientMobile,
+  });
+
+  res.status(200).json({ message: '주문 배송지가 변경되었습니다.' });
 };

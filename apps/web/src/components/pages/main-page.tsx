@@ -1,27 +1,23 @@
-import { useQuery } from '@tanstack/react-query';
-import Infomation from '../home/infomation-content';
-import InstagramContent from '../home/instagram-content';
-import OrderContent from '../home/order-content';
-import SellPopularProducts from '../home/sell-popular-products-content';
-import { getLatest } from '@/services/order-round-apis';
-import MainLoading from '../home/loading';
-import Loading from '../common/loading';
+import Infomation from '@/components/home/infomation-content';
+import InstagramContent from '@/components/home/instagram-content';
+import OrderRoundContent from '@/components/home/order-round-content';
+import SellPopularProducts from '@/components/home/sell-popular-products-content';
+import MainLoading from '@/components/home/loading';
+import Loading from '@/components/common/loading';
+import { useGetOrderRoundLatestQuery } from '@/hooks/use-order-round';
 
 function MainPage() {
   /************************************************************************/
   /** APIs */
   /** 1. 최신 주문차수 조회 API */
-  const { isLoading, data, error } = useQuery({
-    queryKey: ['getLatest'],
-    queryFn: getLatest,
-  });
+  const { isLoading, data, error } = useGetOrderRoundLatestQuery();
   /************************************************************************/
   if (isLoading) return <MainLoading />;
-  if (error || !data?.data) return <Loading />;
+  if (error || !data) return <Loading />;
 
   return (
     <>
-      <OrderContent data={data?.data} />
+      <OrderRoundContent data={data} />
       <SellPopularProducts />
       <InstagramContent />
       <Infomation />

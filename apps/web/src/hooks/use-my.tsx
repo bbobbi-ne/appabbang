@@ -1,13 +1,38 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { MyService } from '@/services/api/my-service';
 
+/** 고객 정보 조회 */
+export function useGetCustomerInfoQuery() {
+  return useQuery({
+    queryKey: ['/my', '내 정보 조회'],
+    queryFn: MyService.getCustomerInfo,
+  });
+}
+
+/** 고객 정보 수정 */
+export function useUpdateCustomerMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { mobileNumber: string }) => MyService.updateCustomer(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/my', '내 정보 조회'] });
+    },
+  });
+}
+
+/** 고객 비밀번호 수정 */
+export function useUpdateCustomerPwMutation() {
+  return useMutation({
+    mutationFn: (data: { pw: string; pwModify: string }) => MyService.updateCustomerPw(data),
+  });
+}
+
 /** 배송지 목록 조회 */
 export function useGetAddressListQuery() {
   return useQuery({
     queryKey: ['/my/addresses', '마이페이지 > 배송지관리'],
     queryFn: () => MyService.getAddressList(),
-    staleTime: Infinity,
-    retry: 3,
   });
 }
 
@@ -16,8 +41,6 @@ export function useGetAddressOneQuery(no: number) {
   return useQuery({
     queryKey: [`/my/addresses/${no}`, '마이페이지 >배송지 상세'],
     queryFn: () => MyService.getAddressOne(no),
-    staleTime: Infinity,
-    retry: 3,
   });
 }
 
@@ -27,7 +50,7 @@ export function useCreateAddressMutation() {
   const createAddressMutation = useMutation({
     mutationFn: (data: any) => MyService.createAddress(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/my/addresses'] });
+      queryClient.invalidateQueries({ queryKey: ['/my/addresses', '마이페이지 > 배송지관리'] });
     },
     onError: (error) => {
       console.error(error);
@@ -38,12 +61,12 @@ export function useCreateAddressMutation() {
 }
 
 /** 배송지 수정 */
-export function useUpdateAddressMutation(no: number) {
+export function useUpdateAddressMutation() {
   const queryClient = useQueryClient();
   const updateAddressMutation = useMutation({
-    mutationFn: (data: any) => MyService.updateAddress(no, data),
+    mutationFn: ({ no, data }: { no: number; data: any }) => MyService.updateAddress(no, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/my/addresses'] });
+      queryClient.invalidateQueries({ queryKey: ['/my/addresses', '마이페이지 > 배송지관리'] });
     },
     onError: (error) => {
       console.error(error);
@@ -54,10 +77,10 @@ export function useUpdateAddressMutation(no: number) {
 }
 
 /** 배송지 삭제 */
-export function useDeleteAddressMutation(no: number) {
+export function useDeleteAddressMutation() {
   const queryClient = useQueryClient();
   const deleteAddressMutation = useMutation({
-    mutationFn: () => MyService.deleteAddress(no),
+    mutationFn: (no: number) => MyService.deleteAddress(no),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/my/addresses'] });
     },
@@ -67,4 +90,62 @@ export function useDeleteAddressMutation(no: number) {
   });
 
   return deleteAddressMutation;
+}
+
+/** 내 주문 목록 조회 */
+export function useGetOrdersQuery() {
+  return useQuery({
+    queryKey: ['/my/orders', '내 주문 목록 조회'],
+    queryFn: () => MyService.getOrders(),
+  });
+}
+
+/** 내 주문 상세 조회 */
+export function useGetOrderQuery(no: number) {
+  return useQuery({
+    queryKey: [`/my/order/${no}`, '내 주문 상세 조회'],
+    queryFn: () => MyService.getOrder(no),
+  });
+}
+
+/** 내 주문 취소 */
+export function useCancelOrderMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ no, data }: { no: number; data: { canceledReason: string } }) =>
+      MyService.cancelOrder(no, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/my/orders', '내 주문 목록 조회'] });
+    },
+  });
+}
+
+/** 내 주문 배송(수령) 조회 */
+export function useGetOrderDeliveryQuery(no: number) {
+  return useQuery({
+    queryKey: [`/my/order/${no}/delivery`, '내 주문 배송(수령) 조회'],
+    queryFn: () => MyService.getOrderDelivery(no),
+  });
+}
+
+/** 주문내역의 배송지 조회 */
+export function useGetOrderAddressQuery(no: number, enabled: boolean) {
+  return useQuery({
+    queryKey: [`/my/order/${no}/address`, '주문내역의 배송지 조회'],
+    queryFn: () => MyService.getOrderAddress(no),
+    enabled,
+  });
+}
+
+/** 주문내역의 배송지 수정 */
+export function useUpdateOrderAddressMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ no, data }: { no: number; data: any }) => MyService.updateOrderAddress(no, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [`/my/order/${variables.no}/address`, '주문내역의 배송지 조회'],
+      });
+    },
+  });
 }

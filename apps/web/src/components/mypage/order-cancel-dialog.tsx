@@ -2,6 +2,7 @@
  * 주문취소
  */
 
+import { useCancelOrderMutation } from '@/hooks/use-my';
 import {
   orderCancelFormSchema,
   type OrderCancelFormSchema,
@@ -21,21 +22,58 @@ import {
   DialogTitle,
   Form,
   DialogDescription,
-  cn,
 } from '@appabbang/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
+import { toast } from '@appabbang/ui';
 
 type Props = {
   children: React.ReactNode;
+  no: number;
 };
 
-export const btnCssStr = `bg-[#ffffff] text-[#202020] hover:bg-[#644a40] hover:text-[#ffffff]`;
-
-function OrderCalcenDialog({ children }: Props) {
+export default function OrderCalcenDialog({ children, no }: Props) {
   const [open, setOpen] = useState<boolean>(false);
+  const cancelOrderMutation = useCancelOrderMutation();
 
+  const cancelOrder = async (data: { canceledReason: string }) => {
+    try {
+      await cancelOrderMutation.mutateAsync({ no, data });
+      toast.success('주문이 취소되었습니다.');
+    } catch (error) {
+      toast.error('주문취소에 실패했습니다.');
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+
+      <DialogContent
+        onInteractOutside={(e) => {
+          e.preventDefault();
+        }}
+        className="overflow-y-auto max-h-11/12"
+      >
+        <DialogHeader>
+          <DialogTitle>주문을 취소하시겠습니까?</DialogTitle>
+          <DialogDescription>취소사유를 입력해야 취소진행이 가능합니다.</DialogDescription>
+        </DialogHeader>
+
+        <OrderCancelForm cancelOrder={cancelOrder} isSubmitting={cancelOrderMutation.isPending} />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+const OrderCancelForm = ({
+  cancelOrder,
+  isSubmitting,
+}: {
+  cancelOrder: (data: { canceledReason: string }) => Promise<void>;
+  isSubmitting: boolean;
+}) => {
   const defaultValues = {
     canceledReason: '', // 취소사유
   };
@@ -56,67 +94,45 @@ function OrderCalcenDialog({ children }: Props) {
   /**
    * form submit
    */
-  const onSubmit: SubmitHandler<OrderCancelFormSchema> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<OrderCancelFormSchema> = async (data) => {
+    await cancelOrder(data);
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent
-        onInteractOutside={(e) => {
-          e.preventDefault();
-        }}
-        className="overflow-y-auto max-h-11/12 flex flex-col"
-      >
-        <DialogHeader>
-          <DialogTitle className="leading-8">
-            <span className="mb-3 text-[18px] font-bold">주문을 취소하시겠습니까?</span>
-          </DialogTitle>
-          <DialogDescription>취소사유를 입력해야 취소진행이 가능합니다.</DialogDescription>
-        </DialogHeader>
+    <Form {...form}>
+      <form onSubmit={onFormHandler}>
+        <FormField
+          control={form.control}
+          name="canceledReason"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center gap-2 py-2">
+              <FormLabel htmlFor="canceledReason" errorCheck={false} className="w-24">
+                <span className="text-red-700">*</span> 취소사유
+              </FormLabel>
+              <div className="flex-1">
+                <FormControl>
+                  <Input
+                    {...field}
+                    id="canceledReason"
+                    placeholder="취소사유 입력"
+                    className="w-full"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs pt-1" />
+              </div>
+            </FormItem>
+          )}
+        />
 
-        <Form {...form}>
-          <form onSubmit={onFormHandler} className="*:m-2 *:has-[.submitBtn]:mt-5">
-            <FormField
-              control={form.control}
-              name="canceledReason"
-              render={({ field }) => (
-                <FormItem className="m-auto flex flex-row items-center justify-center">
-                  <FormLabel htmlFor="canceledReason" errorCheck={false} className="w-50">
-                    <span className="text-red-700">*</span> 취소사유
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      className="w-96"
-                      id="canceledReason"
-                      placeholder="취소사유 입력"
-                      {...field}
-                      onChange={(e) => field.onChange(e)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div>
-              <p className="text-red-700 text-[14px] text-left mt-10">
-                입금이 완료된 경우, 영업일 기준 3일 이내에 환불됩니다.
-              </p>
-              <Button
-                type="button"
-                onClick={() => setOpen(false)}
-                className={cn('w-full submitBtn', btnCssStr)}
-              >
-                주문취소
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+        <div>
+          <p className="text-destructive text-xs py-2">
+            입금이 완료된 경우, 영업일 기준 3일 이내에 환불됩니다.
+          </p>
+          <Button disabled={isSubmitting} className="w-full" variant="destructive">
+            주문취소
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
-}
-
-export default OrderCalcenDialog;
+};

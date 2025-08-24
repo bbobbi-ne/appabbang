@@ -20,14 +20,14 @@ interface IOrderRoundProps {
   };
 }
 
-export default function OrderContent({ data }: IOrderRoundProps) {
+export default function OrderRoundContent({ data }: IOrderRoundProps) {
   const navigate = useNavigate();
   const { addToast } = useToast();
 
   // 주문차수 진행여부(run), 남는시간정보(remaningTime)
   const { run: isRun, remaningTime } = useCountDownTimer(
-    data?.startedAt?.toString(),
-    data?.endedAt?.toString(),
+    data?.startedAt?.toString() ?? '',
+    data?.endedAt?.toString() ?? '',
   );
 
   /**
@@ -46,44 +46,41 @@ export default function OrderContent({ data }: IOrderRoundProps) {
 
     // 주문차수 파라미터와 함께 전달
     navigate({
-      to: '/order/$orderRoundNo',
+      to: '/order-round/$orderRoundNo',
       params: { orderRoundNo: String(data.no) },
     });
   };
 
   return (
     <div>
-      <div className="container mx-auto px-2 py-10 max-h-[500px] overflow-hidden">
+      <div className="container mx-auto px-2 py-10 overflow-hidden">
         <div className="flex flex-row justify-between gap-4 items-center">
           {/* 왼쪽 영역 */}
           <Card className="flex-1 rounded-lg overflow-hidden border-0 shadow-xl">
             <img
               // TODO: 주문차수 이미지가 없을때를 대비한 샘플 이미지 제작 필요
-              src={data?.image?.url ?? '/images/main-order-round-sample.png'}
+              src={data?.image?.url ?? '/images/main-order-round-no-img.png'}
               alt={data?.image?.name ?? '주문차수 이미지'}
-              className="w-full h-auto max-h-[400px] object-cover"
+              className="w-full h-auto object-cover"
             />
           </Card>
 
           {/* 오른쪽 영역 */}
           <div className="flex-1 flex flex-col gap-4">
             <div className="space-y-2">
-              <div className="text-2xl sm:text-4xl">
+              <div className="text-2xl lg:text-4xl">
                 {data?.no}차 주문 {isRun && '오픈!'}
               </div>
-              <p className="text-xs sm:text-base text-gray-500">
+              <p className="text-xs lg:text-base text-gray-500">
                 {isRun ? '망설이면 늦어요!' : `오픈 예정일: ${formatDate(data?.startedAt || '')}`}
               </p>
             </div>
 
             {isRun && (
-              <Card className="flex-1 border-0 shadow-xl p-4 space-y-4">
+              <Card className="flex-1 p-4 space-y-4 lg:space-y-12">
                 <div className="flex flex-row gap-2 items-end">
-                  <AlarmClock
-                    size={32}
-                    className="text-primary animate-bounce transition-all duration-300"
-                  />
-                  <p className="text-2xl sm:text-4xl">{remaningTime}</p>
+                  <AlarmClock size={28} className="animate-bounce transition-all duration-300" />
+                  <p className="text-2xl lg:text-4xl">{remaningTime}</p>
                 </div>
 
                 <Button className="block ml-auto" onClick={onClick}>

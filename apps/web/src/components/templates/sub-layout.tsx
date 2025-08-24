@@ -1,3 +1,5 @@
+import Title from '@/components/common/title';
+
 export default function SubLayout({
   children,
   title,
@@ -9,7 +11,7 @@ export default function SubLayout({
 }) {
   return (
     <div className="container mx-auto px-2 py-2">
-      {title && <h1 className="text-2xl text-center font-bold pt-4 pb-4">{title}</h1>}
+      {title && <Title title={title} />}
       {subTitle && <h3 className="text-center relative -top-5">{subTitle}</h3>}
       {children}
     </div>

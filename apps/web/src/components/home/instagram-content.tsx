@@ -1,8 +1,10 @@
+import Title from '@/components/common/title';
+
 export default function InstagramContent() {
   return (
     <div className="pt-20 pb-30">
       <div className="container mx-auto px-2">
-        <h3 className="text-2xl sm:text-4xl font-bold text-primary py-4 ml-8">Instagram</h3>
+        <Title title="Instagram" className="ml-8 text-left" />
         {/* 내용 */}
         <div className="flex flex-row gap-4 ml-8 mr-16">
           <div className="w-[40%] hover:*:shadow-2xl">

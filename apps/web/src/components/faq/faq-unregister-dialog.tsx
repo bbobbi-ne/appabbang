@@ -23,7 +23,6 @@ import {
   cn,
 } from '@appabbang/ui';
 import { Info } from 'lucide-react';
-import { btnCssStr } from './faq-menu-button';
 import { useState } from 'react';
 import useToast from '@/hooks/useToast';
 import { useNavigate } from '@tanstack/react-router';
@@ -40,7 +39,6 @@ function FaqUnregisterDialog({ children }: Props) {
 
   /** 회원탈퇴 */
   const onUnregister = () => {
-    // 회원탈퇴 로직 처리 필요
     if (!check)
       return addToast({
         type: 'error',
@@ -49,7 +47,7 @@ function FaqUnregisterDialog({ children }: Props) {
 
     addToast({
       type: 'success',
-      message: '그 동안 아빠빵을 이용해주셔서 감사합니다. 메인페이지로 이동합니다.',
+      message: '그 동안 아빠빵을 이용해주셔서 감사합니다. 🙇‍♀️ 메인페이지로 이동합니다.',
     });
 
     navigate({ to: '/' });
@@ -65,36 +63,42 @@ function FaqUnregisterDialog({ children }: Props) {
         className="overflow-y-auto max-h-11/12"
       >
         <DialogHeader>
-          <DialogTitle className="leading-8">
-            <span className="mb-3 text-[18px] font-bold">언제나 반가운 김가나님.</span>
-            <DialogDescription>
-              회원 탈퇴는 언제든 가능하지만, 한 번 더 고민하시는 건 어떤가요?
-            </DialogDescription>
-          </DialogTitle>
+          <DialogTitle>언제나 반가운 김가나님,</DialogTitle>
+          <DialogDescription>
+            회원 탈퇴는 언제든 가능하지만, 한 번 더 고민해보시는건 어떠신가요?
+          </DialogDescription>
         </DialogHeader>
 
-        <DialogTitle className="mt-10">아빠빵 서비스를 그만 받게 된다면 ...</DialogTitle>
+        <h3 className="text-base font-semibold pt-2">아빠빵 서비스를 그만 받게 된다면 ... 😭</h3>
+
         <Card>
-          <CardContent>
-            <p className="flex flex-row mt-5">
-              <Info className="text-[14px] mr-5" />
-              <span>보유하신 쿠폰이 함께 사라집니다.</span>
+          <CardContent className="p-6 flex flex-col gap-4">
+            <p className="flex flex-row items-center gap-2">
+              <Info className="text-destructive" />
+              <span className="text-sm">보유하신 쿠폰이 함께 사라집니다.</span>
             </p>
 
-            <p className="flex flex-row mt-5">
-              <Info className="text-[14px] mr-5" />
-              <span>현재 주문이 진행중인 고객님은 탈퇴가 어렵습니다.</span>
+            <p className="flex flex-row items-center gap-2">
+              <Info className="text-destructive" />
+              <span className="text-sm">
+                해당 계정으로는 더 이상 서비스를 이용하실 수 없습니다.
+              </span>
             </p>
 
-            <p className="flex flex-row mt-5">
-              <Info className="text-[14px] mr-5" />
-              <span>해당 계정으로는 더 이상 서비스를 이용하실 수 없습니다.</span>
+            <p className="flex flex-row items-center gap-2">
+              <Info className="text-destructive" />
+              <span className="text-sm">현재 주문이 진행중인 고객님은 탈퇴가 어렵습니다.</span>
             </p>
           </CardContent>
         </Card>
         <CardDescription>
           <Label className="flex items-center justify-end cursor-pointer ">
-            <Checkbox id="check" className="mr-2" />
+            <Checkbox
+              id="check"
+              className="mr-2"
+              checked={check}
+              onChange={() => setCheck((prev) => !prev)}
+            />
             <span onClick={() => setCheck((prev) => !prev)}>
               회원 탈퇴 유의사항을 확인하였으며, 이에 동의합니다.
             </span>
@@ -102,19 +106,36 @@ function FaqUnregisterDialog({ children }: Props) {
         </CardDescription>
 
         {/* 하단 버튼 */}
-        <div className="mt-15 flex flex-row gap-5">
-          <Button type="button" onClick={() => setOpen(false)} className={cn('w-full', btnCssStr)}>
+        <div className="pt-4 flex flex-row gap-5">
+          <Button
+            type="button"
+            onClick={() => setOpen(false)}
+            className={cn('w-full')}
+            variant="outline"
+          >
             뒤로가기
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" className="w-full">
+              <Button
+                variant="destructive"
+                className="w-full"
+                onClick={(e) => {
+                  if (!check) {
+                    e.preventDefault();
+                    addToast({
+                      type: 'error',
+                      message: '회원 탈퇴 유의사항을 동의해야 탈퇴가 가능합니다.',
+                    });
+                  }
+                }}
+              >
                 회원탈퇴
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent onClick={(e) => e.preventDefault()}>
               <AlertDialogHeader>
-                <AlertDialogTitle>정말로 회원 탈퇴하시겠습니까?</AlertDialogTitle>
+                <AlertDialogTitle>회원탈퇴를 하시겠습니까?</AlertDialogTitle>
                 <AlertDialogDescription></AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

@@ -3,11 +3,12 @@ import { asyncHandler } from '@/middlewares/error.middleware';
 import * as myController from '@/controllers/my.controller';
 import { requireCustomerOwner } from '@/middlewares/auth.middleware';
 import {
-  getMyAddressValidator,
   createMyAddressValidator,
   updateMyAddressValidator,
-  deleteMyAddressValidator,
   validate,
+  updateOrderAddressValidator,
+  cancelOrderValidator,
+  paramsNoValidator,
 } from '@/middlewares/validators/validate';
 import {
   updateCustomerPwValidator,
@@ -45,7 +46,7 @@ router.get('/addresses', requireCustomerOwner, asyncHandler(myController.getAddr
 router.get(
   '/addresses/:no',
   requireCustomerOwner,
-  getMyAddressValidator,
+  validate(paramsNoValidator),
   asyncHandler(myController.getAddressOne),
 );
 
@@ -53,7 +54,7 @@ router.get(
 router.post(
   '/addresses',
   requireCustomerOwner,
-  createMyAddressValidator,
+  validate(createMyAddressValidator),
   asyncHandler(myController.createAddress),
 );
 
@@ -61,7 +62,7 @@ router.post(
 router.put(
   '/addresses/:no',
   requireCustomerOwner,
-  updateMyAddressValidator,
+  validate(updateMyAddressValidator),
   asyncHandler(myController.updateAddress),
 );
 
@@ -69,7 +70,7 @@ router.put(
 router.delete(
   '/addresses/:no',
   requireCustomerOwner,
-  deleteMyAddressValidator,
+  validate(paramsNoValidator),
   asyncHandler(myController.removeAddress),
 );
 
@@ -78,6 +79,43 @@ router.delete(
 router.get('/orders', requireCustomerOwner, asyncHandler(myController.getOrders));
 
 /** GET /my/order/{no} : 내 상세주문 조회 */
-router.get('/order/:no', requireCustomerOwner, asyncHandler(myController.getOrder));
+router.get(
+  '/order/:no',
+  requireCustomerOwner,
+  validate(paramsNoValidator),
+  asyncHandler(myController.getOrder),
+);
+
+/** POST /my/order/{no}/cancel : 내 주문 취소 */
+router.post(
+  '/order/:no/cancel',
+  requireCustomerOwner,
+  validate(cancelOrderValidator),
+  asyncHandler(myController.cancelOrder),
+);
+
+/** GET /my/order/{no}/delivery : 내 주문배송(수령) 조회 */
+router.get(
+  '/order/:no/delivery',
+  requireCustomerOwner,
+  validate(paramsNoValidator),
+  asyncHandler(myController.getOrderDelivery),
+);
+
+/** GET /my/order/{no}/address : 내 주문 배송지 조회 */
+router.get(
+  '/order/:no/address',
+  requireCustomerOwner,
+  validate(paramsNoValidator),
+  asyncHandler(myController.getOrderAddress),
+);
+
+/** PUT /my/order/{no}/address : 내 주문 배송지 수정 */
+router.put(
+  '/order/:no/address',
+  requireCustomerOwner,
+  validate(updateOrderAddressValidator),
+  asyncHandler(myController.updateOrderAddress),
+);
 
 export default router;

@@ -9,10 +9,10 @@ interface BreadSearchProp {
 
 function BreadSearch({ keyword, onKeyDown, onChange, onClick }: BreadSearchProp) {
   return (
-    <div className="w-72 flex flex-row gap-2">
+    <div className="w-full max-w-80 flex flex-row gap-2 ml-auto">
       <Input
         type="text"
-        placeholder="빵이름을 입력하세요."
+        placeholder="빵이름을 입력해주세요."
         value={keyword}
         onChange={onChange}
         onKeyDown={onKeyDown}

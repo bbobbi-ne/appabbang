@@ -11,15 +11,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { customerOrderFormSchema, formSchema } from '@/validate/order-form-schema';
 import NonCustomerOrderForm from '@/components/order/non-customer-order-form';
 import { insertOrders, searchBankList, searchDeliveryList } from '@/services/order-apis';
-import { getOrderRound } from '@/services/order-round-apis';
 import type { CustomerOrderFormSchema, FormSchema } from '@/validate/order-form-schema';
 import useToast from '@/hooks/useToast';
 import { useParams } from '@tanstack/react-router';
 import { useAccessTokenStore } from '@/store/session';
 import CustomerOrderForm from '../order/customer-order-form';
+import { useGetOrderRoundNowQuery, useGetOrderRoundQuery } from '@/hooks/use-order-round';
 
 /** Main Function */
-export default function OrderPage() {
+export default function OrderRoundDetailPage() {
   const [orderRoundBreads, setOrderRoundBreads] = useState<BreadProps[]>([]); // 빵 목록
   const [paymentList, setPaymentList] = useState<BreadProps[]>([]); // 결제목록
   const [errMsg, setErrMsg] = useState<string>(''); // 에러메세지
@@ -29,7 +29,8 @@ export default function OrderPage() {
   const [min, setMin] = useState<number>(0); // 최소주문수량
   const [max, setMax] = useState<number>(0); // 최대주문수량
   // 메인페이지에서 넘어온 주문차수 파라미터
-  const { orderRoundNo } = useParams({ from: '/_sub-page/order/$orderRoundNo' });
+  const { orderRoundNo } = useParams({ from: '/_sub-page/order-round/$orderRoundNo' });
+
   const { accessToken } = useAccessTokenStore();
   const { addToast } = useToast();
   const [save, setSave] = useState<boolean>(false); // 저장여부
@@ -91,14 +92,21 @@ export default function OrderPage() {
   });
 
   /** 주문차수 상세 조회 API */
+  // const {
+  //   isLoading: orderRoundLoading,
+  //   data: orderRoundData,
+  //   error: orderRoundErr,
+  // } = useQuery({
+  //   queryKey: ['getOrderRound'],
+  //   queryFn: () => getOrderRound(Number(orderRoundNo)),
+  // });
+
   const {
-    isLoading: orderRoundLoading,
     data: orderRoundData,
+    isLoading: orderRoundLoading,
     error: orderRoundErr,
-  } = useQuery({
-    queryKey: ['getOrderRound'],
-    queryFn: () => getOrderRound(Number(orderRoundNo)),
-  });
+  } = useGetOrderRoundQuery(Number(orderRoundNo));
+
   /**********************************************************************************/
   /** form submit */
   /** 비회원 form : form과 schema 연결 */
@@ -229,9 +237,9 @@ export default function OrderPage() {
   /** 주문차수 빵 목록 조회 및 설정 */
   useEffect(() => {
     if (orderRoundData) {
-      setOrderRoundBreads(orderRoundData.data.orderRoundBreads);
-      setMin(orderRoundData.data.minOrderQty);
-      setMax(orderRoundData.data.maxOrderQty);
+      setOrderRoundBreads(orderRoundData.orderRoundBreads);
+      setMin(orderRoundData.inOrderQty);
+      setMax(orderRoundData.axOrderQty);
     }
     orderRoundErr && setErrMsg('빵 목록을 조회하는 데 문제가 발생했습니다.');
   }, [orderRoundData, orderRoundErr]);
@@ -274,7 +282,7 @@ export default function OrderPage() {
                 ) : (
                   orderRoundBreads?.map((data, i) => (
                     <AlertDialog key={i}>
-                      <BreadCard bread={data} onClick={handleBreadClick} />
+                      {data && <BreadCard bread={data} onClick={handleBreadClick} />}
                     </AlertDialog>
                   ))
                 )}
