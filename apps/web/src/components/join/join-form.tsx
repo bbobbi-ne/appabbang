@@ -34,6 +34,19 @@ export default function JoinForm() {
   const { set: setAccessToken } = useAccessTokenStore();
   const { set: setCustomer } = useCustomerStore();
 
+  /** 전체동의 체크박스 */
+  const allCheck = (allAgreed: boolean) => {
+    if (allAgreed) {
+      form.setValue('isServiceTermsAgreed', true);
+      form.setValue('isPrivacyTermsAgreed', true);
+      form.setValue('isMarketingTermsAgreed', true);
+    } else {
+      form.setValue('isServiceTermsAgreed', false);
+      form.setValue('isPrivacyTermsAgreed', false);
+      form.setValue('isMarketingTermsAgreed', false);
+    }
+  };
+
   // 폼 선언
   const form = useForm<JoinSchemaType>({
     resolver: zodResolver(joinSchema),
@@ -49,6 +62,7 @@ export default function JoinForm() {
       isServiceTermsAgreed: false,
       isPrivacyTermsAgreed: false,
       isMarketingTermsAgreed: false,
+      allAgreed: false,
     },
   });
 
@@ -265,6 +279,37 @@ export default function JoinForm() {
         </div>
 
         <div className="flex flex-col gap-0">
+          {/* 전체동의 */}
+          <FormField
+            control={form.control}
+            name="allAgreed"
+            render={({ field }) => (
+              <FormItem className="mt-2 mb-2">
+                <div className="flex justify-between items-center gap-2">
+                  <div className="flex items-center gap-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={(checked: boolean) => {
+                          field.onChange(checked);
+                          allCheck(checked);
+                        }}
+                        className="mb-0"
+                      />
+                    </FormControl>
+
+                    <FormLabel
+                      errorCheck={false}
+                      className={`${labelMinWidth} whitespace-nowrap cursor-pointer text-xs`}
+                    >
+                      아래 이용약관을 전체 동의합니다.
+                    </FormLabel>
+                  </div>
+                </div>
+              </FormItem>
+            )}
+          />
+
           {/* 서비스 이용약관 동의여부 */}
           <FormField
             control={form.control}
