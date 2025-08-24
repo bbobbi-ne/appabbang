@@ -1,6 +1,6 @@
 import type { CommonCodeDetailData, PaymentsListData } from '@/api/data-contracts';
 import { getOrderStatus } from '@/service/common-api';
-import { getPaymentDetail, getPaymentsList, updatePaid } from '@/service/payment';
+import { getPaymentDetail, getPaymentsList, refundUpdate, updatePaid } from '@/service/payment';
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 
 /**
@@ -83,4 +83,22 @@ export function usePaidUpdateMutation() {
   });
 
   return { paidUpdateMutation: mutateAsync, isError, error, isSuccess, isPending };
+}
+/**
+ * 🔹 환불 상태 업데이트 Mutation
+ * 성공 시 관련 결제, 주문 데이터 캐시 무효화
+ */
+export function useRefundUpdateMutation() {
+  const queryClient = useQueryClient();
+  const { mutateAsync, error, isError, isSuccess, isPending } = useMutation({
+    mutationFn: refundUpdate, // 환불 확인 업데이트 API
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['payments'] });
+      queryClient.invalidateQueries({ queryKey: ['payment', { no: variables.no }] });
+      queryClient.invalidateQueries({ queryKey: ['order', { no: variables.data.orderNo }] });
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+  });
+
+  return { refundUpdateMutation: mutateAsync, isError, error, isSuccess, isPending };
 }

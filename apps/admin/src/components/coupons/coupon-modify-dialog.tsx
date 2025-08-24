@@ -1,19 +1,12 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@appabbang/ui';
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import { useEffect, useState } from 'react';
 import CouponForm, { type FormType } from './coupon-form';
 import {
   useCouponDeleteMutation,
   useCouponDetailQuery,
   useCouponUpdateMutation,
 } from '@/hooks/use-coupon';
-import { toast } from 'sonner';
+import { toast } from '@appabbang/ui';
+import { DialogLayout } from '../ui/dialog-layout';
 
 interface breadModifyDialogProps {
   children: React.ReactNode;
@@ -21,17 +14,19 @@ interface breadModifyDialogProps {
 }
 
 export function CouponModifyDialog({ children, no }: breadModifyDialogProps) {
-  const [open, setOpen] = useState(false);
-
   return (
-    <Dialog onOpenChange={(open) => setOpen(open)}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      {open && <DialogBody no={no} setOpen={setOpen} />}
-    </Dialog>
+    <DialogLayout
+      height={200}
+      trigger={children}
+      title="쿠폰 수정"
+      description="쿠폰을 수정해주세요"
+    >
+      {({ close }) => <DialogBody no={no} close={close} />}
+    </DialogLayout>
   );
 }
 
-function DialogBody({ no, setOpen }: { no: number; setOpen: Dispatch<SetStateAction<boolean>> }) {
+function DialogBody({ no, close }: { no: number; close: () => void }) {
   const { data: currentData, isSuccess: currentDataIsSuccess } = useCouponDetailQuery(no);
   const couponsUpdateMutation = useCouponUpdateMutation(no);
   const couponsDeleteMutation = useCouponDeleteMutation(no);
@@ -41,7 +36,7 @@ function DialogBody({ no, setOpen }: { no: number; setOpen: Dispatch<SetStateAct
     try {
       await couponsDeleteMutation.mutateAsync(no);
       toast.success('삭제가 완료되었습니다.');
-      setOpen(false);
+      close();
     } catch (error: any) {
       console.error(error);
     }
@@ -60,20 +55,10 @@ function DialogBody({ no, setOpen }: { no: number; setOpen: Dispatch<SetStateAct
   }, [currentDataIsSuccess]);
 
   return (
-    <DialogContent
-      onInteractOutside={(e) => {
-        e.preventDefault();
-      }}
-      className="overflow-y-auto max-h-11/12"
-    >
-      <DialogHeader>
-        <DialogTitle>쿠폰 수정</DialogTitle>
-      </DialogHeader>
-      <DialogDescription hidden>쿠폰을 수정해주세요</DialogDescription>
-
+    <>
       {currentValues && (
         <CouponForm
-          setOpen={setOpen}
+          onSuccess={close}
           currentValues={currentValues}
           submitFn={couponsUpdateMutation.mutateAsync}
           no={no}
@@ -82,6 +67,6 @@ function DialogBody({ no, setOpen }: { no: number; setOpen: Dispatch<SetStateAct
           deleteLoading={couponsDeleteMutation.isPending}
         />
       )}
-    </DialogContent>
+    </>
   );
 }

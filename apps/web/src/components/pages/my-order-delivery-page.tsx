@@ -2,14 +2,14 @@
  * 배송현황 페이지
  */
 
-import { Badge, Button, Card, CardContent } from '@appabbang/ui';
+import { Badge, Button, Card, CardContent, cn } from '@appabbang/ui';
 import { useEffect, useMemo } from 'react';
 import OrderItem from '@/components/mypage/order-item';
-import clsx from 'clsx';
+
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 import { useGetOrderDeliveryQuery } from '@/hooks/use-my';
-import { getFormattedMobile } from '@/utils';
+import { formatMobile } from '@appabbang/utils';
 
 // interface IDataProps {
 //   no: number;
@@ -115,7 +115,7 @@ export default function MyOrderDeliveryPage({ orderNo }: { orderNo: number }) {
               return (
                 <div className="w-1/4" key={step.code}>
                   <div
-                    className={clsx(
+                    className={cn(
                       'h-2 border',
                       isCompleted && 'bg-[#FF9E42] border-[#FF9E42]',
                       isCurrent && 'bg-[#FFE6C0] border-[#FFE6C0]',
@@ -160,7 +160,7 @@ export default function MyOrderDeliveryPage({ orderNo }: { orderNo: number }) {
             </div>
             <div className="flex items-center gap-4">
               <span className="min-w-28">수령인 전화번호</span>
-              <p className="text-sm">{getFormattedMobile(order.recipientMobile ?? '')}</p>
+              <p className="text-sm">{formatMobile(order.recipientMobile ?? '')}</p>
             </div>
           </div>
         </div>

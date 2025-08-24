@@ -19,6 +19,7 @@ import type {
   AddressUpdateData,
   AddressUpdatePayload,
   CustomersCreateData,
+  CustomersCreatePayload,
   CustomersDeleteData,
   CustomersDetailData,
   CustomersListData,
@@ -51,20 +52,24 @@ export class Customers<SecurityDataType = unknown> {
       ...params,
     });
   /**
-   * @description 새로운 고객을 생성합니다. (권한: 관리자만)
+   * @description 새로운 고객을 생성합니다. (권한: 없음 - 누구나 접근 가능)
    *
    * @tags Customers
    * @name CustomersCreate
-   * @summary 고객 생성
+   * @summary 고객 생성 (회원가입)
    * @request POST:/customers
-   * @secure
    * @response `201` `CustomersCreateData` 고객 생성 성공
    */
-  customersCreate = (params: RequestParams = {}) =>
+  customersCreate = (
+    data: CustomersCreatePayload,
+    params: RequestParams = {},
+  ) =>
     this.http.request<CustomersCreateData, any>({
       path: `/customers`,
       method: "POST",
-      secure: true,
+      body: data,
+      type: ContentType.Json,
+      format: "json",
       ...params,
     });
   /**

@@ -1,7 +1,7 @@
 import { CustomHttpClient } from './instance';
-import { toast } from 'sonner';
+import { toast } from '@appabbang/ui';
 import { Payments } from '@/api/Payments';
-import type { PaidUpdatePayload, StatusUpdateBody } from '@/api/data-contracts';
+import type { PaidUpdatePayload, RefundUpdatePayload } from '@/api/data-contracts';
 import type { QueryFunctionContext } from '@tanstack/react-query';
 
 // ✅ 결제 API 인스턴스 생성
@@ -70,6 +70,30 @@ export async function updatePaid({ no, data }: { no: number; data: PaidUpdatePay
   } catch (error: any) {
     const message = error.data.message || '입금 확인 업데이트에 실패했습니다.';
     toast.error('입금 확인 업데이트에 실패했습니다.', {
+      description: message,
+    });
+    throw new Error(message);
+  }
+}
+/**
+ * 환불 상태 업데이트 API
+ *
+ * @param no 결제/주문 번호
+ * @param data PaidUpdatePayload (변경할 환불상태)
+ *
+ * - 환불 상태 업데이트
+ */
+export async function refundUpdate({ no, data }: { no: number; data: RefundUpdatePayload }) {
+  try {
+    // 1. 환불 상태 업데이트
+    const response = await paymentApi.refundUpdate(no, data);
+
+    return {
+      data: response.data,
+    };
+  } catch (error: any) {
+    const message = error.data.message || '환불 상태 업데이트에 실패했습니다.';
+    toast.error('환불 상태 업데이트에 실패했습니다.', {
       description: message,
     });
     throw new Error(message);

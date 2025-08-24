@@ -7,9 +7,9 @@ import {
   AlertDialogContent,
   AlertDialogCancel,
   AlertDialogTitle,
+  cn,
 } from '@appabbang/ui';
 import type { BreadCardProps } from '@/interface/bread-interface';
-import clsx from 'clsx';
 import Slider from 'react-slick';
 import { X } from 'lucide-react';
 
@@ -26,7 +26,7 @@ function BreadCard({ bread, onClick }: BreadCardProps) {
     <>
       <AlertDialogTrigger asChild>
         <Card
-          className={clsx('mt-4 mb-4', 'min-w-[180px] max-w-[220px]', hoverCard)}
+          className={cn('mt-4 mb-4', 'min-w-[180px] max-w-[220px]', hoverCard)}
           onClick={() => onClick(bread)}
         >
           <CardHeader className="p-4">{bread.name}</CardHeader>

@@ -1,0 +1,15 @@
+{
+  "extends": "@appabbang/typescript/tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "emitDeclarationOnly": true,
+    "noEmit": false,
+    "outDir": "dist",
+    "lib": ["DOM"],
+    "jsx": "react-jsx"
+  },
+  "include": ["src"]
+}

@@ -49,7 +49,7 @@ export const updateCloudinary = async (
     });
   }
 
-  const uploadResults = await createCloudinary(images);
+  const uploadResults = await createCloudinary(files);
 
   return uploadResults;
 };

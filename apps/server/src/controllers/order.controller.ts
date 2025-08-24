@@ -65,8 +65,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
   }
 
   // 접수요청,취소요청,취소완료를 제외한 상태로 변경시 입금확인 true으로 수정
-  if (!['10', '51'].includes(orderStatus)) {
-    console.log('실행함');
+  if (!['10', '51', '50'].includes(orderStatus)) {
     await paymentService.update(Number(no), {
       isPaid: true,
       paidConfirmedAt: payment?.paidConfirmedAt ?? new Date(),

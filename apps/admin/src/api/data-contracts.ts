@@ -352,6 +352,11 @@ export type OrdersListData = {
    */
   orderStatusName: string;
   /**
+   * 주문자 전화번호
+   * @example "010-1234-5678"
+   */
+  ordererMobile: string;
+  /**
    * 주문자 이름
    * @example "홍길동"
    */
@@ -992,13 +997,7 @@ export interface OrderRoundDetailData {
      */
     unitPrice: number;
   }[];
-  image: {
-    /**
-     * 이미지 URL
-     * @example "https://example.com/image.jpg"
-     */
-    url?: string;
-  }[];
+  image: objectPropertiesUrlTypeStringDescription이미지UrlExampleHttpsExampleComImageJpgPublicIdTypeStringDescription이미지식별자ExampleBreadsZvypj6Wohag9DghdtdtoOrderTypeNumberDescription이미지순서Example1;
 }
 
 export interface OrderRoundUpdatePayload {

@@ -20,8 +20,8 @@ import {
   DialogTitle,
   DialogTrigger,
   Label,
+  cn,
 } from '@appabbang/ui';
-import clsx from 'clsx';
 import { Info } from 'lucide-react';
 import { useState } from 'react';
 import useToast from '@/hooks/useToast';
@@ -110,7 +110,7 @@ function FaqUnregisterDialog({ children }: Props) {
           <Button
             type="button"
             onClick={() => setOpen(false)}
-            className={clsx('w-full')}
+            className={cn('w-full')}
             variant="outline"
           >
             뒤로가기

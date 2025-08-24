@@ -20,7 +20,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import type { ICustomerProps } from '../pages/info-page';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
-import { getFormattedMobile } from '@/utils';
+import { formatMobile } from '@appabbang/utils';
 import useToast from '@/hooks/useToast';
 
 interface InfoFormProps {
@@ -146,7 +146,7 @@ export default function InfoForm({ customer, updateMutation, isSubmitting }: Inf
                         {...field}
                         placeholder="휴대번호 입력"
                         onChange={(e) => {
-                          const formattedValue = getFormattedMobile(e.target.value);
+                          const formattedValue = formatMobile(e.target.value);
                           field.onChange(formattedValue);
                         }}
                         maxLength={13}

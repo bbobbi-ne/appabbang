@@ -2,12 +2,12 @@ import type { AddressesListData } from '@/api/data-contracts';
 import AddressCreateDialog from '@/components/mypage/address-create-dialog';
 import AddressModifyDialog from '../mypage/address-modify-dialog';
 import { Badge, Skeleton } from '@appabbang/ui';
-import { getFormattedMobile } from '@/utils';
 import {
   useDeleteAddressMutation,
   useGetAddressListQuery,
   useUpdateAddressMutation,
 } from '@/hooks/use-my';
+import { formatMobile } from '@appabbang/utils';
 
 export default function AddressPage() {
   const { data, isLoading } = useGetAddressListQuery();
@@ -72,7 +72,7 @@ const AddressList = ({ data }: { data: AddressesListData | undefined }) => {
             <p>
               {item.address},&nbsp;{item.addressDetail}({item.zipcode})
             </p>
-            <p className="text-sm">{getFormattedMobile(item.recipientMobile ?? '')}</p>
+            <p className="text-sm">{formatMobile(item.recipientMobile ?? '')}</p>
           </div>
         </AddressModifyDialog>
       ))}

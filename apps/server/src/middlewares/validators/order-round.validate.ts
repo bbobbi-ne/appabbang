@@ -73,6 +73,18 @@ const PUBLICID_VALIDATION = {
   string: { message: '이미지 공개ID는 문자열로 입력해야 합니다.' },
 };
 
+const ORDER_ROUND_MINORDERQTY_VALIDATION = {
+  key: 'minOrderQty',
+  empty: { message: '최소 주문 수량은 필수 입력항목입니다.' },
+  isInt: { message: '최소 주문 수량은 숫자여야 합니다.' },
+};
+
+const ORDER_ROUND_MAXORDERQTY_VALIDATION = {
+  key: 'maxOrderQty',
+  empty: { message: '최대 주문 수량은 필수 입력항목입니다.' },
+  isInt: { message: '최대 주문 수량은 숫자여야 합니다.' },
+};
+
 /**
  * 주문차수 등록 validate
  */
@@ -108,6 +120,20 @@ export const createOrderRoundValidator = [
     .withMessage(ORDER_ROUND_ENDEDAT_VALIDATION.empty.message)
     .isISO8601()
     .withMessage(ORDER_ROUND_ENDEDAT_VALIDATION.ISO8601.message),
+
+  body(ORDER_ROUND_MINORDERQTY_VALIDATION.key)
+    .notEmpty()
+    .withMessage(ORDER_ROUND_MINORDERQTY_VALIDATION.empty.message)
+    .toInt()
+    .isInt()
+    .withMessage(ORDER_ROUND_MINORDERQTY_VALIDATION.isInt.message),
+
+  body(ORDER_ROUND_MAXORDERQTY_VALIDATION.key)
+    .notEmpty()
+    .withMessage(ORDER_ROUND_MAXORDERQTY_VALIDATION.empty.message)
+    .toInt()
+    .isInt()
+    .withMessage(ORDER_ROUND_MAXORDERQTY_VALIDATION.isInt.message),
 ];
 
 /**
@@ -153,6 +179,20 @@ export const updateOrderRoundValidator = [
     .withMessage(ORDER_ROUND_ORDERROUNDBREADS_VALIDATION.empty.message)
     .isString()
     .withMessage(ORDER_ROUND_ORDERROUNDBREADS_VALIDATION.string.message),
+
+  body(ORDER_ROUND_MINORDERQTY_VALIDATION.key)
+    .notEmpty()
+    .withMessage(ORDER_ROUND_MINORDERQTY_VALIDATION.empty.message)
+    .toInt()
+    .isInt()
+    .withMessage(ORDER_ROUND_MINORDERQTY_VALIDATION.isInt.message),
+
+  body(ORDER_ROUND_MAXORDERQTY_VALIDATION.key)
+    .notEmpty()
+    .withMessage(ORDER_ROUND_MAXORDERQTY_VALIDATION.empty.message)
+    .toInt()
+    .isInt()
+    .withMessage(ORDER_ROUND_MAXORDERQTY_VALIDATION.isInt.message),
 ];
 
 /**
@@ -164,6 +204,6 @@ export const deleteOrderRoundImageValidator = [
     .withMessage(PUBLICID_VALIDATION.empty.message)
     .isString()
     .withMessage(PUBLICID_VALIDATION.string.message)
-    .trim()
-    .escape(),
+    .trim(),
+  // .escape(),
 ];

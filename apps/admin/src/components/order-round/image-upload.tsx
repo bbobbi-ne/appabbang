@@ -27,12 +27,13 @@ export function ImageUpload({
     }
   };
 
-  const removeImage = () => {
+  const removeImage = async () => {
     if (value instanceof File) {
       inputRef.current?.click();
       return;
     }
-    orderRoundImageDeleteMutation({ no: no!, publicId: value.publicId });
+
+    await orderRoundImageDeleteMutation({ no: no!, publicId: value.publicId });
     onChange(null);
   };
 

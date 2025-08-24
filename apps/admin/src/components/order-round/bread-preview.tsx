@@ -1,5 +1,5 @@
 import { useGetBreadDetailQuery } from '@/hooks/use-breads';
-import { formatCurrencyKR } from '@/utils/format';
+import { formatCurrencyKR } from '@appabbang/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@appabbang/ui';
 
 function BreadPreview({ no }: { no: number }) {

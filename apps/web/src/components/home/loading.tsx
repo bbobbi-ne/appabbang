@@ -3,8 +3,7 @@
  */
 
 import { Container } from '@/styles/home';
-import { Card, CardContent, Skeleton } from '@appabbang/ui';
-import clsx from 'clsx';
+import { Card, CardContent, Skeleton, cn } from '@appabbang/ui';
 
 function MainLoading() {
   const arr = Array(4).fill(0);
@@ -13,13 +12,13 @@ function MainLoading() {
     <>
       <div className="flex flex-row justify-center w-full mt-30 m-auto gap-15">
         <div className="flex flex-col w-1/5 h-72">
-          <Skeleton className={clsx('text-3xl mt-5 mb-5', 'md:text-2xl')}>
+          <Skeleton className={cn('text-3xl mt-5 mb-5', 'md:text-2xl')}>
             <div className="space-y-2">
               <Skeleton className="h-8 w-[250px]" />
             </div>
           </Skeleton>
           <Skeleton className="w-full h-full">
-            <div className={clsx('flex gap-5 justify-center', 'md:gap-2')}>
+            <div className={cn('flex gap-5 justify-center', 'md:gap-2')}>
               <Skeleton className="h-[40px] pt-8 pb-8" />
             </div>
           </Skeleton>

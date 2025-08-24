@@ -1,12 +1,11 @@
 import { Card, cn } from '@appabbang/ui';
 import type { BreadCardProps } from '@/interface/bread-interface';
-import clsx from 'clsx';
 
 /** Main Function :: 빵 카드 클릭 시 onClick 콜백 prop 받음 */
 export default function ProductsBreadCard({ bread }: BreadCardProps) {
   return (
     <Card
-      className={clsx(
+      className={cn(
         'cursor-pointer w-full h-full hover:border-primary lg:hover:border-2 transition-all duration-100',
       )}
     >
