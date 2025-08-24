@@ -19,17 +19,12 @@ export interface IOrderRoundProps {
 }
 
 export default function Header() {
-  const [data, setData] = useState<IOrderRoundProps>();
   const navigate = useNavigate();
   const { accessToken } = useAccessTokenStore();
   const { addToast } = useToast();
 
   // 현재 진행중인 주문차수 조회
-  const { isLoading, data: getData } = useGetOrderRoundNowQuery();
-
-  useEffect(() => {
-    getData && setData(getData.data);
-  }, [getData]);
+  const { isLoading, data } = useGetOrderRoundNowQuery();
 
   const moveToOrderRoundDetail = (no: number) => {
     navigate({
