@@ -90,6 +90,7 @@ export const joinSchema = z
       .min(EMAIL_VALIDATION.min.value, EMAIL_VALIDATION.min.message)
       .max(EMAIL_VALIDATION.max.value, EMAIL_VALIDATION.max.message)
       .regex(EMAIL_VALIDATION.regex.value, EMAIL_VALIDATION.regex.message),
+    code: z.string(),
     pw: z
       .string({ required_error: PASSWORD_VALIDATION.required.message })
       .trim()

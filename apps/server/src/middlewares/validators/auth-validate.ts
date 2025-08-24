@@ -261,6 +261,17 @@ export const loginCustomerValidator = [
     .escape(),
 ];
 
+export const sendEmailValidator = [
+  body('email')
+    .notEmpty()
+    .withMessage('이메일을 입력하세요.')
+    .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/g)
+    .withMessage('유효한 이메일 형식이 아닙니다.')
+    .isString()
+    .withMessage('이메일은 문자열이어야 합니다.')
+    .trim(),
+];
+
 /**
  * 고객정보 수정 유효성 검증
  */

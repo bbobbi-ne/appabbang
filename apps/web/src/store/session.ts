@@ -10,6 +10,12 @@ interface AccessTokenState {
   reset: () => void;
 }
 
+interface EmailCodeState {
+  code: string;
+  set: (code: string) => void;
+  reset: () => void;
+}
+
 /**
  * accessToken 기본설정
  */
@@ -19,5 +25,17 @@ export const useAccessTokenStore = create<AccessTokenState>((set) => ({
   reset: () => {
     sessionStorage.removeItem('accessToken');
     set({ accessToken: '' });
+  },
+}));
+
+/**
+ * 이메일 인증코드 설정
+ */
+export const useEmailCodeStore = create<EmailCodeState>((set) => ({
+  code: sessionStorage.getItem('code') || '',
+  set: (code: string) => set({ code }),
+  reset: () => {
+    sessionStorage.removeItem('code');
+    set({ code: '' });
   },
 }));

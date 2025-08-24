@@ -5,8 +5,10 @@
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  Badge,
   Button,
   Checkbox,
+  cn,
   Form,
   FormControl,
   FormField,
@@ -23,9 +25,10 @@ import { joinSchema, type JoinSchemaType } from '@/validate/join-form-schema';
 import ServiceIsAgreedDialog from './service-terms-agreed-dialog';
 import PrivacyTermsAgreedDialog from './privacy-terms-agreed-dialog';
 import useToast from '@/hooks/useToast';
-import { createCustomer } from '@/services/customer-apis';
-import { useAccessTokenStore } from '@/store/session';
+import { createCustomer, sendEmail } from '@/services/customer-apis';
+import { useAccessTokenStore, useEmailCodeStore } from '@/store/session';
 import { useCustomerStore } from '@/store/customer';
+import { useState } from 'react';
 
 const labelMinWidth = 'min-w-[120px]';
 
@@ -33,6 +36,9 @@ export default function JoinForm() {
   const { addToast } = useToast();
   const { set: setAccessToken } = useAccessTokenStore();
   const { set: setCustomer } = useCustomerStore();
+  const [showCode, setShowCode] = useState<boolean>(false);
+  const [check, setCheck] = useState<boolean>(false);
+  const { code, set: setEmailCode } = useEmailCodeStore();
 
   /** 전체동의 체크박스 */
   const allCheck = (allAgreed: boolean) => {
@@ -58,6 +64,41 @@ export default function JoinForm() {
       : form.setValue('allAgreed', false);
   };
 
+  /** 이메일 인증하기 버튼(뱃지) 클릭 */
+  const authEmail = async () => {
+    const email = form.getValues('email');
+
+    if (!email) {
+      form.setError('email', { type: 'required', message: '이메일을 입력해주세요.' });
+      return;
+    }
+
+    const regexp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/g;
+    if (!regexp.test(email)) {
+      form.setError('email', { type: 'regex', message: '유효한 이메일 형식이 아닙니다.' });
+      return;
+    }
+
+    form.setError('email', { type: 'required', message: '' });
+    setShowCode(true);
+
+    // 이메일 전달
+    await sendEmail(form.getValues('email'), setEmailCode);
+  };
+
+  /** 인증코드 체크 */
+  const checkCode = async (value: string) => {
+    if (value === code) {
+      // 인증성공
+      form.setError('code', { type: 'value', message: '' });
+      setCheck(true);
+    } else {
+      // 인증실패
+      form.setError('code', { type: 'value', message: '인증번호가 일치하지 않습니다.' });
+      setCheck(false);
+    }
+  };
+
   // 폼 선언
   const form = useForm<JoinSchemaType>({
     resolver: zodResolver(joinSchema),
@@ -65,6 +106,7 @@ export default function JoinForm() {
       id: '',
       name: '',
       email: '',
+      code: '',
       pw: '',
       pwConfirm: '',
       mobileNumber: '',
@@ -83,6 +125,16 @@ export default function JoinForm() {
    */
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // 이메일 인증 확인
+    if (!check) {
+      addToast({
+        type: 'error',
+        message: '이메일 인증이 필요합니다.',
+      });
+
+      return;
+    }
 
     // 아빠빵 처리방침 3가지 true 확인
     const service = form.getValues('isServiceTermsAgreed');
@@ -148,6 +200,7 @@ export default function JoinForm() {
           )}
         />
 
+        {/* email */}
         <FormField
           control={form.control}
           name="email"
@@ -159,13 +212,77 @@ export default function JoinForm() {
 
               <div className="w-full space-y-1">
                 <FormControl>
-                  <Input type="email" {...field} placeholder="이메일 입력" maxLength={50} />
+                  <div className="flex flex-row relative">
+                    <Input
+                      type="email"
+                      {...field}
+                      placeholder="이메일 입력"
+                      maxLength={50}
+                      disabled={check} // 인증 완료되고나면 수정불가
+                    />
+                    <Badge
+                      variant="secondary"
+                      onClick={authEmail}
+                      className={cn(
+                        'cursor-pointer absolute right-2 top-1/2 -translate-y-1/2',
+                        showCode
+                          ? 'bg-gray-300 text-white dark:bg-gray-300'
+                          : 'bg-green-700 text-white dark:bg-green-700',
+                      )}
+                    >
+                      인증
+                    </Badge>
+                  </div>
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>
             </FormItem>
           )}
         />
+
+        {/* 인증코드 */}
+        {showCode ? (
+          <FormField
+            control={form.control}
+            name="code"
+            render={({ field }) => (
+              <FormItem className="flex items-center">
+                <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
+                  <span className="text-red-700">*</span> 인증코드
+                </FormLabel>
+
+                <div className="w-full space-y-1">
+                  <FormControl>
+                    <div className="flex flex-row relative">
+                      <Input
+                        type="text"
+                        {...field}
+                        placeholder="인증코드 입력"
+                        onChange={(e) => {
+                          field.onChange(e);
+                          checkCode(e.target.value);
+                        }}
+                      />
+                      <Badge
+                        variant="secondary"
+                        // onClick={() => checkCode(field.value)}
+                        className={cn(
+                          'cursor-pointer absolute right-2 top-1/2 -translate-y-1/2',
+                          check
+                            ? 'bg-green-700 text-white dark:bg-green-700'
+                            : 'bg-gray-300 text-white dark:bg-gray-300',
+                        )}
+                      >
+                        {check ? '확인' : '미확인'}
+                      </Badge>
+                    </div>
+                  </FormControl>
+                  <FormMessage className="text-xs" />
+                </div>
+              </FormItem>
+            )}
+          />
+        ) : null}
 
         {/* 비밀번호 */}
         <FormField

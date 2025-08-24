@@ -8,6 +8,7 @@ import { AppError } from '@/types';
 import { ClientPayload } from '@/types/client-payload';
 import { Request, Response } from 'express';
 import * as customerService from '@/services/customer.service';
+import { sendEmail } from '@/lib/send-email-code';
 
 export const getList = async (_: Request, res: Response) => {
   res.status(200).json('Hello World');
@@ -81,4 +82,10 @@ export const update = async (_: Request, res: Response) => {
 };
 export const remove = async (_: Request, res: Response) => {
   res.status(204).json('Hello World');
+};
+
+/** 이메일로 인증코드 보내기 */
+export const sendEmailCode = async (req: Request, res: Response) => {
+  const code = await sendEmail(req.body.email);
+  res.status(200).json({ code });
 };

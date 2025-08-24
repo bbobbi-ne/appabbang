@@ -224,3 +224,15 @@ export type CustomePwType = { pw: string; pwModify: string };
 export const updateCustomerPw = async ({ pw, pwModify }: CustomePwType) => {
   await client.put('/my/pw', { pw, pwModify });
 };
+
+/** 회원가입 인증코드 이메일 전송 */
+export const sendEmail = async (email: string, setEmailCode: (code: string) => void) => {
+  const response = await client.post('/customers/send-email', { email });
+
+  if (response.status === 200) {
+    // code를 상태관리에 저장
+    const code = response.data.code;
+    sessionStorage.setItem('code', code);
+    setEmailCode(code);
+  }
+};
