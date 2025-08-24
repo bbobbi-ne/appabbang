@@ -2,8 +2,9 @@ import { CustomHttpClient } from './instance';
 import { toast } from '@appabbang/ui';
 import { Coupons } from '@/api/Coupons';
 import type { CouponsCreatePayload, CouponsUpdatePayload } from '@/api/data-contracts';
+import { refreshCreate } from './auth-api';
 
-const couponApi = new Coupons(new CustomHttpClient());
+const couponApi = new Coupons(new CustomHttpClient({}, refreshCreate));
 
 /** 서비스: 쿠폰 목록 조회 */
 export const getCouponsList = async () => {

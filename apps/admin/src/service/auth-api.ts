@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import type { LoginCreatePayload } from '@/api/data-contracts';
 
 // Auth API 인스턴스 생성
-const authApi = new Auth(new CustomHttpClient());
+const authApi = new Auth(new CustomHttpClient({}, refreshCreate));
 
 /**
  * 로그인 API 호출
@@ -67,7 +67,7 @@ export async function getMe() {
  * Refresh Token을 사용하여 Access Token 재발급
  * @returns 새로 발급된 Access Token
  */
-export const refreshCreate = async () => {
+export async function refreshCreate() {
   try {
     // withCredentials 옵션을 사용하여 쿠키 기반 Refresh Token 전송
     const response = await authApi.refreshCreate({
@@ -97,4 +97,4 @@ export const refreshCreate = async () => {
 
     throw new Error(message);
   }
-};
+}

@@ -2,9 +2,10 @@ import { OrderRound } from '@/api/OrderRound';
 import { CustomHttpClient } from './instance';
 import { toast } from '@appabbang/ui';
 import type { OrderRoundCreatePayload, OrderRoundUpdatePayload } from '@/api/data-contracts';
+import { refreshCreate } from './auth-api';
 
 // ✅ 주문차수 API 인스턴스 생성
-const orderRoundsApi = new OrderRound(new CustomHttpClient());
+const orderRoundsApi = new OrderRound(new CustomHttpClient({}, refreshCreate));
 
 /**
  * 주문차수 목록 조회 API
@@ -59,7 +60,6 @@ export const createOrderRound = async ({
 }: {
   formData: OrderRoundCreatePayload | FormData;
 }) => {
-  console.log(formData, '주문차수생성 실행됨');
   try {
     const response = await orderRoundsApi.orderRoundCreate(formData as OrderRoundCreatePayload);
     return {
@@ -87,7 +87,6 @@ export const updateOrderRound = async ({
   formData: OrderRoundUpdatePayload | FormData;
   no: number;
 }) => {
-  console.log(formData, no, '주문차수수정 실행됨');
   try {
     const response = await orderRoundsApi.orderRoundUpdate(no, formData as OrderRoundUpdatePayload);
     return {

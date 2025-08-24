@@ -3,9 +3,10 @@ import { toast } from '@appabbang/ui';
 import { Payments } from '@/api/Payments';
 import type { PaidUpdatePayload, RefundUpdatePayload } from '@/api/data-contracts';
 import type { QueryFunctionContext } from '@tanstack/react-query';
+import { refreshCreate } from './auth-api';
 
 // ✅ 결제 API 인스턴스 생성
-const paymentApi = new Payments(new CustomHttpClient());
+const paymentApi = new Payments(new CustomHttpClient({}, refreshCreate));
 
 /**
  * 결제 정보 전체 목록 조회 API

@@ -3,9 +3,10 @@ import { CustomHttpClient } from './instance';
 import { toast } from '@appabbang/ui';
 import type { QueryFunctionContext } from '@tanstack/react-query';
 import type { StatusUpdateBody } from '@/api/data-contracts';
+import { refreshCreate } from './auth-api';
 
 // ✅ 주문 API 인스턴스 생성
-const ordersApi = new Orders(new CustomHttpClient());
+const ordersApi = new Orders(new CustomHttpClient({}, refreshCreate));
 
 /**
  * 주문 목록 조회 API
