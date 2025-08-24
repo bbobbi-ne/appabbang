@@ -24,7 +24,7 @@ export interface IOrderRoundBreads {
 export interface BreadCardProps {
   bread: BreadProps;
   // openBread?: OrderRoundBreads[];
-  // onClick: (bread: BreadCardProps['bread']) => void;
+  onClick?: (bread: BreadCardProps['bread']) => void;
 }
 
 /** 결제목록 :: 빵 정보 타입 */
