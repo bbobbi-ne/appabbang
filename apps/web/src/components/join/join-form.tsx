@@ -84,16 +84,12 @@ export default function JoinForm() {
     e.preventDefault();
 
     // 아빠빵 처리방침 3가지 true 확인
-    if (
-      !(
-        form.getValues('isServiceTermsAgreed') &&
-        form.getValues('isPrivacyTermsAgreed') &&
-        form.getValues('isMarketingTermsAgreed')
-      )
-    ) {
+    const service = form.getValues('isServiceTermsAgreed');
+    const privacy = form.getValues('isPrivacyTermsAgreed');
+    if (!(service && privacy)) {
       addToast({
         type: 'error',
-        message: '아빠빵 처리방침 약관을 확인 바랍니다.',
+        message: '아빠빵 필수 이용약관을 확인 바랍니다.',
       });
 
       return;
@@ -327,7 +323,7 @@ export default function JoinForm() {
             name="isServiceTermsAgreed"
             render={({ field }) => (
               <FormItem>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center w-full">
                   <div className="flex items-center gap-2">
                     <FormControl>
                       <Checkbox
@@ -348,11 +344,13 @@ export default function JoinForm() {
                     </FormLabel>
                   </div>
 
-                  <ServiceIsAgreedDialog>
-                    <Button type="button" variant="link" className="text-xs p-o">
-                      약관보기
-                    </Button>
-                  </ServiceIsAgreedDialog>
+                  <div className="flex-shrink-0">
+                    <ServiceIsAgreedDialog>
+                      <Button type="button" variant="link" className="text-xs p-o">
+                        약관보기
+                      </Button>
+                    </ServiceIsAgreedDialog>
+                  </div>
                 </div>
               </FormItem>
             )}
@@ -418,7 +416,7 @@ export default function JoinForm() {
                       errorCheck={false}
                       className={`${labelMinWidth} whitespace-nowrap cursor-pointer text-xs`}
                     >
-                      마케팅, 광고 목적 개인정보 이용 처리방침에 동의합니다.
+                      마케팅 목적 개인정보 이용 처리방침에 동의합니다. (선택)
                     </FormLabel>
                   </div>
 
