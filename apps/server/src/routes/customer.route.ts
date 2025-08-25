@@ -13,6 +13,8 @@ import {
 } from '@/middlewares/validators/validate';
 import {
   createCustomerValidator,
+  idEmailPwValidator,
+  idEmailValidator,
   sendEmailValidator,
 } from '@/middlewares/validators/auth-validate';
 
@@ -45,6 +47,12 @@ router.post(
 
 /** POST /customers/id : 고객 아이디 조회 */
 router.post('/id', validate(sendEmailValidator), asyncHandler(customerController.getId));
+
+/** POST /customers/id-email : 고객 아이디, 이메일 조회 */
+router.post('/id-email', validate(idEmailValidator), asyncHandler(customerController.getIdEmail));
+
+/** POST /customers/pw : 고객 아이디, 이메일과 매핑되는 비밀번호 변경 */
+router.post('/pw', validate(idEmailPwValidator), asyncHandler(customerController.modifyPw));
 
 /** GET /customers/{no}/address : 고객 주소 목록 조회 */
 router.get(

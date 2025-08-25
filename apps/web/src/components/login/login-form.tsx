@@ -18,6 +18,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
 import FindIdDialog from './find-id-dialog';
+import FindPwDialog from './find-pw-dialog';
 
 const labelMinWidth = 'min-w-[100px]';
 
@@ -115,7 +116,9 @@ function LoginForm() {
             <div className="hover:underline">아이디찾기</div>
           </FindIdDialog>
           <div> | </div>
-          <div className="hover:underline">비밀번호찾기</div>
+          <FindPwDialog>
+            <div className="hover:underline">비밀번호찾기</div>
+          </FindPwDialog>
           <div> | </div>
           <Link className="hover:underline" to="/join">
             회원가입

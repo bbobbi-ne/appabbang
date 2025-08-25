@@ -179,3 +179,30 @@ export const getId = async (email: string) => {
 
   return id;
 };
+
+/** 아이디와 이메일 조회 */
+export const getIdEmail = async (id: string, email: string) => {
+  const customer = await prisma.customer.findFirst({
+    where: { id, email },
+    select: { id: true, email: true },
+  });
+
+  if (!customer) throw AppError.notFound('해당 정보는 존재하지 않습니다.');
+
+  return customer;
+};
+
+/** 비밀번호 변경 */
+export const modifyPw = async (id: string, email: string, pw: string) => {
+  //해시 비밀번호 생성
+  const hashedPw = await hashPassword(pw);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.customer.update({
+      where: { id, email },
+      data: {
+        pw: hashedPw,
+      },
+    });
+  });
+};
