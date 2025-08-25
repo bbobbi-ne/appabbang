@@ -1,3 +1,4 @@
+import type { UseFormReturn } from 'react-hook-form';
 import z from 'zod';
 
 const ID_VALIDATION = {
@@ -86,3 +87,30 @@ export const pwModifyFormSchema = z
   });
 
 export type pwModifyFormSchema = z.infer<typeof pwModifyFormSchema>;
+
+/** '이메일'만 유효성 검증 */
+export const findPwValidEmail = (id: string, email: string, form: UseFormReturn<FindPwSchema>) => {
+  if (!id) {
+    form.setError('id', { type: 'required', message: '아이디를 입력해주세요.' });
+    return false;
+  }
+
+  const idRegexp = /^[a-zA-Z0-9]{5,30}$/;
+  if (!idRegexp.test(id)) {
+    form.setError('id', { type: 'regex', message: '유효한 아이디 형식이 아닙니다.' });
+    return false;
+  }
+
+  if (!email) {
+    form.setError('id', { type: 'required', message: '이메일을 입력해주세요.' });
+    return false;
+  }
+
+  const regexp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/g;
+  if (!regexp.test(email)) {
+    form.setError('email', { type: 'regex', message: '유효한 이메일 형식이 아닙니다.' });
+    return false;
+  }
+
+  return true;
+};

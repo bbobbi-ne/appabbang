@@ -14,7 +14,6 @@ import {
 import {
   createCustomerValidator,
   emailCodeValidator,
-  idEmailPwValidator,
   idEmailValidator,
   sendEmailValidator,
 } from '@/middlewares/validators/auth-validate';
@@ -52,8 +51,8 @@ router.post('/id', validate(sendEmailValidator), asyncHandler(customerController
 /** POST /customers/id-email : 고객 아이디, 이메일 조회 */
 router.post('/id-email', validate(idEmailValidator), asyncHandler(customerController.getIdEmail));
 
-/** POST /customers/pw : 고객 아이디, 이메일과 매핑되는 비밀번호 변경 */
-router.post('/pw', validate(idEmailPwValidator), asyncHandler(customerController.modifyPw));
+/** POST /customers/pw : 고객 아이디, 이메일과 매핑되는 임시 비밀번호 변경 */
+router.post('/pw', validate(idEmailValidator), asyncHandler(customerController.modifyPw));
 
 /** POST /customers/code-compare : 고객의 입력한 인증번호와 해싱된 인증번호 비교 */
 router.post(

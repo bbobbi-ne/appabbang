@@ -152,10 +152,7 @@ export const joinSchema = z
 export type JoinSchemaType = z.infer<typeof joinSchema>;
 
 /** '이메일'만 유효성 검증 */
-export const validEmail = (
-  email: string,
-  form: UseFormReturn<JoinSchemaType> | UseFormReturn<FindIdSchema>,
-) => {
+export const validEmail = (email: string, form: UseFormReturn<JoinSchemaType>) => {
   if (!email) {
     form.setError('email', { type: 'required', message: '이메일을 입력해주세요.' });
     return false;

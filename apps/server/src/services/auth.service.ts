@@ -41,3 +41,46 @@ export function generateRefreshToken(client: ClientPayload) {
 export function verifyRefreshToken(token: string) {
   return jwt.verify(token, JWT_REFRESH_SECRET) as jwt.JwtPayload;
 }
+
+/** 임시 비밀번호 생성 */
+export function generateTempPassword(): string {
+  const regexp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[^\s]{10,30}$/;
+
+  const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const lower = 'abcdefghijklmnopqrstuvwxyz';
+  const numbers = '0123456789';
+  const symbols = '!@#$%^&*()-_=+[]{};:,.<>?/';
+  const allChars = upper + lower + numbers + symbols;
+
+  function getRandomChar(chars: string) {
+    return chars[Math.floor(Math.random() * chars.length)];
+  }
+
+  while (true) {
+    // 10~30 사이 랜덤 길이
+    const length = Math.floor(Math.random() * (30 - 10 + 1)) + 10;
+
+    // 각 조건 충족을 위해 최소 1개씩 넣기
+    let password = '';
+    password += getRandomChar(upper);
+    password += getRandomChar(lower);
+    password += getRandomChar(numbers);
+    password += getRandomChar(symbols);
+
+    // 나머지 자리는 랜덤하게 채움
+    for (let i = password.length; i < length; i++) {
+      password += getRandomChar(allChars);
+    }
+
+    // 랜덤 섞기
+    password = password
+      .split('')
+      .sort(() => Math.random() - 0.5)
+      .join('');
+
+    // 정규식 검증
+    if (regexp.test(password)) {
+      return password;
+    }
+  }
+}

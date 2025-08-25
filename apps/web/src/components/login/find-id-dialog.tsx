@@ -1,7 +1,7 @@
 import useToast from '@/hooks/useToast';
 import { compareCode, getEmail, getId, sendEmail } from '@/services/customer-apis';
 import { useEmailCodeStore } from '@/store/session';
-import { findIdSchema } from '@/validate/find-id-form-schema';
+import { findIdSchema, findIdValidEmail } from '@/validate/find-id-form-schema';
 import {
   Badge,
   Button,
@@ -30,7 +30,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import Loading from '../common/loading';
-import { validEmail } from '@/validate/join-form-schema';
 
 type Props = {
   children: React.ReactNode;
@@ -72,7 +71,7 @@ function FindIdDialog({ children }: Props) {
   const authEmail = async () => {
     const email = form.getValues('email');
 
-    const validFlag = validEmail(email, form); // 이메일만 유효성 검증
+    const validFlag = findIdValidEmail(email, form); // 이메일만 유효성 검증
     if (!validFlag) return;
 
     // 이메일 확인

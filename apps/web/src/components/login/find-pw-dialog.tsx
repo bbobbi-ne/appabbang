@@ -1,7 +1,7 @@
 import useToast from '@/hooks/useToast';
-import { getIdEmail, modifyPw, sendEmail } from '@/services/customer-apis';
+import { compareCode, getIdEmail, modifyPw, sendEmail } from '@/services/customer-apis';
 import { useEmailCodeStore } from '@/store/session';
-import { findPwSchema, pwModifyFormSchema } from '@/validate/find-pw-form-schema';
+import { findPwSchema, findPwValidEmail, pwModifyFormSchema } from '@/validate/find-pw-form-schema';
 import {
   Badge,
   Button,
@@ -24,7 +24,6 @@ import {
   FormLabel,
   FormMessage,
   Input,
-  PasswordInput,
 } from '@appabbang/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
@@ -41,6 +40,7 @@ function FindPwDialog({ children }: Props) {
   const { code, set: setEmailCode } = useEmailCodeStore();
   const { addToast } = useToast();
   const { reset: emailCodeReset } = useEmailCodeStore();
+  const [tempPw, setTempPw] = useState<string>('');
 
   const form = useForm({
     resolver: zodResolver(findPwSchema),
@@ -73,27 +73,8 @@ function FindPwDialog({ children }: Props) {
     const id = form.getValues('id');
     const email = form.getValues('email');
 
-    if (!id) {
-      form.setError('id', { type: 'required', message: '아이디를 입력해주세요.' });
-      return;
-    }
-
-    const idRegexp = /^[a-zA-Z0-9]{5,30}$/;
-    if (!idRegexp.test(id)) {
-      form.setError('id', { type: 'regex', message: '유효한 아이디 형식이 아닙니다.' });
-      return;
-    }
-
-    if (!email) {
-      form.setError('email', { type: 'required', message: '이메일을 입력해주세요.' });
-      return;
-    }
-
-    const regexp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/g;
-    if (!regexp.test(email)) {
-      form.setError('email', { type: 'regex', message: '유효한 이메일 형식이 아닙니다.' });
-      return;
-    }
+    const validFlag = findPwValidEmail(id, email, form); // 아이디, 이메일 유효성 검증
+    if (!validFlag) return;
 
     // 아이디와 이메일 확인
     const response = await getIdEmail(id, email);
@@ -102,37 +83,44 @@ function FindPwDialog({ children }: Props) {
       return;
     }
 
+    // 이메일로 인증코드 전달
+    const status = await sendEmail(form.getValues('email'), setEmailCode);
+    if (status !== 200) return;
+
     form.setError('id', { type: 'required', message: '' });
     form.setError('email', { type: 'required', message: '' });
     setShowCode(true);
-
-    // 이메일 전달
-    await sendEmail(form.getValues('email'), setEmailCode);
   };
 
   /** 인증번호 확인 */
-  const onSubmit = () => {
+  const onSubmit = async () => {
     const inputCode = form.getValues('code');
-    if (code === inputCode) {
-      setSuccess(true);
-    } else {
-      addToast({ type: 'error', message: '인증번호가 일치하지 않습니다.' });
-      setSuccess(false);
+    if (inputCode) {
+      const data = await compareCode(inputCode, code);
+
+      if (data.code === 200) {
+        setSuccess(true);
+        await modifyPassword();
+      } else {
+        addToast({ type: 'error', message: '인증번호가 일치하지 않습니다.' });
+        setSuccess(false);
+      }
     }
   };
 
-  /** 아이디, 이메일 정보의 비밀번호 변경 */
+  /** 아이디, 이메일 정보의 임시 비밀번호 제공 */
   const modifyPassword = async () => {
     const data = {
       id: form.getValues('id'),
       email: form.getValues('email'),
-      pw: pwForm.getValues('pwModify'),
     };
 
     // 비밀번호 변경
-    await modifyPw(data);
-    emailCodeReset();
-    setOpen(false);
+    const tempPwData = await modifyPw(data);
+    if (tempPwData) {
+      setTempPw(tempPwData.tempPw);
+      emailCodeReset();
+    }
   };
 
   return (
@@ -271,79 +259,14 @@ function FindPwDialog({ children }: Props) {
         {success ? (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">새로운 비밀번호를 입력하세요.</CardTitle>
-              <CardDescription className="hidden" />
+              <CardTitle className="text-lg">임시 비밀번호를 전달합니다!</CardTitle>
+              <CardDescription>
+                고객님의 잃어버린 비밀번호 대신 임시 비밀번호를 제공합니다. 해당 임시 비밀번호로
+                로그인을 시도하세요.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <Form {...pwForm}>
-                <form
-                  onSubmit={pwForm.handleSubmit(() => modifyPassword())}
-                  className="flex flex-col gap-4"
-                >
-                  <FormField
-                    control={pwForm.control}
-                    name="pwModify"
-                    render={({ field }) => (
-                      <FormItem className="flex items-center">
-                        <FormLabel
-                          htmlFor="pwModify"
-                          errorCheck={false}
-                          className={`min-w-[120px] whitespace-nowrap`}
-                        >
-                          <span className="text-red-700">*</span> 새 비밀번호
-                        </FormLabel>
-
-                        <div className="w-full space-y-1">
-                          <FormControl>
-                            <PasswordInput
-                              id="pwModify"
-                              placeholder="새 비밀번호 입력"
-                              {...field}
-                              onChange={(e) => field.onChange(e)}
-                              maxLength={30}
-                            />
-                          </FormControl>
-                          <FormMessage className="text-xs" />
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={pwForm.control}
-                    name="pwConfirm"
-                    render={({ field }) => (
-                      <FormItem className="flex items-center">
-                        <FormLabel
-                          htmlFor="pwConfirm"
-                          errorCheck={false}
-                          className={`min-w-[120px] whitespace-nowrap`}
-                        >
-                          <span className="text-red-700">*</span> 비밀번호 확인
-                        </FormLabel>
-
-                        <div className="w-full space-y-1">
-                          <FormControl>
-                            <PasswordInput
-                              id="pwConfirm"
-                              placeholder="비밀번호 확인 입력"
-                              {...field}
-                              onChange={(e) => field.onChange(e)}
-                              maxLength={30}
-                              value={field.value ?? ''}
-                            />
-                          </FormControl>
-                          <FormMessage className="text-xs" />
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-
-                  <Button type="submit" className="w-full">
-                    비밀변호 변경
-                  </Button>
-                </form>
-              </Form>
+              고객님의 임시 비밀번호는 <strong>{String(tempPw)}</strong>입니다.
             </CardContent>
           </Card>
         ) : null}

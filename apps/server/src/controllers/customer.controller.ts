@@ -2,6 +2,7 @@ import {
   comparePassword,
   generateAccessToken,
   generateRefreshToken,
+  generateTempPassword,
   hashPassword,
   REFRESH_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_OPTIONS,
@@ -119,14 +120,17 @@ export const getIdEmail = async (req: Request, res: Response) => {
   res.status(200).json({ id, email });
 };
 
-/** 아이디와 이메일에 매핑되는 비밀번호 변경 */
+/** 아이디와 이메일에 매핑되는 임시 비밀번호 변경 */
 export const modifyPw = async (req: Request, res: Response) => {
-  const { id, email, pw } = req.body;
-  if (!id || !email || !pw)
+  const { id, email } = req.body;
+  if (!id || !email)
     throw AppError.internalServerError('비밀번호를 변경할 정보가 확인되지 않습니다.');
 
-  await customerService.modifyPw(id, email, pw);
-  res.sendStatus(200);
+  // 임시 비밀번호 생성
+  const tempPw = generateTempPassword();
+
+  await customerService.modifyPw(id, email, tempPw);
+  res.status(200).json({ tempPw });
 };
 
 /** 고객이 입력한 코드와 해싱 코드 비교 */

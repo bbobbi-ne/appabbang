@@ -1,3 +1,4 @@
+import type { UseFormReturn } from 'react-hook-form';
 import z from 'zod';
 
 const EMAIL = {
@@ -21,3 +22,19 @@ export const findIdSchema = z.object({
   code: z.string().optional(),
 });
 export type FindIdSchema = z.infer<typeof findIdSchema>;
+
+/** '이메일'만 유효성 검증 */
+export const findIdValidEmail = (email: string, form: UseFormReturn<FindIdSchema>) => {
+  if (!email) {
+    form.setError('email', { type: 'required', message: '이메일을 입력해주세요.' });
+    return false;
+  }
+
+  const regexp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/g;
+  if (!regexp.test(email)) {
+    form.setError('email', { type: 'regex', message: '유효한 이메일 형식이 아닙니다.' });
+    return false;
+  }
+
+  return true;
+};
