@@ -294,6 +294,26 @@ export const idEmailValidator = [
     .trim(),
 ];
 
+export const emailCodeValidator = [
+  body('code')
+    .notEmpty()
+    .withMessage('인증번호를 입력하세요.')
+    .isString()
+    .withMessage('인증번호는 문자열로 입력되어야 합니다.')
+    .isLength({ min: 1 })
+    .withMessage('인증번호는 1자 이상 입력되어야 합니다.')
+    .trim(),
+
+  body('hashedCode')
+    .notEmpty()
+    .withMessage('해싱 인증번호를 확인하세요.')
+    .isString()
+    .withMessage('해싱 인증번호는 1자 이상 입력되어야 합니다.')
+    .isLength({ min: 1 })
+    .withMessage('해싱 인증번호는 1자 이상 입력되어야 합니다.')
+    .trim(),
+];
+
 export const idEmailPwValidator = [
   body(ID_VALIDATION.key)
     .notEmpty()

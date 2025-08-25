@@ -1,9 +1,13 @@
 /**
  * 사용자 이메일로 인증코드를 전송하는 기능
  */
+import { AppError } from '@/types';
 import nodemailer from 'nodemailer';
 
 export const sendEmail = async (email: string) => {
+  if (!process.env.GMAIL_ID || !process.env.GMAIL_PASSKEY)
+    throw AppError.internalServerError('이메일 인증번호 전송 과정에서 문제가 발생했습니다.');
+
   if (email) {
     let transporter = nodemailer.createTransport({
       service: 'gmail',

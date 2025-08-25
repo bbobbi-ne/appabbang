@@ -234,6 +234,8 @@ export const sendEmail = async (email: string, setEmailCode: (code: string) => v
     const code = response.data.code;
     sessionStorage.setItem('code', code);
     setEmailCode(code);
+
+    return response.status;
   }
 };
 
@@ -269,4 +271,10 @@ export const getIdEmail = async (id: string, email: string) => {
 export const modifyPw = async ({ id, email, pw }: { id: string; email: string; pw: string }) => {
   const response = await client.post('/customers/pw', { id, email, pw });
   if (response.status) addToast({ type: 'success', message: '정상적으로 변경되었습니다.' });
+};
+
+/** 이메일 인증코드 비교 : 해싱된 인증코드와 비교함 */
+export const compareCode = async (code: string, hashedCode: string) => {
+  const response = await client.post('/customers/compare-code', { code, hashedCode });
+  return response.data;
 };

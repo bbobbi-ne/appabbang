@@ -1,6 +1,8 @@
 import {
+  comparePassword,
   generateAccessToken,
   generateRefreshToken,
+  hashPassword,
   REFRESH_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_OPTIONS,
 } from '@/services/auth.service';
@@ -87,7 +89,13 @@ export const remove = async (_: Request, res: Response) => {
 /** 이메일로 인증코드 보내기 */
 export const sendEmailCode = async (req: Request, res: Response) => {
   const code = await sendEmail(req.body.email);
-  res.status(200).json({ code });
+
+  if (!code) throw AppError.internalServerError('이메일 인증번호가 존재하지 않습니다.');
+
+  // 이메일 인증번호 해싱
+  const hashedCode = await hashPassword(code);
+
+  res.status(200).json({ code: hashedCode });
 };
 
 /** 이메일 조회 */
@@ -119,4 +127,16 @@ export const modifyPw = async (req: Request, res: Response) => {
 
   await customerService.modifyPw(id, email, pw);
   res.sendStatus(200);
+};
+
+/** 고객이 입력한 코드와 해싱 코드 비교 */
+export const compareCode = async (req: Request, res: Response) => {
+  const { code, hashedCode } = req.body;
+  if (!code || !hashedCode)
+    throw AppError.internalServerError('검증하기 위한 인증번호 정보가 확인되지 않습니다.');
+
+  const result = await comparePassword(code, hashedCode);
+  const data = result ? { code: 200 } : { code: 500 };
+
+  res.status(200).json(data);
 };
