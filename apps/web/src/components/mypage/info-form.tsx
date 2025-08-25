@@ -18,9 +18,8 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import type { ICustomerProps } from '../pages/info-page';
-import dayjs from 'dayjs';
 import { useEffect } from 'react';
-import { formatMobile } from '@appabbang/utils';
+import { formatIsoToDateTime, formatMobile } from '@appabbang/utils';
 import useToast from '@/hooks/useToast';
 
 interface InfoFormProps {
@@ -56,7 +55,7 @@ export default function InfoForm({ customer, updateMutation, isSubmitting }: Inf
         name: customer.name ?? '',
         id: customer.id ?? '',
         mobileNumber: customer.mobileNumber ?? '',
-        createdAt: dayjs(customer.createdAt).format('YYYY-MM-DD HH:mm:ss') ?? '',
+        createdAt: formatIsoToDateTime(customer.createdAt) ?? '',
       });
     }
   }, [customer]);
@@ -69,7 +68,7 @@ export default function InfoForm({ customer, updateMutation, isSubmitting }: Inf
           name: customer.name || '',
           id: customer.id || '',
           mobileNumber: customer.mobileNumber || '',
-          createdAt: dayjs(customer.createdAt).format('YYYY-MM-DD HH:mm:ss') || '',
+          createdAt: formatIsoToDateTime(customer.createdAt) || '',
         }
       : undefined,
   });

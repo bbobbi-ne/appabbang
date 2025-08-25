@@ -18,15 +18,8 @@
     "@appabbang/typescript": "workspace:*",
     "@appabbang/ui": "workspace:*",
     "@appabbang/utils": "workspace:*",
-    "@ramonak/react-progress-bar": "^5.4.0",
-    "@types/react-slick": "^0.23.13",
     "basic-loading": "^2.1.3",
-    "dayjs": "^1.11.13",
-    "framer-motion": "^12.23.6",
-    "react-daum-postcode": "^3.2.0",
-    "react-slick": "^0.30.3",
-    "slick-carousel": "^1.8.1",
-    "styled-components": "^6.1.19"
+    "react-daum-postcode": "^3.2.0"
   },
   "devDependencies": {
     "swagger-typescript-api": "^13.2.7"

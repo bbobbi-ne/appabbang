@@ -8,9 +8,14 @@ import {
   AlertDialogCancel,
   AlertDialogTitle,
   cn,
+  CarouselDots,
+  CarouselNext,
+  CarouselPrevious,
+  CarouselItem,
+  CarouselContent,
+  Carousel,
 } from '@appabbang/ui';
 import type { BreadCardProps } from '@/interface/bread-interface';
-import Slider from 'react-slick';
 import { X } from 'lucide-react';
 
 /**********************************************************************************/
@@ -27,7 +32,7 @@ function BreadCard({ bread, onClick }: BreadCardProps) {
       <AlertDialogTrigger asChild>
         <Card
           className={cn('mt-4 mb-4', 'min-w-[180px] max-w-[220px]', hoverCard)}
-          onClick={() => onClick(bread)}
+          onClick={() => (onClick ? onClick(bread) : {})}
         >
           <CardHeader className="p-4">{bread.name}</CardHeader>
           <CardContent className="-ml-2">가격 : {bread.unitPrice.toLocaleString()}원</CardContent>
@@ -61,26 +66,33 @@ function BreadCard({ bread, onClick }: BreadCardProps) {
         {bread.images?.length > 0 && (
           <div className="w-full max-w-[500px] mx-auto mb-4">
             {bread.images.length > 1 ? (
-              <Slider
-                {...{
-                  dots: true,
-                  infinite: true,
-                  speed: 500,
-                  slidesToShow: 1,
+              <Carousel
+                opts={{
+                  loop: true,
+                  align: 'start',
                   slidesToScroll: 1,
+                  containScroll: 'trimSnaps',
                 }}
                 className="mr-10"
               >
-                {bread.images.map((image, i) => (
-                  <div key={i} className="flex justify-start items-center w-full">
-                    <img
-                      src={image.url}
-                      alt={`빵 이미지 ${i + 1}`}
-                      className="object-contain rounded-2xl"
-                    />
-                  </div>
-                ))}
-              </Slider>
+                <CarouselContent>
+                  {bread.images.map((image, i) => (
+                    <CarouselItem key={i}>
+                      <div key={i} className="flex justify-start items-center w-full">
+                        <img
+                          src={image.url}
+                          alt={`빵 이미지 ${i + 1}`}
+                          className="object-contain rounded-2xl"
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+
+                <CarouselPrevious />
+                <CarouselNext />
+                <CarouselDots />
+              </Carousel>
             ) : (
               <div className="w-full flex justify-center items-center">
                 <img
