@@ -104,7 +104,7 @@ export const getEmail = async (req: Request, res: Response) => {
   if (!req.body.email)
     throw AppError.badRequest('이메일 조회 과정에서 오류가 발생했습니다. (이메일 누락)');
 
-  const email = await customerService.getEmail(req.query.email as string);
+  const email = await customerService.getEmail(req.body.email);
   res.status(200).json({ email });
 };
 

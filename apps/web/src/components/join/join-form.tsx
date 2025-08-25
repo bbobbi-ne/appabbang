@@ -29,6 +29,7 @@ import { compareCode, createCustomer, sendEmail } from '@/services/customer-apis
 import { useAccessTokenStore, useEmailCodeStore } from '@/store/session';
 import { useCustomerStore } from '@/store/customer';
 import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 
 const labelMinWidth = 'min-w-[120px]';
 
@@ -39,6 +40,7 @@ export default function JoinForm() {
   const [showCode, setShowCode] = useState<boolean>(false);
   const [check, setCheck] = useState<boolean>(false);
   const { code, set: setEmailCode, reset: resetEmailCode } = useEmailCodeStore();
+  const [_, setEmail] = useState<string>('');
 
   /** 전체동의 체크박스 */
   const allCheck = (allAgreed: boolean) => {
@@ -64,19 +66,29 @@ export default function JoinForm() {
       : form.setValue('allAgreed', false);
   };
 
+  /** 이메일 인증코드 전송 */
+  const emailMutation = useMutation({
+    mutationFn: (email: string) => sendEmail(email, setEmailCode),
+    onSuccess: (status) => {
+      if (status === 200) {
+        form.setError('email', { type: 'required', message: '' }); // 에러메세지 제거
+        setShowCode(true); // 인증코드 input 보이게 처리
+      } else addToast({ type: 'error', message: '이메일 전송이 실패되었습니다.' });
+    },
+    onError: (error) => addToast({ type: 'error', message: error.message }),
+  });
+
   /** 이메일 인증하기 버튼(뱃지) 클릭 */
   const authEmail = async () => {
+    if (emailMutation.isPending) return; // 이미 실행중이면 리턴
+
     const email = form.getValues('email');
 
     const validFlag = validEmail(email, form); // 이메일만 유효성 검증
     if (!validFlag) return;
 
-    // 이메일 전달
-    const status = await sendEmail(email, setEmailCode);
-    if (status !== 200) return;
-
-    form.setError('email', { type: 'required', message: '' }); // 에러메세지 제거
-    setShowCode(true); // 인증코드 input 보이게 처리
+    setEmail(email);
+    email.trim() !== '' && emailMutation.mutateAsync(email); // 이메일
   };
 
   /** 인증코드 체크 */

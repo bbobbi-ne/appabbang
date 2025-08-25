@@ -28,7 +28,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import Loading from '../common/loading';
 
 type Props = {
@@ -67,6 +67,18 @@ function FindIdDialog({ children }: Props) {
     form.reset();
   };
 
+  /** 이메일 인증코드 전송 */
+  const emailMutation = useMutation({
+    mutationFn: (targetEmail: string) => sendEmail(targetEmail, setEmailCode),
+    onSuccess: (status) => {
+      if (status === 200) {
+        form.setError('email', { type: 'required', message: '' });
+        setShowCode(true);
+      } else addToast({ type: 'error', message: '이메일 전송이 실패되었습니다.' });
+    },
+    onError: (error) => addToast({ type: 'error', message: error.message }),
+  });
+
   /** 이메일 인증하기 버튼(뱃지) 클릭 */
   const authEmail = async () => {
     const email = form.getValues('email');
@@ -81,12 +93,9 @@ function FindIdDialog({ children }: Props) {
       return;
     }
 
-    // 이메일로 인증코드 전달
-    const status = await sendEmail(form.getValues('email'), setEmailCode);
-    if (status !== 200) return;
-
-    form.setError('email', { type: 'required', message: '' });
-    setShowCode(true);
+    // 이메일로 인증코드 전달 (공백이 아닐 때만 전송)
+    setEmail(email);
+    email.trim() !== '' && emailMutation.mutateAsync(email);
   };
 
   /** 인증번호 확인 */

@@ -26,6 +26,7 @@ import {
   Input,
 } from '@appabbang/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -40,6 +41,7 @@ function FindPwDialog({ children }: Props) {
   const { code, set: setEmailCode } = useEmailCodeStore();
   const { addToast } = useToast();
   const { reset: emailCodeReset } = useEmailCodeStore();
+  const [email, setEmail] = useState<string>('');
 
   const form = useForm({
     resolver: zodResolver(findPwSchema),
@@ -67,8 +69,23 @@ function FindPwDialog({ children }: Props) {
     pwForm.reset();
   };
 
+  /** 이메일 인증코드 전송 */
+  const emailMutation = useMutation({
+    mutationFn: (email: string) => sendEmail(email, setEmailCode),
+    onSuccess: (status) => {
+      if (status === 200) {
+        form.setError('id', { type: 'required', message: '' });
+        form.setError('email', { type: 'required', message: '' });
+        setShowCode(true);
+      } else addToast({ type: 'error', message: '이메일 전송이 실패되었습니다.' });
+    },
+    onError: (error) => addToast({ type: 'error', message: error.message }),
+  });
+
   /** 이메일 인증하기 버튼(뱃지) 클릭 */
   const authEmail = async () => {
+    if (emailMutation.isPending) return; // 이미 실행중이면 리턴
+
     const id = form.getValues('id');
     const email = form.getValues('email');
 
@@ -83,12 +100,8 @@ function FindPwDialog({ children }: Props) {
     }
 
     // 이메일로 인증코드 전달
-    const status = await sendEmail(form.getValues('email'), setEmailCode);
-    if (status !== 200) return;
-
-    form.setError('id', { type: 'required', message: '' });
-    form.setError('email', { type: 'required', message: '' });
-    setShowCode(true);
+    setEmail(email);
+    email.trim() !== '' && emailMutation.mutateAsync(email);
   };
 
   /** 인증번호 확인 */
