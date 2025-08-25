@@ -1,5 +1,5 @@
 import useToast from '@/hooks/useToast';
-import { getEmail, getId, sendEmail } from '@/services/customer-apis';
+import { compareCode, getEmail, getId, sendEmail } from '@/services/customer-apis';
 import { useEmailCodeStore } from '@/store/session';
 import { findIdSchema } from '@/validate/find-id-form-schema';
 import {
@@ -30,6 +30,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import Loading from '../common/loading';
+import { validEmail } from '@/validate/join-form-schema';
 
 type Props = {
   children: React.ReactNode;
@@ -71,42 +72,43 @@ function FindIdDialog({ children }: Props) {
   const authEmail = async () => {
     const email = form.getValues('email');
 
-    if (!email) {
-      form.setError('email', { type: 'required', message: '이메일을 입력해주세요.' });
-      return;
-    }
-
-    const regexp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/g;
-    if (!regexp.test(email)) {
-      form.setError('email', { type: 'regex', message: '유효한 이메일 형식이 아닙니다.' });
-      return;
-    }
+    const validFlag = validEmail(email, form); // 이메일만 유효성 검증
+    if (!validFlag) return;
 
     // 이메일 확인
     const response = await getEmail(email);
-
     if (!response.email) {
       addToast({ type: 'error', message: '존재하지 않는 이메일입니다.' });
       return;
     }
 
+    // 이메일로 인증코드 전달
+    const status = await sendEmail(form.getValues('email'), setEmailCode);
+    if (status !== 200) return;
+
     form.setError('email', { type: 'required', message: '' });
     setShowCode(true);
-
-    // 이메일 전달
-    await sendEmail(form.getValues('email'), setEmailCode);
   };
 
   /** 인증번호 확인 */
-  const onSubmit = () => {
+  const onSubmit = async () => {
+    if (success) return;
+
     const inputCode = form.getValues('code');
-    if (code === inputCode) {
-      setSuccess(true);
-      setEmail(form.getValues('email'));
-    } else {
-      addToast({ type: 'error', message: '인증번호가 일치하지 않습니다.' });
-      setSuccess(false);
-      setEmail('');
+    if (!inputCode)
+      form.setError('code', { type: 'required', message: '인증번호를 입력 바랍니다.' });
+    else {
+      const data = await compareCode(inputCode, code);
+      if (data.code === 200) {
+        // 인증성공
+        setSuccess(true);
+        setEmail(form.getValues('email'));
+      } else {
+        // 인증실패
+        addToast({ type: 'error', message: '인증번호가 일치하지 않습니다.' });
+        setSuccess(false);
+        setEmail('');
+      }
     }
   };
 
