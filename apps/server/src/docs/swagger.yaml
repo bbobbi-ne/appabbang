@@ -1956,42 +1956,7 @@ paths:
                     description: 이메일
                     example: test1231@naver.com
 
-  /customers/pw:
-    post:
-      tags: [Customers]
-      summary: 아이디와 이메일이 일치하는 정보의 비밀번호를 임시 비밀번호로 변경합니다. (권한: 없음 - 누구나 접근가능)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - id
-                - email
-              properties:
-                id: 
-                  type: string
-                  description: 아이디
-                  example: test000001
-                email:
-                  type: string
-                  description: 이메일
-                  example: test1231@naver.com
-      responses:
-        '200':
-          description: 아이디와 이메일이 일치하는 정보의 비밀번호를 임시 비밀번호로 변경 성공
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - tempPw
-                properties:
-                  tempPw:
-                    type: string
-                    description: 임시 비밀번호
-                    example: QY_qGF7zd{^;a%a
+  
 
   /customers/comepare-code:
     post:
