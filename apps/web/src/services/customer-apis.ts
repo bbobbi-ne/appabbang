@@ -267,14 +267,16 @@ export const getIdEmail = async (id: string, email: string) => {
   if (response.status === 200) return response.data;
 };
 
-/** 아이디와 이메일이 매핑되는 정보의 임시 비밀번호 변경 */
-export const modifyPw = async ({ id, email }: { id: string; email: string }) => {
-  const response = await client.post('/customers/pw', { id, email });
-  return response.data;
-};
-
-/** 이메일 인증코드 비교 : 해싱된 인증코드와 비교함 */
-export const compareCode = async (code: string, hashedCode: string) => {
-  const response = await client.post('/customers/compare-code', { code, hashedCode });
+/**
+ * 이메일 인증코드 비교 : 해싱된 인증코드와 비교함
+ * id, email : 비밀번호 찾기 화면에서만 필요한 파라미터
+ */
+export const compareCode = async (
+  code: string,
+  hashedCode: string,
+  id?: string,
+  email?: string,
+) => {
+  const response = await client.post('/customers/compare-code', { code, hashedCode, id, email });
   return response.data;
 };

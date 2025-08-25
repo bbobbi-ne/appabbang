@@ -1,5 +1,5 @@
 import useToast from '@/hooks/useToast';
-import { compareCode, getIdEmail, modifyPw, sendEmail } from '@/services/customer-apis';
+import { compareCode, getIdEmail, sendEmail } from '@/services/customer-apis';
 import { useEmailCodeStore } from '@/store/session';
 import { findPwSchema, findPwValidEmail, pwModifyFormSchema } from '@/validate/find-pw-form-schema';
 import {
@@ -40,7 +40,6 @@ function FindPwDialog({ children }: Props) {
   const { code, set: setEmailCode } = useEmailCodeStore();
   const { addToast } = useToast();
   const { reset: emailCodeReset } = useEmailCodeStore();
-  const [tempPw, setTempPw] = useState<string>('');
 
   const form = useForm({
     resolver: zodResolver(findPwSchema),
@@ -96,30 +95,17 @@ function FindPwDialog({ children }: Props) {
   const onSubmit = async () => {
     const inputCode = form.getValues('code');
     if (inputCode) {
-      const data = await compareCode(inputCode, code);
+      const id = form.getValues('id');
+      const email = form.getValues('email');
+      const data = await compareCode(inputCode, code, id, email);
 
       if (data.code === 200) {
         setSuccess(true);
-        await modifyPassword();
+        emailCodeReset();
       } else {
         addToast({ type: 'error', message: '인증번호가 일치하지 않습니다.' });
         setSuccess(false);
       }
-    }
-  };
-
-  /** 아이디, 이메일 정보의 임시 비밀번호 제공 */
-  const modifyPassword = async () => {
-    const data = {
-      id: form.getValues('id'),
-      email: form.getValues('email'),
-    };
-
-    // 비밀번호 변경
-    const tempPwData = await modifyPw(data);
-    if (tempPwData) {
-      setTempPw(tempPwData.tempPw);
-      emailCodeReset();
     }
   };
 
@@ -261,12 +247,12 @@ function FindPwDialog({ children }: Props) {
             <CardHeader>
               <CardTitle className="text-lg">임시 비밀번호를 전달합니다!</CardTitle>
               <CardDescription>
-                고객님의 잃어버린 비밀번호 대신 임시 비밀번호를 제공합니다. 해당 임시 비밀번호로
-                로그인을 시도하세요.
+                고객님의 잃어버린 비밀번호는 임시 비밀번호를 대체되었습니다.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              고객님의 임시 비밀번호는 <strong>{String(tempPw)}</strong>입니다.
+              입력한 이메일({form.getValues('email')})로 임시 비밀번호를 전달합니다. 해당 임시
+              비밀번호로 로그인을 시도하세요.
             </CardContent>
           </Card>
         ) : null}

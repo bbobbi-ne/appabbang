@@ -312,6 +312,12 @@ export const emailCodeValidator = [
     .isLength({ min: 1 })
     .withMessage('해싱 인증번호는 1자 이상 입력되어야 합니다.')
     .trim(),
+
+  body(EMAIL_VALIDATION.key)
+    .isString()
+    .withMessage(EMAIL_VALIDATION.string.message)
+    .optional()
+    .trim(),
 ];
 
 /**

@@ -11,7 +11,7 @@ import { AppError } from '@/types';
 import { ClientPayload } from '@/types/client-payload';
 import { Request, Response } from 'express';
 import * as customerService from '@/services/customer.service';
-import { sendEmail } from '@/lib/send-email-code';
+import { sendEmail, sendEmailTempPw } from '@/lib/send-email';
 
 export const getList = async (_: Request, res: Response) => {
   res.status(200).json('Hello World');
@@ -121,26 +121,35 @@ export const getIdEmail = async (req: Request, res: Response) => {
 };
 
 /** 아이디와 이메일에 매핑되는 임시 비밀번호 변경 */
-export const modifyPw = async (req: Request, res: Response) => {
+export const modifyPw = async (req: Request) => {
   const { id, email } = req.body;
   if (!id || !email)
     throw AppError.internalServerError('비밀번호를 변경할 정보가 확인되지 않습니다.');
 
   // 임시 비밀번호 생성
   const tempPw = generateTempPassword();
-
+  // 임시 비밀번호 안내 메일 전송
+  const code = await sendEmailTempPw(req.body.email, tempPw);
+  // 임시 비밀번호로 변경
   await customerService.modifyPw(id, email, tempPw);
-  res.status(200).json({ tempPw });
+  if (!code) throw AppError.internalServerError('임시 비밀번호가 존재하지 않습니다.');
+
+  return { tempPw };
 };
 
 /** 고객이 입력한 코드와 해싱 코드 비교 */
 export const compareCode = async (req: Request, res: Response) => {
-  const { code, hashedCode } = req.body;
+  const { code, hashedCode, email } = req.body;
   if (!code || !hashedCode)
     throw AppError.internalServerError('검증하기 위한 인증번호 정보가 확인되지 않습니다.');
 
+  // 인증번호 비교
   const result = await comparePassword(code, hashedCode);
-  const data = result ? { code: 200 } : { code: 500 };
 
+  // 이메일이 존재할 때만 임시 비밀번호 변경처리.
+  // 해당 로직은 비밀번호 찾기 기능에서만 실행되어야 함.
+  email && (await modifyPw(req));
+
+  const data = result ? { code: 200 } : { code: 500 };
   res.status(200).json(data);
 };
