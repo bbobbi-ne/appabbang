@@ -17,6 +17,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
+import FindIdDialog from './find-id-dialog';
 
 const labelMinWidth = 'min-w-[100px]';
 
@@ -109,19 +110,17 @@ function LoginForm() {
           )}
         />
 
-        <p className="text-right pt-2 pb-4 flex flex-col gap-2">
-          <Link className="text-gray-500 text-xs hover:underline" to="/join">
-            아직 회원이 아니신가요? 회원가입하러가기
+        <div className="cursor-pointer pt-10 pb-2 flex flex-row justify-center items-center gap-2 text-gray-500 text-sm ">
+          <FindIdDialog>
+            <div className="hover:underline">아이디찾기</div>
+          </FindIdDialog>
+          <div> | </div>
+          <div className="hover:underline">비밀번호찾기</div>
+          <div> | </div>
+          <Link className="hover:underline" to="/join">
+            회원가입
           </Link>
-          {/* <div className="flex justify-end gap-2">
-            <Link className="text-gray-500 text-xs hover:underline" to="/find-id">
-              아이디찾기
-            </Link>
-            <Link className="text-gray-500 text-xs hover:underline" to="/find-pw">
-              비밀번호찾기
-            </Link>
-          </div> */}
-        </p>
+        </div>
         <Button className="w-full" type="submit">
           로그인
         </Button>

@@ -159,3 +159,23 @@ export const getOneForCheck = async (id: string) => {
 
   return customer;
 };
+
+/** 이메일 조회 */
+export const getEmail = async (email: string) => {
+  return await prisma.customer.findFirst({
+    where: { email },
+    select: { email: true },
+  });
+};
+
+/** 이메일로 아이디 조회 */
+export const getId = async (email: string) => {
+  const id = await prisma.customer.findFirst({
+    where: { email },
+    select: { id: true },
+  });
+
+  if (!id) throw AppError.notFound('해당 이메일은 존재하지 않습니다.');
+
+  return id;
+};

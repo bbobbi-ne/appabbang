@@ -236,3 +236,24 @@ export const sendEmail = async (email: string, setEmailCode: (code: string) => v
     setEmailCode(code);
   }
 };
+
+/** 이메일 가져오기 */
+export const getEmail = async (email: string) => {
+  const response = await client.post(`/customers/email`, { email });
+
+  if (response.status === 200) return response.data;
+};
+
+/** 아이디 가져오기 */
+export const getId = async (email: string, emailCodeReset: () => void) => {
+  try {
+    const response = await client.post('/customers/id', { email });
+
+    if (response.status === 200) {
+      emailCodeReset();
+      return response.data;
+    }
+  } catch (e: any) {
+    addToast({ type: 'error', message: e.response.data.error.message });
+  }
+};

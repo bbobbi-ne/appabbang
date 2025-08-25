@@ -33,12 +33,18 @@ router.get('/:no', requireAdmin, asyncHandler(customerController.getOne));
 /** POST /auth/customers/join : 고객 회원가입 */
 router.post('/', validate(createCustomerValidator), asyncHandler(customerController.create));
 
+/** POST /customers/email : 고객 이메일 조회 */
+router.post('/email', validate(sendEmailValidator), asyncHandler(customerController.getEmail));
+
 /** POST /customers/send-email : 고객 회원가입 시 이메일로 인증코드 전송 */
 router.post(
   '/send-email',
   validate(sendEmailValidator),
   asyncHandler(customerController.sendEmailCode),
 );
+
+/** POST /customers/id : 고객 아이디 조회 */
+router.post('/id', validate(sendEmailValidator), asyncHandler(customerController.getId));
 
 /** GET /customers/{no}/address : 고객 주소 목록 조회 */
 router.get(
