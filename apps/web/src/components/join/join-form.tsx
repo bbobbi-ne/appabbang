@@ -25,7 +25,7 @@ import { joinSchema, validEmail, type JoinSchemaType } from '@/validate/join-for
 import ServiceIsAgreedDialog from './service-terms-agreed-dialog';
 import PrivacyTermsAgreedDialog from './privacy-terms-agreed-dialog';
 import useToast from '@/hooks/useToast';
-import { compareCode, createCustomer, sendEmail } from '@/services/customer-apis';
+import { compareCode, createCustomer, getEmail, sendEmail } from '@/services/customer-apis';
 import { useAccessTokenStore, useEmailCodeStore } from '@/store/session';
 import { useCustomerStore } from '@/store/customer';
 import { useState } from 'react';
@@ -86,6 +86,13 @@ export default function JoinForm() {
 
     const validFlag = validEmail(email, form); // 이메일만 유효성 검증
     if (!validFlag) return;
+
+    // 이메일 인증 보내기 전에, 이미 DB에 존재하는지 확인 (존재하면 가입불가)
+    const response = await getEmail(email);
+    if (response.email) {
+      addToast({ type: 'error', message: '이미 존재하는 이메일입니다.' });
+      return;
+    }
 
     setEmail(email);
     email.trim() !== '' && emailMutation.mutateAsync(email); // 이메일
