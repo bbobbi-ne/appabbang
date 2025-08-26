@@ -153,3 +153,13 @@ export const compareCode = async (req: Request, res: Response) => {
   const data = result ? { code: 200 } : { code: 500 };
   res.status(200).json(data);
 };
+
+/** 아이디 중복체크 */
+export const getCheckId = async (req: Request, res: Response) => {
+  const { id } = req.body;
+  if (!id) throw AppError.internalServerError('아이디 중복체크를 위한 아이디가 확인되지 않습니다.');
+
+  const response = await customerService.getCheckId(id);
+  const data = response ? response.id : null;
+  res.status(200).json({ id: data });
+};

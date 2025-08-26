@@ -25,7 +25,13 @@ import { joinSchema, validEmail, type JoinSchemaType } from '@/validate/join-for
 import ServiceIsAgreedDialog from './service-terms-agreed-dialog';
 import PrivacyTermsAgreedDialog from './privacy-terms-agreed-dialog';
 import useToast from '@/hooks/useToast';
-import { compareCode, createCustomer, getEmail, sendEmail } from '@/services/customer-apis';
+import {
+  compareCode,
+  createCustomer,
+  getCheckId,
+  getEmail,
+  sendEmail,
+} from '@/services/customer-apis';
 import { useAccessTokenStore, useEmailCodeStore } from '@/store/session';
 import { useCustomerStore } from '@/store/customer';
 import { useState } from 'react';
@@ -125,6 +131,20 @@ export default function JoinForm() {
     form.setValue('code', ''); // 초기화
   };
 
+  /** 아이디 중복체크 */
+  const checkId = async (id: string) => {
+    if (!id) {
+      form.setError('id', { type: 'value', message: '' });
+      return;
+    }
+
+    const response = await getCheckId(id);
+    if (response.id) {
+      form.setError('id', { type: 'value', message: '이미 존재하는 아이디입니다.' });
+      form.setFocus('id');
+    }
+  };
+
   // 폼 선언
   const form = useForm<JoinSchemaType>({
     resolver: zodResolver(joinSchema),
@@ -154,11 +174,7 @@ export default function JoinForm() {
 
     // 이메일 인증 확인
     if (!check) {
-      addToast({
-        type: 'error',
-        message: '이메일 인증이 필요합니다.',
-      });
-
+      addToast({ type: 'error', message: '이메일 인증이 필요합니다.' });
       return;
     }
 
@@ -199,7 +215,16 @@ export default function JoinForm() {
 
               <div className="w-full space-y-1">
                 <FormControl>
-                  <Input type="text" {...field} placeholder="아이디 입력" maxLength={30} />
+                  <Input
+                    type="text"
+                    {...field}
+                    placeholder="아이디 입력"
+                    maxLength={30}
+                    onBlur={(e) => {
+                      field.onBlur();
+                      checkId(e.target.value);
+                    }}
+                  />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>

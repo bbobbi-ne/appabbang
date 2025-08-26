@@ -1995,6 +1995,39 @@ paths:
                     description: 인증번호 비교 결과
                     example: 200
 
+  /customers/check/id:
+    post:
+      tags: [Customers]
+      summary: 중복체크를 위한 아이디를 조회합니다. (권한: 없음 - 누구나 접근가능)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id: 
+                  type: string
+                  description: 아이디
+                  example: test000001
+      responses:
+        '200':
+          description: 아이디 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    type: string
+                    description: 아이디
+                    example: test000001
+
+
   /customers/{no}:
     get:
       tags: [Customers]

@@ -14,6 +14,7 @@ import {
 import {
   createCustomerValidator,
   emailCodeValidator,
+  idCheckValidator,
   idEmailValidator,
   sendEmailValidator,
 } from '@/middlewares/validators/auth-validate';
@@ -44,6 +45,9 @@ router.post(
   validate(sendEmailValidator),
   asyncHandler(customerController.sendEmailCode),
 );
+
+/** POST /customers/check/id : 고객 아이디 중복체크(회원가입) */
+router.post('/check/id', validate(idCheckValidator), asyncHandler(customerController.getCheckId));
 
 /** POST /customers/id : 고객 아이디 조회 */
 router.post('/id', validate(sendEmailValidator), asyncHandler(customerController.getId));

@@ -168,6 +168,16 @@ export const getEmail = async (email: string) => {
   });
 };
 
+/** 아이디 중복체크를 위한 아이디 조회 */
+export const getCheckId = async (id: string) => {
+  const data = await prisma.customer.findFirst({
+    where: { id },
+    select: { id: true },
+  });
+
+  return data;
+};
+
 /** 이메일로 아이디 조회 */
 export const getId = async (email: string) => {
   const id = await prisma.customer.findFirst({

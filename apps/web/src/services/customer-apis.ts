@@ -246,7 +246,17 @@ export const getEmail = async (email: string) => {
   if (response.status === 200) return response.data;
 };
 
-/** 아이디 가져오기 */
+/** 아이디 가져오기
+ * @params id
+ */
+export const getCheckId = async (id: string) => {
+  const response = await client.post('/customers/check/id', { id });
+  if (response.status === 200) return response.data;
+};
+
+/** 아이디 가져오기
+ * @params email, emailCodeReset
+ */
 export const getId = async (email: string, emailCodeReset: () => void) => {
   try {
     const response = await client.post('/customers/id', { email });
