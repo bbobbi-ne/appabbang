@@ -41,7 +41,6 @@ function FindPwDialog({ children }: Props) {
   const { code, set: setEmailCode } = useEmailCodeStore();
   const { addToast } = useToast();
   const { reset: emailCodeReset } = useEmailCodeStore();
-  const [email, setEmail] = useState<string>('');
 
   const form = useForm({
     resolver: zodResolver(findPwSchema),
@@ -100,7 +99,6 @@ function FindPwDialog({ children }: Props) {
     }
 
     // 이메일로 인증코드 전달
-    setEmail(email);
     email.trim() !== '' && emailMutation.mutateAsync(email);
   };
 
