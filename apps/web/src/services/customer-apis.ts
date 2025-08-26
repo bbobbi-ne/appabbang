@@ -234,5 +234,49 @@ export const sendEmail = async (email: string, setEmailCode: (code: string) => v
     const code = response.data.code;
     sessionStorage.setItem('code', code);
     setEmailCode(code);
+
+    return response.status;
   }
+};
+
+/** 이메일 가져오기 */
+export const getEmail = async (email: string) => {
+  const response = await client.post(`/customers/email`, { email });
+
+  if (response.status === 200) return response.data;
+};
+
+/** 아이디 가져오기 */
+export const getId = async (email: string, emailCodeReset: () => void) => {
+  try {
+    const response = await client.post('/customers/id', { email });
+
+    if (response.status === 200) {
+      emailCodeReset();
+      return response.data;
+    }
+  } catch (e: any) {
+    addToast({ type: 'error', message: e.response.data.error.message });
+  }
+};
+
+/** 아이디와 이메일 가져오기 */
+export const getIdEmail = async (id: string, email: string) => {
+  const response = await client.post('/customers/id-email', { id, email });
+
+  if (response.status === 200) return response.data;
+};
+
+/**
+ * 이메일 인증코드 비교 : 해싱된 인증코드와 비교함
+ * id, email : 비밀번호 찾기 화면에서만 필요한 파라미터
+ */
+export const compareCode = async (
+  code: string,
+  hashedCode: string,
+  id?: string,
+  email?: string,
+) => {
+  const response = await client.post('/customers/compare-code', { code, hashedCode, id, email });
+  return response.data;
 };

@@ -159,3 +159,50 @@ export const getOneForCheck = async (id: string) => {
 
   return customer;
 };
+
+/** 이메일 조회 */
+export const getEmail = async (email: string) => {
+  return await prisma.customer.findFirst({
+    where: { email },
+    select: { email: true },
+  });
+};
+
+/** 이메일로 아이디 조회 */
+export const getId = async (email: string) => {
+  const id = await prisma.customer.findFirst({
+    where: { email },
+    select: { id: true },
+  });
+
+  if (!id) throw AppError.notFound('해당 이메일은 존재하지 않습니다.');
+
+  return id;
+};
+
+/** 아이디와 이메일 조회 */
+export const getIdEmail = async (id: string, email: string) => {
+  const customer = await prisma.customer.findFirst({
+    where: { id, email },
+    select: { id: true, email: true },
+  });
+
+  if (!customer) throw AppError.notFound('해당 정보는 존재하지 않습니다.');
+
+  return customer;
+};
+
+/** 비밀번호 변경 */
+export const modifyPw = async (id: string, email: string, pw: string) => {
+  //해시 비밀번호 생성
+  const hashedPw = await hashPassword(pw);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.customer.update({
+      where: { id, email },
+      data: {
+        pw: hashedPw,
+      },
+    });
+  });
+};

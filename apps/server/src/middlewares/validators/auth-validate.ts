@@ -272,6 +272,54 @@ export const sendEmailValidator = [
     .trim(),
 ];
 
+export const idEmailValidator = [
+  body(ID_VALIDATION.key)
+    .notEmpty()
+    .withMessage(ID_VALIDATION.empty.message)
+    .matches(ID_VALIDATION.matches.value)
+    .withMessage(ID_VALIDATION.matches.message)
+    .isString()
+    .withMessage(ID_VALIDATION.string.message)
+    .isLength({ min: ID_VALIDATION.length.min, max: ID_VALIDATION.length.max })
+    .withMessage(ID_VALIDATION.length.message)
+    .trim(),
+
+  body(EMAIL_VALIDATION.key)
+    .notEmpty()
+    .withMessage(EMAIL_VALIDATION.empty.message)
+    .matches(EMAIL_VALIDATION.matches.value)
+    .withMessage(EMAIL_VALIDATION.matches.message)
+    .isString()
+    .withMessage(EMAIL_VALIDATION.string.message)
+    .trim(),
+];
+
+export const emailCodeValidator = [
+  body('code')
+    .notEmpty()
+    .withMessage('인증번호를 입력하세요.')
+    .isString()
+    .withMessage('인증번호는 문자열로 입력되어야 합니다.')
+    .isLength({ min: 1 })
+    .withMessage('인증번호는 1자 이상 입력되어야 합니다.')
+    .trim(),
+
+  body('hashedCode')
+    .notEmpty()
+    .withMessage('해싱 인증번호를 확인하세요.')
+    .isString()
+    .withMessage('해싱 인증번호는 1자 이상 입력되어야 합니다.')
+    .isLength({ min: 1 })
+    .withMessage('해싱 인증번호는 1자 이상 입력되어야 합니다.')
+    .trim(),
+
+  body(EMAIL_VALIDATION.key)
+    .isString()
+    .withMessage(EMAIL_VALIDATION.string.message)
+    .optional()
+    .trim(),
+];
+
 /**
  * 고객정보 수정 유효성 검증
  */

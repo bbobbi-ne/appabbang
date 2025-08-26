@@ -1,7 +1,9 @@
 /**
  * 회원가입 유효성 검증
  */
+import type { UseFormReturn } from 'react-hook-form';
 import z from 'zod';
+import type { FindIdSchema } from './find-id-form-schema';
 
 const ID_VALIDATION = {
   min: { value: 5, message: '아이디는 5자 이상 입력 바랍니다.' },
@@ -148,3 +150,19 @@ export const joinSchema = z
 
 // 스키마 타입
 export type JoinSchemaType = z.infer<typeof joinSchema>;
+
+/** '이메일'만 유효성 검증 */
+export const validEmail = (email: string, form: UseFormReturn<JoinSchemaType>) => {
+  if (!email) {
+    form.setError('email', { type: 'required', message: '이메일을 입력해주세요.' });
+    return false;
+  }
+
+  const regexp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/g;
+  if (!regexp.test(email)) {
+    form.setError('email', { type: 'regex', message: '유효한 이메일 형식이 아닙니다.' });
+    return false;
+  }
+
+  return true;
+};
