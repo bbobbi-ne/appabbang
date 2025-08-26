@@ -102,14 +102,14 @@ function FindPwDialog({ children }: Props) {
     email.trim() !== '' && emailMutation.mutateAsync(email);
   };
 
-  /** 인증번호 확인 */
-  const onSubmit = async () => {
-    const inputCode = form.getValues('code');
-    if (inputCode) {
-      const id = form.getValues('id');
-      const email = form.getValues('email');
-      const data = await compareCode(inputCode, code, id, email);
-
+  /** 인증번호 확인 mutation */
+  const compareMutation = useMutation<
+    { code: number },
+    Error,
+    { inputCode: string; code: string; id: string; email: string }
+  >({
+    mutationFn: ({ inputCode, code, id, email }) => compareCode(inputCode, code, id, email),
+    onSuccess: (data) => {
       if (data.code === 200) {
         setSuccess(true);
         emailCodeReset();
@@ -117,6 +117,20 @@ function FindPwDialog({ children }: Props) {
         addToast({ type: 'error', message: '인증번호가 일치하지 않습니다.' });
         setSuccess(false);
       }
+    },
+    onError: (error) => addToast({ type: 'error', message: error.message }),
+  });
+
+  /** 인증번호 확인 */
+  const onSubmit = async () => {
+    if (compareMutation.isPending) return; // 이미 실행중이면 리턴
+
+    const inputCode = form.getValues('code');
+    if (inputCode) {
+      const id = form.getValues('id');
+      const email = form.getValues('email');
+
+      compareMutation.mutateAsync({ inputCode, code, id, email });
     }
   };
 
@@ -163,7 +177,7 @@ function FindPwDialog({ children }: Props) {
                           {...field}
                           placeholder="아이디 입력"
                           maxLength={50}
-                          disabled={success} // 인증 완료되고나면 수정불가
+                          disabled={showCode} // 인증 완료되고나면 수정불가
                         />
                       </div>
                     </FormControl>
@@ -190,7 +204,7 @@ function FindPwDialog({ children }: Props) {
                           {...field}
                           placeholder="이메일 입력"
                           maxLength={50}
-                          disabled={success} // 인증 완료되고나면 수정불가
+                          disabled={showCode} // 인증 완료되고나면 수정불가
                         />
                         <Badge
                           variant="secondary"
