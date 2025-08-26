@@ -137,6 +137,19 @@ const UPDATE_PASSWORD_VALIDATION = {
   empty: { message: '비밀번호를 입력하세요.' },
 };
 
+export const idCheckValidator = [
+  body(ID_VALIDATION.key)
+    .notEmpty()
+    .withMessage(ID_VALIDATION.empty.message)
+    .matches(ID_VALIDATION.matches.value)
+    .withMessage(ID_VALIDATION.matches.message)
+    .isString()
+    .withMessage(ID_VALIDATION.string.message)
+    .isLength({ min: ID_VALIDATION.length.min, max: ID_VALIDATION.length.max })
+    .withMessage(ID_VALIDATION.length.message)
+    .trim(),
+];
+
 /**
  * 회원가입 유효성 검증
  */
