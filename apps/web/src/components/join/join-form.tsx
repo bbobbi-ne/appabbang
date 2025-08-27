@@ -2,7 +2,7 @@
  * 회원가입 폼
  */
 
-import { useForm, type SubmitHandler } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Badge,
@@ -25,20 +25,21 @@ import { joinSchema, type JoinSchemaType } from '@/validate/join-form-schema';
 import ServiceIsAgreedDialog from './service-terms-agreed-dialog';
 import PrivacyTermsAgreedDialog from './privacy-terms-agreed-dialog';
 import useToast from '@/hooks/useToast';
-import { createCustomer, sendEmail } from '@/services/customer-apis';
-import { useAccessTokenStore, useEmailCodeStore } from '@/store/session';
-import { useCustomerStore } from '@/store/customer';
+import { useEmailCodeStore } from '@/store/session';
 import { useState } from 'react';
+import { useCreateCustomerMutation, useSendEmailMutation } from '@/hooks/use-customer';
+import type { CustomersCreatePayload } from '@/api/data-contracts';
 
 const labelMinWidth = 'min-w-[120px]';
 
 export default function JoinForm() {
   const { addToast } = useToast();
-  const { set: setAccessToken } = useAccessTokenStore();
-  const { set: setCustomer } = useCustomerStore();
+
   const [showCode, setShowCode] = useState<boolean>(false);
   const [check, setCheck] = useState<boolean>(false);
-  const { code, set: setEmailCode } = useEmailCodeStore();
+  const { code, set: setEmailCode, reset } = useEmailCodeStore();
+  const createCustomer = useCreateCustomerMutation();
+  const SendEmailMutation = useSendEmailMutation();
 
   /** 전체동의 체크박스 */
   const allCheck = (allAgreed: boolean) => {
@@ -83,7 +84,15 @@ export default function JoinForm() {
     setShowCode(true);
 
     // 이메일 전달
-    await sendEmail(form.getValues('email'), setEmailCode);
+
+    try {
+      const response = await SendEmailMutation.mutateAsync({ email: form.getValues('email') });
+      const code = response.code;
+      sessionStorage.setItem('code', code);
+      setEmailCode(code);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   /** 인증코드 체크 */
@@ -155,8 +164,25 @@ export default function JoinForm() {
   /**
    * 회원가입 submit
    */
-  const onSubmit: SubmitHandler<JoinSchemaType> = (data) => {
-    createCustomer(data, setAccessToken, setCustomer);
+  const onSubmit = async (data: CustomersCreatePayload) => {
+    try {
+      const res = await createCustomer.mutateAsync(data);
+      reset();
+
+      addToast({
+        type: 'success',
+        message: `${res.data.name}님, 환영합니다!`,
+      });
+
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1500);
+    } catch (error: any) {
+      addToast({
+        type: 'error',
+        message: error.response.data.error.message,
+      });
+    }
   };
 
   return (

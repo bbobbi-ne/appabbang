@@ -75,8 +75,8 @@ export default function MyOrderDetailPage({ orderNo }: { orderNo: number }) {
   useEffect(() => {
     if (order) {
       let unitPrice = 0;
-      order?.orderItems?.map((item: OrderItemsType) => {
-        unitPrice += item.totalPrice;
+      order?.orderItems?.map((item) => {
+        unitPrice += item.totalPrice!;
       });
 
       setAmount(unitPrice);
@@ -87,6 +87,7 @@ export default function MyOrderDetailPage({ orderNo }: { orderNo: number }) {
   const onDeliveryMove = (no: number) => navigate({ to: `/mypage/order-list/${no}/delivery` });
 
   if (isLoading) return <div>주문정보를 조회중입니다...</div>;
+  if (!order) return <div>주문 데이터를 불러올 수 없습니다.</div>;
 
   return (
     <Card>
@@ -103,7 +104,7 @@ export default function MyOrderDetailPage({ orderNo }: { orderNo: number }) {
                 )}
               </div>
               <h3 className="text-xl font-semibold">
-                {new Date(order.createdAt).toISOString().split('T')[0]} 주문
+                {new Date(order!.createdAt).toISOString().split('T')[0]} 주문
               </h3>
             </div>
           </div>
@@ -150,7 +151,7 @@ export default function MyOrderDetailPage({ orderNo }: { orderNo: number }) {
         <div>
           <h3 className="font-semibold text-xl pt-2 pb-4">주문상품 내역</h3>
           <div className="space-y-2">
-            {order.orderItems.map((item: OrderItemsType, i: number) => (
+            {order.orderItems.map((item, i: number) => (
               <OrderItem key={i} item={item} />
             ))}
           </div>

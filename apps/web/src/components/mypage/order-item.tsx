@@ -1,18 +1,8 @@
-export interface IOrderItem {
-  no: number;
-  breadName: string;
-  breadImageUrl: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-  countryOfOrigin?: string;
-  allergyInfo?: string;
-  orderNo: number;
-  customerNo?: number;
-  couponNo?: number | null;
-}
+import type { OrdersDeliveryListData } from '@/api/data-contracts';
 
-function OrderItem({ item }: { item: IOrderItem }) {
+export type OrderItem = NonNullable<OrdersDeliveryListData['orderItems']>[number];
+
+function OrderItem({ item }: { item: OrderItem }) {
   return (
     <div className="flex flex-col gap-1">
       <div className="flex flex-row gap-5">
@@ -24,7 +14,7 @@ function OrderItem({ item }: { item: IOrderItem }) {
         <div className="mt-2">
           <p>{item.breadName}</p>
           <div className="flex gap-2">
-            <span>{item.unitPrice.toLocaleString()}원</span>
+            <span>{item.unitPrice!.toLocaleString()}원</span>
             <span>{item.quantity}개</span>
           </div>
         </div>
