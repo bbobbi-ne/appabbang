@@ -33,57 +33,40 @@ export class CustomHttpClient extends HttpClient {
       },
     });
 
-    // if (this.refreshFn) {
-    //   this.instance.interceptors.response.use(
-    //     (response) => response,
-    //     async (error) => {
-    //       const originalRequest = error.config;
-    //       const status = error.response?.status;
+    if (this.refreshFn) {
+      this.instance.interceptors.response.use(
+        (response) => response,
+        async (error) => {
+          const originalRequest = error.config;
 
-    //       // 401/403 + 원래 요청 한 번만 재시도
-    //       if ((status === 401 || status === 403) && !originalRequest._retry) {
-    //         originalRequest._retry = true;
+          if (
+            (error.response?.status === 403 || error.response?.status === 401) &&
+            !originalRequest._retry
+          ) {
+            originalRequest._retry = true;
 
-    //         // refresh 요청 자체이면 interceptor 무시
-    //         if (originalRequest._isRefreshRequest) {
-    //           useAccessTokenStore.getState().reset();
-    //           useCustomerStore.getState().reset();
-    //           deleteCookie('refreshToken');
-    //           return Promise.reject(error);
-    //         }
+            if (!this.refreshFn) {
+              throw new Error('refresh 함수가 설정되지 않음');
+            }
 
-    //         if (!this.refreshFn) {
-    //           return Promise.reject(new Error('refresh 함수가 설정되지 않음'));
-    //         }
+            try {
+              const { data: newAccessToken } = await this.refreshFn();
+              useAccessTokenStore.getState().set(newAccessToken);
 
-    //         try {
-    //           // refresh 요청 호출
-    //           const { data: newAccessToken } = await this.refreshFn();
+              originalRequest.headers = {
+                ...originalRequest.headers,
+                Authorization: `Bearer ${newAccessToken}`,
+              };
 
-    //           // 상태 및 세션에 저장
-    //           sessionStorage.setItem('accessToken', newAccessToken);
-    //           useAccessTokenStore.getState().set(newAccessToken);
+              return this.instance(originalRequest);
+            } catch (e) {
+              throw new Error('accessToken 재발급 실패');
+            }
+          }
 
-    //           // 헤더 업데이트 후 원래 요청 재시도
-    //           originalRequest.headers = {
-    //             ...originalRequest.headers,
-    //             Authorization: `Bearer ${newAccessToken}`,
-    //           };
-
-    //           return this.instance(originalRequest);
-    //         } catch (e: any) {
-    //           // refresh 실패 시 상태 초기화
-    //           useAccessTokenStore.getState().reset();
-    //           useCustomerStore.getState().reset();
-    //           deleteCookie('refreshToken');
-
-    //           return Promise.reject(e);
-    //         }
-    //       }
-
-    //       return Promise.reject(error);
-    //     },
-    //   );
-    // }
+          return Promise.reject(error);
+        },
+      );
+    }
   }
 }

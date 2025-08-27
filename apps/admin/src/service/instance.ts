@@ -32,7 +32,10 @@ export class CustomHttpClient extends HttpClient {
       async (error) => {
         const originalRequest = error.config;
 
-        if (error.response?.status === 403 && !originalRequest._retry) {
+        if (
+          (error.response?.status === 403 || error.response?.status === 401) &&
+          !originalRequest._retry
+        ) {
           originalRequest._retry = true;
 
           if (!this.refreshFn) {
