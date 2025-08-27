@@ -21,21 +21,14 @@ import {
 } from '@appabbang/ui';
 import DaumPostApi from '@/components/common/daum-post-api';
 import { formatMobile } from '@appabbang/utils';
-import { joinSchema, validEmail, type JoinSchemaType } from '@/validate/join-form-schema';
+import { joinSchema, type JoinSchemaType } from '@/validate/join-form-schema';
 import ServiceIsAgreedDialog from './service-terms-agreed-dialog';
 import PrivacyTermsAgreedDialog from './privacy-terms-agreed-dialog';
 import useToast from '@/hooks/useToast';
-import {
-  compareCode,
-  createCustomer,
-  getCheckId,
-  getEmail,
-  sendEmail,
-} from '@/services/customer-apis';
-import { useAccessTokenStore, useEmailCodeStore } from '@/store/session';
-import { useCustomerStore } from '@/store/customer';
+import { useEmailCodeStore } from '@/store/session';
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useCreateCustomerMutation, useSendEmailMutation } from '@/hooks/use-customer';
+import type { CustomersCreatePayload } from '@/api/data-contracts';
 
 const labelMinWidth = 'min-w-[120px]';
 
@@ -44,8 +37,9 @@ export default function JoinForm() {
 
   const [showCode, setShowCode] = useState<boolean>(false);
   const [check, setCheck] = useState<boolean>(false);
-  const { code, set: setEmailCode, reset: resetEmailCode } = useEmailCodeStore();
-  const [_, setEmail] = useState<string>('');
+  const { code, set: setEmailCode, reset } = useEmailCodeStore();
+  const createCustomer = useCreateCustomerMutation();
+  const SendEmailMutation = useSendEmailMutation();
 
   /** 전체동의 체크박스 */
   const allCheck = (allAgreed: boolean) => {
@@ -71,76 +65,46 @@ export default function JoinForm() {
       : form.setValue('allAgreed', false);
   };
 
-  /** 이메일 인증코드 전송 */
-  const emailMutation = useMutation({
-    mutationFn: (email: string) => sendEmail(email, setEmailCode),
-    onSuccess: (status) => {
-      if (status === 200) {
-        form.setError('email', { type: 'required', message: '' }); // 에러메세지 제거
-        setShowCode(true); // 인증코드 input 보이게 처리
-      } else addToast({ type: 'error', message: '이메일 전송이 실패되었습니다.' });
-    },
-    onError: (error) => addToast({ type: 'error', message: error.message }),
-  });
-
   /** 이메일 인증하기 버튼(뱃지) 클릭 */
   const authEmail = async () => {
-    if (emailMutation.isPending) return; // 이미 실행중이면 리턴
-
     const email = form.getValues('email');
 
-    const validFlag = validEmail(email, form); // 이메일만 유효성 검증
-    if (!validFlag) return;
-
-    // 이메일 인증 보내기 전에, 이미 DB에 존재하는지 확인 (존재하면 가입불가)
-    const response = await getEmail(email);
-    if (response.email) {
-      addToast({ type: 'error', message: '이미 존재하는 이메일입니다.' });
+    if (!email) {
+      form.setError('email', { type: 'required', message: '이메일을 입력해주세요.' });
       return;
     }
 
-    setEmail(email);
-    email.trim() !== '' && emailMutation.mutateAsync(email); // 이메일
+    const regexp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/g;
+    if (!regexp.test(email)) {
+      form.setError('email', { type: 'regex', message: '유효한 이메일 형식이 아닙니다.' });
+      return;
+    }
+
+    form.setError('email', { type: 'required', message: '' });
+    setShowCode(true);
+
+    // 이메일 전달
+
+    try {
+      const response = await SendEmailMutation.mutateAsync({ email: form.getValues('email') });
+      const code = response.code;
+      sessionStorage.setItem('code', code);
+      setEmailCode(code);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   /** 인증코드 체크 */
   const checkCode = async (value: string) => {
-    if (check) return; // 이미 체크되었으므로 기능을 수행하지 않는다.
-
-    // 이메일 인증코드 비교
-    const data = await compareCode(value, code);
-
-    if (data.code === 200) {
+    if (value === code) {
       // 인증성공
       form.setError('code', { type: 'value', message: '' });
       setCheck(true);
-      resetEmailCode();
     } else {
       // 인증실패
       form.setError('code', { type: 'value', message: '인증번호가 일치하지 않습니다.' });
       setCheck(false);
-    }
-  };
-
-  /** 이메일 재인증을 위한 상태값 리턴 */
-  const returnValidEmail = () => {
-    setShowCode(false); // 인증코드 input 리셋
-    setCheck(false); // 인증코드 검증 리셋
-    resetEmailCode(); // 세션에 저장된 해싱코드 리셋
-    form.setValue('code', ''); // 초기화
-  };
-
-  /** 아이디 중복체크 */
-  const checkId = async (id: string) => {
-    if (!id) {
-      form.setError('id', { type: 'value', message: '' });
-      return;
-    }
-
-    const response = await getCheckId(id);
-    if (response.id) {
-      form.setError('id', { type: 'value', message: '이미 존재하는 아이디입니다.' });
-      form.setFocus('id');
     }
   };
 
@@ -173,7 +137,11 @@ export default function JoinForm() {
 
     // 이메일 인증 확인
     if (!check) {
-      addToast({ type: 'error', message: '이메일 인증이 필요합니다.' });
+      addToast({
+        type: 'error',
+        message: '이메일 인증이 필요합니다.',
+      });
+
       return;
     }
 
@@ -231,16 +199,7 @@ export default function JoinForm() {
 
               <div className="w-full space-y-1">
                 <FormControl>
-                  <Input
-                    type="text"
-                    {...field}
-                    placeholder="아이디 입력"
-                    maxLength={30}
-                    onBlur={(e) => {
-                      field.onBlur();
-                      checkId(e.target.value);
-                    }}
-                  />
+                  <Input type="text" {...field} placeholder="아이디 입력" maxLength={30} />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>
@@ -285,36 +244,20 @@ export default function JoinForm() {
                       {...field}
                       placeholder="이메일 입력"
                       maxLength={50}
-                      disabled={showCode} // 인증 완료되고나면 수정불가
+                      disabled={check} // 인증 완료되고나면 수정불가
                     />
-                    {!showCode ? (
-                      <Badge
-                        variant="secondary"
-                        onClick={authEmail}
-                        className={cn(
-                          'cursor-pointer absolute right-2 top-1/2 -translate-y-1/2',
-                          showCode
-                            ? 'bg-gray-300 text-white dark:bg-gray-300'
-                            : 'bg-green-700 text-white dark:bg-green-700',
-                          showCode ? 'hidden' : '',
-                        )}
-                      >
-                        인증
-                      </Badge>
-                    ) : (
-                      <Badge
-                        variant="secondary"
-                        onClick={returnValidEmail}
-                        className={cn(
-                          'cursor-pointer absolute right-2 top-1/2 -translate-y-1/2',
-                          !showCode
-                            ? 'bg-gray-300 text-white dark:bg-gray-300'
-                            : 'bg-green-700 text-white dark:bg-green-700',
-                        )}
-                      >
-                        재인증
-                      </Badge>
-                    )}
+                    <Badge
+                      variant="secondary"
+                      onClick={authEmail}
+                      className={cn(
+                        'cursor-pointer absolute right-2 top-1/2 -translate-y-1/2',
+                        showCode
+                          ? 'bg-gray-300 text-white dark:bg-gray-300'
+                          : 'bg-green-700 text-white dark:bg-green-700',
+                      )}
+                    >
+                      인증
+                    </Badge>
                   </div>
                 </FormControl>
                 <FormMessage className="text-xs" />
@@ -341,20 +284,22 @@ export default function JoinForm() {
                         type="text"
                         {...field}
                         placeholder="인증코드 입력"
-                        maxLength={6}
-                        disabled={check}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          checkCode(e.target.value);
+                        }}
                       />
                       <Badge
                         variant="secondary"
-                        onClick={() => checkCode(field.value)}
+                        // onClick={() => checkCode(field.value)}
                         className={cn(
                           'cursor-pointer absolute right-2 top-1/2 -translate-y-1/2',
                           check
                             ? 'bg-green-700 text-white dark:bg-green-700'
-                            : 'bg-gray-700 text-white dark:bg-gray-700',
+                            : 'bg-gray-300 text-white dark:bg-gray-300',
                         )}
                       >
-                        {check ? '확인완료' : '확인'}
+                        {check ? '확인' : '미확인'}
                       </Badge>
                     </div>
                   </FormControl>
