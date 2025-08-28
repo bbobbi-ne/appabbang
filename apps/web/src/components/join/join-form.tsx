@@ -25,7 +25,6 @@ import { joinSchema, validEmail, type JoinSchemaType } from '@/validate/join-for
 import ServiceIsAgreedDialog from './service-terms-agreed-dialog';
 import PrivacyTermsAgreedDialog from './privacy-terms-agreed-dialog';
 import useToast from '@/hooks/useToast';
-import { useEmailCodeStore } from '@/store/session';
 import { useState } from 'react';
 import type { CustomersCreatePayload } from '@/api/data-contracts';
 import {
@@ -42,11 +41,7 @@ export default function JoinForm() {
   const { addToast } = useToast();
   const [showCode, setShowCode] = useState<boolean>(false);
   const [check, setCheck] = useState<boolean>(false);
-  const { code, set: setEmailCode, reset: resetEmailCode } = useEmailCodeStore();
-  const [_, setEmail] = useState<string>('');
-  const createCustomer = useCreateCustomerMutation(() => resetEmailCode());
-
-  const getEmail = useGetEmailMutation();
+  const [hashedCode, setHashedCode] = useState<string>('');
 
   // 폼 선언
   const form = useForm<JoinSchemaType>({
@@ -69,9 +64,11 @@ export default function JoinForm() {
     },
   });
 
-  const getCheckId = useGetCheckIdMutation(form);
-  const sendEmail = useSendEmailMutation(setEmailCode, setShowCode, form);
-  const compareEmailCode = useCompareEmailCodeMutation(form, setCheck, resetEmailCode);
+  const createCustomer = useCreateCustomerMutation(); // 회원가입
+  const getEmail = useGetEmailMutation(); // 이메일 가져오기
+  const getCheckId = useGetCheckIdMutation(); // 아이디 중복체크 :: 존재하는 아이디 찾기
+  const sendEmail = useSendEmailMutation(); // 입력한 이메일로 인증코드 전송
+  const compareEmailCode = useCompareEmailCodeMutation(); // 이메일 인증번호 비교
 
   /**************************************************************************************************************/
 
@@ -115,8 +112,10 @@ export default function JoinForm() {
         return;
       }
 
-      setEmail(email);
-      email.trim() !== '' && sendEmail.mutateAsync({ email }); // 이메일
+      const result = await sendEmail.mutateAsync({ email }); // 이메일
+      setHashedCode(result.code);
+      form.clearErrors('email');
+      setShowCode(true);
     } catch (e) {
       addToast({ type: 'error', message: '이메일 인증 과정에서 문제가 발생했습니다.' });
     }
@@ -128,7 +127,15 @@ export default function JoinForm() {
 
     // 이메일 인증코드 비교
     try {
-      await compareEmailCode.mutateAsync({ code: value, hashedCode: code });
+      const result = await compareEmailCode.mutateAsync({ code: value, hashedCode });
+      if (Number(result.code) === 200) {
+        form.clearErrors('code');
+        setCheck(true);
+        setHashedCode('');
+      } else {
+        form.setError('code', { type: 'value', message: '인증번호가 일치하지 않습니다.' });
+        setCheck(false);
+      }
     } catch (e) {
       addToast({ type: 'error', message: '이메일 인증코드 비교 과정에서 오류가 발생했습니다.' });
     }
@@ -138,7 +145,7 @@ export default function JoinForm() {
   const returnValidEmail = () => {
     setShowCode(false); // 인증코드 input 리셋
     setCheck(false); // 인증코드 검증 리셋
-    resetEmailCode(); // 세션에 저장된 해싱코드 리셋
+    setHashedCode(''); // 해싱코드 리셋
     form.setValue('code', ''); // 초기화
   };
 
@@ -150,7 +157,14 @@ export default function JoinForm() {
     }
 
     try {
-      await getCheckId.mutateAsync({ id });
+      const result = await getCheckId.mutateAsync({ id });
+
+      if (result.id) {
+        form.setError('id', { type: 'value', message: '이미 존재하는 아이디입니다.' });
+        form.setFocus('id');
+      } else {
+        form.clearErrors('id');
+      }
     } catch (e) {
       addToast({ type: 'error', message: '아이디 중복체크 과정에서 오류가 발생했습니다.' });
     }
@@ -185,7 +199,13 @@ export default function JoinForm() {
    */
   const onSubmit = async (data: CustomersCreatePayload) => {
     try {
-      await createCustomer.mutateAsync(data);
+      const { data: result } = await createCustomer.mutateAsync(data);
+
+      if (result) {
+        setHashedCode('');
+        addToast({ type: 'success', message: `${result.name}님, 환영합니다!` });
+        setTimeout(() => (window.location.href = '/'), 1500);
+      }
     } catch (error: any) {
       addToast({ type: 'error', message: error.response.data.error.message });
     }
