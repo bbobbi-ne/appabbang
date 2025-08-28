@@ -29,6 +29,28 @@ export interface LoginCreatePayload {
 }
 
 export interface LoginCreateData {
+  data: {
+    /**
+     * 사용자 번호
+     * @example 1
+     */
+    no: number;
+    /**
+     * 사용자 ID
+     * @example "ghrn9933"
+     */
+    id: string;
+    /**
+     * 사용자 이름
+     * @example "테스트빵"
+     */
+    name: string;
+    /**
+     * 해시된 비밀번호
+     * @example "$2b$12$/gk8toAIQVaIr3jiZuPiM.whSYPOnqqEerBiw47lGLXKCt.MVZp9K"
+     */
+    pw: string;
+  };
   /**
    * 액세스 토큰
    * @example "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
@@ -143,14 +165,14 @@ export type BreadsListData = {
    * @example "2024-01-01T00:00:00.000Z"
    */
   updatedAt: string;
-  /** 빵 이미지 목록 (첫 번째 배열만 포함) */
+  /** 빵 이미지 목록 중 첫 번째 이미지 */
   images?: {
     /**
      * 이미지 URL
      * @example "https://example.com/image.jpg"
      */
-    url?: string;
-  }[];
+    url: string;
+  };
 }[];
 
 export interface BreadsCreatePayload {
@@ -866,6 +888,13 @@ export interface LatestListData {
      */
     breadNo: string;
   }[];
+  image: {
+    /**
+     * 이미지 URL
+     * @example "https://example.com/image.jpg"
+     */
+    url?: string;
+  }[];
 }
 
 export interface GetOrderRoundData {
@@ -970,6 +999,7 @@ export interface OrderRoundDetailData {
    * @example 1
    */
   maxOrderQty: number;
+  /** 주문 차수 내 빵 목록 */
   orderRoundBreads: {
     /**
      * 빵 번호
@@ -987,8 +1017,8 @@ export interface OrderRoundDetailData {
      */
     description: string;
     /**
-     * 빵 상태
-     * @example 10
+     * 빵 상태 (예: 10=판매중, 50=출시예정)
+     * @example "10"
      */
     breadStatus: string;
     /**
@@ -997,7 +1027,23 @@ export interface OrderRoundDetailData {
      */
     unitPrice: number;
   }[];
-  image: objectPropertiesUrlTypeStringDescription이미지UrlExampleHttpsExampleComImageJpgPublicIdTypeStringDescription이미지식별자ExampleBreadsZvypj6Wohag9DghdtdtoOrderTypeNumberDescription이미지순서Example1;
+  image: {
+    /**
+     * 이미지 URL
+     * @example "https://example.com/image.jpg"
+     */
+    url: string;
+    /**
+     * 이미지 식별자
+     * @example "breads/zvypj6wohag9dghdtdto"
+     */
+    publicId: string;
+    /**
+     * 이미지 순서
+     * @example 1
+     */
+    order: number;
+  };
 }
 
 export interface OrderRoundUpdatePayload {
@@ -1079,6 +1125,11 @@ export interface CustomersCreatePayload {
    */
   name: string;
   /**
+   * 이메일
+   * @example "test1231@naver.com"
+   */
+  email: string;
+  /**
    * 전화번호
    * @example "010-1234-5678"
    */
@@ -1133,6 +1184,11 @@ export interface CustomersCreateData {
      */
     name: string;
     /**
+     * 이메일
+     * @example "test1231@naver.com"
+     */
+    email: string;
+    /**
      * 전화번호
      * @example "010-1234-5678"
      */
@@ -1170,6 +1226,22 @@ export interface CustomersCreateData {
    * @example "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
    */
   accessToken: string;
+}
+
+export interface SendEmailCreatePayload {
+  /**
+   * 이메일(테스트시, 실제 이메일을 작성하세요.)
+   * @example "test1231@naver.com"
+   */
+  email: string;
+}
+
+export interface SendEmailCreateData {
+  /**
+   * 생성된 인증번호
+   * @example 123456
+   */
+  code: string;
 }
 
 export type CustomersDetailData = any;
@@ -2092,7 +2164,7 @@ export interface GetMyData {
   totalAmount: number;
 }
 
-export interface PutMyPayload {
+export interface UpdateMyProfilePayload {
   /**
    * 고객명
    * @example "홍길동"
@@ -2105,7 +2177,7 @@ export interface PutMyPayload {
   mobileNumber?: string;
 }
 
-export interface PutMyData {
+export interface UpdateMyProfileData {
   /**
    * 고객 번호
    * @example 1
@@ -2145,7 +2217,7 @@ export interface PutMyData {
   updatedAt: string;
 }
 
-export interface PutMy2Payload {
+export interface UpdateMyPasswordPayload {
   /**
    * 현재 비밀번호
    * @example "old1234!"
@@ -2158,7 +2230,7 @@ export interface PutMy2Payload {
   pwModify: string;
 }
 
-export interface PutMy2Data {
+export interface UpdateMyPasswordData {
   /**
    * 성공 메시지
    * @example "비밀번호가 변경되었습니다."
@@ -2285,6 +2357,269 @@ export type AddressesUpdatePayload = object;
 export type AddressesUpdateData = any;
 
 export type AddressesDeleteData = any;
+
+export type OrdersListResult = {
+  /**
+   * 주문 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 주문 번호
+   * @example "ORD20240825001"
+   */
+  orderNumber: string;
+  /**
+   * 주문 상태 코드
+   * @example "10"
+   */
+  orderStatus: string;
+  /**
+   * 주문 상태명
+   * @example "결제완료"
+   */
+  orderStatusName: string;
+  /**
+   * 주문 생성일시
+   * @format date-time
+   * @example "2024-08-25T15:55:20.000Z"
+   */
+  createdAt: string;
+  orderItems: {
+    /**
+     * 주문 아이템 번호
+     * @example 1
+     */
+    no?: number;
+    /**
+     * 상품명
+     * @example "식빵"
+     */
+    breadName?: string;
+    /**
+     * 상품 이미지 URL
+     * @example "https://example.com/bread.jpg"
+     */
+    breadImageUrl?: string;
+    /**
+     * 단가
+     * @example 3000
+     */
+    unitPrice?: number;
+    /**
+     * 수량
+     * @example 2
+     */
+    quantity?: number;
+  }[];
+}[];
+
+export interface OrdersDetailResult {
+  /** @example 1 */
+  no: number;
+  /** @example "ORD20240825001" */
+  orderNumber: string;
+  /** @example "10" */
+  orderStatus: string;
+  /** @example "결제완료" */
+  orderStatusName: string;
+  /**
+   * @format date-time
+   * @example "2024-08-25T15:55:20.000Z"
+   */
+  createdAt: string;
+  /** @example 15000 */
+  totalPrice: number;
+  /** @example 3000 */
+  deliveryMethodFee?: number;
+  /** @example 2000 */
+  discountAmount?: number;
+  /** @example "서울시 강남구 역삼동 123-456" */
+  address: string;
+  /** @example "101동 101호" */
+  addressDetail?: string;
+  /** @example "12345" */
+  zipcode?: string;
+  /** @example "문 앞에 놓아주세요." */
+  message?: string;
+  /** @example "홍길동" */
+  recipientName?: string;
+  /** @example "010-1234-5678" */
+  recipientMobile?: string;
+  /** @example "홍길동" */
+  ordererName?: string;
+  /** @example "010-1234-5678" */
+  ordererMobile?: string;
+  /** @example "01" */
+  deliveryTypeCode?: string;
+  orderItems: {
+    /** @example 1 */
+    no?: number;
+    /** @example "식빵" */
+    breadName?: string;
+    /** @example "https://example.com/bread.jpg" */
+    breadImageUrl?: string;
+    /** @example 3000 */
+    unitPrice?: number;
+    /** @example 6000 */
+    totalPrice?: number;
+    /** @example 2 */
+    quantity?: number;
+  }[];
+}
+
+export interface OrdersCancelPartialUpdatePayload {
+  /**
+   * 취소 사유
+   * @example "주문 취소 요청"
+   */
+  canceledReason: string;
+}
+
+export type OrdersCancelPartialUpdateData = any;
+
+export interface OrdersDeliveryListData {
+  /** @example 1 */
+  no?: number;
+  /** @example "ORD20240825001" */
+  orderNumber?: string;
+  /** @example "20" */
+  orderStatus?: string;
+  /** @example "배송중" */
+  orderStatusName?: string;
+  /**
+   * @format date-time
+   * @example "2024-08-25T15:55:20.000Z"
+   */
+  createdAt?: string;
+  /** @example "TRK1234567890" */
+  trackingNumber?: string;
+  orderItems?: {
+    /** @example 1 */
+    no?: number;
+    /** @example "식빵" */
+    breadName?: string;
+    /** @example "https://example.com/bread.jpg" */
+    breadImageUrl?: string;
+    /** @example 3000 */
+    unitPrice?: number;
+    /** @example 2 */
+    quantity?: number;
+  }[];
+  /** @example "서울시 강남구 역삼동 123-456" */
+  address?: string;
+  /** @example "101동 101호" */
+  addressDetail?: string;
+  /** @example "12345" */
+  zipcode?: string;
+  /** @example "홍길동" */
+  recipientName?: string;
+  /** @example "010-1234-5678" */
+  recipientMobile?: string;
+  /** @example "택배" */
+  deliveryMethodName?: string;
+  /** @example "01" */
+  deliveryTypeCode?: string;
+}
+
+export interface OrdersAddressListData {
+  /**
+   * 주소
+   * @example "서울시 강남구 역삼동 123-456"
+   */
+  address: string;
+  /**
+   * 상세 주소
+   * @example "101동 101호"
+   */
+  addressDetail: string;
+  /**
+   * 우편번호
+   * @example "12345"
+   */
+  zipcode: string;
+  /**
+   * 배송 메시지
+   * @example "문 앞에 놓아주세요."
+   */
+  message: string;
+  /**
+   * 수령인 이름
+   * @example "홍길동"
+   */
+  recipientName: string;
+  /**
+   * 수령인 전화번호
+   * @example "010-1234-5678"
+   */
+  recipientMobile: string;
+}
+
+export interface OrdersAddressUpdatePayload {
+  /**
+   * 주소
+   * @example "서울시 강남구 역삼동 123-456"
+   */
+  address: string;
+  /**
+   * 상세 주소
+   * @example "101동 101호"
+   */
+  addressDetail: string;
+  /**
+   * 우편번호
+   * @example "12345"
+   */
+  zipcode: string;
+  /**
+   * 배송 메시지
+   * @example "문 앞에 놓아주세요."
+   */
+  message: string;
+  /**
+   * 수령인 이름
+   * @example "홍길동"
+   */
+  recipientName: string;
+  /**
+   * 수령인 전화번호
+   * @example "010-1234-5678"
+   */
+  recipientMobile: string;
+}
+
+export interface OrdersAddressUpdateData {
+  /**
+   * 주소
+   * @example "서울시 강남구 역삼동 123-456"
+   */
+  address: string;
+  /**
+   * 상세 주소
+   * @example "101동 101호"
+   */
+  addressDetail: string;
+  /**
+   * 우편번호
+   * @example "12345"
+   */
+  zipcode: string;
+  /**
+   * 배송 메시지
+   * @example "문 앞에 놓아주세요."
+   */
+  message: string;
+  /**
+   * 수령인 이름
+   * @example "홍길동"
+   */
+  recipientName: string;
+  /**
+   * 수령인 전화번호
+   * @example "010-1234-5678"
+   */
+  recipientMobile: string;
+}
 
 export type CouponsListData = {
   /**

@@ -1,30 +1,27 @@
 import { useEffect, useState } from 'react';
 import BreadSearch from '../products/bread-search';
-import type { BreadProps } from '@/interface/bread-interface';
-import { useQuery } from '@tanstack/react-query';
-import { searchBreadList } from '@/services/order-apis';
+
 import ProductsLoading from '@/components/products/products-loading';
 import BreadCardDetail from '@/components/products/bread-card-detail';
 import { useGetOrderRoundNowQuery } from '@/hooks/use-order-round';
+import type { BreadsListData } from '@/api/data-contracts';
+import { useGetBreadsQuery } from '@/hooks/use-breads';
 
 export default function ProductsPage() {
   const [keyword, setKeyword] = useState<string>('');
-  const [breadList, setBreadList] = useState<BreadProps[]>([]);
-  const [originBreadList, setOriginBreadList] = useState<BreadProps[]>([]);
+  const [breadList, setBreadList] = useState<BreadsListData>([]);
+  const [originBreadList, setOriginBreadList] = useState<BreadsListData>([]);
 
   /** 빵 목록 조회 API */
-  const { isLoading, data, error } = useQuery({
-    queryKey: ['allBreadList'],
-    queryFn: searchBreadList,
-  });
+  const { isLoading, data, error } = useGetBreadsQuery();
 
   const { data: nowData, isLoading: nowLoading, isError: nowErr } = useGetOrderRoundNowQuery();
 
   /** 주문차수 빵 목록 조회 및 설정 */
   useEffect(() => {
     if (data) {
-      setBreadList(data.data);
-      setOriginBreadList(data.data);
+      setBreadList(data);
+      setOriginBreadList(data);
     }
 
     // nowData && setOrderRoundBreads(nowData.data.orderRoundBreads);

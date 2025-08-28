@@ -29,8 +29,21 @@ import { addressSchema, type addresssDailogForm } from '@/validate/address-form.
 
 const labelMinWidth = 'min-w-[120px]';
 
+export type CurrentValuesData = Pick<
+  AddressesListData[number],
+  | 'address'
+  | 'addressDetail'
+  | 'zipcode'
+  | 'message'
+  | 'recipientName'
+  | 'recipientMobile'
+  | 'isDefault'
+> & {
+  no: number;
+};
+
 type Props = {
-  currentValues?: AddressesListData[number] | undefined;
+  currentValues?: CurrentValuesData;
   onSubmit: (body: addresssDailogForm) => Promise<void>;
   isLoading: boolean;
   deleteAddress?: (no: number) => Promise<void>;

@@ -3,19 +3,30 @@
  * 따로 화면을 구현하지는 않고, 기능만 구현하도록 처리함.
  */
 
-import { logout } from '@/services/customer-apis';
-import { useAccessTokenStore } from '@/store/session';
 import { useEffect } from 'react';
 import Loading from '../common/loading';
+import { useLogoutMutation } from '@/hooks/use-auth';
+import useToast from '@/hooks/useToast';
 
 export default function LogoutPage() {
-  const { accessToken, reset } = useAccessTokenStore();
+  const logOutMutaion = useLogoutMutation();
+  const { addToast } = useToast();
 
-  /**
-   * 로그아웃, sessionStorage 리셋
-   */
   useEffect(() => {
-    logout(accessToken, reset);
+    async () => {
+      try {
+        await logOutMutaion.mutateAsync();
+        addToast({
+          type: 'success',
+          message: '정상적으로 로그아웃되었습니다. 다음에 다시 만나요!',
+        });
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1500);
+      } catch (error) {
+        console.log(error);
+      }
+    };
   }, []);
 
   return <Loading title="로그아웃" />;

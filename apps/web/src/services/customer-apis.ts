@@ -7,105 +7,6 @@ import client from './axios';
 
 const { addToast } = useToast();
 
-interface ICustomerProps {
-  no: number | null;
-  id: string | '';
-  name: string | '';
-  defaultAddressNo: number | null;
-  isServiceTermsAgreed: boolean | null;
-  isPrivacyTermsAgreed: boolean | null;
-  isMarketingTermsAgreed: boolean | null;
-  type: string | null;
-
-  // 필요 민감정보
-  // mobileNumber
-  // providerId
-  // providerType
-  // refreshToken
-}
-
-class CustomError extends Error {
-  code: number;
-  constructor(code: number, message: string) {
-    super(message);
-    this.code = code;
-  }
-}
-
-type CustomerProps = {
-  id: string;
-  pw: string;
-  mobileNumber: string;
-  address: string;
-  addressDetail: string;
-  zipcode: string;
-  isServiceTermsAgreed: boolean;
-  isPrivacyTermsAgreed: boolean;
-  isMarketingTermsAgreed: boolean;
-};
-
-/**
- * 회원가입
- */
-export async function createCustomer(
-  data: CustomerProps,
-  setAccessToken: (accountToken: string) => void,
-  setCustomer: (model: ICustomerProps) => void,
-) {
-  try {
-    const response = await client.post('/customers', data);
-
-    if (response.status === 201) {
-      // 고객 간단정보를 상태관리에 저장
-      const {
-        no,
-        id,
-        name,
-        defaultAddressNo,
-        isMarketingTermsAgreed,
-        isPrivacyTermsAgreed,
-        isServiceTermsAgreed,
-        type,
-      } = response.data.data;
-
-      const model = {
-        no,
-        id,
-        name,
-        defaultAddressNo,
-        isServiceTermsAgreed,
-        isPrivacyTermsAgreed,
-        isMarketingTermsAgreed,
-        type,
-      };
-      setCustomer(model);
-
-      // accessToken을 상태관리에 저장
-      const accessToken = response.data.accessToken;
-      sessionStorage.setItem('accessToken', accessToken);
-      setAccessToken(accessToken);
-
-      // success message
-      addToast({
-        type: 'success',
-        message: `${response.data.data.name}님, 환영합니다!`,
-      });
-
-      // 메인페이지 이동
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 1500);
-    } else {
-      throw new CustomError(500, 'fail');
-    }
-  } catch (e: any) {
-    addToast({
-      type: 'error',
-      message: e.response.data.error.message,
-    });
-  }
-}
-
 /** 카카오 인가코드 받기 */
 export async function getKakaoCode() {
   client.get(`http://localhost:4000/auth/kakao/url`).then((response) => {
@@ -119,7 +20,7 @@ export async function getKakaoCode() {
 export const login = async (
   data: { id: string; pw: string },
   setAccessToken: (accessToken: string) => void,
-  setCustomer: (model: ICustomerProps) => void,
+  setCustomer: (model: any) => void,
 ) => {
   try {
     const response = await client.post('/auth/login', data);

@@ -41,11 +41,14 @@ export const getAll = async () => {
       imageMap.set(img.imageTargetNo, img.url ?? '');
     });
 
-    const data = breads.map((bread: Bread) => ({
-      ...bread,
-      breadStatusName: getBreadStatusName(bread.breadStatus),
-      images: [...(imageMap.get(bread.no) ? [{ url: imageMap.get(bread.no) }] : [])],
-    }));
+    const data = breads.map((bread: Bread) => {
+      const url = imageMap.get(bread.no);
+      return {
+        ...bread,
+        breadStatusName: getBreadStatusName(bread.breadStatus),
+        images: url ? { url } : null,
+      };
+    });
 
     return data;
   });

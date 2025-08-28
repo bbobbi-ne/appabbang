@@ -1,7 +1,6 @@
+import { useGetAuthLoginMutation } from '@/hooks/use-auth';
 import useToast from '@/hooks/useToast';
-import { login } from '@/services/customer-apis';
-import { useCustomerStore } from '@/store/customer';
-import { useAccessTokenStore } from '@/store/session';
+
 import { loginSchema, type LoginFormType } from '@/validate/login-form-schema';
 import {
   FormField,
@@ -25,9 +24,9 @@ const labelMinWidth = 'min-w-[100px]';
 /** 로그인 폼 */
 function LoginForm() {
   const navigate = useNavigate();
-  const { set: setAccessToken } = useAccessTokenStore();
-  const { set: setCustomer } = useCustomerStore();
   const { addToast } = useToast();
+
+  const loginMutation = useGetAuthLoginMutation();
 
   const form = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
@@ -37,11 +36,13 @@ function LoginForm() {
   /**
    * 로그인
    */
-  const onSubmit = async (data: { id: string; pw: string }) => {
-    const { code, name } = await login(data, setAccessToken, setCustomer);
-    if (code === 200) {
-      addToast({ type: 'success', message: `${name}님, 환영합니다!` });
+  const onSubmit = async (data: LoginFormType) => {
+    try {
+      const res = await loginMutation.mutateAsync({ ...data });
+      addToast({ type: 'success', message: `${res.data.name}님, 환영합니다!` });
       navigate({ to: '/' });
+    } catch (error: any) {
+      addToast({ type: 'error', message: error || '로그인 오류입니다.' });
     }
   };
 

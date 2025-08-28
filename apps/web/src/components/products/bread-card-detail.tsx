@@ -2,7 +2,6 @@
  * [비회원 개인정보 수집 및 이용 동의서]
  */
 
-import type { BreadProps } from '@/interface/bread-interface';
 import {
   AlertDialogContent,
   AlertDialogTrigger,
@@ -19,8 +18,9 @@ import {
 } from '@appabbang/ui';
 import { X } from 'lucide-react';
 import ProductsBreadCard from '@/components/products/products-bread-card';
+import type { BreadsDetailData } from '@/api/data-contracts';
 
-function BreadCardDetail({ bread }: { bread: BreadProps }) {
+function BreadCardDetail({ bread }: { bread: BreadsDetailData }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>

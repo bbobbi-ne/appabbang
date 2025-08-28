@@ -60,7 +60,7 @@ export default function MyOrderDeliveryPage({ orderNo }: { orderNo: number }) {
 
   useEffect(() => {
     if (order) {
-      if (!AVALIABLE_DELIVERY_ORDER_STATUS.includes(order.orderStatus)) {
+      if (!AVALIABLE_DELIVERY_ORDER_STATUS.includes(order.orderStatus!)) {
         navigate({ to: `/mypage/order-list/${order.no}` });
       }
     }
@@ -76,20 +76,20 @@ export default function MyOrderDeliveryPage({ orderNo }: { orderNo: number }) {
             <div className="flex flex-col gap-2">
               <div className="space-x-2">
                 <Badge variant="outline">{order.orderNumber}</Badge>
-                {CANCEL_ORDER_STATUS.includes(order.orderStatus) ? (
+                {CANCEL_ORDER_STATUS.includes(order.orderStatus!) ? (
                   <Badge variant="destructive">{order.orderStatusName}</Badge>
                 ) : (
                   <Badge variant="secondary">{order.orderStatusName}</Badge>
                 )}
               </div>
               <h3 className="text-xl font-semibold">
-                {new Date(order.createdAt).toISOString().split('T')[0]} 주문
+                {new Date(order.createdAt!).toISOString().split('T')[0]} 주문
               </h3>
             </div>
           </div>
           <Button
             variant="outline"
-            onClick={() => moveToOrderDetail(order.no)}
+            onClick={() => moveToOrderDetail(order.no!)}
             className="hidden sm:inline-flex"
           >
             주문내역보기
@@ -103,7 +103,7 @@ export default function MyOrderDeliveryPage({ orderNo }: { orderNo: number }) {
           {/* STEPS */}
           <div className="flex flex-row pb-8">
             {filteredSteps.map((step, idx) => {
-              if (isNaN(order.orderStatus))
+              if (isNaN(Number(order.orderStatus)))
                 return <div key={`dummy-${idx}`}>데이터 로딩중입니다...</div>;
 
               const orderStatus = Number(order.orderStatus);
@@ -170,7 +170,7 @@ export default function MyOrderDeliveryPage({ orderNo }: { orderNo: number }) {
         <div>
           <h3 className="text-xl font-semibold pt-2 pb-4">주문상품 내역</h3>
           <div className="space-y-2">
-            {order.orderItems.map((item: any, i: number) => (
+            {order.orderItems?.map((item, i: number) => (
               <OrderItem key={`delivery-${i}`} item={item} />
             ))}
           </div>

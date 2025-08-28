@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { MyService } from '@/services/api/my-service';
+import type { UpdateMyPasswordPayload } from '@/api/data-contracts';
 
 /** 고객 정보 조회 */
 export function useGetCustomerInfoQuery() {
@@ -24,7 +25,7 @@ export function useUpdateCustomerMutation() {
 /** 고객 비밀번호 수정 */
 export function useUpdateCustomerPwMutation() {
   return useMutation({
-    mutationFn: (data: { pw: string; pwModify: string }) => MyService.updateCustomerPw(data),
+    mutationFn: (data: UpdateMyPasswordPayload) => MyService.updateCustomerPw(data),
   });
 }
 

@@ -21,9 +21,10 @@ import type { ICustomerProps } from '../pages/info-page';
 import { useEffect } from 'react';
 import { formatIsoToDateTime, formatMobile } from '@appabbang/utils';
 import useToast from '@/hooks/useToast';
+import type { GetMyData } from '@/api/data-contracts';
 
 interface InfoFormProps {
-  customer?: ICustomerProps;
+  customer?: GetMyData['customer'];
   updateMutation: (data: CustomerFormSchema) => Promise<void>;
   isSubmitting: boolean;
 }

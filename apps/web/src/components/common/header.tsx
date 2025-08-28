@@ -1,22 +1,8 @@
-import { useEffect, useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import useToast from '@/hooks/useToast';
 import { useAccessTokenStore } from '@/store/session';
 import { User, NotepadText, LogIn, LogOut } from 'lucide-react';
 import { useGetOrderRoundNowQuery } from '@/hooks/use-order-round';
-
-export interface IOrderRoundProps {
-  no: number;
-  name: string;
-  startedAt: string;
-  endedAt: string;
-  minOrderQty: number;
-  maxOrderQty: number;
-  orderRoundBreads: {
-    orderRoundNo: number;
-    breadNo: number;
-  }[];
-}
 
 export default function Header() {
   const navigate = useNavigate();

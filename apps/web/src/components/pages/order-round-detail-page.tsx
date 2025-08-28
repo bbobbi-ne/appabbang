@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { Card, CardHeader, CardTitle, CardContent, AlertDialog } from '@appabbang/ui';
+import { useQuery } from '@tanstack/react-query';
+import { Card, CardHeader, CardTitle, CardContent } from '@appabbang/ui';
 import BreadCard from '@/components/common/bread-card';
-import type { BreadProps } from '@/interface/bread-interface';
+import type { OrderRoundBreadWithCount } from '@/interface/bread-interface';
 import OrderFormSkeleton from '@/components/order/order-form-skeleton';
 import CardComment from '@/components/common/card-comment';
 import Payment from '@/components/order/Payment';
@@ -10,18 +10,22 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { customerOrderFormSchema, formSchema } from '@/validate/order-form-schema';
 import NonCustomerOrderForm from '@/components/order/non-customer-order-form';
-import { insertOrders, searchBankList, searchDeliveryList } from '@/services/order-apis';
+import { searchBankList, searchDeliveryList } from '@/services/order-apis';
 import type { CustomerOrderFormSchema, FormSchema } from '@/validate/order-form-schema';
 import useToast from '@/hooks/useToast';
 import { useParams } from '@tanstack/react-router';
 import { useAccessTokenStore } from '@/store/session';
 import CustomerOrderForm from '../order/customer-order-form';
-import { useGetOrderRoundNowQuery, useGetOrderRoundQuery } from '@/hooks/use-order-round';
+import { useGetOrderRoundQuery } from '@/hooks/use-order-round';
+import type { OrderRoundDetailData } from '@/api/data-contracts';
+import { useCreateOrderMutation } from '@/hooks/use-orders';
 
 /** Main Function */
 export default function OrderRoundDetailPage() {
-  const [orderRoundBreads, setOrderRoundBreads] = useState<BreadProps[]>([]); // 빵 목록
-  const [paymentList, setPaymentList] = useState<BreadProps[]>([]); // 결제목록
+  const [orderRoundBreads, setOrderRoundBreads] = useState<
+    OrderRoundDetailData['orderRoundBreads'] | []
+  >([]); // 빵 목록
+  const [paymentList, setPaymentList] = useState<OrderRoundBreadWithCount[]>([]); // 결제목록
   const [errMsg, setErrMsg] = useState<string>(''); // 에러메세지
   const [fee, setFee] = useState<number>(0); // 배송비
   const [totalCount, setTotalCount] = useState<number>(0); // 최종 수량
@@ -38,7 +42,7 @@ export default function OrderRoundDetailPage() {
   /**********************************************************************************/
   /** Functions */
   /** 빵 카드 click시 하단 결제목록 컴포넌트에 추가될 빵 list를 삽입함. */
-  const handleBreadClick = (bread: BreadProps) => {
+  const handleBreadClick = (bread: OrderRoundDetailData['orderRoundBreads'][number]) => {
     if (paymentList.length === 0) {
       // 1건도 결제목록이 존재하지 않으면 삽입하고 종료
       setPaymentList((prev) => [...prev, { ...bread, count: 1 }]);
@@ -55,14 +59,14 @@ export default function OrderRoundDetailPage() {
   };
 
   /** 결제목록 수량, 금액 */
-  const onCountChange = useCallback((bread: BreadProps, _: string) => {
+  const onCountChange = useCallback((bread: OrderRoundBreadWithCount, _: string) => {
     setPaymentList((prev) =>
       prev.map((item) => (item.no === bread.no ? { ...item, count: bread.count } : item)),
     );
   }, []);
 
   /** 결제목록에서 삭제 */
-  const onRemove = useCallback((bread: BreadProps) => {
+  const onRemove = useCallback((bread: OrderRoundBreadWithCount) => {
     setPaymentList((prev) => prev.filter((item) => item.no !== bread.no));
   }, []);
 
@@ -203,43 +207,40 @@ export default function OrderRoundDetailPage() {
     }
   };
 
+  // 두 코드 모두 차이없음, 기존버전도 동일..
   /** 고객 주문서 저장 */
   const customerOnSubmit: SubmitHandler<CustomerOrderFormSchema> = async (data) => {
-    await insertOrder.mutateAsync(data); // 주문서 등록(고객)
+    try {
+      await insertOrder.mutateAsync({ ...data, deliveryMethodNo: Number(data.deliveryMethodNo) }); // 주문서 등록(고객)
+      addToast({ message: '주문이 등록되었습니다.', type: 'success' });
+      setSave(true);
+    } catch (error: any) {
+      addToast({ message: error.message, type: 'error' });
+    }
   };
 
   /** 비회원 주문서 저장 */
   const nonCustomerOnSubmit: SubmitHandler<FormSchema> = async (data) => {
-    await insert.mutateAsync(data); // 주문서 등록(비회원)
+    try {
+      await insertOrder.mutateAsync({ ...data, deliveryMethodNo: Number(data.deliveryMethodNo) }); // 주문서 등록(비회원)
+      addToast({ message: '주문이 등록되었습니다.', type: 'success' });
+      setSave(true);
+    } catch (error: any) {
+      addToast({ message: error.message, type: 'error' });
+    }
   };
 
-  /** mutation : 주문서 등록(고객) */
-  const insertOrder = useMutation({
-    mutationFn: (data: CustomerOrderFormSchema) => insertOrders(data),
-    onSuccess: () => {
-      addToast({ message: '주문이 등록되었습니다.', type: 'success' });
-      setSave(true);
-    },
-    onError: (error) => addToast({ message: error.message, type: 'error' }),
-  });
+  /** mutation : 주문서 등록(회원,비회원 차이가없는점 발견 , 수정시 따로 분리할것) */
+  const insertOrder = useCreateOrderMutation();
 
-  /** mutation : 주문서 등록(비회원) */
-  const insert = useMutation({
-    mutationFn: (data: FormSchema) => insertOrders(data),
-    onSuccess: () => {
-      addToast({ message: '주문이 등록되었습니다.', type: 'success' });
-      setSave(true);
-    },
-    onError: (error) => addToast({ message: error.message, type: 'error' }),
-  });
   /**********************************************************************************/
 
   /** 주문차수 빵 목록 조회 및 설정 */
   useEffect(() => {
     if (orderRoundData) {
       setOrderRoundBreads(orderRoundData.orderRoundBreads);
-      setMin(orderRoundData.inOrderQty);
-      setMax(orderRoundData.axOrderQty);
+      setMin(orderRoundData.minOrderQty);
+      setMax(orderRoundData.maxOrderQty);
     }
     orderRoundErr && setErrMsg('빵 목록을 조회하는 데 문제가 발생했습니다.');
   }, [orderRoundData, orderRoundErr]);
@@ -280,11 +281,7 @@ export default function OrderRoundDetailPage() {
                     <CardHeader className="text-red-600">{errMsg}</CardHeader>
                   </Card>
                 ) : (
-                  orderRoundBreads?.map((data, i) => (
-                    <AlertDialog key={i}>
-                      {data && <BreadCard bread={data} onClick={handleBreadClick} />}
-                    </AlertDialog>
-                  ))
+                  orderRoundBreads?.map((data, i) => <BreadCard bread={data} key={i} />)
                 )}
               </div>
             </CardContent>

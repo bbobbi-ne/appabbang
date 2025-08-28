@@ -21,13 +21,11 @@ import {
 import { useEffect, useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import DaumPostApi from '../common/daum-post-api';
-import { useQuery } from '@tanstack/react-query';
-import { getCustomerInfo } from '@/services/customer-apis';
-import { useAccessTokenStore } from '@/store/session';
 import Loading from '../common/loading';
 import PrivacyTermsAgreedDialog from '../join/privacy-terms-agreed-dialog';
 import ServiceIsAgreedDialog from '../join/service-terms-agreed-dialog';
 import PaymentRefundTermsAgreedDialog from './payment-refund-terms-agreed-dialog';
+import { useGetCustomerInfoQuery } from '@/hooks/use-my';
 
 interface CustomerOrderFormProp {
   form: UseFormReturn<CustomerOrderFormSchema>;
@@ -58,14 +56,9 @@ function CustomerOrderForm({
   const { deliveryLoading, deliveryData } = delivery;
   const [checked, setChecked] = useState<boolean>(false); // 주문자-수령인 동일인물 체크여부
   const [disabledAddrDtl, setDisabledAddrDtl] = useState<boolean>(true);
-  const { accessToken } = useAccessTokenStore();
-
   /** 고객정보 조회 */
-  const { isLoading, data } = useQuery({
-    queryKey: ['getCustomer'],
-    queryFn: getCustomerInfo,
-    enabled: !!accessToken,
-  });
+
+  const { isLoading, data } = useGetCustomerInfoQuery();
 
   useEffect(() => {
     if (data) {

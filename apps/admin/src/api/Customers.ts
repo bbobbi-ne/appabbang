@@ -24,6 +24,8 @@ import type {
   CustomersDetailData,
   CustomersListData,
   CustomersUpdateData,
+  SendEmailCreateData,
+  SendEmailCreatePayload,
 } from "./data-contracts";
 import { ContentType, HttpClient, type RequestParams } from "./http-client";
 
@@ -66,6 +68,27 @@ export class Customers<SecurityDataType = unknown> {
   ) =>
     this.http.request<CustomersCreateData, any>({
       path: `/customers`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 요청한 이메일로 서버에서 만든 인증번호를 전달합니다. (권한: 없음 - 누구나 접근가능)
+   *
+   * @tags Customers
+   * @name SendEmailCreate
+   * @summary 이메일 인증번호 전송
+   * @request POST:/customers/send-email
+   * @response `200` `SendEmailCreateData` 이메일 전송 성공
+   */
+  sendEmailCreate = (
+    data: SendEmailCreatePayload,
+    params: RequestParams = {},
+  ) =>
+    this.http.request<SendEmailCreateData, any>({
+      path: `/customers/send-email`,
       method: "POST",
       body: data,
       type: ContentType.Json,

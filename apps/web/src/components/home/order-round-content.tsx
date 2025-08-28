@@ -1,26 +1,12 @@
 import useToast from '@/hooks/useToast';
 import { Button, Card } from '@appabbang/ui';
 import { useNavigate } from '@tanstack/react-router';
-import { useCountDownTimer } from '@appabbang/utils';
+import { formatIsoToDateTime, useCountDownTimer } from '@appabbang/utils';
 import { AlarmClock } from 'lucide-react';
 import { formatDate } from '@appabbang/utils';
-interface IOrderRoundProps {
-  data: {
-    no: number;
-    name: string;
-    startedAt: Date;
-    endedAt: Date;
-    breadNoList: {
-      breadNo: number;
-    }[];
-    image?: {
-      url: string;
-      name: string;
-    };
-  };
-}
+import type { LatestListData } from '@/api/data-contracts';
 
-export default function OrderRoundContent({ data }: IOrderRoundProps) {
+export default function OrderRoundContent({ data }: { data: LatestListData }) {
   const navigate = useNavigate();
   const { addToast } = useToast();
 
@@ -59,8 +45,9 @@ export default function OrderRoundContent({ data }: IOrderRoundProps) {
           <Card className="flex-1 rounded-lg overflow-hidden border-0 shadow-xl">
             <img
               // TODO: 주문차수 이미지가 없을때를 대비한 샘플 이미지 제작 필요
-              src={data?.image?.url ?? '/images/main-order-round-no-img.png'}
-              alt={data?.image?.name ?? '주문차수 이미지'}
+              // 최신주문차수에 이미지를 안주고있음 서버에서 수정 후 클라이언트 부분 수정 필요
+              src={'/images/main-order-round-no-img.png'}
+              alt={'주문차수 이미지'}
               className="w-full h-auto object-cover"
             />
           </Card>
@@ -72,7 +59,9 @@ export default function OrderRoundContent({ data }: IOrderRoundProps) {
                 {data?.no}차 주문 {isRun && '오픈!'}
               </div>
               <p className="text-xs lg:text-base text-gray-500">
-                {isRun ? '망설이면 늦어요!' : `오픈 예정일: ${formatDate(data?.startedAt || '')}`}
+                {isRun
+                  ? '망설이면 늦어요!'
+                  : `오픈 예정일: ${formatIsoToDateTime(data?.startedAt || '')}`}
               </p>
             </div>
 

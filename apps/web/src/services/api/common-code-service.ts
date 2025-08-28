@@ -1,9 +1,23 @@
-import client from '@/services/axios';
+import { CommonCode } from '@/api/CommonCode';
+import { CustomHttpClient } from '../httpclient-instance';
+
+const commonCodeApi = new CommonCode(new CustomHttpClient());
 
 export const CommonCodeService = {
-  // TODO: 타입 정의 (any 대신 타입 정의)
-  getCodes: async (groupName: 'order_status' | any) => {
-    const response = await client.get(`/common-code/${groupName}`);
+  getCodes: async (
+    groupName:
+      | 'user_role'
+      | 'bread_status'
+      | 'material_type'
+      | 'order_status'
+      | 'purchase_status'
+      | 'delivery_type'
+      | 'image_target_type'
+      | 'discount_type'
+      | 'provider_type'
+      | 'bank_code',
+  ) => {
+    const response = await commonCodeApi.commonCodeDetail(groupName);
     return response.data;
   },
 };

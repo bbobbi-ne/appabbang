@@ -44,18 +44,17 @@ export const BreadsColumns = () => {
       },
     }),
 
-    columnHelper.accessor('images', {
+    columnHelper.accessor('images.url', {
       maxSize: 3,
       header: '대표이미지',
-      cell: ({ row }) => {
-        const url = (row.getValue('images') as { url: string }[]) || [];
-        const src = url[0]?.url ? url[0].url : '/images/no_image.png';
+      cell: (info) => {
+        const src = info.getValue() || '/images/no_image.png';
 
         return (
           <AspectRatio ratio={9 / 5}>
             <img
               src={src}
-              alt={row.original.name}
+              alt={info.row.original.name}
               className="h-full w-full rounded-lg object-fill"
             />
           </AspectRatio>

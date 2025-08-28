@@ -1,9 +1,8 @@
 import { Card, CardContent } from '@appabbang/ui';
 import { useCustomerStore } from '@/store/customer';
-import { getCustomerInfo } from '@/services/customer-apis';
 import { ToggleMenuButton } from '@/components/common/toggle-menu-button';
 import { useLocation, useNavigate } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
+import { useGetCustomerInfoQuery } from '@/hooks/use-my';
 
 export default function MypageLayout({ children }: { children: React.ReactNode }) {
   const {
@@ -12,10 +11,7 @@ export default function MypageLayout({ children }: { children: React.ReactNode }
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const { data } = useQuery({
-    queryKey: ['/my', '내 정보 조회'],
-    queryFn: getCustomerInfo,
-  });
+  const { data } = useGetCustomerInfoQuery();
 
   const menuList = [
     { label: '정보수정', value: '/mypage/info' },
