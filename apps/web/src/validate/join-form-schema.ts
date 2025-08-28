@@ -3,7 +3,6 @@
  */
 import type { UseFormReturn } from 'react-hook-form';
 import z from 'zod';
-import type { FindIdSchema } from './find-id-form-schema';
 
 const ID_VALIDATION = {
   min: { value: 5, message: '아이디는 5자 이상 입력 바랍니다.' },
@@ -20,7 +19,7 @@ const NAME_VALIDATION = {
   min: { value: 2, message: '이름은 2자 이상 입력 바랍니다.' },
   max: { value: 30, message: '이름은 30자 이내로 입력 바랍니다.' },
   regex: {
-    // 영문 대/소문자 + 숫자 조합, 5~30자
+    // 한글 + 숫자 조합, 2~30자
     value: /^[가-힣]{2,30}$/,
     message: '이름은 한글 2~30자 입력 가능합니다.',
   },
