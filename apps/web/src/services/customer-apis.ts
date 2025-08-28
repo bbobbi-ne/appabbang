@@ -15,7 +15,7 @@ export async function getKakaoCode() {
 }
 
 /**
- * 로그인
+ * 로그인 ok
  */
 export const login = async (
   data: { id: string; pw: string },
@@ -66,7 +66,7 @@ export const login = async (
 };
 
 /**
- * 로그아웃
+ * 로그아웃 ok
  */
 export const logout = async (accessToken: string, reset: (accessToken: string) => void) => {
   try {
@@ -85,7 +85,7 @@ export const logout = async (accessToken: string, reset: (accessToken: string) =
         window.location.href = '/';
       }, 1500);
     } else {
-      throw new CustomError(500, 'fail');
+      // throw new CustomError(500, 'fail');
     }
   } catch (e: any) {
     addToast({
@@ -102,7 +102,7 @@ export const getCustomerInfo = async () => {
   try {
     const response = await client.get('/my');
     if (response.status === 200) return response.data;
-    else throw new CustomError(500, 'fail');
+    // else throw new CustomError(500, 'fail');
   } catch (e: any) {
     addToast({
       type: 'error',
@@ -147,7 +147,7 @@ export const getEmail = async (email: string) => {
   if (response.status === 200) return response.data;
 };
 
-/** 아이디 가져오기
+/** 아이디 가져오기 ok
  * @params id
  */
 export const getCheckId = async (id: string) => {
