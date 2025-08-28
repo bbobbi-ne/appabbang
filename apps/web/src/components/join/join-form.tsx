@@ -25,27 +25,55 @@ import { joinSchema, validEmail, type JoinSchemaType } from '@/validate/join-for
 import ServiceIsAgreedDialog from './service-terms-agreed-dialog';
 import PrivacyTermsAgreedDialog from './privacy-terms-agreed-dialog';
 import useToast from '@/hooks/useToast';
-import {
-  compareCode,
-  createCustomer,
-  getCheckId,
-  getEmail,
-  sendEmail,
-} from '@/services/customer-apis';
-import { useAccessTokenStore, useEmailCodeStore } from '@/store/session';
-import { useCustomerStore } from '@/store/customer';
+import { useEmailCodeStore } from '@/store/session';
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import type { CustomersCreatePayload } from '@/api/data-contracts';
+import {
+  useCompareEmailCodeMutation,
+  useCreateCustomerMutation,
+  useGetCheckIdMutation,
+  useGetEmailMutation,
+  useSendEmailMutation,
+} from '@/hooks/use-customer';
 
 const labelMinWidth = 'min-w-[120px]';
 
 export default function JoinForm() {
   const { addToast } = useToast();
-
   const [showCode, setShowCode] = useState<boolean>(false);
   const [check, setCheck] = useState<boolean>(false);
   const { code, set: setEmailCode, reset: resetEmailCode } = useEmailCodeStore();
   const [_, setEmail] = useState<string>('');
+  const createCustomer = useCreateCustomerMutation(() => resetEmailCode());
+
+  const getEmail = useGetEmailMutation();
+
+  // 폼 선언
+  const form = useForm<JoinSchemaType>({
+    resolver: zodResolver(joinSchema),
+    defaultValues: {
+      id: '',
+      name: '',
+      email: '',
+      code: '',
+      pw: '',
+      pwConfirm: '',
+      mobileNumber: '',
+      address: '',
+      addressDetail: '',
+      zipcode: '',
+      isServiceTermsAgreed: false,
+      isPrivacyTermsAgreed: false,
+      isMarketingTermsAgreed: false,
+      allAgreed: false,
+    },
+  });
+
+  const getCheckId = useGetCheckIdMutation(form);
+  const sendEmail = useSendEmailMutation(setEmailCode, setShowCode, form);
+  const compareEmailCode = useCompareEmailCodeMutation(form, setCheck, resetEmailCode);
+
+  /**************************************************************************************************************/
 
   /** 전체동의 체크박스 */
   const allCheck = (allAgreed: boolean) => {
@@ -71,36 +99,27 @@ export default function JoinForm() {
       : form.setValue('allAgreed', false);
   };
 
-  /** 이메일 인증코드 전송 */
-  const emailMutation = useMutation({
-    mutationFn: (email: string) => sendEmail(email, setEmailCode),
-    onSuccess: (status) => {
-      if (status === 200) {
-        form.setError('email', { type: 'required', message: '' }); // 에러메세지 제거
-        setShowCode(true); // 인증코드 input 보이게 처리
-      } else addToast({ type: 'error', message: '이메일 전송이 실패되었습니다.' });
-    },
-    onError: (error) => addToast({ type: 'error', message: error.message }),
-  });
-
   /** 이메일 인증하기 버튼(뱃지) 클릭 */
   const authEmail = async () => {
-    if (emailMutation.isPending) return; // 이미 실행중이면 리턴
+    if (sendEmail.isPending) return; // 이미 실행중이면 리턴
 
     const email = form.getValues('email');
-
     const validFlag = validEmail(email, form); // 이메일만 유효성 검증
     if (!validFlag) return;
 
     // 이메일 인증 보내기 전에, 이미 DB에 존재하는지 확인 (존재하면 가입불가)
-    const response = await getEmail(email);
-    if (response.email) {
-      addToast({ type: 'error', message: '이미 존재하는 이메일입니다.' });
-      return;
-    }
+    try {
+      const response = await getEmail.mutateAsync({ email });
+      if (response.email) {
+        addToast({ type: 'error', message: '이미 존재하는 이메일입니다.' });
+        return;
+      }
 
-    setEmail(email);
-    email.trim() !== '' && emailMutation.mutateAsync(email); // 이메일
+      setEmail(email);
+      email.trim() !== '' && sendEmail.mutateAsync({ email }); // 이메일
+    } catch (e) {
+      addToast({ type: 'error', message: '이메일 인증 과정에서 문제가 발생했습니다.' });
+    }
   };
 
   /** 인증코드 체크 */
@@ -108,17 +127,10 @@ export default function JoinForm() {
     if (check) return; // 이미 체크되었으므로 기능을 수행하지 않는다.
 
     // 이메일 인증코드 비교
-    const data = await compareCode(value, code);
-
-    if (data.code === 200) {
-      // 인증성공
-      form.setError('code', { type: 'value', message: '' });
-      setCheck(true);
-      resetEmailCode();
-    } else {
-      // 인증실패
-      form.setError('code', { type: 'value', message: '인증번호가 일치하지 않습니다.' });
-      setCheck(false);
+    try {
+      await compareEmailCode.mutateAsync({ code: value, hashedCode: code });
+    } catch (e) {
+      addToast({ type: 'error', message: '이메일 인증코드 비교 과정에서 오류가 발생했습니다.' });
     }
   };
 
@@ -133,37 +145,16 @@ export default function JoinForm() {
   /** 아이디 중복체크 */
   const checkId = async (id: string) => {
     if (!id) {
-      form.setError('id', { type: 'value', message: '' });
+      form.clearErrors('id');
       return;
     }
 
-    const response = await getCheckId(id);
-    if (response.id) {
-      form.setError('id', { type: 'value', message: '이미 존재하는 아이디입니다.' });
-      form.setFocus('id');
+    try {
+      await getCheckId.mutateAsync({ id });
+    } catch (e) {
+      addToast({ type: 'error', message: '아이디 중복체크 과정에서 오류가 발생했습니다.' });
     }
   };
-
-  // 폼 선언
-  const form = useForm<JoinSchemaType>({
-    resolver: zodResolver(joinSchema),
-    defaultValues: {
-      id: '',
-      name: '',
-      email: '',
-      code: '',
-      pw: '',
-      pwConfirm: '',
-      mobileNumber: '',
-      address: '',
-      addressDetail: '',
-      zipcode: '',
-      isServiceTermsAgreed: false,
-      isPrivacyTermsAgreed: false,
-      isMarketingTermsAgreed: false,
-      allAgreed: false,
-    },
-  });
 
   /**
    * 회원가입 submit 전 핸들러
@@ -181,11 +172,7 @@ export default function JoinForm() {
     const service = form.getValues('isServiceTermsAgreed');
     const privacy = form.getValues('isPrivacyTermsAgreed');
     if (!(service && privacy)) {
-      addToast({
-        type: 'error',
-        message: '아빠빵 필수 이용약관을 확인 바랍니다.',
-      });
-
+      addToast({ type: 'error', message: '아빠빵 필수 이용약관을 확인 바랍니다.' });
       return;
     }
 
@@ -198,22 +185,9 @@ export default function JoinForm() {
    */
   const onSubmit = async (data: CustomersCreatePayload) => {
     try {
-      const res = await createCustomer.mutateAsync(data);
-      reset();
-
-      addToast({
-        type: 'success',
-        message: `${res.data.name}님, 환영합니다!`,
-      });
-
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 1500);
+      await createCustomer.mutateAsync(data);
     } catch (error: any) {
-      addToast({
-        type: 'error',
-        message: error.response.data.error.message,
-      });
+      addToast({ type: 'error', message: error.response.data.error.message });
     }
   };
 
