@@ -6,6 +6,7 @@ import type {
   CompareCodeCreatePayload,
   CustomersCreatePayload,
   EmailCreatePayload,
+  PostCustomersPayload,
   SendEmailCreatePayload,
 } from '@/api/data-contracts';
 
@@ -15,6 +16,11 @@ export const CustomerService = {
   /** 회원가입 */
   create: async (data: CustomersCreatePayload) => {
     const response = await customerApi.customersCreate(data);
+    return response.data;
+  },
+  /** 입력한 이메일로 아이디 조회하기 */
+  getId: async (data: PostCustomersPayload) => {
+    const response = await customerApi.postCustomers(data);
     return response.data;
   },
   /** 아이디 중복체크 :: 존재하는 아이디 찾기 */

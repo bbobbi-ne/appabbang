@@ -110,8 +110,8 @@ export const getEmail = async (req: Request, res: Response) => {
 
 /** 이메일로 아이디 조회 */
 export const getId = async (req: Request, res: Response) => {
-  const id = await customerService.getId(req.body.email);
-  res.status(200).json({ id });
+  const data = await customerService.getId(req.body.email);
+  res.status(200).json(data);
 };
 
 /** 아이디와 이메일 조회 */

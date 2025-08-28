@@ -1,5 +1,5 @@
 import useToast from '@/hooks/useToast';
-import { compareCode, getEmail, getId, sendEmail } from '@/services/customer-apis';
+import { compareCode, getEmail, sendEmail } from '@/services/customer-apis';
 import { useEmailCodeStore } from '@/store/session';
 import { findIdSchema, findIdValidEmail } from '@/validate/find-id-form-schema';
 import {
@@ -26,10 +26,11 @@ import {
   Input,
 } from '@appabbang/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import Loading from '../common/loading';
+import { CustomerService } from '@/services/api/customer-service';
 
 type Props = {
   children: React.ReactNode;
@@ -43,12 +44,19 @@ function FindIdDialog({ children }: Props) {
   const [email, setEmail] = useState<string>('');
   const { addToast } = useToast();
   const { reset: emailCodeReset } = useEmailCodeStore();
+  const { getId } = CustomerService;
 
   const { isLoading, data } = useQuery({
     queryKey: ['getId', email],
-    queryFn: () => getId(email, emailCodeReset),
+    queryFn: () => getId({ email }),
     enabled: success && !!email, // 조건부 실행
+    select: (res) => res.id,
   });
+
+  useEffect(() => {
+    // 아이디 값이 있으면 임시보관한 이메일 인증코드 리셋
+    data && emailCodeReset();
+  }, [isLoading, data]);
 
   const form = useForm({
     resolver: zodResolver(findIdSchema),
@@ -237,9 +245,9 @@ function FindIdDialog({ children }: Props) {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {data && typeof data === 'object' && 'id' in data ? (
+              {typeof data === 'string' && data ? (
                 <p>
-                  고객님의 아이디는 <strong>{String(data.id.id)}</strong>입니다.
+                  고객님의 아이디는 <strong>{data}</strong>입니다.
                 </p>
               ) : (
                 <p>아이디를 불러오는 중입니다...</p>
