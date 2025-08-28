@@ -25,7 +25,6 @@ import { joinSchema, validEmail, type JoinSchemaType } from '@/validate/join-for
 import ServiceIsAgreedDialog from './service-terms-agreed-dialog';
 import PrivacyTermsAgreedDialog from './privacy-terms-agreed-dialog';
 import useToast from '@/hooks/useToast';
-import { useEmailCodeStore } from '@/store/session';
 import { useState } from 'react';
 import type { CustomersCreatePayload } from '@/api/data-contracts';
 import {
@@ -42,7 +41,7 @@ export default function JoinForm() {
   const { addToast } = useToast();
   const [showCode, setShowCode] = useState<boolean>(false);
   const [check, setCheck] = useState<boolean>(false);
-  const { code, set: setEmailCode, reset: resetEmailCode } = useEmailCodeStore();
+  const [hashedCode, setHashedCode] = useState<string>('');
 
   // 폼 선언
   const form = useForm<JoinSchemaType>({
@@ -114,8 +113,7 @@ export default function JoinForm() {
       }
 
       const result = await sendEmail.mutateAsync({ email }); // 이메일
-
-      setEmailCode(result.code);
+      setHashedCode(result.code);
       form.clearErrors('email');
       setShowCode(true);
     } catch (e) {
@@ -129,11 +127,11 @@ export default function JoinForm() {
 
     // 이메일 인증코드 비교
     try {
-      const result = await compareEmailCode.mutateAsync({ code: value, hashedCode: code });
+      const result = await compareEmailCode.mutateAsync({ code: value, hashedCode });
       if (Number(result.code) === 200) {
         form.clearErrors('code');
         setCheck(true);
-        resetEmailCode();
+        setHashedCode('');
       } else {
         form.setError('code', { type: 'value', message: '인증번호가 일치하지 않습니다.' });
         setCheck(false);
@@ -147,7 +145,7 @@ export default function JoinForm() {
   const returnValidEmail = () => {
     setShowCode(false); // 인증코드 input 리셋
     setCheck(false); // 인증코드 검증 리셋
-    resetEmailCode(); // 세션에 저장된 해싱코드 리셋
+    setHashedCode(''); // 해싱코드 리셋
     form.setValue('code', ''); // 초기화
   };
 
@@ -204,8 +202,7 @@ export default function JoinForm() {
       const { data: result } = await createCustomer.mutateAsync(data);
 
       if (result) {
-        resetEmailCode();
-        debugger;
+        setHashedCode('');
         addToast({ type: 'success', message: `${result.name}님, 환영합니다!` });
         setTimeout(() => (window.location.href = '/'), 1500);
       }

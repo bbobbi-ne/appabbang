@@ -81,10 +81,6 @@ export function useGetEmailMutation() {
 export function useSendEmailMutation() {
   const mutation = useMutation({
     mutationFn: (data: SendEmailCreatePayload) => CustomerService.sendEmail(data),
-    onSuccess: ({ code }) => {
-      // code를 상태관리에 임시저장(회원가입 완료 후 제거할 것)
-      sessionStorage.setItem('code', code);
-    },
   });
 
   return mutation;
