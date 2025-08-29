@@ -55,3 +55,9 @@ export async function removeImage(req: Request, res: Response) {
   await ImageService.remove([publicId]);
   res.sendStatus(204);
 }
+
+/** 빵 목록 조회 (주문차수에 속했는지 포함) */
+export async function getBreadListWithOrderRound(_: Request, res: Response) {
+  const breads = await BreadService.getBreadListWithOrderRound();
+  res.status(200).json(breads);
+}

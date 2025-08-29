@@ -10,4 +10,8 @@ export const BreadsService = {
     const response = await client.get(`/breads/${no}`);
     return response.data;
   },
+  getListWithOrderRound: async (): Promise<any> => {
+    const response = await client.get('/breads/with-order-round');
+    return response.data;
+  },
 };

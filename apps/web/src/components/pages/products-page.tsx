@@ -1,34 +1,23 @@
 import { useEffect, useState } from 'react';
 import BreadSearch from '../products/bread-search';
 import type { BreadProps } from '@/interface/bread-interface';
-import { useQuery } from '@tanstack/react-query';
-import { searchBreadList } from '@/services/order-apis';
 import ProductsLoading from '@/components/products/products-loading';
 import BreadCardDetail from '@/components/products/bread-card-detail';
-import { useGetOrderRoundNowQuery } from '@/hooks/use-order-round';
+import { useGetBreadsWithOrderRoundQuery } from '@/hooks/use-breads';
 
 export default function ProductsPage() {
   const [keyword, setKeyword] = useState<string>('');
   const [breadList, setBreadList] = useState<BreadProps[]>([]);
   const [originBreadList, setOriginBreadList] = useState<BreadProps[]>([]);
 
-  /** 빵 목록 조회 API */
-  const { isLoading, data, error } = useQuery({
-    queryKey: ['allBreadList'],
-    queryFn: searchBreadList,
-  });
-
-  const { data: nowData, isLoading: nowLoading, isError: nowErr } = useGetOrderRoundNowQuery();
-
+  const { data, isLoading, error } = useGetBreadsWithOrderRoundQuery();
   /** 주문차수 빵 목록 조회 및 설정 */
   useEffect(() => {
     if (data) {
-      setBreadList(data.data);
-      setOriginBreadList(data.data);
+      setBreadList(data);
+      setOriginBreadList(data);
     }
-
-    // nowData && setOrderRoundBreads(nowData.data.orderRoundBreads);
-  }, [data, error, nowData, nowErr]);
+  }, [data, error]);
 
   /** enter key 누를때 빵 검색 기능 수행 */
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -57,7 +46,7 @@ export default function ProductsPage() {
     setKeyword(e.target.value);
   };
 
-  return isLoading && nowLoading ? (
+  return isLoading ? (
     <ProductsLoading />
   ) : (
     <div>

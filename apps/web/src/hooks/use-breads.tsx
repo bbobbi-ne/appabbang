@@ -18,5 +18,16 @@ export function useGetBreadQuery(no: number) {
     queryFn: () => BreadsService.getOne(no),
     staleTime: Infinity,
     retry: 3,
+    enabled: !!no,
+  });
+}
+
+/** 빵 목록 조회 (주문차수에 속했는지 포함) */
+export function useGetBreadsWithOrderRoundQuery() {
+  return useQuery({
+    queryKey: ['/breads/with-order-round', '빵 목록 조회'],
+    queryFn: () => BreadsService.getListWithOrderRound(),
+    staleTime: Infinity,
+    retry: 3,
   });
 }

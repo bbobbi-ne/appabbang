@@ -4,6 +4,7 @@ import { Bread, Image } from '@prisma/client';
 import * as ImageService from './image.service';
 import { UploadedFile } from 'express-fileupload';
 import { AppError } from '@/types';
+import * as OrderRoundService from './order-round.service';
 
 type CreateBreadRequestBody = Pick<
   Bread,
@@ -198,4 +199,63 @@ export const remove = async (noList: number[]) => {
       where: { publicId: { in: publicIdList } },
     });
   });
+};
+
+/** 빵 목록 조회 (주문차수에 속했는지 포함) */
+export const getBreadListWithOrderRound = async () => {
+  const result = await prisma.$transaction(async (tx) => {
+    const originBreads = await tx.bread.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        no: true,
+        name: true,
+        description: true,
+      },
+    });
+
+    const images = await tx.image.findMany({
+      take: 10000,
+      orderBy: [{ no: 'desc' }, { order: 'asc' }],
+      where: {
+        imageTargetType: IMAGE_TARGET_TYPE_CODE,
+        order: 1,
+      },
+      select: {
+        imageTargetNo: true,
+        url: true,
+      },
+    });
+
+    const imageMap = new Map<number, string>();
+    images.forEach((img: Pick<Image, 'imageTargetNo' | 'url'>) => {
+      // imageTargetNo 는 빵 no 와 동일함
+      imageMap.set(img.imageTargetNo, img.url ?? '');
+    });
+
+    const breads = originBreads.map((bread: Pick<Bread, 'no' | 'name' | 'description'>) => ({
+      ...bread,
+      images: [...(imageMap.get(bread.no) ? [{ url: imageMap.get(bread.no) }] : [])],
+    }));
+
+    // 반복문이 너무 많이 사용되고 있음. 최적화 필요
+    const orderRound = await OrderRoundService.selectStartedAtOrderRound(new Date());
+    const orderRoundBreads = orderRound?.orderRoundBreads;
+
+    const breadsWithOrderRound = breads.map((bread) => {
+      const isCurrentOrderRound = orderRoundBreads?.some((item) => item.breadNo === bread.no);
+      return { ...bread, isCurrentOrderRound };
+    });
+
+    const sortedBreads = breadsWithOrderRound.sort((a, b) => {
+      if (a.isCurrentOrderRound && !b.isCurrentOrderRound) return -1;
+      if (!a.isCurrentOrderRound && b.isCurrentOrderRound) return 1;
+      return 0;
+    });
+
+    return sortedBreads;
+  });
+
+  return result;
 };
