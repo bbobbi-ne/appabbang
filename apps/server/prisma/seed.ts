@@ -77,7 +77,7 @@ async function main() {
       {
         code: '20',
         groupName: 'image_target_type',
-        name: 'orderRound',
+        name: 'order_rounds',
         remarkTxt: '주문차수 이미지',
       },
       { code: '10', groupName: 'discount_type', name: '기간할인', remarkTxt: '기간할인' },
@@ -189,7 +189,7 @@ async function main() {
         startedAt: '2025-08-01T09:36:15.992Z',
         endedAt: '2025-08-31T20:36:15.992Z',
         minOrderQty: 1,
-        maxOrderQty: 999,
+        maxOrderQty: 20,
       },
     ],
   });
@@ -203,6 +203,10 @@ async function main() {
       {
         orderRoundNo: 1,
         breadNo: 1,
+      },
+      {
+        orderRoundNo: 1,
+        breadNo: 2,
       },
     ],
   });
