@@ -86,8 +86,14 @@ export const MyService = {
   updateOrderAddress: async (no: number, data: OrdersAddressUpdatePayload) => {
     await myApi.ordersAddressUpdate(no, data);
   },
+  /** 쿠폰 목록 조회 */
   getCouponList: async () => {
     const response = await myApi.couponsList();
+    return response.data;
+  },
+  /** 내 사용 가능한 쿠폰 조회 */
+  getAvailableCouponList: async () => {
+    const response = await myApi.couponsAvailableList();
     return response.data;
   },
   /** 특정 주문차수에 내 주문이 있는지 확인 (취소, 환불 제외) - 주문서 접근 확인 용도 */

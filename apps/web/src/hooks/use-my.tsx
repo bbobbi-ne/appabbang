@@ -194,3 +194,12 @@ export function useGetCouponQuery() {
     queryFn: () => MyService.getCouponList(),
   });
 }
+
+/** 내 사용 가능한 쿠폰 조회 */
+export function useGetAvailableCouponQuery({ enabled = true }: { enabled: boolean }) {
+  return useQuery({
+    queryKey: ['/my/coupons/available', '마이페이지 > 사용 가능한 쿠폰'],
+    queryFn: () => MyService.getAvailableCouponList(),
+    enabled,
+  });
+}

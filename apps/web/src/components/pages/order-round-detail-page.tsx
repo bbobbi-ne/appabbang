@@ -17,10 +17,16 @@ import { BreadItem } from '@/components/order-round/bread-item';
 import { OrderForm } from '@/components/order-round/order-form';
 import { formatIsoToDateTime } from '@appabbang/utils';
 import { useCreateOrderMutation } from '@/hooks/use-orders';
-import type { ActiveListData } from '@/api/data-contracts';
+import type {
+  ActiveListData,
+  ContactListData,
+  CouponsAvailableListData,
+  OrdersCreatePayload,
+} from '@/api/data-contracts';
+import { useGetAvailableCouponQuery } from '@/hooks/use-my';
 
 /** Main Function */
-export default function OrderRoundDetailPage({ myContact }: { myContact: any }) {
+export default function OrderRoundDetailPage({ myContact }: { myContact: ContactListData }) {
   const orderRoundData = useLoaderData({ from: '/_sub-page/order-round/$orderRoundNo' });
   const { orderRoundNo } = useParams({ from: '/_sub-page/order-round/$orderRoundNo' });
   const navigate = useNavigate();
@@ -29,7 +35,7 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: any }) 
   const { data: deliveryData } = useGetDeliveryMethodsQuery();
 
   /** 쿠폰 목록 API */
-  const couponData: any[] = [];
+  const { data: couponData } = useGetAvailableCouponQuery({ enabled: !!myContact });
 
   /** 선택한 빵 목록 */
   const [selectedBreads, setSelectedBreads] = useState<
@@ -40,11 +46,7 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: any }) 
   const [selectedDelivery, setSelectedDelivery] = useState<ActiveListData[0]>();
 
   /** 선택한 쿠폰 (임시) */
-  const [selectedCoupon, setSelectedCoupon] = useState<{
-    no: number;
-    name: string;
-    discountAmount: number;
-  }>();
+  const [selectedCoupon, setSelectedCoupon] = useState<CouponsAvailableListData[0]>();
 
   const totalQuantity = useMemo(() => {
     return selectedBreads.reduce((acc, item) => acc + item.quantity, 0);
@@ -55,7 +57,11 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: any }) 
   }, [selectedBreads]);
 
   const totalPrice = useMemo(() => {
-    return totalBreadPrice - (selectedCoupon?.discountAmount ?? 0) + (selectedDelivery?.fee ?? 0);
+    const discountedBreads =
+      totalBreadPrice - (selectedCoupon?.amount ?? 0) > 0
+        ? totalBreadPrice - (selectedCoupon?.amount ?? 0)
+        : 0;
+    return discountedBreads + (selectedDelivery?.fee ?? 0);
   }, [totalBreadPrice, selectedCoupon, selectedDelivery]);
 
   const createMutation = useCreateOrderMutation();
@@ -83,7 +89,7 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: any }) 
     }
   };
 
-  const createOrder = async (data: any) => {
+  const createOrder = async (data: Partial<OrdersCreatePayload>) => {
     if (totalQuantity < orderRoundData?.minOrderQty) {
       alert('최소 주문 수량을 확인해주세요.');
       return;
@@ -99,6 +105,7 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: any }) 
     }
 
     const body = {
+      ...data,
       orderRoundNo,
       orderItems: selectedBreads.map((item) => ({
         breadNo: item.no,
@@ -108,11 +115,10 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: any }) 
       deliveryTypeCode: selectedDelivery?.deliveryTypeCode,
       customerCouponNo: selectedCoupon?.no,
       totalPrice,
-      ...data,
     };
 
     try {
-      const data = await createMutation.mutateAsync(body);
+      const data = await createMutation.mutateAsync(body as any);
       toast.success('주문이 완료되었습니다.');
 
       if (myContact) {
@@ -135,7 +141,7 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: any }) 
 
   /** 쿠폰 기본값 설정 */
   useEffect(() => {
-    if (myContact && couponData.length > 0) {
+    if (myContact && couponData) {
       setSelectedCoupon(couponData[0]);
     }
   }, [myContact, couponData]);
@@ -176,16 +182,47 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: any }) 
       </div>
 
       {/* 금액 영역  */}
+      {/* 멤버이고, 쿠폰이 있을때만 조회 */}
+      {myContact && couponData && (
+        <div className="flex flex-row items-center gap-2">
+          <div className="w-24 min-w-24">내 쿠폰</div>
+          <Select
+            value={selectedCoupon?.no.toString() ?? ''}
+            onValueChange={(value) => {
+              setSelectedCoupon(couponData?.find((item: any) => item.no.toString() === value));
+            }}
+          >
+            <SelectTrigger id="couponNo" className="w-full bg-white">
+              <SelectValue placeholder="내 쿠폰 선택" />
+            </SelectTrigger>
+
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>내 쿠폰</SelectLabel>
+                {couponData?.map((coupon: any, idx: number) => {
+                  return (
+                    <SelectItem key={idx} value={coupon.no.toString()}>
+                      {coupon.name} ({coupon.amount}원), 만료일 (
+                      {formatIsoToDateTime(coupon.expiredAt)})
+                    </SelectItem>
+                  );
+                })}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       <div className="space-y-2">
         <div className="flex flex-row items-center gap-2">
-          <div className="w-24">배송방법</div>
+          <div className="w-24 min-w-24">배송방법</div>
           <Select
             value={selectedDelivery?.no.toString() ?? ''}
             onValueChange={(value) => {
               setSelectedDelivery(deliveryData?.find((item: any) => item.no.toString() === value));
             }}
           >
-            <SelectTrigger id="deliveryMethodNo" className="min-w-40 bg-white">
+            <SelectTrigger id="deliveryMethodNo" className="w-full bg-white">
               <SelectValue placeholder="배송방법 선택" />
             </SelectTrigger>
 
@@ -204,56 +241,26 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: any }) 
           </Select>
         </div>
 
-        {/* 멤버이고, 쿠폰이 있을때만 조회 */}
-        {myContact && couponData.length > 0 && (
-          <div className="flex flex-row items-center gap-2">
-            <div className="w-24">내 쿠폰</div>
-            <Select
-              value={selectedCoupon?.no.toString() ?? ''}
-              onValueChange={(value) => {
-                setSelectedCoupon(couponData?.find((item: any) => item.no.toString() === value));
-              }}
-            >
-              <SelectTrigger id="couponNo" className="min-w-40">
-                <SelectValue placeholder="내 쿠폰 선택" />
-              </SelectTrigger>
-
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>내 쿠폰</SelectLabel>
-                  {couponData?.map((coupon: any, idx: number) => {
-                    return (
-                      <SelectItem key={idx} value={coupon.no.toString()}>
-                        {coupon.name}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-
         {/* 금액 요약 */}
         <div className="flex flex-col items-end">
           <div className="flex flex-row items-center gap-2">
-            <p>상품 금액({totalQuantity}개 주문):</p>
+            <p>상품 금액({totalQuantity}개 주문)</p>
             <p className="min-w-40 text-right">{totalBreadPrice} 원</p>
           </div>
+          {selectedCoupon && (
+            <div className="flex flex-row items-center gap-2">
+              <p>할인금액</p>
+              <p className="min-w-40 text-right">{selectedCoupon?.amount} 원</p>
+            </div>
+          )}
           {selectedDelivery?.deliveryTypeCode === '10' && (
             <div className="flex flex-row items-center gap-2">
               <p>배송비</p>
               <p className="min-w-40 text-right">{selectedDelivery?.fee} 원</p>
             </div>
           )}
-          {selectedCoupon && (
-            <div className="flex flex-row items-center gap-2">
-              <p>할인금액:(수정필요)</p>
-              <p className="min-w-40 text-right">{selectedCoupon?.discountAmount}원</p>
-            </div>
-          )}
           <div className="flex flex-row items-center gap-2">
-            <p className="text-lg font-bold">총 금액:</p>
+            <p className="text-lg font-bold">총 금액</p>
             <p className="font-bold min-w-40 text-right">{totalPrice}원</p>
           </div>
         </div>

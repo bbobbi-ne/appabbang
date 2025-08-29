@@ -12,6 +12,8 @@ export function useCreateOrderMutation() {
       queryClient.invalidateQueries({
         queryKey: [`/my/order-rounds/${variables.orderRoundNo}/has-order`],
       });
+      queryClient.invalidateQueries({ queryKey: ['/my/coupons/available'] });
+      queryClient.invalidateQueries({ queryKey: ['/my/coupons'] });
     },
   });
 }
