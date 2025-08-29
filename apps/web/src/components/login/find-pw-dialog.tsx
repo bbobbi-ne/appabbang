@@ -1,6 +1,9 @@
+import {
+  useCompareEmailCodeMutation,
+  useGetIdEmailMutation,
+  useSendEmailMutation,
+} from '@/hooks/use-customer';
 import useToast from '@/hooks/useToast';
-import { compareCode, getIdEmail, sendEmail } from '@/services/customer-apis';
-import { useEmailCodeStore } from '@/store/session';
 import { findPwSchema, findPwValidEmail, pwModifyFormSchema } from '@/validate/find-pw-form-schema';
 import {
   Badge,
@@ -26,7 +29,6 @@ import {
   Input,
 } from '@appabbang/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -38,9 +40,12 @@ function FindPwDialog({ children }: Props) {
   const [open, setOpen] = useState<boolean>(false);
   const [showCode, setShowCode] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
-  const { code, set: setEmailCode } = useEmailCodeStore();
   const { addToast } = useToast();
-  const { reset: emailCodeReset } = useEmailCodeStore();
+  const [hashedCode, setHashedCode] = useState<string>();
+
+  const sendEmail = useSendEmailMutation();
+  const getIdEmail = useGetIdEmailMutation();
+  const compareEmailCode = useCompareEmailCodeMutation();
 
   const form = useForm({
     resolver: zodResolver(findPwSchema),
@@ -63,74 +68,63 @@ function FindPwDialog({ children }: Props) {
   const resetAllStates = () => {
     setShowCode(false);
     setSuccess(false);
-    setEmailCode('');
+    setHashedCode('');
     form.reset();
     pwForm.reset();
   };
 
-  /** 이메일 인증코드 전송 */
-  const emailMutation = useMutation({
-    mutationFn: (email: string) => sendEmail(email, setEmailCode),
-    onSuccess: (status) => {
-      if (status === 200) {
-        form.setError('id', { type: 'required', message: '' });
-        form.setError('email', { type: 'required', message: '' });
-        setShowCode(true);
-      } else addToast({ type: 'error', message: '이메일 전송이 실패되었습니다.' });
-    },
-    onError: (error) => addToast({ type: 'error', message: error.message }),
-  });
-
   /** 이메일 인증하기 버튼(뱃지) 클릭 */
   const authEmail = async () => {
-    if (emailMutation.isPending) return; // 이미 실행중이면 리턴
+    if (sendEmail.isPending) return; // 이미 실행중이면 리턴
 
     const id = form.getValues('id');
     const email = form.getValues('email');
 
-    const validFlag = findPwValidEmail(id, email, form); // 아이디, 이메일 유효성 검증
-    if (!validFlag) return;
+    try {
+      const validFlag = findPwValidEmail(id, email, form); // 아이디, 이메일 유효성 검증
+      if (!validFlag) return;
 
-    // 아이디와 이메일 확인
-    const response = await getIdEmail(id, email);
-    if (!response.id || !response.email) {
-      addToast({ type: 'error', message: '존재하지 않는 정보입니다.' });
-      return;
-    }
-
-    // 이메일로 인증코드 전달
-    email.trim() !== '' && emailMutation.mutateAsync(email);
-  };
-
-  /** 인증번호 확인 mutation */
-  const compareMutation = useMutation<
-    { code: number },
-    Error,
-    { inputCode: string; code: string; id: string; email: string }
-  >({
-    mutationFn: ({ inputCode, code, id, email }) => compareCode(inputCode, code, id, email),
-    onSuccess: (data) => {
-      if (data.code === 200) {
-        setSuccess(true);
-        emailCodeReset();
-      } else {
-        addToast({ type: 'error', message: '인증번호가 일치하지 않습니다.' });
-        setSuccess(false);
+      // 아이디와 이메일 확인
+      const response = await getIdEmail.mutateAsync({ id, email });
+      if (!response.id || !response.email) {
+        addToast({ type: 'error', message: '존재하지 않는 정보입니다.' });
+        return;
       }
-    },
-    onError: (error) => addToast({ type: 'error', message: error.message }),
-  });
+
+      // 이메일로 인증코드 전달
+      const result = await sendEmail.mutateAsync({ email });
+      setHashedCode(result.code);
+      form.clearErrors('id');
+      form.clearErrors('email');
+      setShowCode(true);
+    } catch (e) {
+      addToast({ type: 'error', message: '이메일 인증 과정에서 오류가 발생했습니다.' });
+    }
+  };
 
   /** 인증번호 확인 */
   const onSubmit = async () => {
-    if (compareMutation.isPending) return; // 이미 실행중이면 리턴
+    if (compareEmailCode.isPending) return; // 이미 실행중이면 리턴
 
-    const inputCode = form.getValues('code');
-    if (inputCode) {
+    const code = form.getValues('code');
+    if (code && hashedCode) {
       const id = form.getValues('id');
       const email = form.getValues('email');
 
-      compareMutation.mutateAsync({ inputCode, code, id, email });
+      try {
+        const result = await compareEmailCode.mutateAsync({ code, hashedCode, id, email });
+        if (Number(result.code) === 200) {
+          setSuccess(true);
+          setHashedCode('');
+        } else {
+          addToast({ type: 'error', message: '인증번호가 일치하지 않습니다.' });
+          setSuccess(false);
+        }
+      } catch (e) {
+        addToast({ type: 'error', message: '이메일 인증번호 확인 과정에서 오류가 발생했습니다.' });
+      }
+
+      // compareMutation.mutateAsync({ inputCode, code, id, email });
     }
   };
 
