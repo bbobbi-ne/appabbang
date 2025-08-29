@@ -1,361 +1,271 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { Card, CardHeader, CardTitle, CardContent, AlertDialog } from '@appabbang/ui';
-import BreadCard from '@/components/common/bread-card';
-import type { BreadProps } from '@/interface/bread-interface';
+import { useEffect, useMemo, useState } from 'react';
+
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectGroup,
+  SelectLabel,
+  SelectItem,
+  toast,
+} from '@appabbang/ui';
 import OrderFormSkeleton from '@/components/order/order-form-skeleton';
-import CardComment from '@/components/common/card-comment';
-import Payment from '@/components/order/Payment';
-import { useForm, type SubmitHandler } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { customerOrderFormSchema, formSchema } from '@/validate/order-form-schema';
-import NonCustomerOrderForm from '@/components/order/non-customer-order-form';
-import { insertOrders, searchBankList, searchDeliveryList } from '@/services/order-apis';
-import type { CustomerOrderFormSchema, FormSchema } from '@/validate/order-form-schema';
-import useToast from '@/hooks/useToast';
-import { useParams } from '@tanstack/react-router';
-import { useAccessTokenStore } from '@/store/session';
-import CustomerOrderForm from '../order/customer-order-form';
-import { useGetOrderRoundNowQuery, useGetOrderRoundQuery } from '@/hooks/use-order-round';
+import { useLoaderData, useParams } from '@tanstack/react-router';
+import { useGetDeliveryMethodsQuery } from '@/hooks/use-common-code';
+import { BreadItem } from '@/components/order-round/bread-item';
+import { OrderForm } from '@/components/order-round/order-form';
+import { formatIsoToDateTime } from '@appabbang/utils';
+import { useCreateOrderMutation } from '@/hooks/use-orders';
 
 /** Main Function */
-export default function OrderRoundDetailPage() {
-  const [orderRoundBreads, setOrderRoundBreads] = useState<BreadProps[]>([]); // 빵 목록
-  const [paymentList, setPaymentList] = useState<BreadProps[]>([]); // 결제목록
-  const [errMsg, setErrMsg] = useState<string>(''); // 에러메세지
-  const [fee, setFee] = useState<number>(0); // 배송비
-  const [totalCount, setTotalCount] = useState<number>(0); // 최종 수량
-  const [totalPrice, setTotalPrice] = useState<number>(0); // 최종 금액
-  const [min, setMin] = useState<number>(0); // 최소주문수량
-  const [max, setMax] = useState<number>(0); // 최대주문수량
-  // 메인페이지에서 넘어온 주문차수 파라미터
+export default function OrderRoundDetailPage({ myContact }: { myContact: any }) {
+  const orderRoundData = useLoaderData({ from: '/_sub-page/order-round/$orderRoundNo' });
   const { orderRoundNo } = useParams({ from: '/_sub-page/order-round/$orderRoundNo' });
 
-  const { accessToken } = useAccessTokenStore();
-  const { addToast } = useToast();
-  const [save, setSave] = useState<boolean>(false); // 저장여부
-
-  /**********************************************************************************/
-  /** Functions */
-  /** 빵 카드 click시 하단 결제목록 컴포넌트에 추가될 빵 list를 삽입함. */
-  const handleBreadClick = (bread: BreadProps) => {
-    if (paymentList.length === 0) {
-      // 1건도 결제목록이 존재하지 않으면 삽입하고 종료
-      setPaymentList((prev) => [...prev, { ...bread, count: 1 }]);
-      return false;
-    }
-
-    let tmpCount = 0;
-
-    // list에 동일한 빵이 있다면 추가하지 않는다.
-    paymentList.map((payment, _) => {
-      payment.no === bread.no ? tmpCount++ : null;
-    });
-    tmpCount === 0 ? setPaymentList((prev) => [...prev, { ...bread, count: 1 }]) : null;
-  };
-
-  /** 결제목록 수량, 금액 */
-  const onCountChange = useCallback((bread: BreadProps, _: string) => {
-    setPaymentList((prev) =>
-      prev.map((item) => (item.no === bread.no ? { ...item, count: bread.count } : item)),
-    );
-  }, []);
-
-  /** 결제목록에서 삭제 */
-  const onRemove = useCallback((bread: BreadProps) => {
-    setPaymentList((prev) => prev.filter((item) => item.no !== bread.no));
-  }, []);
-
-  const handlers = useMemo(
-    () => ({
-      onCountChange,
-      onRemove,
-    }),
-    [onCountChange, onRemove],
-  );
-
-  /** 우체국 한정으로 배송비 4,000원 추가 */
-  const onSelectedDeliveryTp = (value: string) => (value === '10' ? setFee(4000) : setFee(0));
-
-  /**********************************************************************************/
-  /** APIs */
   /** 배송방법 목록 API */
-  const { isLoading: deliveryLoading, data: deliveryData } = useQuery({
-    queryKey: ['deliveryList'],
-    queryFn: searchDeliveryList,
-  });
+  const { data: deliveryData } = useGetDeliveryMethodsQuery();
 
-  /** 은행 목록 API */
-  const { isLoading: bankLoading, data: bankData } = useQuery({
-    queryKey: ['bankList'],
-    queryFn: searchBankList,
-  });
+  /** 쿠폰 목록 API */
+  const couponData: any[] = [];
 
-  /** 주문차수 상세 조회 API */
-  // const {
-  //   isLoading: orderRoundLoading,
-  //   data: orderRoundData,
-  //   error: orderRoundErr,
-  // } = useQuery({
-  //   queryKey: ['getOrderRound'],
-  //   queryFn: () => getOrderRound(Number(orderRoundNo)),
-  // });
+  /** 선택한 빵 목록 */
+  const [selectedBreads, setSelectedBreads] = useState<
+    { no: number; quantity: number; unitPrice: number }[]
+  >([]);
 
-  const {
-    data: orderRoundData,
-    isLoading: orderRoundLoading,
-    error: orderRoundErr,
-  } = useGetOrderRoundQuery(Number(orderRoundNo));
+  /** 선택한 배송방법 */
+  const [selectedDelivery, setSelectedDelivery] = useState<{
+    no: number;
+    name: string;
+    deliveryTypeCode: string;
+    fee: number;
+    deliveryTypeName: string;
+  }>();
 
-  /**********************************************************************************/
-  /** form submit */
-  /** 비회원 form : form과 schema 연결 */
-  const nonCustomerForm = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      ordererName: '', // 주문자명
-      ordererMobile: '', // 주문자 전화번호
-      recipientName: '', // 수령인명
-      recipientMobile: '', // 수령인 전화번호
-      zipcode: '', // 우편번호
-      deliveryMethodNo: '', // 배송방법
-      address: '', // 주소
-      addressDetail: '', // 상세주소
-      message: '', // 배송메세지
-      orderPw: '', // 주문 비밀번호
-      orderItems: [], // 주문목록
-      totalPrice: 0, // 최종금액
-      discountAmount: 0, // 할인금액
-      bankCode: '', // 은행코드
-      accountNumber: '', // 계좌번호
-      accountHolderName: '', // 예금주
-      same: false, // 주문자-수령인 동일여부
-      isServiceTermsAgreed: false, // 서비스 이용약관
-      isPrivacyTermsAgreed: false, // 개인정보 이용약관
-      isPaymentRefundTermsAgreed: false, // 결제 및 환불 약관
-      orderRoundNo: Number(orderRoundNo), // 주문차수
-    },
-  });
+  /** 선택한 쿠폰 (임시) */
+  const [selectedCoupon, setSelectedCoupon] = useState<{
+    no: number;
+    name: string;
+    discountAmount: number;
+  }>();
 
-  /** 고객 form */
-  const customerForm = useForm({
-    resolver: zodResolver(customerOrderFormSchema),
-    defaultValues: {
-      ordererName: '', // 주문자명
-      recipientName: '', // 수령인명
-      recipientMobile: '', // 수령인 전화번호
-      zipcode: '', // 우편번호
-      deliveryMethodNo: '', // 배송방법
-      address: '', // 주소
-      addressDetail: '', // 상세주소
-      orderItems: [], // 주문목록
-      totalPrice: 0, // 최종금액
-      discountAmount: 0, // 할인금액
-      bankCode: '', // 은행코드
-      accountNumber: '', // 계좌번호
-      accountHolderName: '', // 예금주
-      same: false, // 주문자-수령인 동일여부
-      isServiceTermsAgreed: false, // 서비스 이용약관
-      isPrivacyTermsAgreed: false, // 개인정보 이용약관
-      isPaymentRefundTermsAgreed: false, // 결제 및 환불 약관
-      orderRoundNo: Number(orderRoundNo), // 주문차수
-    },
-  });
+  const totalQuantity = useMemo(() => {
+    return selectedBreads.reduce((acc, item) => acc + item.quantity, 0);
+  }, [selectedBreads]);
 
-  /**
-   * form onSubmit 핸들러
-   * 조건 1. 비회원은 accessToken이 존재하지 않으면서, 개인정보 수집 이용 동의가 되어야 함.
-   * 조건 2. 주문 건이 1건 이상 존재해야 함. (고객/비회원 둘다)
-   */
-  const handleOrderSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const totalBreadPrice = useMemo(() => {
+    return selectedBreads.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0);
+  }, [selectedBreads]);
 
-    if (paymentList.length === 0) {
-      addToast({ message: '빵 결제목록이 1개 이상 선택돼야 주문이 가능합니다.', type: 'error' });
+  const totalPrice = useMemo(() => {
+    return totalBreadPrice - (selectedCoupon?.discountAmount ?? 0) + (selectedDelivery?.fee ?? 0);
+  }, [totalBreadPrice, selectedCoupon, selectedDelivery]);
+
+  const createMutation = useCreateOrderMutation();
+
+  /** 선택한 빵 핸들링 함수 */
+  const handleSelectedBread = (bread: any, quantity: number) => {
+    if (quantity === 0) {
+      setSelectedBreads((prev) => prev.filter((item) => item.no !== bread.no));
       return;
     }
 
-    // customerForm / nonCustomerForm totalPrice 설정
-    if (accessToken && accessToken.length > 0) {
-      customerForm.setValue('totalPrice', totalPrice);
-      customerForm.setValue(
-        'orderItems',
-        paymentList.map((bread) => ({
-          breadNo: bread.no,
-          quantity: bread.count,
-        })),
+    // 이미 존재하는 빵이면 개수 증가
+    const existingBread = selectedBreads.find((item) => item.no === bread.no);
+    if (existingBread) {
+      setSelectedBreads((prev) =>
+        prev.map((item) => (item.no === bread.no ? { ...item, quantity } : item)),
       );
-      customerForm.setValue('orderRoundNo', 1);
-
-      customerForm.handleSubmit(customerOnSubmit, (error) => console.log(error))();
+      return;
     } else {
-      nonCustomerForm.setValue('totalPrice', totalPrice);
-
-      nonCustomerForm.setValue(
-        'orderItems',
-        paymentList.map((bread) => ({
-          breadNo: bread.no,
-          quantity: bread.count,
-        })),
-      );
-
-      nonCustomerForm.handleSubmit(nonCustomerOnSubmit, (error) => console.log(error))();
+      // 존재하지 않는 빵이면 추가
+      setSelectedBreads((prev) => [
+        ...prev,
+        { no: bread.no, quantity, unitPrice: bread.unitPrice },
+      ]);
     }
   };
 
-  /** 고객 주문서 저장 */
-  const customerOnSubmit: SubmitHandler<CustomerOrderFormSchema> = async (data) => {
-    await insertOrder.mutateAsync(data); // 주문서 등록(고객)
-  };
-
-  /** 비회원 주문서 저장 */
-  const nonCustomerOnSubmit: SubmitHandler<FormSchema> = async (data) => {
-    await insert.mutateAsync(data); // 주문서 등록(비회원)
-  };
-
-  /** mutation : 주문서 등록(고객) */
-  const insertOrder = useMutation({
-    mutationFn: (data: CustomerOrderFormSchema) => insertOrders(data),
-    onSuccess: () => {
-      addToast({ message: '주문이 등록되었습니다.', type: 'success' });
-      setSave(true);
-    },
-    onError: (error) => addToast({ message: error.message, type: 'error' }),
-  });
-
-  /** mutation : 주문서 등록(비회원) */
-  const insert = useMutation({
-    mutationFn: (data: FormSchema) => insertOrders(data),
-    onSuccess: () => {
-      addToast({ message: '주문이 등록되었습니다.', type: 'success' });
-      setSave(true);
-    },
-    onError: (error) => addToast({ message: error.message, type: 'error' }),
-  });
-  /**********************************************************************************/
-
-  /** 주문차수 빵 목록 조회 및 설정 */
-  useEffect(() => {
-    if (orderRoundData) {
-      setOrderRoundBreads(orderRoundData.orderRoundBreads);
-      setMin(orderRoundData.inOrderQty);
-      setMax(orderRoundData.axOrderQty);
+  const createOrder = async (data: any) => {
+    if (totalQuantity < orderRoundData?.minOrderQty) {
+      alert('최소 주문 수량을 확인해주세요.');
+      return;
     }
-    orderRoundErr && setErrMsg('빵 목록을 조회하는 데 문제가 발생했습니다.');
-  }, [orderRoundData, orderRoundErr]);
 
-  /** 빵 결제목록의 총 개수, 총 금액 계산 */
+    if (totalQuantity > orderRoundData?.maxOrderQty) {
+      alert('최대 주문 수량을 초과하였습니다.');
+      return;
+    }
+
+    if (!window.confirm('주문을 진행하시겠습니까?')) {
+      return;
+    }
+
+    const body = {
+      orderRoundNo,
+      orderItems: selectedBreads.map((item) => ({
+        breadNo: item.no,
+        quantity: item.quantity,
+      })),
+      deliveryMethodNo: selectedDelivery?.no,
+      deliveryTypeCode: selectedDelivery?.deliveryTypeCode,
+      customerCouponNo: selectedCoupon?.no,
+      totalPrice,
+      ...data,
+    };
+
+    try {
+      await createMutation.mutateAsync(body);
+      toast.success('주문이 완료되었습니다.');
+    } catch (error) {
+      toast.error('주문을 실패하였습니다.');
+    }
+  };
+
+  /** 배송방법 기본값 설정 */
   useEffect(() => {
-    const count = paymentList.reduce((sum, bread) => sum + (bread.count ?? 0), 0);
-    const price = paymentList.reduce(
-      (sum, bread) => sum + (bread.unitPrice ?? 0) * (bread.count ?? 0),
-      0,
-    );
+    if (deliveryData) {
+      setSelectedDelivery(deliveryData[0]);
+    }
+  }, [deliveryData]);
 
-    setTotalCount(count);
-    setTotalPrice(price + fee); // 빵 목록 금액의 합 + 배송비
-  }, [paymentList, fee]);
+  /** 쿠폰 기본값 설정 */
+  useEffect(() => {
+    if (myContact && couponData.length > 0) {
+      setSelectedCoupon(couponData[0]);
+    }
+  }, [myContact, couponData]);
 
-  /**********************************************************************************/
-
-  // if (isLoading) return <Loading />;
-
-  return orderRoundLoading ? (
+  return false ? (
     <OrderFormSkeleton />
   ) : (
-    <div>
-      <div className="relative flex h-auto m-auto">
-        <Card className="w-full bg-[#fcfcfc]">
-          <div className="m-5 mt-10">
-            <CardContent>
-              <CardComment
-                title="1. 이번 주문서에 포함된 빵을 확인하세요!"
-                comment="현재 주문서에 포함된 빵 목록은 다음과 같습니다. 카드를 클릭하면 빵 결제목록에 담을 수 있습니다."
-              />
+    <div className="space-y-4 pb-24">
+      {/* 안내 영역 */}
+      <div className="bg-secondary rounded-sm p-2 shadow-md space-y-1 border-white border-4">
+        <p className="text-sm text-primary">{orderRoundData?.no}차 주문서가 오픈했습니다!</p>
 
-              {/* 주문차수 빵 목록 */}
-              <div className="flex flex-row flex-wrap gap-5 justify-start">
-                {orderRoundLoading ? (
-                  <Card>
-                    <CardHeader className="text-red-600">{errMsg}</CardHeader>
-                  </Card>
-                ) : (
-                  orderRoundBreads?.map((data, i) => (
-                    <AlertDialog key={i}>
-                      {data && <BreadCard bread={data} onClick={handleBreadClick} />}
-                    </AlertDialog>
-                  ))
-                )}
-              </div>
-            </CardContent>
+        <p className="text-sm text-primary">
+          해당 주문은 종류와 상관없이 <u>최소 {orderRoundData?.minOrderQty}개</u>부터{' '}
+          <u>최대 {orderRoundData?.maxOrderQty}개</u>
+          까지 주문이 가능합니다.
+        </p>
 
-            {paymentList.length === 0
-              ? null
-              : paymentList.map((data, i) => (
-                  <Payment key={i} bread={data} min={min} max={max} handlers={handlers} />
-                ))}
+        <p className="text-sm text-primary">
+          마감일: <u>{formatIsoToDateTime(orderRoundData?.endedAt || '')}</u>
+        </p>
+      </div>
+
+      {/* 빵 목록 영역 */}
+      <div>
+        <p className="pb-2 font-semibold">이번 주문차수에 포함된 빵을 확인하고 추가하세요!</p>
+
+        {orderRoundData.orderRoundBreads?.map((data: any, i: number) => (
+          <BreadItem
+            key={i}
+            bread={data}
+            handleSelectedBread={handleSelectedBread}
+            maxOrderQty={orderRoundData?.maxOrderQty}
+            totalQuantity={totalQuantity}
+            isSelected={selectedBreads.some((item) => item.no === data.no)}
+          />
+        ))}
+      </div>
+
+      {/* 금액 영역  */}
+      <div className="space-y-2">
+        <div className="flex flex-row items-center gap-2">
+          <div className="w-24">배송방법</div>
+          <Select
+            value={selectedDelivery?.no.toString() ?? ''}
+            onValueChange={(value) => {
+              setSelectedDelivery(deliveryData?.find((item: any) => item.no.toString() === value));
+            }}
+          >
+            <SelectTrigger id="deliveryMethodNo" className="min-w-40 bg-white">
+              <SelectValue placeholder="배송방법 선택" />
+            </SelectTrigger>
+
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>배송방법</SelectLabel>
+                {deliveryData?.map((delivery: any, idx: number) => {
+                  return (
+                    <SelectItem key={idx} value={delivery.no.toString()}>
+                      {delivery.deliveryTypeName}
+                    </SelectItem>
+                  );
+                })}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* 멤버이고, 쿠폰이 있을때만 조회 */}
+        {myContact && couponData.length > 0 && (
+          <div className="flex flex-row items-center gap-2">
+            <div className="w-24">내 쿠폰</div>
+            <Select
+              value={selectedCoupon?.no.toString() ?? ''}
+              onValueChange={(value) => {
+                setSelectedCoupon(couponData?.find((item: any) => item.no.toString() === value));
+              }}
+            >
+              <SelectTrigger id="couponNo" className="min-w-40">
+                <SelectValue placeholder="내 쿠폰 선택" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>내 쿠폰</SelectLabel>
+                  {couponData?.map((coupon: any, idx: number) => {
+                    return (
+                      <SelectItem key={idx} value={coupon.no.toString()}>
+                        {coupon.name}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
+        )}
 
-          <div className="mt-5 mb-5 mr-10 text-right font-bold text-[18px]">
-            <ul className="flex justify-end text-red-700">
-              <li className="w-1/3"></li>
-              <li className="w-1/3">배송비 :</li>
-              <li className="w-xs">{fee.toLocaleString()}원</li>
-            </ul>
+        {/* 금액 요약 */}
+        <div className="flex flex-col items-end">
+          <div className="flex flex-row items-center gap-2">
+            <p>상품 금액({totalQuantity}개 주문):</p>
+            <p className="min-w-40 text-right">{totalBreadPrice} 원</p>
           </div>
-
-          <div className="mt-5 mb-5 mr-10 text-right font-bold">
-            <CardTitle>
-              <ul className="flex justify-end">
-                <li className="w-1/3"></li>
-                <li className="w-1/3">총 금액({totalCount}개) :</li>
-                <li className="w-xs">
-                  <CardTitle>{totalPrice.toLocaleString()}원</CardTitle>
-                </li>
-              </ul>
-            </CardTitle>
-          </div>
-
-          <div className="mt-20 m-5">
-            <CardContent>
-              {accessToken && accessToken.length > 0 ? (
-                <CardComment
-                  title="2. 고객 정보를 입력 해주세요."
-                  comment="필수항목을 입력해야 주문이 진행됩니다."
-                />
-              ) : (
-                <CardComment
-                  title="2. 비회원 정보를 입력 해주세요."
-                  comment="필수항목을 입력해야 주문이 진행됩니다."
-                />
-              )}
-            </CardContent>
-
-            <div className="flex justify-center w-full">
-              {accessToken && accessToken.length > 0 ? (
-                // 고객 전용 폼
-                <CustomerOrderForm
-                  form={customerForm}
-                  onSelectedDeliveryTp={onSelectedDeliveryTp}
-                  bank={{ bankLoading, bankData: bankData?.data }}
-                  delivery={{ deliveryLoading, deliveryData: deliveryData?.data }}
-                  handleOrderSubmit={handleOrderSubmit}
-                  save={save}
-                />
-              ) : (
-                // 비회원 전용 폼
-                <NonCustomerOrderForm
-                  form={nonCustomerForm}
-                  onSelectedDeliveryTp={onSelectedDeliveryTp}
-                  bank={{ bankLoading, bankData: bankData?.data }}
-                  delivery={{ deliveryLoading, deliveryData: deliveryData?.data }}
-                  handleOrderSubmit={handleOrderSubmit}
-                  save={save}
-                />
-              )}
+          {selectedDelivery?.deliveryTypeCode === '10' && (
+            <div className="flex flex-row items-center gap-2">
+              <p>배송비</p>
+              <p className="min-w-40 text-right">{selectedDelivery?.fee} 원</p>
             </div>
+          )}
+          {selectedCoupon && (
+            <div className="flex flex-row items-center gap-2">
+              <p>할인금액:(수정필요)</p>
+              <p className="min-w-40 text-right">{selectedCoupon?.discountAmount}원</p>
+            </div>
+          )}
+          <div className="flex flex-row items-center gap-2">
+            <p className="text-lg font-bold">총 금액:</p>
+            <p className="font-bold min-w-40 text-right">{totalPrice}원</p>
           </div>
-        </Card>
+        </div>
+      </div>
+
+      {/* 고객 정보 영역  */}
+      <div className="bg-white rounded-sm p-6 shadow-md">
+        <p className="pb-2 font-semibold">고객님의 정보를 입력해주세요!</p>
+
+        <OrderForm
+          isDelivery={selectedDelivery?.deliveryTypeCode === '10'}
+          myContact={myContact}
+          onSubmit={createOrder}
+          isSubmitting={createMutation.isPending}
+        />
       </div>
     </div>
   );
