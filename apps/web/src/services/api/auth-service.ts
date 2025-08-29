@@ -10,6 +10,7 @@ function deleteCookie(name: string) {
 }
 
 export const AuthService = {
+  /** 로그인 */
   login: async (data: LoginCreatePayload) => {
     try {
       const response = await authApi.loginCreate(data);
@@ -21,6 +22,7 @@ export const AuthService = {
       throw new Error(message);
     }
   },
+  /** 로그아웃 */
   logout: async () => {
     const response = await authApi.logoutCreate();
     return response.data;

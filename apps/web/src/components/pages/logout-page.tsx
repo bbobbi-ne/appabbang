@@ -13,7 +13,7 @@ export default function LogoutPage() {
   const { addToast } = useToast();
 
   useEffect(() => {
-    async () => {
+    (async () => {
       try {
         await logOutMutaion.mutateAsync();
         addToast({
@@ -26,7 +26,7 @@ export default function LogoutPage() {
       } catch (error) {
         console.log(error);
       }
-    };
+    })();
   }, []);
 
   return <Loading title="로그아웃" />;

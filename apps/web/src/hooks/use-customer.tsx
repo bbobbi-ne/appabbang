@@ -6,6 +6,7 @@ import type {
   CompareCodeCreatePayload,
   CustomersCreatePayload,
   EmailCreatePayload,
+  IdEmailCreatePayload,
   SendEmailCreatePayload,
 } from '@/api/data-contracts';
 import { CustomerService } from '@/services/api/customer-service';
@@ -90,6 +91,17 @@ export function useSendEmailMutation() {
 export function useCompareEmailCodeMutation() {
   const mutation = useMutation({
     mutationFn: (data: CompareCodeCreatePayload) => CustomerService.compareCode(data),
+  });
+
+  return mutation;
+}
+
+/**
+ * 입력한 아이디와 이메일 가져오기
+ */
+export function useGetIdEmailMutation() {
+  const mutation = useMutation({
+    mutationFn: (data: IdEmailCreatePayload) => CustomerService.getIdEmail(data),
   });
 
   return mutation;
