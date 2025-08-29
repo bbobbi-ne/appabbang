@@ -348,6 +348,11 @@ export interface ImageDeletePayload {
    * @example "breads/image123"
    */
   publicId: string;
+  /**
+   * 해당하는 빵의 No
+   * @example "1"
+   */
+  no: number;
 }
 
 export type ImageDeleteData = any;
