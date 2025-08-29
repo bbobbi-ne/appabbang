@@ -11,7 +11,7 @@ import {
   toast,
 } from '@appabbang/ui';
 import OrderFormSkeleton from '@/components/order/order-form-skeleton';
-import { useLoaderData, useParams } from '@tanstack/react-router';
+import { useLoaderData, useNavigate, useParams } from '@tanstack/react-router';
 import { useGetDeliveryMethodsQuery } from '@/hooks/use-common-code';
 import { BreadItem } from '@/components/order-round/bread-item';
 import { OrderForm } from '@/components/order-round/order-form';
@@ -23,6 +23,7 @@ import type { ActiveListData } from '@/api/data-contracts';
 export default function OrderRoundDetailPage({ myContact }: { myContact: any }) {
   const orderRoundData = useLoaderData({ from: '/_sub-page/order-round/$orderRoundNo' });
   const { orderRoundNo } = useParams({ from: '/_sub-page/order-round/$orderRoundNo' });
+  const navigate = useNavigate();
 
   /** 배송방법 목록 API */
   const { data: deliveryData } = useGetDeliveryMethodsQuery();
@@ -111,9 +112,16 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: any }) 
     };
 
     try {
-      await createMutation.mutateAsync(body);
+      const data = await createMutation.mutateAsync(body);
       toast.success('주문이 완료되었습니다.');
+
+      if (myContact) {
+        navigate({ to: `/mypage/order-list/${data.no}` });
+      } else {
+        navigate({ to: `/` });
+      }
     } catch (error) {
+      console.log(error);
       toast.error('주문을 실패하였습니다.');
     }
   };
