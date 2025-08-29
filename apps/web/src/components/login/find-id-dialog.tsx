@@ -1,6 +1,4 @@
 import useToast from '@/hooks/useToast';
-import { compareCode, getEmail, sendEmail } from '@/services/customer-apis';
-import { useEmailCodeStore } from '@/store/session';
 import { findIdSchema, findIdValidEmail } from '@/validate/find-id-form-schema';
 import {
   Badge,
@@ -28,9 +26,14 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import Loading from '../common/loading';
 import { CustomerService } from '@/services/api/customer-service';
+import {
+  useCompareEmailCodeMutation,
+  useGetEmailMutation,
+  useSendEmailMutation,
+} from '@/hooks/use-customer';
 
 type Props = {
   children: React.ReactNode;
@@ -40,11 +43,10 @@ function FindIdDialog({ children }: Props) {
   const [open, setOpen] = useState<boolean>(false);
   const [showCode, setShowCode] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
-  const { code, set: setEmailCode } = useEmailCodeStore();
   const [email, setEmail] = useState<string>('');
   const { addToast } = useToast();
-  const { reset: emailCodeReset } = useEmailCodeStore();
   const { getId } = CustomerService;
+  const [hashedCode, setHashedCode] = useState<string>();
 
   const { isLoading, data } = useQuery({
     queryKey: ['getId', email],
@@ -55,7 +57,7 @@ function FindIdDialog({ children }: Props) {
 
   useEffect(() => {
     // 아이디 값이 있으면 임시보관한 이메일 인증코드 리셋
-    data && emailCodeReset();
+    data && setHashedCode('');
   }, [isLoading, data]);
 
   const form = useForm({
@@ -66,26 +68,20 @@ function FindIdDialog({ children }: Props) {
     },
   });
 
+  const getEmail = useGetEmailMutation();
+  const sendEmail = useSendEmailMutation();
+  const compareEmailCode = useCompareEmailCodeMutation();
+
+  /*************************************************************************/
+
   // 모든 상태값과 form을 초기화
   const resetAllStates = () => {
     setShowCode(false);
     setSuccess(false);
     setEmail('');
-    setEmailCode('');
+    setHashedCode('');
     form.reset();
   };
-
-  /** 이메일 인증코드 전송 */
-  const emailMutation = useMutation({
-    mutationFn: (targetEmail: string) => sendEmail(targetEmail, setEmailCode),
-    onSuccess: (status) => {
-      if (status === 200) {
-        form.setError('email', { type: 'required', message: '' });
-        setShowCode(true);
-      } else addToast({ type: 'error', message: '이메일 전송이 실패되었습니다.' });
-    },
-    onError: (error) => addToast({ type: 'error', message: error.message }),
-  });
 
   /** 이메일 인증하기 버튼(뱃지) 클릭 */
   const authEmail = async () => {
@@ -94,37 +90,42 @@ function FindIdDialog({ children }: Props) {
     const validFlag = findIdValidEmail(email, form); // 이메일만 유효성 검증
     if (!validFlag) return;
 
-    // 이메일 확인
-    const response = await getEmail(email);
-    if (!response.email) {
-      addToast({ type: 'error', message: '존재하지 않는 이메일입니다.' });
-      return;
-    }
+    try {
+      const response = await getEmail.mutateAsync({ email });
+      if (!response.email) {
+        addToast({ type: 'error', message: '존재하지 않는 이메일입니다.' });
+        return;
+      }
 
-    // 이메일로 인증코드 전달 (공백이 아닐 때만 전송)
-    setEmail(email);
-    email.trim() !== '' && emailMutation.mutateAsync(email);
+      // 이메일로 인증코드 전달 (공백이 아닐 때만 전송)
+      setEmail(email);
+      const result = await sendEmail.mutateAsync({ email });
+      form.clearErrors('email');
+      setShowCode(true);
+      setHashedCode(result.code);
+    } catch (e) {
+      addToast({ type: 'error', message: '이메일 인증하는 과정에서 오류가 발생했습니다.' });
+    }
   };
 
   /** 인증번호 확인 */
   const onSubmit = async () => {
     if (success) return;
 
-    const inputCode = form.getValues('code');
-    if (!inputCode)
+    const code = form.getValues('code');
+    if (!code) {
       form.setError('code', { type: 'required', message: '인증번호를 입력 바랍니다.' });
-    else {
-      const data = await compareCode(inputCode, code);
-      if (data.code === 200) {
-        // 인증성공
-        setSuccess(true);
-        setEmail(form.getValues('email'));
-      } else {
-        // 인증실패
-        addToast({ type: 'error', message: '인증번호가 일치하지 않습니다.' });
-        setSuccess(false);
-        setEmail('');
-      }
+      return;
+    }
+
+    const result = hashedCode && (await compareEmailCode.mutateAsync({ code, hashedCode }));
+    if (result && Number(result.code) === 200) {
+      setSuccess(true);
+      setEmail(form.getValues('email'));
+    } else {
+      addToast({ type: 'error', message: '인증번호가 일치하지 않습니다.' });
+      setSuccess(false);
+      setEmail('');
     }
   };
 
