@@ -45,7 +45,11 @@ export default function AddressCreateDialog() {
         <DialogHeader>
           <DialogTitle>배송지 추가</DialogTitle>
         </DialogHeader>
-        <AddressForm onSubmit={create} isLoading={createMutation.isPending} />
+        <AddressForm
+          onSubmit={create}
+          isLoading={createMutation.isPending}
+          onCancel={() => setOpen(false)}
+        />
       </DialogContent>
     </Dialog>
   );

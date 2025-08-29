@@ -55,12 +55,12 @@ const AddressList = ({ data }: { data: AddressesListData | undefined }) => {
           key={item.no}
           data={item}
           update={{
-            mutationAsync: updateMutation.mutateAsync,
-            isSubmitting: updateMutation.isPending,
+            mutateAsync: updateMutation.mutateAsync,
+            isPending: updateMutation.isPending,
           }}
           remove={{
-            mutationAsync: deleteMutation.mutateAsync,
-            isSubmitting: deleteMutation.isPending,
+            mutateAsync: deleteMutation.mutateAsync,
+            isPending: deleteMutation.isPending,
           }}
         >
           <div className="border-b p-2 cursor-pointer flex flex-col gap-2 hover:bg-muted">

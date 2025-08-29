@@ -16,12 +16,12 @@ type Props = {
   children: React.ReactNode;
   data: AddressesListData[number] | undefined;
   update: {
-    mutationAsync: ({ no, data }: { no: number; data: addresssDailogForm }) => Promise<void>;
-    isSubmitting: boolean;
+    mutateAsync: ({ no, data }: { no: number; data: addresssDailogForm }) => Promise<void>;
+    isPending: boolean;
   };
   remove?: {
-    mutationAsync: (no: number) => Promise<void>;
-    isSubmitting: boolean;
+    mutateAsync: (no: number) => Promise<void>;
+    isPending: boolean;
   };
 };
 
@@ -33,7 +33,7 @@ export default function AddressModifyDialog({ children, data, update, remove }: 
     try {
       if (!update || !data?.no) return;
 
-      await update.mutationAsync({ no: data.no, data: body });
+      await update.mutateAsync({ no: data.no, data: body });
       toast.success('수정이 완료되었습니다.');
       setOpen(false);
     } catch (error: any) {
@@ -46,7 +46,7 @@ export default function AddressModifyDialog({ children, data, update, remove }: 
     try {
       if (!remove) return;
 
-      await remove.mutationAsync(no); // 배송지변경에서 온 배송지 삭제
+      await remove.mutateAsync(no); // 배송지변경에서 온 배송지 삭제
       toast.success('삭제가 완료되었습니다.');
       setOpen(false);
     } catch (error: any) {
@@ -70,9 +70,10 @@ export default function AddressModifyDialog({ children, data, update, remove }: 
         <AddressForm
           currentValues={data}
           onSubmit={updateAddress}
-          isLoading={update.isSubmitting}
+          isLoading={update.isPending}
           deleteAddress={deleteAddress}
-          deleteLoading={remove?.isSubmitting}
+          deleteLoading={remove?.isPending}
+          onCancel={() => setOpen(false)}
         />
       </DialogContent>
     </Dialog>
