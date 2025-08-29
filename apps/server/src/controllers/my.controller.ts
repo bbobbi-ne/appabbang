@@ -8,9 +8,20 @@ export const getInfo = async (req: Request, res: Response) => {
   if (!req.user) throw AppError.unauthorized('고객정보를 조회할 수 없습니다.');
 
   // 고객 상세정보 조회 + 고객 보유 쿠폰 조회
-  const { customer, coupon } = await myService.getMyInfo(req.user.no);
-  const totalAmount = await myService.getOrderAccumulatedAmount(req.user.no);
-  res.status(200).json({ customer, coupon, totalAmount });
+  const customer = await myService.getMyInfo(req.user.no);
+  res.status(200).json(customer);
+};
+
+/** 내 정보 + 주문 누적금액 + 총 보유 쿠폰 수 조회 */
+export const getLayoutInfo = async (req: Request, res: Response) => {
+  if (!req.user) throw AppError.unauthorized('고객정보를 조회할 수 없습니다.');
+
+  const customerNo = req.user.no;
+  // 고객 상세정보 조회 + 고객 보유 쿠폰 조회
+  const customer = await myService.getMyInfo(customerNo);
+  const couponCount = await myService.getCustomerCouponCount(customerNo);
+  const totalAmount = await myService.getOrderAccumulatedAmount(customerNo);
+  res.status(200).json({ customer, couponCount, totalAmount });
 };
 
 /** 내 정보 수정 */
