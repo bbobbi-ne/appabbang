@@ -131,12 +131,18 @@ export function useGetOrderQuery(no: number) {
 export function useCancelOrderMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ no, data }: { no: number; data: { canceledReason: string } }) =>
-      MyService.cancelOrder(no, data),
+    mutationFn: (payload: {
+      no: number;
+      data: { canceledReason: string };
+      orderRoundNo: number;
+    }) => {
+      const { no, data } = payload;
+      return MyService.cancelOrder(no, data);
+    },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['/my/orders', '내 주문 목록 조회'] });
+      queryClient.invalidateQueries({ queryKey: ['/my/orders'] });
       queryClient.invalidateQueries({
-        queryKey: [`/my/orders/${variables.no}/has-order`, '내 주문 상세 조회'],
+        queryKey: [`/my/order-rounds/${variables.orderRoundNo}/has-order`],
       });
     },
   });
@@ -175,7 +181,7 @@ export function useUpdateOrderAddressMutation() {
 /** 주문차수에 내 주문이 있는지 확인 (취소, 환불 제외) */
 export const useCheckHasOrderQuery = (no: number, enabled = false) => {
   return useQuery({
-    queryKey: [`/my/orders/${no}/has-order`, '내 주문 상세 조회'],
+    queryKey: [`/my/order-rounds/${no}/has-order`, '내 주문 상세 조회'],
     queryFn: () => MyService.checkHasOrder(no),
     enabled,
   });

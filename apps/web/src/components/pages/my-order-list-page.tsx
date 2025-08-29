@@ -67,7 +67,7 @@ export default function MyOrderListPage() {
                     </Button>
                   )}
                 {Number(order.orderStatus) < 20 ? (
-                  <OrderCalcenDialog no={order.no}>
+                  <OrderCalcenDialog no={order.no} orderRoundNo={order.orderRoundNo}>
                     <Button variant="outline">주문취소</Button>
                   </OrderCalcenDialog>
                 ) : null}

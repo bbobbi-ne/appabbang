@@ -222,8 +222,8 @@ export async function checkHasOrder(req: Request, res: Response) {
 
   if (!customerNo) return res.status(200).json(false);
 
-  const no = Number(req.params.no);
-  const hasOrder = await myService.checkHasOrder(customerNo, no);
+  const orderRoundNo = Number(req.params.no);
+  const hasOrder = await myService.checkHasOrder(customerNo, orderRoundNo);
   res.status(200).json(hasOrder);
 }
 /** 쿠폰목록 조회 */

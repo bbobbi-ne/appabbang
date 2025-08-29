@@ -15,7 +15,7 @@ function MainPage() {
   /** APIs */
   const { data, isLoading, error } = useGetOrderRoundCurrentQuery();
   // 로그인 여부를 확인할 수 있는 다른 방법이 없을지?
-  const { data: hasOrder } = useCheckHasOrderQuery(data?.no, data?.no && !!accessToken);
+  const { data: hasOrder } = useCheckHasOrderQuery(data?.no ?? 0, !!data?.no && !!accessToken);
 
   /************************************************************************/
   if (isLoading) return <MainLoading />;
@@ -23,7 +23,7 @@ function MainPage() {
 
   return (
     <>
-      <OrderRoundContent data={data} hasOrder={hasOrder} />
+      <OrderRoundContent data={data} hasOrder={!!hasOrder} />
       <SellPopularProducts />
       <InstagramContent />
       <Infomation />

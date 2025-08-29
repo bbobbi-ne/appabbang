@@ -234,6 +234,7 @@ export const getOrders = async (customerNo: number) => {
         no: true,
         orderNumber: true,
         orderStatus: true,
+        orderRoundNo: true,
         createdAt: true,
         orderItems: {
           select: {
@@ -382,10 +383,10 @@ export const updateOrderAddress = async (
 };
 
 /** 내가 주문했던 주문인지 확인하는 메서드 (완료, 취소, 환불 제외) */
-export const checkHasOrder = async (customerNo: number, no: number): Promise<boolean> => {
+export const checkHasOrder = async (customerNo: number, orderRoundNo: number): Promise<boolean> => {
   const order = await prisma.order.findFirst({
     where: {
-      no,
+      orderRoundNo,
       customerNo,
       orderStatus: { notIn: ['40', '50', '51', '52'] },
       // 완료, 취소요청, 취소완료, 취소완료(환불)

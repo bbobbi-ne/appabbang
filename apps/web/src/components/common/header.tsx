@@ -13,7 +13,7 @@ export default function Header() {
   // 현재 진행중인 주문차수 조회
   const { data, isSuccess } = useGetOrderRoundCurrentQuery();
   // 로그인 여부를 확인할 수 있는 다른 방법이 없을지?
-  const { data: hasOrder } = useCheckHasOrderQuery(data?.no, data?.no && !!accessToken);
+  const { data: hasOrder } = useCheckHasOrderQuery(data?.no ?? 0, !!data?.no && !!accessToken);
 
   const moveToOrderRoundDetail = (no: number) => {
     navigate({

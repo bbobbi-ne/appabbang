@@ -7,10 +7,10 @@ export function useCreateOrderMutation() {
   return useMutation({
     mutationFn: (data: OrdersCreatePayload) => OrdersService.create(data),
     retry: 3,
-    onSuccess: (data) => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['/my/orders', '내 주문 목록 조회'] });
       queryClient.invalidateQueries({
-        queryKey: [`/my/order/${data.no}/has-order`, '주문차수상세'],
+        queryKey: [`/my/order-rounds/${variables.orderRoundNo}/has-order`],
       });
     },
   });

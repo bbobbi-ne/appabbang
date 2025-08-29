@@ -125,9 +125,9 @@ router.put(
   asyncHandler(myController.updateOrderAddress),
 );
 
-/** GET /my/orders/:no/has-order : 내가 주문했던 주문인지 확인하는 라우트 */
+/** GET /my/order-rounds/:no/has-order : 내가 주문했던 주문인지 확인하는 라우트 */
 router.get(
-  '/orders/:no/has-order',
+  '/order-rounds/:no/has-order',
   optionalAuth,
   validate(paramsNoValidator),
   asyncHandler(myController.checkHasOrder),
