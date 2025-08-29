@@ -81,4 +81,8 @@ export const MyService = {
   updateOrderAddress: async (no: number, data: OrdersAddressUpdatePayload) => {
     await myApi.ordersAddressUpdate(no, data);
   },
+  getCouponList: async () => {
+    const response = await myApi.couponsList();
+    return response.data;
+  },
 };
