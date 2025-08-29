@@ -106,18 +106,23 @@ export async function removeImage(req: Request, res: Response) {
   res.sendStatus(204);
 }
 
-/**
- * 최신 주문차수 조회
- */
-export async function getLatest(_: Request, res: Response) {
-  const list = await OrderRoundService.getLatest();
-  res.status(200).json(list);
+/** 현재 주문차수 조회 (now or next) */
+export async function getCurrent(_: Request, res: Response) {
+  const currentOrderRound =
+    (await OrderRoundService.getNow()) || (await OrderRoundService.getNextOrderRound());
+  res.status(200).json(currentOrderRound);
 }
 
-/**
- * 현재일자에 진행중인 주문차수 조회
- */
-export async function getNow(_: Request, res: Response) {
-  const list = await OrderRoundService.getNow();
-  res.status(200).json(list);
+/** 오픈된 특정 주문차수 조회 */
+export async function getOpenByNo(req: Request, res: Response) {
+  const no = Number(req.params.no);
+  const openOrderRound = await OrderRoundService.getOpenByNo(no);
+  res.status(200).json(openOrderRound);
+}
+
+/** 주문차수가 진행중인지 확인하는 메서드 */
+export async function checkOpenByNo(req: Request, res: Response) {
+  const no = Number(req.params.no);
+  const isOpen = await OrderRoundService.checkOpenByNo(no);
+  res.status(200).json(isOpen);
 }
