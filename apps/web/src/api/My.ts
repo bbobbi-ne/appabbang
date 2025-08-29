@@ -21,14 +21,14 @@ import type {
   ContactListData,
   CouponsListData,
   GetMyData,
+  OrderRoundsHasOrderListData,
   OrdersAddressListData,
   OrdersAddressUpdateData,
   OrdersAddressUpdatePayload,
-  OrdersCancelPartialUpdateData,
-  OrdersCancelPartialUpdatePayload,
+  OrdersCancelCreateData,
+  OrdersCancelCreatePayload,
   OrdersDeliveryListData,
   OrdersDetailResult,
-  OrdersHasOrderListData,
   OrdersListResult,
   SummaryListData,
   UpdateMyPasswordData,
@@ -265,20 +265,20 @@ export class My<SecurityDataType = unknown> {
    * @description 주문을 취소합니다. (권한: 고객만)
    *
    * @tags My
-   * @name OrdersCancelPartialUpdate
+   * @name OrdersCancelCreate
    * @summary 내 주문 취소
-   * @request PATCH:/my/orders/{no}/cancel
+   * @request POST:/my/orders/{no}/cancel
    * @secure
-   * @response `200` `OrdersCancelPartialUpdateData` 주문 취소 성공
+   * @response `200` `OrdersCancelCreateData` 주문 취소 성공
    */
-  ordersCancelPartialUpdate = (
+  ordersCancelCreate = (
     no: number,
-    data: OrdersCancelPartialUpdatePayload,
+    data: OrdersCancelCreatePayload,
     params: RequestParams = {},
   ) =>
-    this.http.request<OrdersCancelPartialUpdateData, any>({
+    this.http.request<OrdersCancelCreateData, any>({
       path: `/my/orders/${no}/cancel`,
-      method: "PATCH",
+      method: "POST",
       body: data,
       secure: true,
       type: ContentType.Json,
@@ -366,15 +366,15 @@ export class My<SecurityDataType = unknown> {
    * @description 특정 주문이 현재 로그인한 고객이 주문한 것인지 확인합니다. (권한: 선택적 로그인)
    *
    * @tags My
-   * @name OrdersHasOrderList
+   * @name OrderRoundsHasOrderList
    * @summary 내가 주문했던 주문인지 확인
-   * @request GET:/my/orders/{no}/has-order
+   * @request GET:/my/order-rounds/{no}/has-order
    * @secure
-   * @response `200` `OrdersHasOrderListData` 주문 확인 성공
+   * @response `200` `OrderRoundsHasOrderListData` 주문 확인 성공
    */
-  ordersHasOrderList = (no: number, params: RequestParams = {}) =>
-    this.http.request<OrdersHasOrderListData, any>({
-      path: `/my/orders/${no}/has-order`,
+  orderRoundsHasOrderList = (no: number, params: RequestParams = {}) =>
+    this.http.request<OrderRoundsHasOrderListData, any>({
+      path: `/my/order-rounds/${no}/has-order`,
       method: "GET",
       secure: true,
       format: "json",

@@ -54,6 +54,7 @@ export class Orders<SecurityDataType = unknown> {
    * @name OrdersCreate
    * @summary 주문 생성 (비회원)
    * @request POST:/orders
+   * @secure
    * @response `201` `OrdersCreateData` 주문 생성 성공
    */
   ordersCreate = (data: OrdersCreatePayload, params: RequestParams = {}) =>
@@ -61,6 +62,7 @@ export class Orders<SecurityDataType = unknown> {
       path: `/orders`,
       method: "POST",
       body: data,
+      secure: true,
       type: ContentType.Json,
       ...params,
     });

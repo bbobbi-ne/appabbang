@@ -1779,7 +1779,7 @@ export type DeliveryMethodsListData = {
    * 배송 타입 (10-택배배송, 20-직접수령, 90-기타)
    * @example "10"
    */
-  deliveryType: "10" | "20" | "90";
+  deliveryTypeCode: "10" | "20" | "90";
   /**
    * 배송 타입 이름 (쿼리 파라미터가 있을 때만 포함)
    * @example "택배배송"
@@ -1804,7 +1804,7 @@ export interface DeliveryMethodsCreatePayload {
    * 배송 타입 (10-택배배송, 20-직접수령, 90-기타)
    * @example "10"
    */
-  deliveryType: "10" | "20" | "90";
+  deliveryTypeCode: "10" | "20" | "90";
   /**
    * 배송 방법 이름
    * @example "우체국"
@@ -1854,7 +1854,7 @@ export type ActiveListData = {
    * 배송 타입 (10-택배배송, 20-직접수령, 90-기타)
    * @example "10"
    */
-  deliveryType: "10" | "20" | "90";
+  deliveryTypeCode: "10" | "20" | "90";
   /**
    * 배송 타입 이름
    * @example "택배배송"
@@ -1904,7 +1904,7 @@ export interface DeliveryMethodsDetailData {
    * 배송 타입 (10-택배배송, 20-직접수령, 90-기타)
    * @example "10"
    */
-  deliveryType: "10" | "20" | "90";
+  deliveryTypeCode: "10" | "20" | "90";
   /**
    * 배송 타입 이름
    * @example "택배배송"
@@ -1929,7 +1929,7 @@ export interface DeliveryMethodsUpdatePayload {
    * 배송 타입 (10-택배배송, 20-직접수령, 90-기타)
    * @example "10"
    */
-  deliveryType: "10" | "20" | "90";
+  deliveryTypeCode: "10" | "20" | "90";
   /**
    * 배송 방법 이름
    * @example "우체국"
@@ -2678,6 +2678,11 @@ export type OrdersListResult = {
    */
   orderStatusName: string;
   /**
+   * 주문차수 번호
+   * @example 1
+   */
+  orderRoundNo: number;
+  /**
    * 주문 생성일시
    * @format date-time
    * @example "2024-08-25T15:55:20.000Z"
@@ -2766,7 +2771,7 @@ export interface OrdersDetailResult {
   }[];
 }
 
-export interface OrdersCancelPartialUpdatePayload {
+export interface OrdersCancelCreatePayload {
   /**
    * 취소 사유
    * @example "주문 취소 요청"
@@ -2774,7 +2779,7 @@ export interface OrdersCancelPartialUpdatePayload {
   canceledReason: string;
 }
 
-export type OrdersCancelPartialUpdateData = any;
+export type OrdersCancelCreateData = any;
 
 export interface OrdersDeliveryListData {
   /** @example 1 */
@@ -2936,7 +2941,7 @@ export interface ContactListData {
  * 주문 여부 (true: 주문함, false: 주문하지 않음)
  * @example true
  */
-export type OrdersHasOrderListData = boolean;
+export type OrderRoundsHasOrderListData = boolean;
 
 export type CouponsListData = {
   /**
