@@ -7,6 +7,7 @@ const orderApi = new Orders(new CustomHttpClient({}, refreshCreate));
 
 export const OrdersService = {
   create: async (data: OrdersCreatePayload) => {
-    await orderApi.ordersCreate(data);
+    const response = await orderApi.ordersCreate(data);
+    return response.data;
   },
 };
