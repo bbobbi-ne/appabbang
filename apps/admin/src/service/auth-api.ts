@@ -9,7 +9,7 @@ const authApi = new Auth(new CustomHttpClient({}, refreshCreate));
 
 /**
  * 로그인 API 호출
- * @param {LoginCreatePayload} param0 - id, pw, type 정보를 포함한 로그인 요청 데이터
+ * @param {LoginCreatePayload} param - id, pw, type 정보를 포함한 로그인 요청 데이터
  * @returns accessToken을 담은 객체
  */
 export const loginCreate = async ({ id, pw, type }: LoginCreatePayload) => {
@@ -32,6 +32,37 @@ export const loginCreate = async ({ id, pw, type }: LoginCreatePayload) => {
 
     // 실패 토스트 알림
     toast.error('로그인에 실패했습니다.', {
+      description: message,
+    });
+
+    // 호출 측에서 핸들링할 수 있도록 예외 던짐
+    throw new Error(message);
+  }
+};
+/**
+ * 로그아웃 API 호출
+ */
+export const logOut = async () => {
+  try {
+    // 서버에 로그인 요청
+    const response = await authApi.logoutCreate();
+
+    // 성공 토스트 알림
+    toast.success('로그아웃에 성공했습니다!.');
+
+    // Zustand 스토어에 Access Token 저장
+    useAuthStore.getState().clearAccessToken();
+    useAuthStore.getState().clearAuth();
+
+    return {
+      data: response.data,
+    };
+  } catch (error: any) {
+    // 서버에서 전달된 에러 메시지 추출
+    const message = error.data?.message || '로그아웃에 실패했습니다.';
+
+    // 실패 토스트 알림
+    toast.error('로그아웃에 실패했습니다.', {
       description: message,
     });
 

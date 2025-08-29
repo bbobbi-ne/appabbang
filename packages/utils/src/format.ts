@@ -56,6 +56,15 @@ export function formatIsoToDateTime(isoString: string): string {
 }
 
 /**
+ * 🕒 ISO 문자열을 'yyyy-MM-dd' 형식으로 변환
+ * @param isoString ISO 8601 문자열
+ * @returns '2025-08-14' 형태 문자열
+ */
+export function formatIsoToDate(isoString: string): string {
+  return format(new Date(isoString), 'yyyy-MM-dd', { locale: ko });
+}
+
+/**
  * 연락처 하이픈 추가
  * @param value 전화번호형식의 문자열
  * @returns 숫자 길이에 따른 전화번호 형식의 문자열 예: 000-000-0000
