@@ -226,9 +226,17 @@ export async function checkHasOrder(req: Request, res: Response) {
   const hasOrder = await myService.checkHasOrder(customerNo, orderRoundNo);
   res.status(200).json(hasOrder);
 }
+
 /** 쿠폰목록 조회 */
 export const getCouponList = async (req: Request, res: Response) => {
   const customerNo = req.user.no;
   const data = await myService.getCouponList(customerNo);
+  res.status(200).json(data);
+};
+
+/** 내 사용 가능한 쿠폰 조회 */
+export const getAvailableCouponList = async (req: Request, res: Response) => {
+  const customerNo = req.user.no;
+  const data = await myService.getAvailableCouponList(customerNo);
   res.status(200).json(data);
 };

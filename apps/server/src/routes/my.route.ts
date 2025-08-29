@@ -135,4 +135,11 @@ router.get(
 /** GET /my/coupons : 쿠폰내역 조회 */
 router.get('/coupons', requireCustomerOwner, asyncHandler(myController.getCouponList));
 
+/** GET /my/coupons/available : 내 사용 가능한 쿠폰 조회 */
+router.get(
+  '/coupons/available',
+  requireCustomerOwner,
+  asyncHandler(myController.getAvailableCouponList),
+);
+
 export default router;

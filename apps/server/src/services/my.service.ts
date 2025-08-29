@@ -424,3 +424,39 @@ export const getCouponList = async (customerNo: number) => {
   if (!customerCoupon) throw AppError.notFound('고객님의 쿠폰을 찾을 수 없습니다.');
   return customerCoupon;
 };
+
+/** 내 사용 가능한 쿠폰 조회 */
+export const getAvailableCouponList = async (customerNo: number) => {
+  // 오늘기준으로 expiredAt 이 지났는지도 조건 체크 (안지났으면 조회가능)
+  const now = new Date();
+  const customerCoupon = await prisma.customerCoupon.findMany({
+    where: { customerNo, isUsed: false, isExpired: false, expiredAt: { gte: now } },
+    select: {
+      no: true,
+      customerNo: true,
+      couponNo: true,
+      expiredAt: true,
+      coupon: {
+        select: {
+          name: true,
+          amount: true,
+        },
+      },
+    },
+  });
+
+  const result = customerCoupon.map((item) => {
+    const {
+      coupon: { name, amount },
+      ...rest
+    } = item;
+
+    return {
+      ...rest,
+      name,
+      amount,
+    };
+  });
+
+  return result;
+};

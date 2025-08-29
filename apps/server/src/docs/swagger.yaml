@@ -5228,6 +5228,56 @@ paths:
                           description: 할인금액
                           example: 10000
 
+  /my/coupons/available:
+    get:
+      tags: [My]
+      summary: 내 사용 가능한 쿠폰 조회
+      description: 로그인한 고객의 사용 가능한 쿠폰 목록을 조회합니다. (권한: 고객만)
+      security: 
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 쿠폰 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - no
+                    - customerNo
+                    - couponNo
+                    - expiredAt
+                    - name
+                    - amount
+                  properties:
+                    no:
+                      type: integer
+                      description: 쿠폰 번호
+                      example: 1
+                    customerNo:
+                      type: integer
+                      description: 고객 번호
+                      example: 1
+                    couponNo:
+                      type: integer
+                      description: 쿠폰 번호
+                      example: 1
+                    expiredAt:
+                      type: string
+                      format: date-time
+                      description: 쿠폰 만료일
+                      example: '2024-01-31T00:00:00.000Z'
+                    name:
+                      type: string
+                      description: 쿠폰명
+                      example: '첫 로그인 쿠폰'
+                    amount:
+                      type: integer
+                      description: 할인 금액 (원)
+                      example: 3000
+                
 
   /coupons:
     get:
