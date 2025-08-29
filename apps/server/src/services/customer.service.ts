@@ -3,6 +3,40 @@ import { AppError } from '@/types';
 import { Customer } from '@prisma/client';
 import { hashPassword } from './auth.service';
 
+// 고객 전체 목록 조회
+export const getCustomerList = async () => {
+  return await prisma.customer.findMany({
+    select: {
+      no: true,
+      id: true,
+      name: true,
+      mobileNumber: true,
+      email: true,
+      createdAt: true,
+      defaultAddressNo: true,
+      address: true,
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+};
+
+// 고객 단일 조회
+export const getOne = async (no: number) => {
+  return await prisma.customer.findUnique({
+    where: { no },
+    select: {
+      no: true,
+      id: true,
+      name: true,
+      mobileNumber: true,
+      email: true,
+      createdAt: true,
+      defaultAddressNo: true,
+      customerCoupon: { select: { coupon: true } },
+    },
+  });
+};
+
 /**
  * 로그인하기 위한 사용자 정보 조회 (민감정보)
  * @param id

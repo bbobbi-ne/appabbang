@@ -1681,35 +1681,79 @@ paths:
       responses:
         '200':
           description: 고객 목록 조회 성공
-          # content:
-          #   application/json:
-          #     schema:
-          #       type: array
-          #       items:
-          #         type: object
-          #         properties:
-          #           no:
-          #             type: integer
-          #             description: 고객 번호
-          #             example: 1
-          #           name:
-          #             type: string
-          #             description: 고객명
-          #             example: '홍길동'
-          #           mobileNumber:
-          #             type: string
-          #             description: 전화번호
-          #             example: '010-1234-5678'
-          #           createdAt:
-          #             type: string
-          #             format: date-time
-          #             description: '생성일시'
-          #             example: '2024-01-01T00:00:00.000Z'
-          #           updatedAt:
-          #             type: string
-          #             format: date-time
-          #             description: '수정일시'
-          #             example: '2024-01-01T00:00:00.000Z'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    no:
+                      type: integer
+                      description: 고객 번호
+                      example: 1
+                    id:
+                      type: string
+                      description: 고객 아이디
+                      example: "user01"
+                    name:
+                      type: string
+                      description: 고객명
+                      example: "홍길동"
+                    mobileNumber:
+                      type: string
+                      description: 전화번호
+                      example: "010-1234-5678"
+                    email:
+                      type: string
+                      description: 이메일
+                      example: "test@example.com"
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: 생성일시
+                      example: "2024-01-01T00:00:00.000Z"
+                    defaultAddressNo:
+                      type: integer
+                      nullable: true
+                      description: 기본 배송지 번호
+                      example: 101
+                    address:
+                      type: array
+                      description: 고객 주소 목록
+                      items:
+                        type: object
+                        properties:
+                          no:
+                            type: integer
+                            description: 주소 번호
+                            example: 1
+                          address:
+                            type: string
+                            description: 기본 주소
+                            example: "서울시 강남구"
+                          addressDetail:
+                            type: string
+                            description: 상세 주소
+                            example: "123-45"
+                          zipcode:
+                            type: string
+                            description: 우편번호
+                            example: "12345"
+                          message:
+                            type: string
+                            description: 배송 메시지
+                            example: "문 앞에 놓아주세요."
+                          createdAt:
+                            type: string
+                            format: date-time
+                            description: 생성일시
+                            example: "2024-01-01T00:00:00.000Z"
+                          updatedAt:
+                            type: string
+                            format: date-time
+                            description: 수정일시
+                            example: "2024-01-01T00:00:00.000Z"
 
     post:
       tags: [Customers]
