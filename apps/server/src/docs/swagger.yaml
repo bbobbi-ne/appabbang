@@ -580,11 +580,16 @@ paths:
               type: object
               required:
                 - publicId
+                - no
               properties:
                 publicId:
                   type: string
                   description: 삭제할 이미지의 공개 ID
                   example: 'breads/image123'
+                no:
+                  type: number
+                  description: 해당하는 빵의 No
+                  example: '1'
       responses:
         '204':
           description: 이미지 삭제 성공
