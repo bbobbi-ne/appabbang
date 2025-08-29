@@ -743,6 +743,8 @@ paths:
       tags: [Orders]
       summary: 주문 생성 (비회원)
       description: 비회원 주문을 생성합니다. (권한: 없음 - 누구나 접근 가능)
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -4302,6 +4304,7 @@ paths:
                     - orderNumber
                     - orderStatus
                     - orderStatusName
+                    - orderRoundNo
                     - createdAt
                     - orderItems
                   properties:
@@ -4321,6 +4324,10 @@ paths:
                       type: string
                       description: 주문 상태명
                       example: '결제완료'
+                    orderRoundNo:
+                      type: integer
+                      description: 주문차수 번호
+                      example: 1
                     createdAt:
                       type: string
                       format: date-time
@@ -4461,7 +4468,7 @@ paths:
                           example: 2
 
   /my/orders/{no}/cancel:
-    patch:
+    post:
       tags: [My]
       summary: 내 주문 취소
       description: 주문을 취소합니다. (권한: 고객만)
@@ -5130,7 +5137,7 @@ paths:
                     description: 수령인 전화번호
                     example: '010-1234-5678'
 
-  /my/orders/{no}/has-order:
+  /my/order-rounds/{no}/has-order:
     get:
       tags: [My]
       summary: 내가 주문했던 주문인지 확인

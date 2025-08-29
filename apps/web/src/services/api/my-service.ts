@@ -4,7 +4,7 @@ import type {
   AddressesCreatePayload,
   AddressesUpdatePayload,
   OrdersAddressUpdatePayload,
-  OrdersCancelPartialUpdatePayload,
+  OrdersCancelCreatePayload,
   UpdateMyPasswordPayload,
   UpdateMyProfilePayload,
 } from '@/api/data-contracts';
@@ -69,8 +69,8 @@ export const MyService = {
     return response.data;
   },
   /** 내 주문 취소 */
-  cancelOrder: async (no: number, data: OrdersCancelPartialUpdatePayload) => {
-    await myApi.ordersCancelPartialUpdate(no, data);
+  cancelOrder: async (no: number, data: OrdersCancelCreatePayload) => {
+    await myApi.ordersCancelCreate(no, data);
   },
   /** 내 주문 배송(수령) 조회 */
   getOrderDelivery: async (no: number) => {
@@ -92,7 +92,7 @@ export const MyService = {
   },
   /** 특정 주문차수에 내 주문이 있는지 확인 (취소, 환불 제외) - 주문서 접근 확인 용도 */
   checkHasOrder: async (no: number) => {
-    const response = await myApi.ordersHasOrderList(no);
+    const response = await myApi.orderRoundsHasOrderList(no);
     return response.data;
   },
 };
