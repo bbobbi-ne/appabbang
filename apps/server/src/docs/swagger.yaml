@@ -2047,7 +2047,7 @@ paths:
 
   
 
-  /customers/comepare-code:
+  /customers/compare-code:
     post:
       tags: [Customers]
       summary: 입력한 인증코드와 해싱된 인증코드를 비교합니다. (권한: 없음 - 누구나 접근가능)
@@ -2057,9 +2057,7 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - code
-                - hashedCode
+              required: [code, hashedCode]
               properties:
                 code: 
                   type: string
@@ -2069,6 +2067,14 @@ paths:
                   type: string
                   description: 서버에서 해싱된 인증코드
                   example: $2b$12$KB5rI6XED.9o5LHGpE3.7u8yiX32SXDSgDm/NWiZQjQOfWpq/wKqi
+                id:
+                  type: string
+                  description: 사용자 아이디
+                  example: test000001
+                email:
+                  type: string
+                  description: 사용자 이메일
+                  example: test1231@naver.com
       responses:
         '200':
           description: 입력한 인증코드와 해싱된 인증코드 비교 성공

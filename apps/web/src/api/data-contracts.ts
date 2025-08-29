@@ -1244,6 +1244,111 @@ export interface SendEmailCreateData {
   code: string;
 }
 
+export interface EmailCreatePayload {
+  /**
+   * 이메일
+   * @example "test1231@naver.com"
+   */
+  email: string;
+}
+
+export interface EmailCreateData {
+  /**
+   * 이메일
+   * @example "test1231@naver.com"
+   */
+  email: string;
+}
+
+export interface PostCustomersPayload {
+  /**
+   * 이메일
+   * @example "test1231@naver.com"
+   */
+  email: string;
+}
+
+export interface PostCustomersData {
+  /**
+   * 아이디
+   * @example "test0000001"
+   */
+  id: string;
+}
+
+export interface IdEmailCreatePayload {
+  /**
+   * 아이디
+   * @example "test000001"
+   */
+  id: string;
+  /**
+   * 이메일
+   * @example "test1231@naver.com"
+   */
+  email: string;
+}
+
+export interface IdEmailCreateData {
+  /**
+   * 아이디
+   * @example "test0000001"
+   */
+  id: string;
+  /**
+   * 이메일
+   * @example "test1231@naver.com"
+   */
+  email: string;
+}
+
+export interface CompareCodeCreatePayload {
+  /**
+   * 입력한 인증코드
+   * @example 123456
+   */
+  code: string;
+  /**
+   * 서버에서 해싱된 인증코드
+   * @example "$2b$12$KB5rI6XED.9o5LHGpE3.7u8yiX32SXDSgDm/NWiZQjQOfWpq/wKqi"
+   */
+  hashedCode: string;
+  /**
+   * 사용자 아이디
+   * @example "test000001"
+   */
+  id?: string;
+  /**
+   * 사용자 이메일
+   * @example "test1231@naver.com"
+   */
+  email?: string;
+}
+
+export interface CompareCodeCreateData {
+  /**
+   * 인증번호 비교 결과
+   * @example 200
+   */
+  code: string;
+}
+
+export interface CheckIdCreatePayload {
+  /**
+   * 아이디
+   * @example "test000001"
+   */
+  id: string;
+}
+
+export interface CheckIdCreateData {
+  /**
+   * 아이디
+   * @example "test000001"
+   */
+  id: string;
+}
+
 export type CustomersDetailData = any;
 
 export type CustomersUpdateData = any;

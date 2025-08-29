@@ -18,12 +18,22 @@ import type {
   AddressListData,
   AddressUpdateData,
   AddressUpdatePayload,
+  CheckIdCreateData,
+  CheckIdCreatePayload,
+  CompareCodeCreateData,
+  CompareCodeCreatePayload,
   CustomersCreateData,
   CustomersCreatePayload,
   CustomersDeleteData,
   CustomersDetailData,
   CustomersListData,
   CustomersUpdateData,
+  EmailCreateData,
+  EmailCreatePayload,
+  IdEmailCreateData,
+  IdEmailCreatePayload,
+  PostCustomersData,
+  PostCustomersPayload,
   SendEmailCreateData,
   SendEmailCreatePayload,
 } from "./data-contracts";
@@ -89,6 +99,99 @@ export class Customers<SecurityDataType = unknown> {
   ) =>
     this.http.request<SendEmailCreateData, any>({
       path: `/customers/send-email`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 요청한 이메일을 조회합니다. (권한: 없음 - 누구나 접근가능)
+   *
+   * @tags Customers
+   * @name EmailCreate
+   * @summary 고객 이메일 조회
+   * @request POST:/customers/email
+   * @response `200` `EmailCreateData` 고객 이메일 조회 성공
+   */
+  emailCreate = (data: EmailCreatePayload, params: RequestParams = {}) =>
+    this.http.request<EmailCreateData, any>({
+      path: `/customers/email`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Customers
+   * @name PostCustomers
+   * @summary 입력한 이메일로 아이디를 조회합니다. (권한: 없음 - 누구나 접근가능)
+   * @request POST:/customers/id
+   * @response `200` `PostCustomersData` 고객의 이메일로 아이디 조회 성공
+   */
+  postCustomers = (data: PostCustomersPayload, params: RequestParams = {}) =>
+    this.http.request<PostCustomersData, any>({
+      path: `/customers/id`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Customers
+   * @name IdEmailCreate
+   * @summary 등록된 아이디와 이메일을 조회합니다. (권한: 없음 - 누구나 접근가능)
+   * @request POST:/customers/id-email
+   * @response `200` `IdEmailCreateData` 아이디와 이메일 조회 성공
+   */
+  idEmailCreate = (data: IdEmailCreatePayload, params: RequestParams = {}) =>
+    this.http.request<IdEmailCreateData, any>({
+      path: `/customers/id-email`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Customers
+   * @name CompareCodeCreate
+   * @summary 입력한 인증코드와 해싱된 인증코드를 비교합니다. (권한: 없음 - 누구나 접근가능)
+   * @request POST:/customers/compare-code
+   * @response `200` `CompareCodeCreateData` 입력한 인증코드와 해싱된 인증코드 비교 성공
+   */
+  compareCodeCreate = (
+    data: CompareCodeCreatePayload,
+    params: RequestParams = {},
+  ) =>
+    this.http.request<CompareCodeCreateData, any>({
+      path: `/customers/compare-code`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags Customers
+   * @name CheckIdCreate
+   * @summary 중복체크를 위한 아이디를 조회합니다. (권한: 없음 - 누구나 접근가능)
+   * @request POST:/customers/check/id
+   * @response `200` `CheckIdCreateData` 아이디 조회 성공
+   */
+  checkIdCreate = (data: CheckIdCreatePayload, params: RequestParams = {}) =>
+    this.http.request<CheckIdCreateData, any>({
+      path: `/customers/check/id`,
       method: "POST",
       body: data,
       type: ContentType.Json,
