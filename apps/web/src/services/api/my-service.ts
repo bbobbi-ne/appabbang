@@ -1,4 +1,3 @@
-import client from '@/services/axios';
 import { My } from '@/api/My';
 import { CustomHttpClient } from '../httpclient-instance';
 import type {
@@ -75,5 +74,9 @@ export const MyService = {
   /** 주문내역의 배송지 수정 */
   updateOrderAddress: async (no: number, data: OrdersAddressUpdatePayload) => {
     await myApi.ordersAddressUpdate(no, data);
+  },
+  getCouponList: async () => {
+    const response = await myApi.couponsList();
+    return response.data;
   },
 };

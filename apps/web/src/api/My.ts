@@ -18,6 +18,7 @@ import type {
   AddressesListData,
   AddressesUpdateData,
   AddressesUpdatePayload,
+  CouponsListData,
   GetMyData,
   OrdersAddressListData,
   OrdersAddressUpdateData,
@@ -319,6 +320,24 @@ export class My<SecurityDataType = unknown> {
       body: data,
       secure: true,
       type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 로그인한 고객의 쿠폰 목록을 조회합니다. (권한: 고객만)
+   *
+   * @tags My
+   * @name CouponsList
+   * @summary 내 쿠폰내역 조회
+   * @request GET:/my/coupons
+   * @secure
+   * @response `200` `CouponsListData` 주문 목록 조회 성공
+   */
+  couponsList = (params: RequestParams = {}) =>
+    this.http.request<CouponsListData, any>({
+      path: `/my/coupons`,
+      method: "GET",
+      secure: true,
       format: "json",
       ...params,
     });

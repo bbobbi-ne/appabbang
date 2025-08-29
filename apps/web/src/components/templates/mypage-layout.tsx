@@ -18,11 +18,14 @@ export default function MypageLayout({ children }: { children: React.ReactNode }
     { label: '비밀번호 수정', value: '/mypage/password' },
     { label: '배송지 관리', value: '/mypage/address' },
     { label: '주문내역', value: '/mypage/order-list' },
+    { label: '쿠폰내역', value: '/mypage/coupon' },
   ];
 
   const onChangeActiveMenu = (value: string) => {
     navigate({ to: value });
   };
+
+  const onMoveCouponUrl = () => navigate({ to: '/mypage/coupon' });
 
   return (
     <div className="pb-20">
@@ -31,7 +34,7 @@ export default function MypageLayout({ children }: { children: React.ReactNode }
           <p>
             <b>
               {name}({id})
-            </b>{' '}
+            </b>
             님 안녕하세요.
           </p>
           <div className="flex">
@@ -39,7 +42,13 @@ export default function MypageLayout({ children }: { children: React.ReactNode }
               <b>주문 누적금액</b> <span>{data?.totalAmount || 0}원</span>
             </p>
             <p className="flex flex-col items-center gap-2 px-8">
-              <b>총 보유 쿠폰 수</b> <span>{data?.coupon.length || 0}개</span>
+              <b>총 보유 쿠폰 수</b>{' '}
+              <span
+                className="hover:underline hover:font-bold hover:cursor-pointer"
+                onClick={onMoveCouponUrl}
+              >
+                {data?.coupon.length || 0}개
+              </span>
             </p>
           </div>
         </CardContent>

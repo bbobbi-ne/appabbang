@@ -374,3 +374,28 @@ export const updateOrderAddress = async (
 ) => {
   await prisma.order.update({ where: { no }, data });
 };
+
+/** 내 쿠폰내역 조회 */
+export const getCouponList = async (customerNo: number) => {
+  const customerCoupon = await prisma.customerCoupon.findMany({
+    where: { customerNo },
+    select: {
+      no: true,
+      issuedAt: true,
+      expiredAt: true,
+      isUsed: true,
+      isExpired: true,
+
+      coupon: {
+        select: {
+          no: true,
+          name: true,
+          amount: true,
+        },
+      },
+    },
+  });
+
+  if (!customerCoupon) throw AppError.notFound('고객님의 쿠폰을 찾을 수 없습니다.');
+  return customerCoupon;
+};

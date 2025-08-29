@@ -197,3 +197,10 @@ export const updateOrderAddress = async (req: Request, res: Response) => {
 
   res.status(200).json({ message: '주문 배송지가 변경되었습니다.' });
 };
+
+/** 쿠폰목록 조회 */
+export const getCouponList = async (req: Request, res: Response) => {
+  const customerNo = req.user.no;
+  const data = await myService.getCouponList(customerNo);
+  res.status(200).json(data);
+};

@@ -150,3 +150,11 @@ export function useUpdateOrderAddressMutation() {
     },
   });
 }
+
+/** 현재 보유하고 있는 쿠폰 조회 */
+export function useGetCouponQuery() {
+  return useQuery({
+    queryKey: ['/my/coupons', '마이페이지 > 쿠폰내역'],
+    queryFn: () => MyService.getCouponList(),
+  });
+}

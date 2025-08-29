@@ -118,4 +118,7 @@ router.put(
   asyncHandler(myController.updateOrderAddress),
 );
 
+/** GET /my/coupons : 쿠폰내역 조회 */
+router.get('/coupons', requireCustomerOwner, asyncHandler(myController.getCouponList));
+
 export default router;

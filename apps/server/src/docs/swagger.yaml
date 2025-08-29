@@ -4476,6 +4476,73 @@ paths:
                     description: 수령인 전화번호
                     example: '010-1234-5678'
 
+  /my/coupons:
+    get:
+      tags: [My]
+      summary: 내 쿠폰내역 조회
+      description: 로그인한 고객의 쿠폰 목록을 조회합니다. (권한: 고객만)
+      security: 
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 주문 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - no
+                    - issuedAt
+                    - expiredAt
+                    - isUsed
+                    - isExpired
+                    - coupon
+                  properties:
+                    no:
+                      type: number
+                      description: 고객-쿠폰 번호
+                      example: 1
+                    issuedAt:
+                      type: string
+                      format: date-time
+                      description: 쿠폰 발급일
+                      example: '2024-01-01T00:00:00.000Z'
+                    expiredAt:
+                      type: string
+                      format: date-time
+                      description: 쿠폰 만료일
+                      example: '2024-01-31T00:00:00.000Z'
+                    isUsed:
+                      type: boolean
+                      description: 사용여부
+                      example: false
+                    isExpired:
+                      type: boolean
+                      description: 만료여부
+                      example: false
+                    coupon:
+                      type: object
+                      required: 
+                        - no
+                        - name 
+                        - amount
+                      properties:
+                        no:
+                          type: number
+                          description: 쿠폰번호
+                          example: 1
+                        name: 
+                          type: string
+                          description: 쿠폰명
+                          example: 회원가입 쿠폰
+                        amount:
+                          type: string
+                          description: 할인금액
+                          example: 10000
+
+
   /coupons:
     get:
       tags: [Coupons]

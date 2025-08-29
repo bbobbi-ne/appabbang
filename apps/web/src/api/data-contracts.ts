@@ -2728,6 +2728,53 @@ export interface OrdersAddressUpdateData {
 
 export type CouponsListData = {
   /**
+   * 고객-쿠폰 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 쿠폰 발급일
+   * @format date-time
+   * @example "2024-01-01T00:00:00.000Z"
+   */
+  issuedAt: string;
+  /**
+   * 쿠폰 만료일
+   * @format date-time
+   * @example "2024-01-31T00:00:00.000Z"
+   */
+  expiredAt: string;
+  /**
+   * 사용여부
+   * @example false
+   */
+  isUsed: boolean;
+  /**
+   * 만료여부
+   * @example false
+   */
+  isExpired: boolean;
+  coupon: {
+    /**
+     * 쿠폰번호
+     * @example 1
+     */
+    no: number;
+    /**
+     * 쿠폰명
+     * @example "회원가입 쿠폰"
+     */
+    name: string;
+    /**
+     * 할인금액
+     * @example 10000
+     */
+    amount: string;
+  };
+}[];
+
+export type CouponsListResult = {
+  /**
    * 쿠폰 번호
    * @example 1
    */

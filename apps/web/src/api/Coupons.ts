@@ -15,7 +15,7 @@ import type {
   CouponsCreatePayload,
   CouponsDeleteData,
   CouponsDetailData,
-  CouponsListData,
+  CouponsListResult,
   CouponsUpdateData,
   CouponsUpdatePayload,
   IssueCreateData,
@@ -39,10 +39,10 @@ export class Coupons<SecurityDataType = unknown> {
    * @summary 쿠폰 목록 조회
    * @request GET:/coupons
    * @secure
-   * @response `200` `CouponsListData` 쿠폰 목록 조회 성공
+   * @response `200` `CouponsListResult` 쿠폰 목록 조회 성공
    */
   couponsList = (params: RequestParams = {}) =>
-    this.http.request<CouponsListData, any>({
+    this.http.request<CouponsListResult, any>({
       path: `/coupons`,
       method: "GET",
       secure: true,
