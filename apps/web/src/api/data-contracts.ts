@@ -2990,6 +2990,40 @@ export type CouponsListData = {
   };
 }[];
 
+export type CouponsAvailableListData = {
+  /**
+   * 쿠폰 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 고객 번호
+   * @example 1
+   */
+  customerNo: number;
+  /**
+   * 쿠폰 번호
+   * @example 1
+   */
+  couponNo: number;
+  /**
+   * 쿠폰 만료일
+   * @format date-time
+   * @example "2024-01-31T00:00:00.000Z"
+   */
+  expiredAt: string;
+  /**
+   * 쿠폰명
+   * @example "첫 로그인 쿠폰"
+   */
+  name: string;
+  /**
+   * 할인 금액 (원)
+   * @example 3000
+   */
+  amount: number;
+}[];
+
 export type CouponsListResult = {
   /**
    * 쿠폰 번호
