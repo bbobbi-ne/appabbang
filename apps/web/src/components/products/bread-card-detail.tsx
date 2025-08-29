@@ -2,6 +2,7 @@
  * [비회원 개인정보 수집 및 이용 동의서]
  */
 
+import { useState } from 'react';
 import {
   AlertDialogContent,
   AlertDialogTrigger,
@@ -18,11 +19,17 @@ import {
 } from '@appabbang/ui';
 import { X } from 'lucide-react';
 import ProductsBreadCard from '@/components/products/products-bread-card';
-import type { BreadsDetailData } from '@/api/data-contracts';
+import { useGetBreadQuery } from '@/hooks/use-breads';
+import type { WithOrderRoundListData } from '@/api/data-contracts';
 
-function BreadCardDetail({ bread }: { bread: BreadsDetailData }) {
+function BreadCardDetail({ bread }: { bread: WithOrderRoundListData[0] }) {
+  const [open, setOpen] = useState(false);
+  const { data: breadDetail } = useGetBreadQuery(bread.no, !!bread.no && open);
+
+  if (!bread) return null;
+
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <button className="">
           <ProductsBreadCard bread={bread} />
@@ -35,13 +42,13 @@ function BreadCardDetail({ bread }: { bread: BreadsDetailData }) {
         </AlertDialogCancel>
 
         <AlertDialogTitle className="text-2xl text-center break-keep py-2">
-          {bread.name}
+          {breadDetail?.name}
         </AlertDialogTitle>
-        <AlertDialogDescription hidden>{bread.description}</AlertDialogDescription>
+        <AlertDialogDescription hidden>{breadDetail?.description}</AlertDialogDescription>
 
         {/* 이미지 슬라이더 */}
         <div className="w-full max-w-[500px] mx-auto">
-          {bread.images.length > 1 ? (
+          {breadDetail?.images && breadDetail?.images?.length > 1 ? (
             <Carousel
               opts={{
                 loop: true,
@@ -52,7 +59,7 @@ function BreadCardDetail({ bread }: { bread: BreadsDetailData }) {
               className="mr-10"
             >
               <CarouselContent>
-                {bread.images.map((image, i) => (
+                {breadDetail?.images?.map((image, i) => (
                   <CarouselItem key={i}>
                     <div key={i} className="flex justify-start items-center w-full">
                       <img
@@ -72,7 +79,7 @@ function BreadCardDetail({ bread }: { bread: BreadsDetailData }) {
           ) : (
             <div className="w-full flex justify-center items-center">
               <img
-                src={bread?.images[0]?.url ?? '/images/no-image.png'}
+                src={breadDetail?.images?.[0]?.url ?? '/images/no-image.png'}
                 alt="단일 이미지"
                 className="h-[150px] object-contain rounded"
               />
@@ -82,12 +89,12 @@ function BreadCardDetail({ bread }: { bread: BreadsDetailData }) {
 
         <div className="space-y-2">
           <h3 className="text-base font-semibold">알레르기 유발 요인</h3>
-          <p className="text-sm text-gray-500 break-keep">{bread.allergyInfo}</p>
+          <p className="text-sm text-gray-500 break-keep">{breadDetail?.allergyInfo}</p>
         </div>
 
         <div className="space-y-2">
           <h3 className="text-base font-semibold">원산지 정보</h3>
-          <p className="text-sm text-gray-500 break-keep">{bread.countryOfOrigin}</p>
+          <p className="text-sm text-gray-500 break-keep">{breadDetail?.countryOfOrigin}</p>
         </div>
       </AlertDialogContent>
     </AlertDialog>

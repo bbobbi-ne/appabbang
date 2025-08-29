@@ -1,8 +1,8 @@
 import { Card, cn, Badge } from '@appabbang/ui';
-import type { BreadsListItem } from '@/services/api/breads-service';
+import type { WithOrderRoundListData } from '@/api/data-contracts';
 
 /** Main Function :: 빵 카드 클릭 시 onClick 콜백 prop 받음 */
-export default function ProductsBreadCard({ bread }: { bread: BreadsListItem }) {
+export default function ProductsBreadCard({ bread }: { bread: WithOrderRoundListData[0] }) {
   return (
     <Card
       className={cn(

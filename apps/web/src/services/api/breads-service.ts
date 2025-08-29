@@ -16,7 +16,7 @@ export const BreadsService = {
     return response.data;
   },
   getListWithOrderRound: async (): Promise<any> => {
-    const response = await client.get('/breads/with-order-round');
+    const response = await breadsApi.withOrderRoundList();
     return response.data;
   },
 };

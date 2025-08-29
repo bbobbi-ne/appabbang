@@ -12,13 +12,13 @@ export function useGetBreadsQuery() {
 }
 
 /** 제품 상세 조회 */
-export function useGetBreadQuery(no: number) {
+export function useGetBreadQuery(no: number, enabled = false) {
   return useQuery({
     queryKey: [`/breads/${no}`, '제품 상세'],
     queryFn: () => BreadsService.getOne(no),
     staleTime: Infinity,
     retry: 3,
-    enabled: !!no,
+    enabled,
   });
 }
 
