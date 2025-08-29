@@ -122,7 +122,7 @@ export function useGetOrdersQuery() {
 /** 내 주문 상세 조회 */
 export function useGetOrderQuery(no: number) {
   return useQuery({
-    queryKey: [`/my/order/${no}`, '내 주문 상세 조회'],
+    queryKey: [`/my/orders/${no}`, '내 주문 상세 조회'],
     queryFn: () => MyService.getOrder(no),
   });
 }
@@ -136,7 +136,7 @@ export function useCancelOrderMutation() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['/my/orders', '내 주문 목록 조회'] });
       queryClient.invalidateQueries({
-        queryKey: [`/my/order/${variables.no}/has-order`, '내 주문 상세 조회'],
+        queryKey: [`/my/orders/${variables.no}/has-order`, '내 주문 상세 조회'],
       });
     },
   });
@@ -145,7 +145,7 @@ export function useCancelOrderMutation() {
 /** 내 주문 배송(수령) 조회 */
 export function useGetOrderDeliveryQuery(no: number) {
   return useQuery({
-    queryKey: [`/my/order/${no}/delivery`, '내 주문 배송(수령) 조회'],
+    queryKey: [`/my/orders/${no}/delivery`, '내 주문 배송(수령) 조회'],
     queryFn: () => MyService.getOrderDelivery(no),
   });
 }
@@ -153,7 +153,7 @@ export function useGetOrderDeliveryQuery(no: number) {
 /** 주문내역의 배송지 조회 */
 export function useGetOrderAddressQuery(no: number, enabled: boolean) {
   return useQuery({
-    queryKey: [`/my/order/${no}/address`, '주문내역의 배송지 조회'],
+    queryKey: [`/my/orders/${no}/address`, '주문내역의 배송지 조회'],
     queryFn: () => MyService.getOrderAddress(no),
     enabled,
   });
@@ -166,7 +166,7 @@ export function useUpdateOrderAddressMutation() {
     mutationFn: ({ no, data }: { no: number; data: any }) => MyService.updateOrderAddress(no, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: [`/my/order/${variables.no}/address`, '주문내역의 배송지 조회'],
+        queryKey: [`/my/orders/${variables.no}/address`, '주문내역의 배송지 조회'],
       });
     },
   });
@@ -175,7 +175,7 @@ export function useUpdateOrderAddressMutation() {
 /** 주문차수에 내 주문이 있는지 확인 (취소, 환불 제외) */
 export const useCheckHasOrderQuery = (no: number, enabled = false) => {
   return useQuery({
-    queryKey: [`/my/order/${no}/has-order`, '내 주문 상세 조회'],
+    queryKey: [`/my/orders/${no}/has-order`, '내 주문 상세 조회'],
     queryFn: () => MyService.checkHasOrder(no),
     enabled,
   });
