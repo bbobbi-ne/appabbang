@@ -1,8 +1,4 @@
-/**
- * 유저 APIs
- */
-
-import client from './axios';
+import client from '../axios';
 
 /** 카카오 인가코드 받기 */
 export async function getKakaoCode() {
