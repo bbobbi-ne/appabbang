@@ -23,6 +23,7 @@ import type {
   ImageDeletePayload,
   StatusUpdateData,
   StatusUpdatePayload,
+  WithOrderRoundListData,
 } from "./data-contracts";
 import { ContentType, HttpClient, type RequestParams } from "./http-client";
 
@@ -170,6 +171,22 @@ export class Breads<SecurityDataType = unknown> {
       body: data,
       secure: true,
       type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 빵 목록을 조회하며, 각 빵이 현재 주문차수에 속했는지 여부를 포함합니다. (권한: 없음 - 누구나 접근 가능)
+   *
+   * @tags Breads
+   * @name WithOrderRoundList
+   * @summary 빵 목록 조회 (주문차수에 속했는지 포함)
+   * @request GET:/breads/with-order-round
+   * @response `200` `WithOrderRoundListData` 빵 목록 조회 성공
+   */
+  withOrderRoundList = (params: RequestParams = {}) =>
+    this.http.request<WithOrderRoundListData, any>({
+      path: `/breads/with-order-round`,
+      method: "GET",
+      format: "json",
       ...params,
     });
 }

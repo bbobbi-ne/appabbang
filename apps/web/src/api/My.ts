@@ -18,6 +18,7 @@ import type {
   AddressesListData,
   AddressesUpdateData,
   AddressesUpdatePayload,
+  ContactListData,
   CouponsListData,
   GetMyData,
   OrdersAddressListData,
@@ -27,6 +28,7 @@ import type {
   OrdersCancelPartialUpdatePayload,
   OrdersDeliveryListData,
   OrdersDetailResult,
+  OrdersHasOrderListData,
   OrdersListResult,
   SummaryListData,
   UpdateMyPasswordData,
@@ -339,6 +341,42 @@ export class My<SecurityDataType = unknown> {
       body: data,
       secure: true,
       type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 현재 로그인한 고객의 연락처 정보를 조회합니다. (권한: 고객만)
+   *
+   * @tags My
+   * @name ContactList
+   * @summary 내 연락처 조회
+   * @request GET:/my/contact
+   * @secure
+   * @response `200` `ContactListData` 연락처 조회 성공
+   */
+  contactList = (params: RequestParams = {}) =>
+    this.http.request<ContactListData, any>({
+      path: `/my/contact`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 특정 주문이 현재 로그인한 고객이 주문한 것인지 확인합니다. (권한: 선택적 로그인)
+   *
+   * @tags My
+   * @name OrdersHasOrderList
+   * @summary 내가 주문했던 주문인지 확인
+   * @request GET:/my/orders/{no}/has-order
+   * @secure
+   * @response `200` `OrdersHasOrderListData` 주문 확인 성공
+   */
+  ordersHasOrderList = (no: number, params: RequestParams = {}) =>
+    this.http.request<OrdersHasOrderListData, any>({
+      path: `/my/orders/${no}/has-order`,
+      method: "GET",
+      secure: true,
       format: "json",
       ...params,
     });

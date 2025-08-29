@@ -61,6 +61,7 @@ export class Customers<SecurityDataType = unknown> {
       path: `/customers`,
       method: "GET",
       secure: true,
+      format: "json",
       ...params,
     });
   /**

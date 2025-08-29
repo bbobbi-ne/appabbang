@@ -348,9 +348,44 @@ export interface ImageDeletePayload {
    * @example "breads/image123"
    */
   publicId: string;
+  /**
+   * 해당하는 빵의 No
+   * @example 1
+   */
+  no: number;
 }
 
 export type ImageDeleteData = any;
+
+export type WithOrderRoundListData = {
+  /**
+   * 빵 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 빵 이름
+   * @example "크로아상"
+   */
+  name: string;
+  /**
+   * 빵 설명
+   * @example "바삭한 크로아상"
+   */
+  description: string;
+  images: {
+    /**
+     * 빵 이미지 URL
+     * @example "https://example.com/bread.jpg"
+     */
+    url: string;
+  }[];
+  /**
+   * 현재 주문차수에 속했는지 여부
+   * @example true
+   */
+  isCurrentOrderRound: boolean;
+}[];
 
 export type OrdersListData = {
   /**
@@ -1098,6 +1133,101 @@ export interface OrderRoundUpdatePayload {
 
 export type OrderRoundUpdateData = any;
 
+export interface CurrentListData {
+  /**
+   * 주문차수 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 주문차수명
+   * @example "주문 1차"
+   */
+  name: string;
+  /**
+   * 시작일시
+   * @format date-time
+   * @example "2025-07-01T11:00:00.000Z"
+   */
+  startedAt: string;
+  /**
+   * 종료일시
+   * @format date-time
+   * @example "2025-07-31T11:00:00.000Z"
+   */
+  endedAt: string;
+  /**
+   * 주문차수 이미지 URL
+   * @example "https://example.com/image.jpg"
+   */
+  orderRoundImageUrl: string;
+}
+
+export interface OpenDetailData {
+  /**
+   * 주문차수 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 주문차수명
+   * @example "주문 1차"
+   */
+  name: string;
+  /**
+   * 시작일시
+   * @format date-time
+   * @example "2025-07-01T11:00:00.000Z"
+   */
+  startedAt: string;
+  /**
+   * 종료일시
+   * @format date-time
+   * @example "2025-07-31T11:00:00.000Z"
+   */
+  endedAt: string;
+  /**
+   * 최소주문수량
+   * @example 1
+   */
+  minOrderQty: number;
+  /**
+   * 최대주문수량
+   * @example 999
+   */
+  maxOrderQty: number;
+  orderRoundBreads: {
+    /**
+     * 빵 번호
+     * @example 1
+     */
+    no: number;
+    /**
+     * 빵 이름
+     * @example "단팥빵"
+     */
+    name: string;
+    /**
+     * 가격
+     * @example 1000
+     */
+    unitPrice: number;
+    images?: {
+      /**
+       * 이미지 URL
+       * @example "https://example.com/image.jpg"
+       */
+      url?: string;
+    }[];
+  }[];
+}
+
+/**
+ * 진행중 여부 (true: 진행중, false: 진행중이 아님)
+ * @example true
+ */
+export type IsOpenListData = boolean;
+
 export interface ImageDeleteBody {
   /**
    * 삭제할 이미지의 공개 ID
@@ -1106,7 +1236,84 @@ export interface ImageDeleteBody {
   publicId: string;
 }
 
-export type CustomersListData = any;
+export type CustomersListData = {
+  /**
+   * 고객 번호
+   * @example 1
+   */
+  no?: number;
+  /**
+   * 고객 아이디
+   * @example "user01"
+   */
+  id?: string;
+  /**
+   * 고객명
+   * @example "홍길동"
+   */
+  name?: string;
+  /**
+   * 전화번호
+   * @example "010-1234-5678"
+   */
+  mobileNumber?: string;
+  /**
+   * 이메일
+   * @example "test@example.com"
+   */
+  email?: string;
+  /**
+   * 생성일시
+   * @format date-time
+   * @example "2024-01-01T00:00:00.000Z"
+   */
+  createdAt?: string;
+  /**
+   * 기본 배송지 번호
+   * @example 101
+   */
+  defaultAddressNo?: number | null;
+  /** 고객 주소 목록 */
+  address?: {
+    /**
+     * 주소 번호
+     * @example 1
+     */
+    no?: number;
+    /**
+     * 기본 주소
+     * @example "서울시 강남구"
+     */
+    address?: string;
+    /**
+     * 상세 주소
+     * @example "123-45"
+     */
+    addressDetail?: string;
+    /**
+     * 우편번호
+     * @example "12345"
+     */
+    zipcode?: string;
+    /**
+     * 배송 메시지
+     * @example "문 앞에 놓아주세요."
+     */
+    message?: string;
+    /**
+     * 생성일시
+     * @format date-time
+     * @example "2024-01-01T00:00:00.000Z"
+     */
+    createdAt?: string;
+    /**
+     * 수정일시
+     * @format date-time
+     * @example "2024-01-01T00:00:00.000Z"
+     */
+    updatedAt?: string;
+  }[];
+}[];
 
 export interface CustomersCreatePayload {
   /**
@@ -2711,6 +2918,25 @@ export interface OrdersAddressUpdateData {
    */
   recipientMobile: string;
 }
+
+export interface ContactListData {
+  /**
+   * 이름
+   * @example "홍길동"
+   */
+  name: string;
+  /**
+   * 전화번호
+   * @example "010-1234-5678"
+   */
+  mobileNumber: string;
+}
+
+/**
+ * 주문 여부 (true: 주문함, false: 주문하지 않음)
+ * @example true
+ */
+export type OrdersHasOrderListData = boolean;
 
 export type CouponsListData = {
   /**
