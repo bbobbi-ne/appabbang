@@ -135,7 +135,8 @@ export const create = async (customerNo: number | undefined, body: CreateOrderRe
     }, 0);
 
     const deliveryMethodFee = deliveryMethod.fee;
-    const calculatedTotalPrice = originPrice - discountAmount + deliveryMethodFee;
+    const discountedPrice = originPrice - discountAmount > 0 ? originPrice - discountAmount : 0;
+    const calculatedTotalPrice = discountedPrice + deliveryMethodFee;
 
     if (calculatedTotalPrice !== totalPrice) {
       throw AppError.badRequest('주문 금액이 일치하지 않습니다.', {
