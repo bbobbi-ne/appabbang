@@ -349,20 +349,21 @@ export const getOrderDelivery = async (no: number) => {
 
 /** 내 주문 배송지 조회 */
 export const getOrderAddress = async (no: number) => {
-  const order = await prisma.order.findUnique({ where: { no } });
+  const order = await prisma.order.findUnique({
+    where: { no },
+    select: {
+      address: true,
+      addressDetail: true,
+      zipcode: true,
+      message: true,
+      recipientName: true,
+      recipientMobile: true,
+    },
+  });
 
   if (!order) throw AppError.notFound('주문을 찾을 수 없습니다.');
 
-  const result = {
-    address: order.address,
-    addressDetail: order.addressDetail,
-    zipcode: order.zipcode,
-    message: order.message,
-    recipientName: order.recipientName,
-    recipientMobile: order.recipientMobile,
-  };
-
-  return result;
+  return order;
 };
 
 /** 내 주문 배송지 수정 */
