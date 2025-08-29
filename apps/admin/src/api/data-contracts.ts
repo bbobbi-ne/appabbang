@@ -348,6 +348,11 @@ export interface ImageDeletePayload {
    * @example "breads/image123"
    */
   publicId: string;
+  /**
+   * 해당하는 빵의 No
+   * @example "1"
+   */
+  no: number;
 }
 
 export type ImageDeleteData = any;
@@ -1106,7 +1111,84 @@ export interface ImageDeleteBody {
   publicId: string;
 }
 
-export type CustomersListData = any;
+export type CustomersListData = {
+  /**
+   * 고객 번호
+   * @example 1
+   */
+  no?: number;
+  /**
+   * 고객 아이디
+   * @example "user01"
+   */
+  id?: string;
+  /**
+   * 고객명
+   * @example "홍길동"
+   */
+  name?: string;
+  /**
+   * 전화번호
+   * @example "010-1234-5678"
+   */
+  mobileNumber?: string;
+  /**
+   * 이메일
+   * @example "test@example.com"
+   */
+  email?: string;
+  /**
+   * 생성일시
+   * @format date-time
+   * @example "2024-01-01T00:00:00.000Z"
+   */
+  createdAt?: string;
+  /**
+   * 기본 배송지 번호
+   * @example 101
+   */
+  defaultAddressNo?: number | null;
+  /** 고객 주소 목록 */
+  address?: {
+    /**
+     * 주소 번호
+     * @example 1
+     */
+    no?: number;
+    /**
+     * 기본 주소
+     * @example "서울시 강남구"
+     */
+    address?: string;
+    /**
+     * 상세 주소
+     * @example "123-45"
+     */
+    addressDetail?: string;
+    /**
+     * 우편번호
+     * @example "12345"
+     */
+    zipcode?: string;
+    /**
+     * 배송 메시지
+     * @example "문 앞에 놓아주세요."
+     */
+    message?: string;
+    /**
+     * 생성일시
+     * @format date-time
+     * @example "2024-01-01T00:00:00.000Z"
+     */
+    createdAt?: string;
+    /**
+     * 수정일시
+     * @format date-time
+     * @example "2024-01-01T00:00:00.000Z"
+     */
+    updatedAt?: string;
+  }[];
+}[];
 
 export interface CustomersCreatePayload {
   /**
@@ -1242,6 +1324,101 @@ export interface SendEmailCreateData {
    * @example 123456
    */
   code: string;
+}
+
+export interface EmailCreatePayload {
+  /**
+   * 이메일
+   * @example "test1231@naver.com"
+   */
+  email: string;
+}
+
+export interface EmailCreateData {
+  /**
+   * 이메일
+   * @example "test1231@naver.com"
+   */
+  email: string;
+}
+
+export interface PostCustomersPayload {
+  /**
+   * 이메일
+   * @example "test1231@naver.com"
+   */
+  email: string;
+}
+
+export interface PostCustomersData {
+  /**
+   * 아이디
+   * @example "test0000001"
+   */
+  id: string;
+}
+
+export interface IdEmailCreatePayload {
+  /**
+   * 아이디
+   * @example "test000001"
+   */
+  id: string;
+  /**
+   * 이메일
+   * @example "test1231@naver.com"
+   */
+  email: string;
+}
+
+export interface IdEmailCreateData {
+  /**
+   * 아이디
+   * @example "test0000001"
+   */
+  id: string;
+  /**
+   * 이메일
+   * @example "test1231@naver.com"
+   */
+  email: string;
+}
+
+export interface ComepareCodeCreatePayload {
+  /**
+   * 입력한 인증코드
+   * @example 123456
+   */
+  code: string;
+  /**
+   * 서버에서 해싱된 인증코드
+   * @example "$2b$12$KB5rI6XED.9o5LHGpE3.7u8yiX32SXDSgDm/NWiZQjQOfWpq/wKqi"
+   */
+  hashedCode: string;
+}
+
+export interface ComepareCodeCreateData {
+  /**
+   * 인증번호 비교 결과
+   * @example 200
+   */
+  code: string;
+}
+
+export interface CheckIdCreatePayload {
+  /**
+   * 아이디
+   * @example "test000001"
+   */
+  id: string;
+}
+
+export interface CheckIdCreateData {
+  /**
+   * 아이디
+   * @example "test000001"
+   */
+  id: string;
 }
 
 export type CustomersDetailData = any;

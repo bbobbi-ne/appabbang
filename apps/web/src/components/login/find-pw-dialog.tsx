@@ -86,7 +86,7 @@ function FindPwDialog({ children }: Props) {
 
       // 아이디와 이메일 확인
       const response = await getIdEmail.mutateAsync({ id, email });
-      if (!response.id || !response.email) {
+      if (!response) {
         addToast({ type: 'error', message: '존재하지 않는 정보입니다.' });
         return;
       }

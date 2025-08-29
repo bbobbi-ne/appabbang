@@ -6,12 +6,21 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
 } from '@appabbang/ui';
-import { Link, useRouterState } from '@tanstack/react-router';
+import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
 import ThemeToggleBtn from './theme-toggle-btn';
 
 import {
   Home,
+  LogOut,
   Receipt,
   ClipboardList, // 주문관리
   CreditCard, // 결제관리
@@ -19,6 +28,7 @@ import {
   Calendar,
   Users,
 } from 'lucide-react';
+import { logOut } from '@/service/auth-api';
 
 const items = [
   // { title: '홈', url: '/dashboard', icon: <Home /> },
@@ -32,15 +42,36 @@ const items = [
 
 export function Sidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigator = useNavigate();
 
   return (
     <SidebarRoot>
-      <SidebarHeader className="font-bold">
+      <SidebarHeader className="font-bold flex-row justify-between items-center">
         {/* <img
           className="w-[200px] h-[100px] rounded-lg object-fill"
           src="/images/appabbang_logo.png"
         /> */}
-        ㅇㅃㅃ
+        <h1>ㅇㅃㅃ</h1>
+        <AlertDialog>
+          <AlertDialogTrigger>
+            <LogOut className="cursor-pointer" size={16} />
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogTitle>로그아웃</AlertDialogTitle>
+            <AlertDialogDescription>로그아웃 하시겠습니까?</AlertDialogDescription>
+            <AlertDialogFooter>
+              <AlertDialogCancel>취소</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={async () => {
+                  await logOut();
+                  navigator({ to: '/' });
+                }}
+              >
+                확인
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>

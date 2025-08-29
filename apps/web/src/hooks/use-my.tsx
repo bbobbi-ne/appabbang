@@ -1,6 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { MyService } from '@/services/api/my-service';
-import type { UpdateMyPasswordPayload } from '@/api/data-contracts';
+import type { UpdateMyPasswordPayload, UpdateMyProfilePayload } from '@/api/data-contracts';
+
+/** 고객 요약정보 조회 */
+export function useGetCustomerSummaryQuery() {
+  return useQuery({
+    queryKey: ['/my/summary', '내 요약정보 조회'],
+    queryFn: MyService.getCustomerSummaryInfo,
+  });
+}
 
 /** 고객 정보 조회 */
 export function useGetCustomerInfoQuery() {
@@ -15,7 +23,7 @@ export function useUpdateCustomerMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { mobileNumber: string }) => MyService.updateCustomer(data),
+    mutationFn: (data: UpdateMyProfilePayload) => MyService.updateCustomer(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/my', '내 정보 조회'] });
     },

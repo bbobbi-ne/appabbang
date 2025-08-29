@@ -107,7 +107,7 @@ export default function JoinForm() {
     // 이메일 인증 보내기 전에, 이미 DB에 존재하는지 확인 (존재하면 가입불가)
     try {
       const response = await getEmail.mutateAsync({ email });
-      if (response.email) {
+      if (response && response.email) {
         addToast({ type: 'error', message: '이미 존재하는 이메일입니다.' });
         return;
       }

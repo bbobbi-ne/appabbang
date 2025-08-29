@@ -43,7 +43,7 @@ export default function InfoPage() {
 
   return (
     <InfoForm
-      customer={data?.customer}
+      customer={data}
       updateMutation={updateCustomerMutation.mutateAsync}
       isSubmitting={updateCustomerMutation.isPending}
     />

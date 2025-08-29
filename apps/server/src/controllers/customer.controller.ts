@@ -13,13 +13,24 @@ import { Request, Response } from 'express';
 import * as customerService from '@/services/customer.service';
 import { sendEmail, sendEmailTempPw } from '@/lib/send-email';
 
+/** 고객 전체 목록 조회 */
 export const getList = async (_: Request, res: Response) => {
-  res.status(200).json('Hello World');
+  const customers = await customerService.getCustomerList();
+  res.status(200).json(customers);
 };
+
+/** 고객 단건 조회 */
+export const getOne = async (req: Request, res: Response) => {
+  const { no } = req.params;
+  if (!no) throw AppError.badRequest('고객 번호가 필요합니다.');
+
+  const customer = await customerService.getOne(Number(no));
+  if (!customer) throw AppError.notFound('해당 고객을 찾을 수 없습니다.');
+
+  res.status(200).json(customer);
+};
+
 export const getListAll = async (_: Request, res: Response) => {
-  res.status(200).json('Hello World');
-};
-export const getOne = async (_: Request, res: Response) => {
   res.status(200).json('Hello World');
 };
 
@@ -104,8 +115,8 @@ export const getEmail = async (req: Request, res: Response) => {
   if (!req.body.email)
     throw AppError.badRequest('이메일 조회 과정에서 오류가 발생했습니다. (이메일 누락)');
 
-  const email = await customerService.getEmail(req.body.email);
-  res.status(200).json({ email });
+  const data = await customerService.getEmail(req.body.email);
+  res.status(200).json(data);
 };
 
 /** 이메일로 아이디 조회 */

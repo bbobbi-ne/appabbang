@@ -1254,6 +1254,11 @@ export interface EmailCreatePayload {
 
 export interface EmailCreateData {
   /**
+   * 고객번호
+   * @example 1
+   */
+  no: number;
+  /**
    * 이메일
    * @example "test1231@naver.com"
    */
@@ -2171,102 +2176,37 @@ export interface RefundUpdatePayload {
 export type RefundUpdateData = any;
 
 export interface GetMyData {
-  customer: {
-    /**
-     * 고객 번호
-     * @example 1
-     */
-    no: number;
-    /**
-     * 고객 ID
-     * @example "customer123"
-     */
-    id: string;
-    /**
-     * 고객명
-     * @example "홍길동"
-     */
-    name: string;
-    /**
-     * 전화번호
-     * @example "010-1234-5678"
-     */
-    mobileNumber: string;
-    /**
-     * 기본 배송지 번호
-     * @example 1
-     */
-    defaultAddressNo: number;
-    /**
-     * 생성일시
-     * @format date-time
-     * @example "2024-01-01T00:00:00.000Z"
-     */
-    createdAt: string;
-    /** 배송지 목록 */
-    address: {
-      /**
-       * 배송지 번호
-       * @example 1
-       */
-      no?: number;
-      /**
-       * 주소
-       * @example "서울시 강남구"
-       */
-      address?: string;
-      /**
-       * 상세주소
-       * @example "123-45"
-       */
-      addressDetail?: string;
-    }[];
-    /** 고객 쿠폰 목록 */
-    customerCoupon: {
-      /**
-       * 고객 쿠폰 번호
-       * @example 1
-       */
-      no?: number;
-      coupon?: {
-        /**
-         * 쿠폰명
-         * @example "첫 로그인 쿠폰"
-         */
-        name?: string;
-        /**
-         * 할인 금액
-         * @example 3000
-         */
-        amount?: number;
-      };
-    }[];
-  };
-  /** 할인 정보 */
-  coupon: {
-    /**
-     * 고객 쿠폰 번호
-     * @example 1
-     */
-    no?: number;
-    coupon?: {
-      /**
-       * 쿠폰명
-       * @example "첫 로그인 쿠폰"
-       */
-      name?: string;
-      /**
-       * 할인 금액
-       * @example 3000
-       */
-      amount?: number;
-    };
-  }[];
   /**
-   * 주문 누적 금액
-   * @example 150000
+   * 고객 번호
+   * @example 1
    */
-  totalAmount: number;
+  no: number;
+  /**
+   * 고객 ID
+   * @example "customer123"
+   */
+  id: string;
+  /**
+   * 고객 email
+   * @example "test1231@naver.com"
+   */
+  email: string;
+  /**
+   * 고객명
+   * @example "홍길동"
+   */
+  name: string;
+  /**
+   * 전화번호
+   * @example "010-1234-5678"
+   */
+  mobileNumber: string;
+  /**
+   * 생성일시
+   * @format date-time
+   * @example "2024-01-01T00:00:00.000Z"
+   */
+  createdAt: string;
 }
 
 export interface UpdateMyProfilePayload {
@@ -2320,6 +2260,52 @@ export interface UpdateMyProfileData {
    * @example "2024-01-01T00:00:00.000Z"
    */
   updatedAt: string;
+}
+
+export interface SummaryListData {
+  customer: {
+    /**
+     * 고객 번호
+     * @example 1
+     */
+    no: number;
+    /**
+     * 고객 ID
+     * @example "customer123"
+     */
+    id: string;
+    /**
+     * 고객 email
+     * @example "test1231@naver.com"
+     */
+    email: string;
+    /**
+     * 고객명
+     * @example "홍길동"
+     */
+    name: string;
+    /**
+     * 전화번호
+     * @example "010-1234-5678"
+     */
+    mobileNumber: string;
+    /**
+     * 생성일시
+     * @format date-time
+     * @example "2024-01-01T00:00:00.000Z"
+     */
+    createdAt: string;
+  };
+  /**
+   * 총 보유 쿠폰 수
+   * @example 1
+   */
+  couponCount: number;
+  /**
+   * 주문 누적 금액
+   * @example 150000
+   */
+  totalAmount: number;
 }
 
 export interface UpdateMyPasswordPayload {
