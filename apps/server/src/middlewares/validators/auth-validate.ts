@@ -57,6 +57,21 @@ const NAME_VALIDATION = {
   empty: { message: '이름을 입력하세요.' },
 };
 
+const EMAIL_VALIDATION = {
+  key: 'email',
+  length: {
+    min: 1,
+    max: 50,
+    message: '이메일은 1~50자 이내로 입력해야 합니다.',
+  },
+  matches: {
+    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/g,
+    message: '유효하는 이메일 형식이 아닙니다.',
+  },
+  string: { message: '이메일은 문자열로 입력해야 합니다.' },
+  empty: { message: '이메일을 입력하세요.' },
+};
+
 const PASSWORD_VALIDATION = {
   key: 'pw',
   length: { min: 10, max: 30, message: '비밀번호는 10~30자 이내로 입력해야 합니다.' },
@@ -122,6 +137,19 @@ const UPDATE_PASSWORD_VALIDATION = {
   empty: { message: '비밀번호를 입력하세요.' },
 };
 
+export const idCheckValidator = [
+  body(ID_VALIDATION.key)
+    .notEmpty()
+    .withMessage(ID_VALIDATION.empty.message)
+    .matches(ID_VALIDATION.matches.value)
+    .withMessage(ID_VALIDATION.matches.message)
+    .isString()
+    .withMessage(ID_VALIDATION.string.message)
+    .isLength({ min: ID_VALIDATION.length.min, max: ID_VALIDATION.length.max })
+    .withMessage(ID_VALIDATION.length.message)
+    .trim(),
+];
+
 /**
  * 회원가입 유효성 검증
  */
@@ -149,6 +177,17 @@ export const createCustomerValidator = [
     .withMessage(NAME_VALIDATION.length.message)
     .trim()
     .escape(),
+
+  body(EMAIL_VALIDATION.key)
+    .notEmpty()
+    .withMessage(EMAIL_VALIDATION.empty.message)
+    .matches(EMAIL_VALIDATION.matches.value)
+    .withMessage(EMAIL_VALIDATION.matches.message)
+    .isString()
+    .withMessage(EMAIL_VALIDATION.string.message)
+    .isLength({ min: EMAIL_VALIDATION.length.min, max: EMAIL_VALIDATION.length.max })
+    .withMessage(EMAIL_VALIDATION.length.message)
+    .trim(),
 
   body(PASSWORD_VALIDATION.key)
     .notEmpty()
@@ -233,6 +272,65 @@ export const loginCustomerValidator = [
     .withMessage(PASSWORD_VALIDATION.length.message)
     .trim()
     .escape(),
+];
+
+export const sendEmailValidator = [
+  body('email')
+    .notEmpty()
+    .withMessage('이메일을 입력하세요.')
+    .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/g)
+    .withMessage('유효한 이메일 형식이 아닙니다.')
+    .isString()
+    .withMessage('이메일은 문자열이어야 합니다.')
+    .trim(),
+];
+
+export const idEmailValidator = [
+  body(ID_VALIDATION.key)
+    .notEmpty()
+    .withMessage(ID_VALIDATION.empty.message)
+    .matches(ID_VALIDATION.matches.value)
+    .withMessage(ID_VALIDATION.matches.message)
+    .isString()
+    .withMessage(ID_VALIDATION.string.message)
+    .isLength({ min: ID_VALIDATION.length.min, max: ID_VALIDATION.length.max })
+    .withMessage(ID_VALIDATION.length.message)
+    .trim(),
+
+  body(EMAIL_VALIDATION.key)
+    .notEmpty()
+    .withMessage(EMAIL_VALIDATION.empty.message)
+    .matches(EMAIL_VALIDATION.matches.value)
+    .withMessage(EMAIL_VALIDATION.matches.message)
+    .isString()
+    .withMessage(EMAIL_VALIDATION.string.message)
+    .trim(),
+];
+
+export const emailCodeValidator = [
+  body('code')
+    .notEmpty()
+    .withMessage('인증번호를 입력하세요.')
+    .isString()
+    .withMessage('인증번호는 문자열로 입력되어야 합니다.')
+    .isLength({ min: 1 })
+    .withMessage('인증번호는 1자 이상 입력되어야 합니다.')
+    .trim(),
+
+  body('hashedCode')
+    .notEmpty()
+    .withMessage('해싱 인증번호를 확인하세요.')
+    .isString()
+    .withMessage('해싱 인증번호는 1자 이상 입력되어야 합니다.')
+    .isLength({ min: 1 })
+    .withMessage('해싱 인증번호는 1자 이상 입력되어야 합니다.')
+    .trim(),
+
+  body(EMAIL_VALIDATION.key)
+    .isString()
+    .withMessage(EMAIL_VALIDATION.string.message)
+    .optional()
+    .trim(),
 ];
 
 /**

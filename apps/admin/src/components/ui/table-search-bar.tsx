@@ -33,7 +33,7 @@ export const TableSearchBar: FC<TableSearchBarProps> = ({
   }, [columns, onColumnChange]);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 py-6">
       {columns.length > 1 ? (
         <Select value={column} onValueChange={(val) => onColumnChange?.(val)}>
           <SelectTrigger>

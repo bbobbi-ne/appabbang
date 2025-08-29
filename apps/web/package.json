@@ -9,8 +9,7 @@
     "serve": "vite preview",
     "test": "vitest run",
     "lint": "eslint",
-    "gen:api": "swagger-typescript-api generate -p http://localhost:4000/swagger.json --additional-properties kebab-file-name=true -r -o src/api --modular -d --extract-request-body --extract-response-body --extract-response-error --axios --use-type-imports --templates ./src/api/swagger-templates --single-http-client --extract-types",
-    "gen:templates": "swagger-typescript-api generate-templates -p http://localhost:4000/swagger.json -r -o ./src/api/swagger-templates --modular -d --extract-request-body --extract-response-body --extract-response-error --axios --use-type-imports"
+    "gen:api": "swagger-typescript-api generate -p http://localhost:4000/swagger.json -r -o src/api --modular -d --extract-request-body --extract-response-body --extract-response-error --axios --use-type-imports --templates ./src/api/swagger-templates --single-http-client"
   },
   "dependencies": {
     "@appabbang/eslint": "workspace:*",
@@ -18,15 +17,8 @@
     "@appabbang/typescript": "workspace:*",
     "@appabbang/ui": "workspace:*",
     "@appabbang/utils": "workspace:*",
-    "@ramonak/react-progress-bar": "^5.4.0",
-    "@types/react-slick": "^0.23.13",
     "basic-loading": "^2.1.3",
-    "dayjs": "^1.11.13",
-    "framer-motion": "^12.23.6",
-    "react-daum-postcode": "^3.2.0",
-    "react-slick": "^0.30.3",
-    "slick-carousel": "^1.8.1",
-    "styled-components": "^6.1.19"
+    "react-daum-postcode": "^3.2.0"
   },
   "devDependencies": {
     "swagger-typescript-api": "^13.2.7"

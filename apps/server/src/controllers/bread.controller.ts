@@ -48,12 +48,30 @@ export async function remove(req: Request, res: Response) {
   res.sendStatus(204);
 }
 
-/** 빵 이미지 삭제 (한건 즉시 삭제) */
-export async function removeImage(req: Request, res: Response) {
-  const { publicId } = req.body;
+// /** 빵 이미지 삭제 (한건 즉시 삭제) */
+// export async function removeImage(req: Request, res: Response) {
+//   const { publicId } = req.body;
 
-  await ImageService.remove([publicId]);
-  res.sendStatus(204);
+//   await ImageService.remove([publicId]);
+//   res.sendStatus(204);
+// }
+
+/** 빵 이미지 단일 삭제 */
+export async function removeImage(req: Request, res: Response) {
+  try {
+    const { no, publicId } = req.body as { no?: number; publicId?: string };
+
+    if (!no || !publicId) {
+      return res.status(400).json({ message: 'no와 publicId가 필요합니다.' });
+    }
+
+    await BreadService.removeBreadImage(no, publicId);
+
+    return res.sendStatus(204);
+  } catch (err) {
+    console.error('빵 이미지 삭제 실패:', err);
+    return res.status(500).json({ message: '서버 오류로 삭제에 실패했습니다.' });
+  }
 }
 
 /** 빵 목록 조회 (주문차수에 속했는지 포함) */

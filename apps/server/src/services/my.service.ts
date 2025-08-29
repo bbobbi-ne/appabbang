@@ -10,36 +10,27 @@ export const getCodeName = (code: string): string => {
 
 /** 내 정보 상세정보 조회 */
 export const getMyInfo = async (no: number) => {
-  const result = await prisma.$transaction(async (tx) => {
-    // 고객정보
-    const customer = await tx.customer.findUnique({
-      where: { no },
-      select: {
-        no: true,
-        id: true,
-        name: true,
-        mobileNumber: true,
-        defaultAddressNo: true,
-        createdAt: true,
-
-        // relationship
-        address: true,
-        customerCoupon: true,
-      },
-    });
-
-    // 할인정보
-    const coupon = await tx.customerCoupon.findMany({
-      where: { customerNo: no },
-      include: {
-        coupon: true,
-      },
-    });
-
-    return { customer, coupon };
+  // 고객정보
+  const result = await prisma.customer.findUnique({
+    where: { no },
+    select: {
+      no: true,
+      id: true,
+      email: true,
+      name: true,
+      mobileNumber: true,
+      createdAt: true,
+    },
   });
 
   return result;
+};
+
+/** 고객의 할인쿠폰 개수 조회 */
+export const getCustomerCouponCount = async (no: number) => {
+  // 고객의 할인정보
+  const data = await prisma.customerCoupon.count({ where: { customerNo: no } });
+  return data;
 };
 
 /**
@@ -97,13 +88,14 @@ export const getOrderAccumulatedAmount = async (no: number) => {
 export const update = async (
   no: number,
   data: {
+    email: string;
     mobileNumber: string;
   },
 ) => {
   const result = await prisma.$transaction(async (tx) => {
     const updateCustomer = await tx.customer.update({
       where: { no },
-      data: { mobileNumber: data.mobileNumber },
+      data: { email: data.email, mobileNumber: data.mobileNumber },
     });
 
     return updateCustomer;
@@ -404,4 +396,29 @@ export const checkHasOrder = async (customerNo: number, no: number): Promise<boo
 
   const hasOrder = !!order;
   return hasOrder;
+};
+
+/** 내 쿠폰내역 조회 */
+export const getCouponList = async (customerNo: number) => {
+  const customerCoupon = await prisma.customerCoupon.findMany({
+    where: { customerNo },
+    select: {
+      no: true,
+      issuedAt: true,
+      expiredAt: true,
+      isUsed: true,
+      isExpired: true,
+
+      coupon: {
+        select: {
+          no: true,
+          name: true,
+          amount: true,
+        },
+      },
+    },
+  });
+
+  if (!customerCoupon) throw AppError.notFound('고객님의 쿠폰을 찾을 수 없습니다.');
+  return customerCoupon;
 };

@@ -1,4 +1,4 @@
-import { getKakaoCode } from '@/services/customer-apis';
+import { getKakaoCode } from '@/services/api/kakao-service';
 import { Button } from '@appabbang/ui';
 
 function KakaoLoginButton() {

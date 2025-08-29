@@ -11,58 +11,6 @@ import { useGetOrderQuery } from '@/hooks/use-my';
 import OrderItem from '@/components/mypage/order-item';
 import OrderAddressModifyDialog from '@/components/mypage/order-address-modify-dialog';
 
-type OrderItemsType = {
-  no: number;
-  breadNo: number;
-  breadImageUrl: string;
-  allergyInfo: string;
-  breadName: string;
-  countryOfOrigin: string;
-  quantity: number;
-
-  totalPrice: number;
-  unitPrice: number;
-
-  createdAt: string;
-  updatedAt: string;
-
-  orderNo: number;
-  order: {
-    no: number;
-
-    address: string;
-    addressDetail: string;
-    zipcode: string;
-
-    deliveryMethodFee: number;
-    deliveryMethodName: string;
-    discountAmount: number;
-    totalPrice: number;
-    trackingNumber: string;
-    message: string;
-    orderStatus: string;
-
-    isPaymentRefundTermsAgreed: boolean;
-    isPrivacyTermsAgreed: boolean;
-    isServiceTermsAgreed: boolean;
-    memo: string;
-    orderNumber: string;
-    orderPw: string;
-
-    ordererName: string;
-    ordererMobile: string;
-    recipientMobile: string;
-    recipientName: string;
-
-    customerNo: number;
-    couponNo: number;
-    orderRoundNo: number;
-
-    createdAt: string;
-    updatedAt: string;
-  };
-};
-
 const CANCEL_ORDER_STATUS = ['50', '51', '52'];
 const AVALIABLE_DELIVERY_ORDER_STATUS = ['11', '20', '30', '31', '40'];
 
@@ -75,8 +23,8 @@ export default function MyOrderDetailPage({ orderNo }: { orderNo: number }) {
   useEffect(() => {
     if (order) {
       let unitPrice = 0;
-      order?.orderItems?.map((item: OrderItemsType) => {
-        unitPrice += item.totalPrice;
+      order?.orderItems?.map((item) => {
+        unitPrice += item.totalPrice!;
       });
 
       setAmount(unitPrice);
@@ -87,6 +35,7 @@ export default function MyOrderDetailPage({ orderNo }: { orderNo: number }) {
   const onDeliveryMove = (no: number) => navigate({ to: `/mypage/order-list/${no}/delivery` });
 
   if (isLoading) return <div>주문정보를 조회중입니다...</div>;
+  if (!order) return <div>주문 데이터를 불러올 수 없습니다.</div>;
 
   return (
     <Card>
@@ -103,7 +52,7 @@ export default function MyOrderDetailPage({ orderNo }: { orderNo: number }) {
                 )}
               </div>
               <h3 className="text-xl font-semibold">
-                {new Date(order.createdAt).toISOString().split('T')[0]} 주문
+                {new Date(order!.createdAt).toISOString().split('T')[0]} 주문
               </h3>
             </div>
           </div>
@@ -133,7 +82,7 @@ export default function MyOrderDetailPage({ orderNo }: { orderNo: number }) {
 
             {!!order.discountAmount && (
               <div className="flex flex-row justify-between">
-                <div>할인금액</div>
+                <div>쿠폰할인</div>
                 <div>{order.discountAmount.toLocaleString()}원</div>
               </div>
             )}
@@ -150,7 +99,7 @@ export default function MyOrderDetailPage({ orderNo }: { orderNo: number }) {
         <div>
           <h3 className="font-semibold text-xl pt-2 pb-4">주문상품 내역</h3>
           <div className="space-y-2">
-            {order.orderItems.map((item: OrderItemsType, i: number) => (
+            {order.orderItems.map((item, i: number) => (
               <OrderItem key={i} item={item} />
             ))}
           </div>
@@ -200,7 +149,7 @@ export default function MyOrderDetailPage({ orderNo }: { orderNo: number }) {
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="min-w-28">주문인 전화번호</span>
-                  <p className="text-sm">{getFormattedMobile(order.ordererMobile ?? '')}</p>
+                  <p className="text-sm">{formatMobile(order.ordererMobile ?? '')}</p>
                 </div>
               </div>
             </div>

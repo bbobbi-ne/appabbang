@@ -105,7 +105,7 @@ export async function breadsUpdate({
  */
 export async function imageDelete({ publicId, no }: ImageDeletePayload & { no: number }) {
   try {
-    const response = await breadsApi.imageDelete({ publicId });
+    const response = await breadsApi.imageDelete({ publicId, no });
     toast.success('빵 이미지삭제에 성공했습니다.');
     return { data: response.data };
   } catch (error: any) {

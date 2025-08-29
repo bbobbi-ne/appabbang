@@ -1,5 +1,4 @@
 import { Card, CardContent, CardTitle } from '@appabbang/ui';
-import Title from '@/components/common/title';
 
 export default function BrandPage() {
   const onClick = () => {

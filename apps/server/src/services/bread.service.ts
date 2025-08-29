@@ -42,11 +42,14 @@ export const getAll = async () => {
       imageMap.set(img.imageTargetNo, img.url ?? '');
     });
 
-    const data = breads.map((bread: Bread) => ({
-      ...bread,
-      breadStatusName: getBreadStatusName(bread.breadStatus),
-      images: [...(imageMap.get(bread.no) ? [{ url: imageMap.get(bread.no) }] : [])],
-    }));
+    const data = breads.map((bread: Bread) => {
+      const url = imageMap.get(bread.no);
+      return {
+        ...bread,
+        breadStatusName: getBreadStatusName(bread.breadStatus),
+        images: url ? { url } : null,
+      };
+    });
 
     return data;
   });
@@ -258,4 +261,45 @@ export const getBreadListWithOrderRound = async () => {
   });
 
   return result;
+};
+
+/** 빵 이미지 단일 삭제 (db + cloudinary + order 재정렬) */
+export const removeBreadImage = async (breadNo: number, publicId: string) => {
+  // 1. 클라우드에서 삭제
+  await ImageService.removeCloudinary([publicId]);
+
+  // 2. 삭제 대상 확인
+  const deletedImage = await prisma.image.findFirst({
+    where: {
+      publicId,
+      imageTargetType: IMAGE_TARGET_TYPE_CODE,
+      imageTargetNo: breadNo,
+    },
+    select: { no: true },
+  });
+
+  if (!deletedImage) return; // 해당 bread 이미지 아니면 그냥 종료
+
+  // 3. DB에서 삭제
+  await prisma.image.delete({
+    where: { no: deletedImage.no },
+  });
+
+  // 4. 남은 이미지 order 재정렬
+  const remain = await prisma.image.findMany({
+    where: {
+      imageTargetType: IMAGE_TARGET_TYPE_CODE,
+      imageTargetNo: breadNo,
+    },
+    orderBy: { order: 'asc' },
+  });
+
+  await Promise.all(
+    remain.map((img, idx) =>
+      prisma.image.update({
+        where: { no: img.no },
+        data: { order: idx + 1 },
+      }),
+    ),
+  );
 };

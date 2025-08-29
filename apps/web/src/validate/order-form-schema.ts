@@ -123,8 +123,7 @@ export const formSchema = z.object({
 
   message: z // 배송메세지
     .string()
-    .trim()
-    .optional(),
+    .trim(),
 
   orderItems: z // 주문목록
     .array(
@@ -233,8 +232,7 @@ export const customerOrderFormSchema = z.object({
 
   message: z // 배송메세지
     .string()
-    .trim()
-    .optional(),
+    .trim(),
 
   orderItems: z // 주문목록
     .array(

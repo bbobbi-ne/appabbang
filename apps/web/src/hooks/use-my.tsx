@@ -1,5 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { MyService } from '@/services/api/my-service';
+import type { UpdateMyPasswordPayload, UpdateMyProfilePayload } from '@/api/data-contracts';
+
+/** 고객 요약정보 조회 */
+export function useGetCustomerSummaryQuery() {
+  return useQuery({
+    queryKey: ['/my/summary', '내 요약정보 조회'],
+    queryFn: MyService.getCustomerSummaryInfo,
+  });
+}
 
 /** 고객 정보 조회 */
 export function useGetCustomerInfoQuery() {
@@ -23,7 +32,7 @@ export function useUpdateCustomerMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: { mobileNumber: string }) => MyService.updateCustomer(data),
+    mutationFn: (data: UpdateMyProfilePayload) => MyService.updateCustomer(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/my', '내 정보 조회'] });
       queryClient.invalidateQueries({ queryKey: ['/my/contact', '내 연락처 조회'] });
@@ -34,7 +43,7 @@ export function useUpdateCustomerMutation() {
 /** 고객 비밀번호 수정 */
 export function useUpdateCustomerPwMutation() {
   return useMutation({
-    mutationFn: (data: { pw: string; pwModify: string }) => MyService.updateCustomerPw(data),
+    mutationFn: (data: UpdateMyPasswordPayload) => MyService.updateCustomerPw(data),
   });
 }
 
@@ -171,3 +180,11 @@ export const useCheckHasOrderQuery = (no: number, enabled = false) => {
     enabled,
   });
 };
+
+/** 현재 보유하고 있는 쿠폰 조회 */
+export function useGetCouponQuery() {
+  return useQuery({
+    queryKey: ['/my/coupons', '마이페이지 > 쿠폰내역'],
+    queryFn: () => MyService.getCouponList(),
+  });
+}

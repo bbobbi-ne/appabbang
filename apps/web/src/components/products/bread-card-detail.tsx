@@ -2,7 +2,6 @@
  * [비회원 개인정보 수집 및 이용 동의서]
  */
 
-import type { BreadProps } from '@/interface/bread-interface';
 import {
   AlertDialogContent,
   AlertDialogTrigger,
@@ -10,14 +9,18 @@ import {
   AlertDialogCancel,
   AlertDialogDescription,
   AlertDialog,
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+  CarouselDots,
 } from '@appabbang/ui';
 import { X } from 'lucide-react';
 import ProductsBreadCard from '@/components/products/products-bread-card';
-import Slider from 'react-slick';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
+import type { BreadsDetailData } from '@/api/data-contracts';
 
-function BreadCardDetail({ bread }: { bread: BreadProps }) {
+function BreadCardDetail({ bread }: { bread: BreadsDetailData }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -39,26 +42,33 @@ function BreadCardDetail({ bread }: { bread: BreadProps }) {
         {/* 이미지 슬라이더 */}
         <div className="w-full max-w-[500px] mx-auto">
           {bread.images.length > 1 ? (
-            <Slider
-              {...{
-                dots: true,
-                infinite: true,
-                speed: 500,
-                slidesToShow: 1,
+            <Carousel
+              opts={{
+                loop: true,
+                align: 'start',
                 slidesToScroll: 1,
+                containScroll: 'trimSnaps',
               }}
               className="mr-10"
             >
-              {bread.images.map((image, i) => (
-                <div key={i} className="flex justify-start items-center w-full">
-                  <img
-                    src={image?.url ?? '/images/no-image.png'}
-                    alt={`빵 이미지 ${i + 1}`}
-                    className="h-[100px] object-contain rounded"
-                  />
-                </div>
-              ))}
-            </Slider>
+              <CarouselContent>
+                {bread.images.map((image, i) => (
+                  <CarouselItem key={i}>
+                    <div key={i} className="flex justify-start items-center w-full">
+                      <img
+                        src={image.url}
+                        alt={`빵 이미지 ${i + 1}`}
+                        className="h-[100px] object-contain rounded"
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+
+              <CarouselPrevious />
+              <CarouselNext />
+              <CarouselDots />
+            </Carousel>
           ) : (
             <div className="w-full flex justify-center items-center">
               <img

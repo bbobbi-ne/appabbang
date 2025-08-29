@@ -1,8 +1,12 @@
 import type { OrdersCreatePayload } from '@/api/data-contracts';
-import client from '@/services/axios';
+import { Orders } from '@/api/Orders';
+import { CustomHttpClient } from '../httpclient-instance';
+import { refreshCreate } from './auth-service';
+
+const orderApi = new Orders(new CustomHttpClient({}, refreshCreate));
 
 export const OrdersService = {
-  create: async (data: OrdersCreatePayload): Promise<void> => {
-    await client.post('/orders', data);
+  create: async (data: OrdersCreatePayload) => {
+    await orderApi.ordersCreate(data);
   },
 };

@@ -13,7 +13,9 @@
   },
   "dependencies": {
     "@appabbang/typescript": "workspace:*",
+    "@types/nodemailer": "^7.0.1",
     "dotenv": "^17.0.1",
+    "nodemailer": "^7.0.5",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "yamljs": "^0.3.0"

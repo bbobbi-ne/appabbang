@@ -17,6 +17,7 @@ import { BreadItem } from '@/components/order-round/bread-item';
 import { OrderForm } from '@/components/order-round/order-form';
 import { formatIsoToDateTime } from '@appabbang/utils';
 import { useCreateOrderMutation } from '@/hooks/use-orders';
+import type { ActiveListData } from '@/api/data-contracts';
 
 /** Main Function */
 export default function OrderRoundDetailPage({ myContact }: { myContact: any }) {
@@ -35,13 +36,7 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: any }) 
   >([]);
 
   /** 선택한 배송방법 */
-  const [selectedDelivery, setSelectedDelivery] = useState<{
-    no: number;
-    name: string;
-    deliveryTypeCode: string;
-    fee: number;
-    deliveryTypeName: string;
-  }>();
+  const [selectedDelivery, setSelectedDelivery] = useState<ActiveListData[0]>();
 
   /** 선택한 쿠폰 (임시) */
   const [selectedCoupon, setSelectedCoupon] = useState<{

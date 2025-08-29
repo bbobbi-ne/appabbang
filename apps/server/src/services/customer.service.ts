@@ -3,6 +3,40 @@ import { AppError } from '@/types';
 import { Customer } from '@prisma/client';
 import { hashPassword } from './auth.service';
 
+// 고객 전체 목록 조회
+export const getCustomerList = async () => {
+  return await prisma.customer.findMany({
+    select: {
+      no: true,
+      id: true,
+      name: true,
+      mobileNumber: true,
+      email: true,
+      createdAt: true,
+      defaultAddressNo: true,
+      address: true,
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+};
+
+// 고객 단일 조회
+export const getOne = async (no: number) => {
+  return await prisma.customer.findUnique({
+    where: { no },
+    select: {
+      no: true,
+      id: true,
+      name: true,
+      mobileNumber: true,
+      email: true,
+      createdAt: true,
+      defaultAddressNo: true,
+      customerCoupon: { select: { coupon: true } },
+    },
+  });
+};
+
 /**
  * 로그인하기 위한 사용자 정보 조회 (민감정보)
  * @param id
@@ -37,6 +71,7 @@ export type CreateCustomerInput = Pick<
   Customer,
   | 'id'
   | 'name'
+  | 'email'
   | 'pw'
   | 'mobileNumber'
   | 'isServiceTermsAgreed'
@@ -57,6 +92,7 @@ export const createCustomerInfo = async (data: CreateCustomerInput) => {
       const {
         id,
         name,
+        email,
         pw,
         mobileNumber,
         address,
@@ -74,6 +110,7 @@ export const createCustomerInfo = async (data: CreateCustomerInput) => {
         data: {
           id,
           name,
+          email,
           pw: hashedPw,
           mobileNumber,
           isServiceTermsAgreed,
@@ -155,4 +192,61 @@ export const getOneForCheck = async (id: string) => {
   });
 
   return customer;
+};
+
+/** 이메일 조회 */
+export const getEmail = async (email: string) => {
+  return await prisma.customer.findFirst({
+    where: { email },
+    select: { no: true, email: true },
+  });
+};
+
+/** 아이디 중복체크를 위한 아이디 조회 */
+export const getCheckId = async (id: string) => {
+  const data = await prisma.customer.findFirst({
+    where: { id },
+    select: { id: true },
+  });
+
+  return data;
+};
+
+/** 이메일로 아이디 조회 */
+export const getId = async (email: string) => {
+  const id = await prisma.customer.findFirst({
+    where: { email },
+    select: { id: true },
+  });
+
+  if (!id) throw AppError.notFound('해당 이메일은 존재하지 않습니다.');
+
+  return id;
+};
+
+/** 아이디와 이메일 조회 */
+export const getIdEmail = async (id: string, email: string) => {
+  const customer = await prisma.customer.findFirst({
+    where: { id, email },
+    select: { id: true, email: true },
+  });
+
+  if (!customer) throw AppError.notFound('해당 정보는 존재하지 않습니다.');
+
+  return customer;
+};
+
+/** 비밀번호 변경 */
+export const modifyPw = async (id: string, email: string, pw: string) => {
+  //해시 비밀번호 생성
+  const hashedPw = await hashPassword(pw);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.customer.update({
+      where: { id, email },
+      data: {
+        pw: hashedPw,
+      },
+    });
+  });
 };

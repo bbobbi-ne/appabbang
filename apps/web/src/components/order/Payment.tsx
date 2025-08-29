@@ -32,7 +32,7 @@ function Payment({ bread, min, max, handlers }: PaymentProp) {
     const newAmount = bread.unitPrice * newCount;
 
     bread.count = newCount;
-    bread.price = newAmount;
+    bread.unitPrice = newAmount;
 
     // 수량은 최대주문수량까지만 넘어갈 수 있음
     newCount = newCount <= max ? newCount : max;
@@ -62,7 +62,7 @@ function Payment({ bread, min, max, handlers }: PaymentProp) {
     setAmount(newAmount);
 
     bread.count = value;
-    bread.price = newAmount;
+    bread.unitPrice = newAmount;
 
     handlers.onCountChange(bread, 'input');
   };

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import BreadSearch from '../products/bread-search';
-import type { BreadProps } from '@/interface/bread-interface';
 import ProductsLoading from '@/components/products/products-loading';
 import BreadCardDetail from '@/components/products/bread-card-detail';
 import { useGetBreadsWithOrderRoundQuery } from '@/hooks/use-breads';
+import type { BreadsListData } from '@/api/data-contracts';
 
 export default function ProductsPage() {
   const [keyword, setKeyword] = useState<string>('');
-  const [breadList, setBreadList] = useState<BreadProps[]>([]);
-  const [originBreadList, setOriginBreadList] = useState<BreadProps[]>([]);
+  const [breadList, setBreadList] = useState<BreadsListData>([]);
+  const [originBreadList, setOriginBreadList] = useState<BreadsListData>([]);
 
   const { data, isLoading, error } = useGetBreadsWithOrderRoundQuery();
   /** 주문차수 빵 목록 조회 및 설정 */

@@ -1,7 +1,6 @@
+import { useGetAuthLoginMutation } from '@/hooks/use-auth';
 import useToast from '@/hooks/useToast';
-import { login } from '@/services/customer-apis';
-import { useCustomerStore } from '@/store/customer';
-import { useAccessTokenStore } from '@/store/session';
+
 import { loginSchema, type LoginFormType } from '@/validate/login-form-schema';
 import {
   FormField,
@@ -17,15 +16,17 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
+import FindIdDialog from './find-id-dialog';
+import FindPwDialog from './find-pw-dialog';
 
 const labelMinWidth = 'min-w-[100px]';
 
 /** 로그인 폼 */
 function LoginForm() {
   const navigate = useNavigate();
-  const { set: setAccessToken } = useAccessTokenStore();
-  const { set: setCustomer } = useCustomerStore();
   const { addToast } = useToast();
+
+  const loginMutation = useGetAuthLoginMutation();
 
   const form = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
@@ -35,11 +36,13 @@ function LoginForm() {
   /**
    * 로그인
    */
-  const onSubmit = async (data: { id: string; pw: string }) => {
-    const { code, name } = await login(data, setAccessToken, setCustomer);
-    if (code === 200) {
-      addToast({ type: 'success', message: `${name}님, 환영합니다!` });
+  const onSubmit = async (data: LoginFormType) => {
+    try {
+      const res = await loginMutation.mutateAsync({ ...data });
+      addToast({ type: 'success', message: `${res.data.name}님, 환영합니다!` });
       navigate({ to: '/' });
+    } catch (error: any) {
+      addToast({ type: 'error', message: error || '로그인 오류입니다.' });
     }
   };
 
@@ -109,19 +112,19 @@ function LoginForm() {
           )}
         />
 
-        <p className="text-right pt-2 pb-4 flex flex-col gap-2">
-          <Link className="text-gray-500 text-xs hover:underline" to="/join">
-            아직 회원이 아니신가요? 회원가입하러가기
+        <div className="cursor-pointer pt-10 pb-2 flex flex-row justify-center items-center gap-2 text-gray-500 text-sm ">
+          <FindIdDialog>
+            <div className="hover:underline">아이디찾기</div>
+          </FindIdDialog>
+          <div> | </div>
+          <FindPwDialog>
+            <div className="hover:underline">비밀번호찾기</div>
+          </FindPwDialog>
+          <div> | </div>
+          <Link className="hover:underline" to="/join">
+            회원가입
           </Link>
-          {/* <div className="flex justify-end gap-2">
-            <Link className="text-gray-500 text-xs hover:underline" to="/find-id">
-              아이디찾기
-            </Link>
-            <Link className="text-gray-500 text-xs hover:underline" to="/find-pw">
-              비밀번호찾기
-            </Link>
-          </div> */}
-        </p>
+        </div>
         <Button className="w-full" type="submit">
           로그인
         </Button>

@@ -11,7 +11,13 @@ import {
   updateAddressValidator,
   validate,
 } from '@/middlewares/validators/validate';
-import { createCustomerValidator } from '@/middlewares/validators/auth-validate';
+import {
+  createCustomerValidator,
+  emailCodeValidator,
+  idCheckValidator,
+  idEmailValidator,
+  sendEmailValidator,
+} from '@/middlewares/validators/auth-validate';
 
 const router = Router();
 
@@ -29,6 +35,32 @@ router.get('/:no', requireAdmin, asyncHandler(customerController.getOne));
 
 /** POST /auth/customers/join : 고객 회원가입 */
 router.post('/', validate(createCustomerValidator), asyncHandler(customerController.create));
+
+/** POST /customers/email : 고객 이메일 조회 */
+router.post('/email', validate(sendEmailValidator), asyncHandler(customerController.getEmail));
+
+/** POST /customers/send-email : 고객 회원가입 시 이메일로 인증코드 전송 */
+router.post(
+  '/send-email',
+  validate(sendEmailValidator),
+  asyncHandler(customerController.sendEmailCode),
+);
+
+/** POST /customers/check/id : 고객 아이디 중복체크(회원가입) */
+router.post('/check/id', validate(idCheckValidator), asyncHandler(customerController.getCheckId));
+
+/** POST /customers/id : 고객 아이디 조회 */
+router.post('/id', validate(sendEmailValidator), asyncHandler(customerController.getId));
+
+/** POST /customers/id-email : 고객 아이디, 이메일 조회 */
+router.post('/id-email', validate(idEmailValidator), asyncHandler(customerController.getIdEmail));
+
+/** POST /customers/code-compare : 고객의 입력한 인증번호와 해싱된 인증번호 비교 */
+router.post(
+  '/compare-code',
+  validate(emailCodeValidator),
+  asyncHandler(customerController.compareCode),
+);
 
 /** GET /customers/{no}/address : 고객 주소 목록 조회 */
 router.get(

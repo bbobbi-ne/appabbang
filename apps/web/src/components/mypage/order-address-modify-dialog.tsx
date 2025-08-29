@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@appabbang/ui';
 import {
   Dialog,
   DialogContent,
@@ -54,7 +54,7 @@ export default function OrderAddressModifyDialog({ children, no }: Props) {
           접수중인 주문의 배송지를 수정할 수 있습니다.
         </DialogDescription>
         <AddressForm
-          currentValues={data}
+          currentValues={{ ...data!, isDefault: false, no }}
           onSubmit={updateOrderAddress}
           isLoading={updateOrderAddressMutation.isPending}
           isHidden={true}

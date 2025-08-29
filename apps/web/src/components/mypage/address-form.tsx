@@ -23,14 +23,27 @@ import {
 } from '@appabbang/ui';
 import DaumPostApi from '@/components/common/daum-post-api';
 import type { AddressesListData } from '@/api/data-contracts';
-import { toast } from 'sonner';
+import { toast } from '@appabbang/ui';
 import { formatMobile } from '@appabbang/utils';
 import { addressSchema, type addresssDailogForm } from '@/validate/address-form.schema';
 
 const labelMinWidth = 'min-w-[120px]';
 
+export type CurrentValuesData = Pick<
+  AddressesListData[number],
+  | 'address'
+  | 'addressDetail'
+  | 'zipcode'
+  | 'message'
+  | 'recipientName'
+  | 'recipientMobile'
+  | 'isDefault'
+> & {
+  no: number;
+};
+
 type Props = {
-  currentValues?: AddressesListData[number] | undefined;
+  currentValues?: CurrentValuesData;
   onSubmit: (body: addresssDailogForm) => Promise<void>;
   isLoading: boolean;
   deleteAddress?: (no: number) => Promise<void>;

@@ -5,19 +5,6 @@ import { User, LogIn, LogOut, NotepadText } from 'lucide-react';
 import { useGetOrderRoundCurrentQuery } from '@/hooks/use-order-round';
 import { useCheckHasOrderQuery } from '@/hooks/use-my';
 
-export interface IOrderRoundProps {
-  no: number;
-  name: string;
-  startedAt: string;
-  endedAt: string;
-  minOrderQty: number;
-  maxOrderQty: number;
-  orderRoundBreads: {
-    orderRoundNo: number;
-    breadNo: number;
-  }[];
-}
-
 export default function Header() {
   const navigate = useNavigate();
   const { accessToken } = useAccessTokenStore();

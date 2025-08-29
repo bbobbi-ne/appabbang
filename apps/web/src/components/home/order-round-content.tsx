@@ -1,9 +1,8 @@
 import useToast from '@/hooks/useToast';
 import { Button, Card } from '@appabbang/ui';
 import { useNavigate } from '@tanstack/react-router';
-import useCountDownTimer from '@/hooks/useCountDownTimer';
+import { formatIsoToDateTime, useCountDownTimer } from '@appabbang/utils';
 import { AlarmClock } from 'lucide-react';
-import { formatDate } from '@appabbang/utils';
 
 type Props = {
   data: any;
@@ -14,8 +13,8 @@ export default function OrderRoundContent({ data, hasOrder }: Props) {
   const navigate = useNavigate();
   const { addToast } = useToast();
 
-  // 주문차수 진행여부(run), 남는시간정보(remaningTime)
-  const { run: isRun, remaningTime } = useCountDownTimer(
+  // 주문차수 진행여부(run), 남는시간정보(remainingTime)
+  const { run: isRun, remainingTime } = useCountDownTimer(
     data?.startedAt?.toString() ?? '',
     data?.endedAt?.toString() ?? '',
   );
@@ -77,7 +76,9 @@ export default function OrderRoundContent({ data, hasOrder }: Props) {
                 {data?.no}차 주문 {isRun && '오픈!'}
               </div>
               <p className="text-xs lg:text-base text-gray-500">
-                {isRun ? '망설이면 늦어요!' : `오픈 예정일: ${formatDate(data?.startedAt || '')}`}
+                {isRun
+                  ? '망설이면 늦어요!'
+                  : `오픈 예정일: ${formatIsoToDateTime(data?.startedAt || '')}`}
               </p>
             </div>
 
@@ -85,7 +86,7 @@ export default function OrderRoundContent({ data, hasOrder }: Props) {
               <Card className="flex-1 p-4 space-y-4 lg:space-y-12">
                 <div className="flex flex-row gap-2 items-end">
                   <AlarmClock size={28} className="animate-bounce transition-all duration-300" />
-                  <p className="text-2xl lg:text-4xl">{remaningTime}</p>
+                  <p className="text-2xl lg:text-4xl">{remainingTime}</p>
                 </div>
 
                 {!hasOrder ? (

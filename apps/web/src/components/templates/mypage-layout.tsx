@@ -1,9 +1,8 @@
 import { Card, CardContent } from '@appabbang/ui';
 import { useCustomerStore } from '@/store/customer';
-import { getCustomerInfo } from '@/services/customer-apis';
 import { ToggleMenuButton } from '@/components/common/toggle-menu-button';
 import { useLocation, useNavigate } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
+import { useGetCustomerSummaryQuery } from '@/hooks/use-my';
 
 export default function MypageLayout({ children }: { children: React.ReactNode }) {
   const {
@@ -12,21 +11,21 @@ export default function MypageLayout({ children }: { children: React.ReactNode }
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const { data } = useQuery({
-    queryKey: ['/my', '내 정보 조회'],
-    queryFn: getCustomerInfo,
-  });
+  const { data } = useGetCustomerSummaryQuery();
 
   const menuList = [
     { label: '정보수정', value: '/mypage/info' },
     { label: '비밀번호 수정', value: '/mypage/password' },
     { label: '배송지 관리', value: '/mypage/address' },
     { label: '주문내역', value: '/mypage/order-list' },
+    { label: '쿠폰내역', value: '/mypage/coupon' },
   ];
 
   const onChangeActiveMenu = (value: string) => {
     navigate({ to: value });
   };
+
+  const onMoveCouponUrl = () => navigate({ to: '/mypage/coupon' });
 
   return (
     <div className="pb-20">
@@ -35,7 +34,7 @@ export default function MypageLayout({ children }: { children: React.ReactNode }
           <p>
             <b>
               {name}({id})
-            </b>{' '}
+            </b>
             님 안녕하세요.
           </p>
           <div className="flex">
@@ -43,7 +42,7 @@ export default function MypageLayout({ children }: { children: React.ReactNode }
               <b>주문 누적금액</b> <span>{data?.totalAmount || 0}원</span>
             </p>
             <p className="flex flex-col items-center gap-2 px-8">
-              <b>총 보유 쿠폰 수</b> <span>{data?.coupon.length || 0}개</span>
+              <b>총 보유 쿠폰 수</b> <span>{data?.couponCount || 0}개</span>
             </p>
           </div>
         </CardContent>

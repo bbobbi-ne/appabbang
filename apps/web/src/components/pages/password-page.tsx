@@ -1,6 +1,6 @@
+import type { UpdateMyPasswordPayload } from '@/api/data-contracts';
 import { useUpdateCustomerPwMutation } from '@/hooks/use-my';
 import useToast from '@/hooks/useToast';
-import { type CustomePwType } from '@/services/customer-apis';
 import {
   passwordModifyFormSchema,
   type PasswordModifyFormSchema,
@@ -40,7 +40,9 @@ export default function PasswordPage() {
     defaultValues,
   });
 
-  const onSubmit: SubmitHandler<PasswordModifyFormSchema> = async (data: CustomePwType) => {
+  const onSubmit: SubmitHandler<PasswordModifyFormSchema> = async (
+    data: UpdateMyPasswordPayload,
+  ) => {
     try {
       await updateMutation.mutateAsync(data);
 

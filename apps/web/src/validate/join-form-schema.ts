@@ -1,7 +1,9 @@
 /**
  * 회원가입 유효성 검증
  */
+import type { UseFormReturn } from 'react-hook-form';
 import z from 'zod';
+import type { CustomerFormSchema } from './info-form-schema';
 
 const ID_VALIDATION = {
   min: { value: 5, message: '아이디는 5자 이상 입력 바랍니다.' },
@@ -18,11 +20,21 @@ const NAME_VALIDATION = {
   min: { value: 2, message: '이름은 2자 이상 입력 바랍니다.' },
   max: { value: 30, message: '이름은 30자 이내로 입력 바랍니다.' },
   regex: {
-    // 영문 대/소문자 + 숫자 조합, 5~30자
+    // 한글 + 숫자 조합, 2~30자
     value: /^[가-힣]{2,30}$/,
     message: '이름은 한글 2~30자 입력 가능합니다.',
   },
   required: { message: '이름을 입력하세요.' },
+};
+
+const EMAIL_VALIDATION = {
+  min: { value: 1, message: '이메일은 1자 이상 입력 바랍니다.' },
+  max: { value: 50, message: '이메일은 50자 이내로 입력 바랍니다.' },
+  regex: {
+    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/g,
+    message: '유효한 이메일 형식이 아닙니다.',
+  },
+  required: { message: '이메일을 입력하세요.' },
 };
 
 const PASSWORD_VALIDATION = {
@@ -74,6 +86,13 @@ export const joinSchema = z
       .min(NAME_VALIDATION.min.value, NAME_VALIDATION.min.message)
       .max(NAME_VALIDATION.max.value, NAME_VALIDATION.max.message)
       .regex(NAME_VALIDATION.regex.value, { message: NAME_VALIDATION.regex.message }),
+    email: z
+      .string({ required_error: EMAIL_VALIDATION.required.message })
+      .trim()
+      .min(EMAIL_VALIDATION.min.value, EMAIL_VALIDATION.min.message)
+      .max(EMAIL_VALIDATION.max.value, EMAIL_VALIDATION.max.message)
+      .regex(EMAIL_VALIDATION.regex.value, EMAIL_VALIDATION.regex.message),
+    code: z.string(),
     pw: z
       .string({ required_error: PASSWORD_VALIDATION.required.message })
       .trim()
@@ -131,3 +150,22 @@ export const joinSchema = z
 
 // 스키마 타입
 export type JoinSchemaType = z.infer<typeof joinSchema>;
+
+/** '이메일'만 유효성 검증 */
+export const validEmail = (
+  email: string,
+  form: UseFormReturn<JoinSchemaType> | UseFormReturn<CustomerFormSchema>,
+) => {
+  if (!email) {
+    form.setError('email', { type: 'required', message: '이메일을 입력해주세요.' });
+    return false;
+  }
+
+  const regexp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/g;
+  if (!regexp.test(email)) {
+    form.setError('email', { type: 'regex', message: '유효한 이메일 형식이 아닙니다.' });
+    return false;
+  }
+
+  return true;
+};

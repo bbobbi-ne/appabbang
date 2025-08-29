@@ -21,6 +21,8 @@ const router = Router();
 
 /** GET /my : 내 정보 조회 */
 router.get('/', requireCustomerOwner, asyncHandler(myController.getInfo));
+/** GET /my/summary : 내 정보 + 주문 누적금액 + 총 보유 쿠폰 수 조회 */
+router.get('/summary', requireCustomerOwner, asyncHandler(myController.getLayoutInfo));
 
 /** PUT /my : 내 정보 수정 */
 router.put(
@@ -123,8 +125,6 @@ router.put(
   asyncHandler(myController.updateOrderAddress),
 );
 
-////////////////////////////////////////////////////////////////////
-
 /** GET /my/order/:no/has-order : 내가 주문했던 주문인지 확인하는 라우트 */
 router.get(
   '/order/:no/has-order',
@@ -132,5 +132,7 @@ router.get(
   validate(paramsNoValidator),
   asyncHandler(myController.checkHasOrder),
 );
+/** GET /my/coupons : 쿠폰내역 조회 */
+router.get('/coupons', requireCustomerOwner, asyncHandler(myController.getCouponList));
 
 export default router;
