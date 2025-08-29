@@ -83,17 +83,17 @@ router.delete(
 /** GET /my/orders : 내 주문내역 조회 */
 router.get('/orders', requireCustomerOwner, asyncHandler(myController.getOrders));
 
-/** GET /my/order/{no} : 내 상세주문 조회 */
+/** GET /my/orders/{no} : 내 상세주문 조회 */
 router.get(
-  '/order/:no',
+  '/orders/:no',
   requireCustomerOwner,
   validate(paramsNoValidator),
   asyncHandler(myController.getOrder),
 );
 
-/** POST /my/order/{no}/cancel : 내 주문 취소 */
+/** POST /my/orders/{no}/cancel : 내 주문 취소 */
 router.post(
-  '/order/:no/cancel',
+  '/orders/:no/cancel',
   requireCustomerOwner,
   validate(cancelOrderValidator),
   asyncHandler(myController.cancelOrder),
@@ -101,33 +101,33 @@ router.post(
 
 ////////////////////////////////////////////////////////////////////
 
-/** GET /my/order/{no}/delivery : 내 주문배송(수령) 조회 */
+/** GET /my/orders/{no}/delivery : 내 주문배송(수령) 조회 */
 router.get(
-  '/order/:no/delivery',
+  '/orders/:no/delivery',
   requireCustomerOwner,
   validate(paramsNoValidator),
   asyncHandler(myController.getOrderDelivery),
 );
 
-/** GET /my/order/{no}/address : 내 주문 배송지 조회 */
+/** GET /my/orders/{no}/address : 내 주문 배송지 조회 */
 router.get(
-  '/order/:no/address',
+  '/orders/:no/address',
   requireCustomerOwner,
   validate(paramsNoValidator),
   asyncHandler(myController.getOrderAddress),
 );
 
-/** PUT /my/order/{no}/address : 내 주문 배송지 수정 */
+/** PUT /my/orders/{no}/address : 내 주문 배송지 수정 */
 router.put(
-  '/order/:no/address',
+  '/orders/:no/address',
   requireCustomerOwner,
   validate(updateOrderAddressValidator),
   asyncHandler(myController.updateOrderAddress),
 );
 
-/** GET /my/order/:no/has-order : 내가 주문했던 주문인지 확인하는 라우트 */
+/** GET /my/orders/:no/has-order : 내가 주문했던 주문인지 확인하는 라우트 */
 router.get(
-  '/order/:no/has-order',
+  '/orders/:no/has-order',
   optionalAuth,
   validate(paramsNoValidator),
   asyncHandler(myController.checkHasOrder),
