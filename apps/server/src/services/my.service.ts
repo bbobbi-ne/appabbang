@@ -56,6 +56,19 @@ export const getMyInfoDetail = async (id: string) => {
   return result;
 };
 
+/** 내 연락처 조회 */
+export const getMyContact = async (no: number) => {
+  const result = await prisma.customer.findUnique({
+    where: { no },
+    select: {
+      name: true,
+      mobileNumber: true,
+    },
+  });
+
+  return result;
+};
+
 /**
  * 주문 누적금액 조회
  */

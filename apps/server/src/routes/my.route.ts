@@ -38,6 +38,9 @@ router.put(
   asyncHandler(myController.updatePw),
 );
 
+/** GET /my/contact : 내 연락처 조회 */
+router.get('/contact', requireCustomerOwner, asyncHandler(myController.getMyContact));
+
 // >>>>>> 배송지 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 /** GET /my/addresses : 배송지 목록 조회 */
 router.get('/addresses', requireCustomerOwner, asyncHandler(myController.getAddressList));

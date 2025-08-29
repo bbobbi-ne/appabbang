@@ -13,6 +13,13 @@ export const getInfo = async (req: Request, res: Response) => {
   res.status(200).json({ customer, coupon, totalAmount });
 };
 
+/** 내 연락처 조회 */
+export const getMyContact = async (req: Request, res: Response) => {
+  const customerNo = req.user.no;
+  const contact = await myService.getMyContact(customerNo);
+  res.status(200).json(contact);
+};
+
 /** 내 정보 수정 */
 export const update = async (req: Request, res: Response) => {
   if (!req.user) throw AppError.unauthorized('토큰에 저장된 고객정보를 확인할 수 없습니다.');
