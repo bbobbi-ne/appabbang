@@ -44,11 +44,11 @@ export const BreadsColumns = () => {
       },
     }),
 
-    columnHelper.accessor('images.url', {
+    columnHelper.accessor('images', {
       maxSize: 3,
       header: '대표이미지',
       cell: (info) => {
-        const src = info.getValue() || '/images/no_image.png';
+        const src = info.getValue()?.url || '/images/no_image.png';
 
         return (
           <AspectRatio ratio={9 / 5}>
