@@ -101,7 +101,6 @@ export const OrderForm = ({ isDelivery, onSubmit, myContact, isSubmitting }: Pro
 
   // 배송지 등록
   const handleSubmit = async (data: any) => {
-    console.log(data);
     await onSubmit(data);
   };
 
@@ -137,7 +136,6 @@ export const OrderForm = ({ isDelivery, onSubmit, myContact, isSubmitting }: Pro
       <form
         onSubmit={form.handleSubmit(handleSubmit, (error) => {
           console.log(error);
-          console.log(form.getValues());
         })}
         className="space-y-4"
       >
