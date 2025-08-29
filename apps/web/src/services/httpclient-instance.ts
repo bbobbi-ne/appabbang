@@ -39,6 +39,11 @@ export class CustomHttpClient extends HttpClient {
         async (error) => {
           const originalRequest = error.config;
 
+          // refresh 요청 자체라면 retry 금지
+          if (originalRequest.url.includes('/auth/refresh')) {
+            return Promise.reject(error);
+          }
+
           if (
             (error.response?.status === 403 || error.response?.status === 401) &&
             !originalRequest._retry

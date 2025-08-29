@@ -32,15 +32,18 @@ export class CustomHttpClient extends HttpClient {
       async (error) => {
         const originalRequest = error.config;
 
+        // refresh 요청 자체라면 retry 금지
+        if (originalRequest.url.includes('/auth/refresh')) {
+          return Promise.reject(error);
+        }
+
         if (
           (error.response?.status === 403 || error.response?.status === 401) &&
           !originalRequest._retry
         ) {
           originalRequest._retry = true;
 
-          if (!this.refreshFn) {
-            throw new Error('refresh 함수가 설정되지 않음');
-          }
+          if (!this.refreshFn) throw new Error('refresh 함수가 설정되지 않음');
 
           try {
             const { data: newAccessToken } = await this.refreshFn();
