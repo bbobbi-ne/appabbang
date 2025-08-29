@@ -17,7 +17,6 @@ import {
 } from '@appabbang/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import type { ICustomerProps } from '../pages/info-page';
 import { useEffect } from 'react';
 import { formatIsoToDateTime, formatMobile } from '@appabbang/utils';
 import useToast from '@/hooks/useToast';
