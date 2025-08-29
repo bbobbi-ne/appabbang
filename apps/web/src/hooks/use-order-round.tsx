@@ -1,23 +1,28 @@
 import { useQuery } from '@tanstack/react-query';
 import { OrderRoundService } from '@/services/api/order-round-service';
 
-export const useGetOrderRoundLatestQuery = () => {
+/** 현재 주문차수 조회 */
+export const useGetOrderRoundCurrentQuery = () => {
   return useQuery({
-    queryKey: ['/order-round/latest', '최신 주문차수'],
-    queryFn: () => OrderRoundService.getLatest(),
+    queryKey: ['/order-round/current', '메인페이지'],
+    queryFn: () => OrderRoundService.getOrderRoundCurrent(),
   });
 };
 
-export const useGetOrderRoundNowQuery = () => {
+/** 주문차수가 진행중인지 확인 */
+export const useCheckOpenByNoQuery = (no: number) => {
   return useQuery({
-    queryKey: ['/order-round/now', '현재 주문차수'],
-    queryFn: () => OrderRoundService.getOrderRoundNow(),
+    queryKey: [`/order-round/${no}/is-open`, `주문차수상세`],
+    queryFn: () => OrderRoundService.checkOpenByNo(no),
+    enabled: !!no,
   });
 };
 
-export const useGetOrderRoundQuery = (no: number) => {
+/** 오픈된 특정 주문차수 조회 */
+export const useGetOpenOrderRoundQuery = (no: number) => {
   return useQuery({
-    queryKey: ['/order-round', '특정 주문차수'],
-    queryFn: () => OrderRoundService.getOrderRound(no),
+    queryKey: [`/order-round/${no}/open`, '주문차수상세'],
+    queryFn: () => OrderRoundService.getOpenOrderRound(no),
+    enabled: !!no,
   });
 };
