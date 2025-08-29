@@ -144,6 +144,12 @@ export function useCancelOrderMutation() {
       queryClient.invalidateQueries({
         queryKey: [`/my/order-rounds/${variables.orderRoundNo}/has-order`],
       });
+      queryClient.invalidateQueries({
+        queryKey: [`/my/coupons`],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [`/my/coupons/available`],
+      });
     },
   });
 }
