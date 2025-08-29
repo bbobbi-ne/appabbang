@@ -19,6 +19,8 @@ export const getOne = async (req: Request, res: Response) => {
 export const create = async (req: Request, res: Response) => {
   const user = req.user;
 
+  // 조건이 없을땐 validate.ts 에서 처리했지만
+  // 조건에 따른 필수값/옵션값 처리 여부는 아래에서 진행
   if (!user) {
     if (!req.body.orderPw) {
       throw AppError.badRequest('주문 비밀번호를 입력해주세요.');
@@ -33,9 +35,35 @@ export const create = async (req: Request, res: Response) => {
     }
   }
 
-  await OrderService.create(user?.no, req.body);
+  if (req.body.deliveryTypeCode === '10') {
+    if (!req.body.address) {
+      throw AppError.badRequest('배송지를 입력해주세요.');
+    }
 
-  res.status(200).json({ message: '주문이 완료되었습니다.' });
+    if (!req.body.addressDetail) {
+      throw AppError.badRequest('상세 주소를 입력해주세요.');
+    }
+
+    if (!req.body.zipcode) {
+      throw AppError.badRequest('우편번호를 입력해주세요.');
+    }
+
+    if (!req.body.recipientName) {
+      throw AppError.badRequest('수령자 이름을 입력해주세요.');
+    }
+
+    if (!req.body.recipientMobile) {
+      throw AppError.badRequest('수령자 전화번호를 입력해주세요.');
+    }
+
+    if (!req.body.message) {
+      throw AppError.badRequest('메시지를 입력해주세요.');
+    }
+  }
+
+  const no = await OrderService.create(user?.no, req.body);
+
+  res.status(200).json({ no });
 };
 
 /** 주문 수정 */
