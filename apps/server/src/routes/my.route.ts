@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { asyncHandler } from '@/middlewares/error.middleware';
 import * as myController from '@/controllers/my.controller';
-import { requireCustomerOwner } from '@/middlewares/auth.middleware';
+import { optionalAuth, requireCustomerOwner } from '@/middlewares/auth.middleware';
 import {
   createMyAddressValidator,
   updateMyAddressValidator,
@@ -97,6 +97,8 @@ router.post(
   asyncHandler(myController.cancelOrder),
 );
 
+////////////////////////////////////////////////////////////////////
+
 /** GET /my/order/{no}/delivery : 내 주문배송(수령) 조회 */
 router.get(
   '/order/:no/delivery',
@@ -119,6 +121,16 @@ router.put(
   requireCustomerOwner,
   validate(updateOrderAddressValidator),
   asyncHandler(myController.updateOrderAddress),
+);
+
+////////////////////////////////////////////////////////////////////
+
+/** GET /my/order/:no/has-order : 내가 주문했던 주문인지 확인하는 라우트 */
+router.get(
+  '/order/:no/has-order',
+  optionalAuth,
+  validate(paramsNoValidator),
+  asyncHandler(myController.checkHasOrder),
 );
 
 export default router;

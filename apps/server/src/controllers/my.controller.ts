@@ -204,3 +204,14 @@ export const updateOrderAddress = async (req: Request, res: Response) => {
 
   res.status(200).json({ message: '주문 배송지가 변경되었습니다.' });
 };
+
+/** 내가 주문했던 주문인지 확인하는 메서드 (취소, 환불 제외) */
+export async function checkHasOrder(req: Request, res: Response) {
+  const customerNo = req.user?.no;
+
+  if (!customerNo) return res.status(200).json(false);
+
+  const no = Number(req.params.no);
+  const hasOrder = await myService.checkHasOrder(customerNo, no);
+  res.status(200).json(hasOrder);
+}
