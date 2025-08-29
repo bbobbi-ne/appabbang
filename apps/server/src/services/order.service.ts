@@ -105,8 +105,8 @@ export const create = async (customerNo: number | undefined, body: CreateOrderRe
         throw AppError.badRequest('쿠폰 소유자가 일치하지 않습니다.');
 
       await tx.customerCoupon.update({ where: { no: customerCouponNo }, data: { isUsed: true } });
-      couponNo = customerCoupon.coupon.no;
       discountAmount = customerCoupon.coupon.amount || 0;
+      couponNo = customerCoupon.coupon.no;
     }
 
     // 3. 빵 조회
@@ -183,6 +183,7 @@ export const create = async (customerNo: number | undefined, body: CreateOrderRe
               isPrivacyTermsAgreed: false,
               isServiceTermsAgreed: false,
             }),
+        ...(customerCouponNo && { customerCouponNo }),
       },
     });
 

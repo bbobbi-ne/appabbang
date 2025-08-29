@@ -306,10 +306,33 @@ export const getOrder = async (no: number) => {
 };
 
 /** 내 주문 취소 */
-export const cancelOrder = async (no: number, canceledReason: string) => {
+export const cancelOrder = async ({
+  orderNo,
+  customerNo,
+  canceledReason,
+}: {
+  orderNo: number;
+  customerNo: number;
+  canceledReason: string;
+}) => {
   await prisma.$transaction(async (tx) => {
-    await tx.order.update({ where: { no }, data: { orderStatus: '50' } });
-    await tx.payment.update({ where: { orderNo: no }, data: { canceledReason } });
+    await tx.order.update({ where: { no: orderNo, customerNo }, data: { orderStatus: '50' } });
+    await tx.payment.update({ where: { orderNo }, data: { canceledReason } });
+
+    // 이주문에 쿠폰이 사용되었었는지 확인 후 사용되었다면 만료여부를 확인하여 지나지 않았다면 isUse 를 다시 초기화
+    const order = await tx.order.findUnique({ where: { no: orderNo } });
+    if (order?.customerCouponNo && order?.couponNo) {
+      await tx.customerCoupon.update({
+        where: {
+          no: order.customerCouponNo,
+          customerNo,
+          couponNo: order.couponNo,
+          isUsed: true,
+          expiredAt: { gte: new Date() },
+        },
+        data: { isUsed: false },
+      });
+    }
   });
 };
 

@@ -741,8 +741,8 @@ paths:
 
     post:
       tags: [Orders]
-      summary: 주문 생성 (비회원)
-      description: 비회원 주문을 생성합니다. (권한: 없음 - 누구나 접근 가능)
+      summary: 주문 생성 
+      description: 주문을 생성합니다. (권한: 선택적 로그인 - 회원/비회원 모두 가능)
       security:
         - bearerAuth: []
       requestBody:
@@ -750,21 +750,11 @@ paths:
         content:
           application/json:
             schema:
-              description: |
-                [필수값 안내]
-                - 비회원 주문: ordererName, ordererMobile, recipientName, recipientMobile, address, addressDetail, zipcode, message, orderRoundNo, totalPrice, orderPw, isServiceTermsAgreed, isPrivacyTermsAgreed, deliveryMethodNo, orderItems, bankCode, accountNumber, accountHolderName
-                - 회원 주문: ordererName, ordererMobile, recipientName, recipientMobile, address, addressDetail, zipcode, message, orderRoundNo, totalPrice, deliveryMethodNo, orderItems, bankCode, accountNumber, accountHolderName, customerCouponNo (선택)
-                (상세 예시는 아래 examples 참고)
+              description: 주문 생성 
               type: object
               required:
                 - ordererName
                 - ordererMobile
-                - recipientName
-                - recipientMobile
-                - address
-                - addressDetail
-                - zipcode
-                - message
                 - orderRoundNo
                 - totalPrice
                 - deliveryMethodNo
@@ -792,19 +782,19 @@ paths:
                   example: '010-1234-5678'
                 address:
                   type: string
-                  description: 주소
+                  description: 주소 (택배배송시 필수)
                   example: '서울시 강남구'
                 addressDetail:
                   type: string
-                  description: 상세주소
+                  description: 상세주소 (택배배송시 필수)
                   example: '123-45'
                 zipcode:
                   type: string
-                  description: 우편번호
+                  description: 우편번호 (택배배송시 필수)
                   example: '12345'
                 message:
                   type: string
-                  description: 배송 메시지
+                  description: 배송 메시지 (택배배송시 필수)
                   example: '문 앞에 놓아주세요'
                 orderRoundNo:
                   type: integer
@@ -858,10 +848,6 @@ paths:
                   type: integer
                   description: 고객 쿠폰 번호 (회원 선택사항)
                   example: 1
-                isPaymentRefundTermsAgreed:
-                  type: boolean
-                  description: 결제, 환불 약관 동의여부
-                  example: true
                 bankCode:
                   type: string
                   description: 은행 코드
@@ -884,7 +870,6 @@ paths:
                   recipientMobile: "010-1234-5678"
                   address: "서울시 강남구"
                   addressDetail: "123-45"
-                  discountAmount: 0
                   zipcode: "12345"
                   message: "문 앞에 놓아주세요"
                   orderRoundNo: 1
@@ -924,12 +909,20 @@ paths:
                   bankCode: "004"
                   accountNumber: "123-456-7890"
                   accountHolderName: "김회원"
-                  bankCode: "004"
-                  accountNumber: "123-456-7890"
-                  accountHolderName: "홍길동"
       responses:
         '201':
           description: 주문 생성 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - no
+                properties:
+                  no:
+                    type: integer
+                    description: 생성된 주문 번호
+                    example: 1
 
   /orders/{no}:
     get:

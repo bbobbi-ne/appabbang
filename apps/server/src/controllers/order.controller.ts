@@ -63,7 +63,7 @@ export const create = async (req: Request, res: Response) => {
 
   const no = await OrderService.create(user?.no, req.body);
 
-  res.status(200).json({ no });
+  res.status(201).json({ no });
 };
 
 /** 주문 수정 */

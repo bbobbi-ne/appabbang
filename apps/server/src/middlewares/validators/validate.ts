@@ -355,12 +355,12 @@ export const createOrderValidator = [
   body('accountNumber').trim().notEmpty().withMessage('accountNumber는 필수입니다'),
   body('accountHolderName').trim().notEmpty().withMessage('accountHolderName는 필수입니다'),
   //// 쿠폰은 옵션
-  body('couponNo')
+  body('customerCouponNo')
     .trim()
     .optional()
     .isInt()
     .toInt()
-    .withMessage('couponNo를 올바르게 입력해주세요.'),
+    .withMessage('customerCouponNo를 올바르게 입력해주세요.'),
   ////
   body('orderRoundNo')
     .trim()

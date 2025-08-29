@@ -171,7 +171,8 @@ export const cancelOrder = async (req: Request, res: Response) => {
     throw AppError.badRequest('현재는 주문을 취소할 수 없습니다.');
   }
 
-  await myService.cancelOrder(orderNo, canceledReason);
+  const user = req.user;
+  await myService.cancelOrder({ orderNo, customerNo: user.no, canceledReason });
 
   res.status(200).json({ message: '주문이 취소되었습니다.' });
 };

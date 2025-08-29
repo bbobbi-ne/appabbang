@@ -469,12 +469,7 @@ export type OrdersListData = {
   };
 }[];
 
-/**
- * [필수값 안내]
- * - 비회원 주문: ordererName, ordererMobile, recipientName, recipientMobile, address, addressDetail, zipcode, message, orderRoundNo, totalPrice, orderPw, isServiceTermsAgreed, isPrivacyTermsAgreed, deliveryMethodNo, orderItems, bankCode, accountNumber, accountHolderName
- * - 회원 주문: ordererName, ordererMobile, recipientName, recipientMobile, address, addressDetail, zipcode, message, orderRoundNo, totalPrice, deliveryMethodNo, orderItems, bankCode, accountNumber, accountHolderName, customerCouponNo (선택)
- * (상세 예시는 아래 examples 참고)
- */
+/** 주문 생성 */
 export interface OrdersCreatePayload {
   /**
    * 주문자 이름
@@ -490,32 +485,32 @@ export interface OrdersCreatePayload {
    * 수령인 이름
    * @example "홍길동"
    */
-  recipientName: string;
+  recipientName?: string;
   /**
    * 수령인 전화번호
    * @example "010-1234-5678"
    */
-  recipientMobile: string;
+  recipientMobile?: string;
   /**
-   * 주소
+   * 주소 (택배배송시 필수)
    * @example "서울시 강남구"
    */
-  address: string;
+  address?: string;
   /**
-   * 상세주소
+   * 상세주소 (택배배송시 필수)
    * @example "123-45"
    */
-  addressDetail: string;
+  addressDetail?: string;
   /**
-   * 우편번호
+   * 우편번호 (택배배송시 필수)
    * @example "12345"
    */
-  zipcode: string;
+  zipcode?: string;
   /**
-   * 배송 메시지
+   * 배송 메시지 (택배배송시 필수)
    * @example "문 앞에 놓아주세요"
    */
-  message: string;
+  message?: string;
   /**
    * 주문차수 번호
    * @example 1
@@ -590,7 +585,13 @@ export interface OrdersCreatePayload {
   accountHolderName: string;
 }
 
-export type OrdersCreateData = any;
+export interface OrdersCreateData {
+  /**
+   * 생성된 주문 번호
+   * @example 1
+   */
+  no: number;
+}
 
 export interface OrdersDetailData {
   /**
