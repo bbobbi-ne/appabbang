@@ -32,7 +32,7 @@ import { TablePagination } from '@/components/ui/table-pagination';
 import TableSkeleton from './table-skeletion';
 
 interface TableContainerProps<TData> {
-  title: string; // 테이블 제목
+  title: string | React.ReactNode; // 테이블 제목
   table: ReactTable<TData>; // ✅ table 인스턴스를 외부에서 받음
   isLoading: boolean;
   isError?: boolean;
@@ -69,10 +69,10 @@ export function TableContainer<TData>({
     : [];
 
   return (
-    <Card className="shadow-none bg-background border-none">
+    <Card className="shadow-none bg-background border-none flex-1">
       {/* 테이블 헤더 */}
-      <CardHeader className="space-y-6">
-        <CardTitle>{title}</CardTitle>
+      <CardHeader>
+        {typeof title === 'string' ? <CardTitle>{title}</CardTitle> : title}
         <div className="flex justify-between">
           {searchBar}
           {createDialog}
