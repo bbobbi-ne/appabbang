@@ -4,23 +4,13 @@ import { useNavigate } from '@tanstack/react-router';
 import useCountDownTimer from '@/hooks/useCountDownTimer';
 import { AlarmClock } from 'lucide-react';
 import { formatDate } from '@appabbang/utils';
-interface IOrderRoundProps {
-  data: {
-    no: number;
-    name: string;
-    startedAt: Date;
-    endedAt: Date;
-    breadNoList: {
-      breadNo: number;
-    }[];
-    image?: {
-      url: string;
-      name: string;
-    };
-  };
-}
 
-export default function OrderRoundContent({ data }: IOrderRoundProps) {
+type Props = {
+  data: any;
+  hasOrder: boolean;
+};
+
+export default function OrderRoundContent({ data, hasOrder }: Props) {
   const navigate = useNavigate();
   const { addToast } = useToast();
 
@@ -44,10 +34,25 @@ export default function OrderRoundContent({ data }: IOrderRoundProps) {
       return;
     }
 
+    if (hasOrder) {
+      addToast({
+        message: '이미 주문하신 주문이 있습니다. 주문서를 확인해주세요.',
+        type: 'error',
+      });
+      navigate({ to: '/mypage/order-list/$orderNo', params: { orderNo: String(data?.no) } });
+      return;
+    }
+
     // 주문차수 파라미터와 함께 전달
     navigate({
       to: '/order-round/$orderRoundNo',
-      params: { orderRoundNo: String(data.no) },
+      params: { orderRoundNo: String(data?.no) },
+    });
+  };
+
+  const moveToMyOrderList = () => {
+    navigate({
+      to: '/mypage/order-list',
     });
   };
 
@@ -59,8 +64,8 @@ export default function OrderRoundContent({ data }: IOrderRoundProps) {
           <Card className="flex-1 rounded-lg overflow-hidden border-0 shadow-xl">
             <img
               // TODO: 주문차수 이미지가 없을때를 대비한 샘플 이미지 제작 필요
-              src={data?.image?.url ?? '/images/main-order-round-no-img.png'}
-              alt={data?.image?.name ?? '주문차수 이미지'}
+              src={data?.orderRoundImageUrl || '/images/main-order-round-no-img.png'}
+              alt={data?.name || '주문차수 이미지'}
               className="w-full h-auto object-cover"
             />
           </Card>
@@ -83,9 +88,15 @@ export default function OrderRoundContent({ data }: IOrderRoundProps) {
                   <p className="text-2xl lg:text-4xl">{remaningTime}</p>
                 </div>
 
-                <Button className="block ml-auto" onClick={onClick}>
-                  주문하러 가기
-                </Button>
+                {!hasOrder ? (
+                  <Button className="block ml-auto" onClick={onClick}>
+                    주문하러 가기
+                  </Button>
+                ) : (
+                  <Button className="block ml-auto" onClick={moveToMyOrderList}>
+                    내 주문 확인하기
+                  </Button>
+                )}
               </Card>
             )}
           </div>
