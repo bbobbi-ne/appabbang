@@ -246,7 +246,7 @@ export const getDeliveryMethodValidator = [
 ];
 
 export const createDeliveryMethodValidator = [
-  body('deliveryType').trim().notEmpty().withMessage('deliveryType는 필수입니다'),
+  body('deliveryTypeCode').trim().notEmpty().withMessage('deliveryTypeCode 필수입니다'),
   body('name').trim().notEmpty().withMessage('name은 필수입니다'),
   body('fee')
     .trim()
@@ -271,7 +271,7 @@ export const updateDeliveryMethodValidator = [
     .isInt()
     .toInt()
     .withMessage('no 를 올바르게 입력해주세요.'),
-  body('deliveryType').trim().notEmpty().withMessage('deliveryType는 필수입니다'),
+  body('deliveryTypeCode').trim().notEmpty().withMessage('deliveryTypeCode는 필수입니다'),
   body('name').trim().notEmpty().withMessage('name은 필수입니다'),
   body('fee')
     .trim()

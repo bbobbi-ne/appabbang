@@ -2875,7 +2875,7 @@ paths:
                     - name
                     - fee
                     - isActive
-                    - deliveryType
+                    - deliveryTypeCode
                     - deliveryTypeName
                     - createdAt
                     - updatedAt
@@ -2900,7 +2900,7 @@ paths:
                       type: boolean
                       description: 활성화 여부
                       example: true
-                    deliveryType:
+                    deliveryTypeCode:
                       type: string
                       enum: ['10', '20', '90']
                       description: '배송 타입 (10-택배배송, 20-직접수령, 90-기타)'
@@ -2933,12 +2933,12 @@ paths:
             schema:
               type: object
               required:
-                - deliveryType
+                - deliveryTypeCode
                 - name
                 - fee
                 - isActive
               properties:
-                deliveryType:
+                deliveryTypeCode:
                   type: string
                   enum: ['10', '20', '90']
                   description: '배송 타입 (10-택배배송, 20-직접수령, 90-기타)'
@@ -3003,7 +3003,7 @@ paths:
                     - name
                     - fee
                     - isActive
-                    - deliveryType
+                    - deliveryTypeCode
                     - deliveryTypeName
                     - createdAt
                     - updatedAt
@@ -3028,7 +3028,7 @@ paths:
                       type: boolean
                       description: 활성화 여부
                       example: true
-                    deliveryType:
+                    deliveryTypeCode:
                       type: string
                       enum: ['10', '20', '90']
                       description: '배송 타입 (10-택배배송, 20-직접수령, 90-기타)'
@@ -3075,7 +3075,7 @@ paths:
                   - name
                   - fee
                   - isActive
-                  - deliveryType
+                  - deliveryTypeCode
                   - deliveryTypeName
                   - createdAt
                   - updatedAt
@@ -3100,7 +3100,7 @@ paths:
                     type: boolean
                     description: 활성화 여부
                     example: true
-                  deliveryType:
+                  deliveryTypeCode:
                     type: string
                     enum: ['10', '20', '90']
                     description: '배송 타입 (10-택배배송, 20-직접수령, 90-기타)'
@@ -3141,12 +3141,12 @@ paths:
             schema:
               type: object
               required:
-                - deliveryType
+                - deliveryTypeCode
                 - name
                 - fee
                 - isActive
               properties:
-                deliveryType:
+                deliveryTypeCode:
                   type: string
                   enum: ['10', '20', '90']
                   description: '배송 타입 (10-택배배송, 20-직접수령, 90-기타)'
