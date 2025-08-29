@@ -685,6 +685,7 @@ export const getNextOrderRound = async () => {
       where: {
         imageTargetType: IMAGE_TARGET_TYPE_NAME,
         imageTargetNo: orderRound?.no,
+        order: 1,
       },
       select: {
         url: true,
