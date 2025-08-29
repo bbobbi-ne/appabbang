@@ -27,6 +27,7 @@ import type {
   OrdersDeliveryListData,
   OrdersDetailResult,
   OrdersListResult,
+  SummaryListData,
   UpdateMyPasswordData,
   UpdateMyPasswordPayload,
   UpdateMyProfileData,
@@ -42,7 +43,7 @@ export class My<SecurityDataType = unknown> {
   }
 
   /**
-   * @description 현재 로그인한 고객의 정보를 조회합니다. (권한: 고객만)
+   * @description 현재 로그인한 고객의 상세정보를 조회합니다. (권한: 고객만)
    *
    * @tags My
    * @name GetMy
@@ -79,6 +80,24 @@ export class My<SecurityDataType = unknown> {
       body: data,
       secure: true,
       type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 현재 로그인한 고객의 요약 정보를 조회합니다. (권한: 고객만)
+   *
+   * @tags My
+   * @name SummaryList
+   * @summary 내 정보 조회
+   * @request GET:/my/summary
+   * @secure
+   * @response `200` `SummaryListData` 내 정보 조회 성공
+   */
+  summaryList = (params: RequestParams = {}) =>
+    this.http.request<SummaryListData, any>({
+      path: `/my/summary`,
+      method: "GET",
+      secure: true,
       format: "json",
       ...params,
     });

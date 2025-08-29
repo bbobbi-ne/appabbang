@@ -11,58 +11,6 @@ import { useGetOrderQuery } from '@/hooks/use-my';
 import OrderItem from '@/components/mypage/order-item';
 import OrderAddressModifyDialog from '@/components/mypage/order-address-modify-dialog';
 
-type OrderItemsType = {
-  no: number;
-  breadNo: number;
-  breadImageUrl: string;
-  allergyInfo: string;
-  breadName: string;
-  countryOfOrigin: string;
-  quantity: number;
-
-  totalPrice: number;
-  unitPrice: number;
-
-  createdAt: string;
-  updatedAt: string;
-
-  orderNo: number;
-  order: {
-    no: number;
-
-    address: string;
-    addressDetail: string;
-    zipcode: string;
-
-    deliveryMethodFee: number;
-    deliveryMethodName: string;
-    discountAmount: number;
-    totalPrice: number;
-    trackingNumber: string;
-    message: string;
-    orderStatus: string;
-
-    isPaymentRefundTermsAgreed: boolean;
-    isPrivacyTermsAgreed: boolean;
-    isServiceTermsAgreed: boolean;
-    memo: string;
-    orderNumber: string;
-    orderPw: string;
-
-    ordererName: string;
-    ordererMobile: string;
-    recipientMobile: string;
-    recipientName: string;
-
-    customerNo: number;
-    couponNo: number;
-    orderRoundNo: number;
-
-    createdAt: string;
-    updatedAt: string;
-  };
-};
-
 const CANCEL_ORDER_STATUS = ['50', '51', '52'];
 const AVALIABLE_DELIVERY_ORDER_STATUS = ['11', '20', '30', '31', '40'];
 
@@ -134,7 +82,7 @@ export default function MyOrderDetailPage({ orderNo }: { orderNo: number }) {
 
             {!!order.discountAmount && (
               <div className="flex flex-row justify-between">
-                <div>할인금액</div>
+                <div>쿠폰할인</div>
                 <div>{order.discountAmount.toLocaleString()}원</div>
               </div>
             )}

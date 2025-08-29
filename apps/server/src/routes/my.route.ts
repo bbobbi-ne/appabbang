@@ -21,6 +21,8 @@ const router = Router();
 
 /** GET /my : 내 정보 조회 */
 router.get('/', requireCustomerOwner, asyncHandler(myController.getInfo));
+/** GET /my/summary : 내 정보 + 주문 누적금액 + 총 보유 쿠폰 수 조회 */
+router.get('/summary', requireCustomerOwner, asyncHandler(myController.getLayoutInfo));
 
 /** PUT /my : 내 정보 수정 */
 router.put(

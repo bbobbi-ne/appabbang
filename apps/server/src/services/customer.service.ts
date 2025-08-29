@@ -198,7 +198,7 @@ export const getOneForCheck = async (id: string) => {
 export const getEmail = async (email: string) => {
   return await prisma.customer.findFirst({
     where: { email },
-    select: { email: true },
+    select: { no: true, email: true },
   });
 };
 

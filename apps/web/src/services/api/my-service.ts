@@ -1,4 +1,3 @@
-import client from '@/services/axios';
 import { My } from '@/api/My';
 import { CustomHttpClient } from '../httpclient-instance';
 import type {
@@ -7,19 +6,25 @@ import type {
   OrdersAddressUpdatePayload,
   OrdersCancelPartialUpdatePayload,
   UpdateMyPasswordPayload,
+  UpdateMyProfilePayload,
 } from '@/api/data-contracts';
 import { refreshCreate } from './auth-service';
 
 const myApi = new My(new CustomHttpClient({}, refreshCreate));
 
 export const MyService = {
+  /** 내 요약정보 조회 */
+  getCustomerSummaryInfo: async () => {
+    const response = await myApi.summaryList();
+    return response.data;
+  },
   /** 내 정보 조회 */
   getCustomerInfo: async () => {
     const response = await myApi.getMy();
     return response.data;
   },
   /** 내 정보 수정 */
-  updateCustomer: async (data: { mobileNumber: string }) => {
+  updateCustomer: async (data: UpdateMyProfilePayload) => {
     await myApi.updateMyProfile(data);
   },
   /** 내 비밀번호 수정 */

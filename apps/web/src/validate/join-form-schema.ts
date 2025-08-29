@@ -3,6 +3,7 @@
  */
 import type { UseFormReturn } from 'react-hook-form';
 import z from 'zod';
+import type { CustomerFormSchema } from './info-form-schema';
 
 const ID_VALIDATION = {
   min: { value: 5, message: '아이디는 5자 이상 입력 바랍니다.' },
@@ -151,7 +152,10 @@ export const joinSchema = z
 export type JoinSchemaType = z.infer<typeof joinSchema>;
 
 /** '이메일'만 유효성 검증 */
-export const validEmail = (email: string, form: UseFormReturn<JoinSchemaType>) => {
+export const validEmail = (
+  email: string,
+  form: UseFormReturn<JoinSchemaType> | UseFormReturn<CustomerFormSchema>,
+) => {
   if (!email) {
     form.setError('email', { type: 'required', message: '이메일을 입력해주세요.' });
     return false;

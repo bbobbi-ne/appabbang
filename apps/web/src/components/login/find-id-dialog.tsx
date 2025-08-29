@@ -92,7 +92,7 @@ function FindIdDialog({ children }: Props) {
 
     try {
       const response = await getEmail.mutateAsync({ email });
-      if (!response.email) {
+      if (!response) {
         addToast({ type: 'error', message: '존재하지 않는 이메일입니다.' });
         return;
       }

@@ -1964,8 +1964,13 @@ paths:
               schema:
                 type: object
                 required:
+                  - no
                   - email
                 properties:
+                  no:
+                    type: integer
+                    description: 고객번호
+                    example: 1
                   email:
                     type: string
                     description: 이메일
@@ -3640,7 +3645,7 @@ paths:
     get:
       tags: [My]
       summary: 내 정보 조회
-      description: 현재 로그인한 고객의 정보를 조회합니다. (권한: 고객만)
+      description: 현재 로그인한 고객의 상세정보를 조회합니다. (권한: 고객만)
       security:
         - bearerAuth: []
       responses:
@@ -3651,111 +3656,38 @@ paths:
               schema:
                 type: object
                 required:
-                  - customer
-                  - coupon
-                  - totalAmount
+                  - no
+                  - id
+                  - name
+                  - email
+                  - mobileNumber
+                  - createdAt
                 properties:
-                  customer:
-                    type: object
-                    required:
-                      - no
-                      - id
-                      - name
-                      - mobileNumber
-                      - defaultAddressNo
-                      - createdAt
-                      - address
-                      - customerCoupon
-                    properties:
-                      no:
-                        type: integer
-                        description: 고객 번호
-                        example: 1
-                      id:
-                        type: string
-                        description: 고객 ID
-                        example: 'customer123'
-                      name:
-                        type: string
-                        description: 고객명
-                        example: '홍길동'
-                      mobileNumber:
-                        type: string
-                        description: 전화번호
-                        example: '010-1234-5678'
-                      defaultAddressNo:
-                        type: integer
-                        description: 기본 배송지 번호
-                        example: 1
-                      createdAt:
-                        type: string
-                        format: date-time
-                        description: '생성일시'
-                        example: '2024-01-01T00:00:00.000Z'
-                      address:
-                        type: array
-                        description: 배송지 목록
-                        items:
-                          type: object
-                          properties:
-                            no:
-                              type: integer
-                              description: 배송지 번호
-                              example: 1
-                            address:
-                              type: string
-                              description: 주소
-                              example: '서울시 강남구'
-                            addressDetail:
-                              type: string
-                              description: 상세주소
-                              example: '123-45'
-                      customerCoupon:
-                        type: array
-                        description: 고객 쿠폰 목록
-                        items:
-                          type: object
-                          properties:
-                            no:
-                              type: integer
-                              description: 고객 쿠폰 번호
-                              example: 1
-                            coupon:
-                              type: object
-                              properties:
-                                name:
-                                  type: string
-                                  description: 쿠폰명
-                                  example: '첫 로그인 쿠폰'
-                                amount:
-                                  type: integer
-                                  description: 할인 금액
-                                  example: 3000
-                  coupon:
-                    type: array
-                    description: 할인 정보
-                    items:
-                      type: object
-                      properties:
-                        no:
-                          type: integer
-                          description: 고객 쿠폰 번호
-                          example: 1
-                        coupon:
-                          type: object
-                          properties:
-                            name:
-                              type: string
-                              description: 쿠폰명
-                              example: '첫 로그인 쿠폰'
-                            amount:
-                              type: integer
-                              description: 할인 금액
-                              example: 3000
-                  totalAmount:
+                  no:
                     type: integer
-                    description: 주문 누적 금액
-                    example: 150000
+                    description: 고객 번호
+                    example: 1
+                  id:
+                    type: string
+                    description: 고객 ID
+                    example: 'customer123'
+                  email:
+                    type: string
+                    description: 고객 email
+                    example: test1231@naver.com
+                  name:
+                    type: string
+                    description: 고객명
+                    example: '홍길동'
+                  mobileNumber:
+                    type: string
+                    description: 전화번호
+                    example: '010-1234-5678'
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: '생성일시'
+                    example: '2024-01-01T00:00:00.000Z'
 
     put:
       tags: [My]
@@ -3825,6 +3757,69 @@ paths:
                     format: date-time
                     description: '수정일시'
                     example: '2024-01-01T00:00:00.000Z'
+
+  /my/summary:
+    get:
+      tags: [My]
+      summary: 내 정보 조회
+      description: 현재 로그인한 고객의 요약 정보를 조회합니다. (권한: 고객만)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 내 정보 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - customer
+                  - couponCount
+                  - totalAmount
+                properties:
+                  customer:
+                    type: object
+                    required:
+                      - no
+                      - id
+                      - name
+                      - email
+                      - mobileNumber
+                      - createdAt
+                    properties:
+                      no:
+                        type: integer
+                        description: 고객 번호
+                        example: 1
+                      id:
+                        type: string
+                        description: 고객 ID
+                        example: 'customer123'
+                      email:
+                        type: string
+                        description: 고객 email
+                        example: test1231@naver.com
+                      name:
+                        type: string
+                        description: 고객명
+                        example: '홍길동'
+                      mobileNumber:
+                        type: string
+                        description: 전화번호
+                        example: '010-1234-5678'
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: '생성일시'
+                        example: '2024-01-01T00:00:00.000Z'
+                  couponCount:
+                    type: integer
+                    description: 총 보유 쿠폰 수
+                    example: 1
+                  totalAmount:
+                    type: integer
+                    description: 주문 누적 금액
+                    example: 150000
 
   /my/pw:
     put:
