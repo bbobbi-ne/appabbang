@@ -42,7 +42,7 @@ function BreadCard({ bread, onClick }: BreadCardProps) {
             ) : (
               <img
                 className="rounded-2xl m-4 w-40 h-40"
-                src="../../../public/images/no_image.jpg"
+                src="/images/no-image.png"
                 alt={bread.name}
               />
             )}
