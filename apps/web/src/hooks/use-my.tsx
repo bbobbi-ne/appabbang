@@ -9,6 +9,15 @@ export function useGetCustomerInfoQuery() {
   });
 }
 
+/** 내 연락처 조회 */
+export function useGetMyContactQuery({ enabled = true }: { enabled: boolean }) {
+  return useQuery({
+    queryKey: ['/my/contact', '내 연락처 조회'],
+    queryFn: MyService.getMyContact,
+    enabled,
+  });
+}
+
 /** 고객 정보 수정 */
 export function useUpdateCustomerMutation() {
   const queryClient = useQueryClient();
@@ -17,6 +26,7 @@ export function useUpdateCustomerMutation() {
     mutationFn: (data: { mobileNumber: string }) => MyService.updateCustomer(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/my', '내 정보 조회'] });
+      queryClient.invalidateQueries({ queryKey: ['/my/contact', '내 연락처 조회'] });
     },
   });
 }
@@ -114,8 +124,11 @@ export function useCancelOrderMutation() {
   return useMutation({
     mutationFn: ({ no, data }: { no: number; data: { canceledReason: string } }) =>
       MyService.cancelOrder(no, data),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['/my/orders', '내 주문 목록 조회'] });
+      queryClient.invalidateQueries({
+        queryKey: [`/my/order/${variables.no}/has-order`, '내 주문 상세 조회'],
+      });
     },
   });
 }
@@ -149,3 +162,12 @@ export function useUpdateOrderAddressMutation() {
     },
   });
 }
+
+/** 주문차수에 내 주문이 있는지 확인 (취소, 환불 제외) */
+export const useCheckHasOrderQuery = (no: number, enabled = false) => {
+  return useQuery({
+    queryKey: [`/my/order/${no}/has-order`, '내 주문 상세 조회'],
+    queryFn: () => MyService.checkHasOrder(no),
+    enabled,
+  });
+};

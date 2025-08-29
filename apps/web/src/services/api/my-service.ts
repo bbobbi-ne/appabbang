@@ -61,6 +61,11 @@ export const MyService = {
     const response = await client.get('/my');
     return response.data;
   },
+  /** 내 연락처 조회 */
+  getMyContact: async () => {
+    const response = await client.get('/my/contact');
+    return response.data;
+  },
   /** 내 정보 수정 */
   updateCustomer: async (data: { mobileNumber: string }) => {
     await client.put('/my', data);
@@ -118,5 +123,10 @@ export const MyService = {
   /** 주문내역의 배송지 수정 */
   updateOrderAddress: async (no: number, data: addresssDailogForm) => {
     await client.put(`/my/order/${no}/address`, data);
+  },
+  /** 특정 주문차수에 내 주문이 있는지 확인 (취소, 환불 제외) - 주문서 접근 확인 용도 */
+  checkHasOrder: async (no: number) => {
+    const response = await client.get(`/my/order/${no}/has-order`);
+    return response.data;
   },
 };
