@@ -178,7 +178,10 @@ export function useUpdateOrderAddressMutation() {
     mutationFn: ({ no, data }: { no: number; data: any }) => MyService.updateOrderAddress(no, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: [`/my/orders/${variables.no}/address`, '주문내역의 배송지 조회'],
+        queryKey: [`/my/orders/${variables.no}/address`],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [`/my/orders/${variables.no}`],
       });
     },
   });

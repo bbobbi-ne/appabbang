@@ -29,7 +29,7 @@ export default function OrderAddressModifyDialog({ children, no }: Props) {
       if (!no) return;
 
       await updateOrderAddressMutation.mutateAsync({ no, data: body });
-      toast.success('수정이 완료되었습니다.');
+      toast.success('배송지가 수정되었습니다.');
       setOpen(false);
     } catch (error: any) {
       toast.error(error.message);

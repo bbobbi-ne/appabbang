@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Button } from '@appabbang/ui';
 import { BreadDialog } from '@/components/order-round/bread-dialog';
 import { CountButton } from '@/components/order-round/count-button';
-import { formatCurrencyKR } from '@appabbang/utils';
 import { CheckIcon } from 'lucide-react';
 
 type Props = {
@@ -64,7 +63,7 @@ export const BreadItem = ({
             <CheckIcon className="w-5 h-5 text-white bg-green-600 rounded-full shadow-md" />
           )}
         </div>
-        <p className="text-sm text-gray-500">{formatCurrencyKR(bread.unitPrice)}</p>
+        <p className="text-sm text-gray-500">{bread?.unitPrice?.toLocaleString()}원</p>
         <BreadDialog bread={bread}>
           <Button size="sm">빵 정보 보기</Button>
         </BreadDialog>

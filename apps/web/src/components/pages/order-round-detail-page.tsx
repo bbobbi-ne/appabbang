@@ -9,6 +9,7 @@ import {
   SelectLabel,
   SelectItem,
   toast,
+  Button,
 } from '@appabbang/ui';
 import OrderFormSkeleton from '@/components/order/order-form-skeleton';
 import { useLoaderData, useNavigate, useParams } from '@tanstack/react-router';
@@ -24,6 +25,7 @@ import type {
   OrdersCreatePayload,
 } from '@/api/data-contracts';
 import { useGetAvailableCouponQuery } from '@/hooks/use-my';
+import ConfirmDialog from '../order-round/order-confirm-dialog';
 
 /** Main Function */
 export default function OrderRoundDetailPage({ myContact }: { myContact: ContactListData }) {
@@ -45,7 +47,7 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: Contact
   /** 선택한 배송방법 */
   const [selectedDelivery, setSelectedDelivery] = useState<ActiveListData[0]>();
 
-  /** 선택한 쿠폰 (임시) */
+  /** 선택한 쿠폰 */
   const [selectedCoupon, setSelectedCoupon] = useState<CouponsAvailableListData[0]>();
 
   const totalQuantity = useMemo(() => {
@@ -90,20 +92,6 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: Contact
   };
 
   const createOrder = async (data: Partial<OrdersCreatePayload>) => {
-    if (totalQuantity < orderRoundData?.minOrderQty) {
-      alert('최소 주문 수량을 확인해주세요.');
-      return;
-    }
-
-    if (totalQuantity > orderRoundData?.maxOrderQty) {
-      alert('최대 주문 수량을 초과하였습니다.');
-      return;
-    }
-
-    if (!window.confirm('주문을 진행하시겠습니까?')) {
-      return;
-    }
-
     const body = {
       ...data,
       orderRoundNo,
@@ -140,11 +128,11 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: Contact
   }, [deliveryData]);
 
   /** 쿠폰 기본값 설정 */
-  useEffect(() => {
-    if (myContact && couponData) {
-      setSelectedCoupon(couponData[0]);
-    }
-  }, [myContact, couponData]);
+  // useEffect(() => {
+  //   if (myContact && couponData) {
+  //     setSelectedCoupon(couponData[0]);
+  //   }
+  // }, [myContact, couponData]);
 
   return false ? (
     <OrderFormSkeleton />
@@ -182,13 +170,18 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: Contact
       </div>
 
       {/* 금액 영역  */}
-      {/* 멤버이고, 쿠폰이 있을때만 조회 */}
+      {/* 멤버이고, 쿠폰이 있을때만 확인가능 */}
       {myContact && couponData && (
         <div className="flex flex-row items-center gap-2">
           <div className="w-24 min-w-24">내 쿠폰</div>
           <Select
+            defaultValue=""
             value={selectedCoupon?.no.toString() ?? ''}
             onValueChange={(value) => {
+              if (value === 'none') {
+                setSelectedCoupon(undefined);
+                return;
+              }
               setSelectedCoupon(couponData?.find((item: any) => item.no.toString() === value));
             }}
           >
@@ -199,6 +192,7 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: Contact
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>내 쿠폰</SelectLabel>
+                <SelectItem value="none">미적용</SelectItem>
                 {couponData?.map((coupon: any, idx: number) => {
                   return (
                     <SelectItem key={idx} value={coupon.no.toString()}>
@@ -242,26 +236,28 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: Contact
         </div>
 
         {/* 금액 요약 */}
-        <div className="flex flex-col items-end">
+        <div className="flex flex-col items-end gap-1">
           <div className="flex flex-row items-center gap-2">
             <p>상품 금액({totalQuantity}개 주문)</p>
-            <p className="min-w-40 text-right">{totalBreadPrice} 원</p>
+            <p className="min-w-40 text-right">{totalBreadPrice.toLocaleString()} 원</p>
           </div>
           {selectedCoupon && (
             <div className="flex flex-row items-center gap-2">
               <p>할인금액</p>
-              <p className="min-w-40 text-right">{selectedCoupon?.amount} 원</p>
+              <p className="min-w-40 text-right">- {selectedCoupon?.amount.toLocaleString()} 원</p>
             </div>
           )}
           {selectedDelivery?.deliveryTypeCode === '10' && (
             <div className="flex flex-row items-center gap-2">
               <p>배송비</p>
-              <p className="min-w-40 text-right">{selectedDelivery?.fee} 원</p>
+              <p className="min-w-40 text-right">{selectedDelivery?.fee?.toLocaleString()} 원</p>
             </div>
           )}
-          <div className="flex flex-row items-center gap-2">
-            <p className="text-lg font-bold">총 금액</p>
-            <p className="font-bold min-w-40 text-right">{totalPrice}원</p>
+          <div className="flex flex-row items-center gap-2 pt-2">
+            <p className="text-xl font-bold">총 금액</p>
+            <p className="text-xl font-bold min-w-40 text-right">
+              {totalPrice.toLocaleString()} 원
+            </p>
           </div>
         </div>
       </div>
@@ -273,8 +269,41 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: Contact
         <OrderForm
           isDelivery={selectedDelivery?.deliveryTypeCode === '10'}
           myContact={myContact}
-          onSubmit={createOrder}
-          isSubmitting={createMutation.isPending}
+          buttonArea={({ form }) => (
+            <>
+              <ConfirmDialog
+                title="주문을 진행하시겠습니까?"
+                description="주문 이후 입금여부를 확인해주세요."
+                onConfirm={(data) => createOrder(data as Partial<OrdersCreatePayload>)}
+                isLoading={createMutation.isPending}
+              >
+                {({ open }) => (
+                  <Button
+                    type="button"
+                    className="w-full"
+                    disabled={createMutation.isPending}
+                    onClick={() => {
+                      form.handleSubmit((data: any) => {
+                        if (totalQuantity < orderRoundData?.minOrderQty) {
+                          toast.error('최소 주문 수량을 확인해주세요.');
+                          return;
+                        }
+
+                        if (totalQuantity > orderRoundData?.maxOrderQty) {
+                          toast.error('최대 주문 수량을 초과하였습니다.');
+                          return;
+                        }
+
+                        open(data);
+                      })();
+                    }}
+                  >
+                    주문하기
+                  </Button>
+                )}
+              </ConfirmDialog>
+            </>
+          )}
         />
       </div>
     </div>
