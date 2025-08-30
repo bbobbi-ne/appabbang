@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Button } from '@appabbang/ui';
 import { BreadDialog } from '@/components/order-round/bread-dialog';
 import { CountButton } from '@/components/order-round/count-button';
-import { formatCurrencyKR } from '@appabbang/utils';
 import { CheckIcon } from 'lucide-react';
 
 type Props = {

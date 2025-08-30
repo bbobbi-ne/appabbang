@@ -45,7 +45,7 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: Contact
   /** 선택한 배송방법 */
   const [selectedDelivery, setSelectedDelivery] = useState<ActiveListData[0]>();
 
-  /** 선택한 쿠폰 (임시) */
+  /** 선택한 쿠폰 */
   const [selectedCoupon, setSelectedCoupon] = useState<CouponsAvailableListData[0]>();
 
   const totalQuantity = useMemo(() => {
@@ -182,7 +182,7 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: Contact
       </div>
 
       {/* 금액 영역  */}
-      {/* 멤버이고, 쿠폰이 있을때만 조회 */}
+      {/* 멤버이고, 쿠폰이 있을때만 확인가능 */}
       {myContact && couponData && (
         <div className="flex flex-row items-center gap-2">
           <div className="w-24 min-w-24">내 쿠폰</div>
