@@ -75,8 +75,8 @@ export default function MyOrderDetailPage({ orderNo }: { orderNo: number }) {
 
             {!!order.discountAmount && (
               <div className="flex flex-row justify-between">
-                <div>쿠폰할인</div>
-                <div>{order.discountAmount.toLocaleString()}원</div>
+                <div>할인금액</div>
+                <div>-{order.discountAmount.toLocaleString()}원</div>
               </div>
             )}
 
@@ -88,8 +88,8 @@ export default function MyOrderDetailPage({ orderNo }: { orderNo: number }) {
             )}
 
             <div className="flex flex-row justify-between border-t pt-2">
-              <div className="font-semibold">최종결제금액</div>
-              <div className="font-semibold">{order.totalPrice.toLocaleString()}원</div>
+              <div className="text-lg font-bold">최종결제금액</div>
+              <div className="text-lg font-bold">{order.totalPrice.toLocaleString()}원</div>
             </div>
           </div>
         </div>
