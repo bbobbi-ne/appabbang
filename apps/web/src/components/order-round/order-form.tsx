@@ -8,14 +8,6 @@ import {
   FormField,
   Label,
   Button,
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  Badge,
-  toast,
   PasswordInput,
   Select,
   SelectTrigger,
@@ -29,22 +21,16 @@ import {
 import { formatMobile } from '@appabbang/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import DaumPostApi from '../common/daum-post-api';
-import {
-  useCreateAddressMutation,
-  useDeleteAddressMutation,
-  useGetAddressListQuery,
-  useUpdateAddressMutation,
-} from '@/hooks/use-my';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useGetCommonCodesQuery } from '@/hooks/use-common-code';
-import AddressForm from '@/components/mypage/address-form';
 import { orderFormSchema, type OrderFormSchema } from '@/validate/order-form-schema';
 
 // TODO: 점검 및 정리 필요 (약관들)
 import ServiceIsAgreedDialog from '../join/service-terms-agreed-dialog';
 import PrivacyTermsAgreedDialog from '../join/privacy-terms-agreed-dialog';
 import PaymentRefundTermsAgreedDialog from '../join/privacy-terms-agreed-dialog';
+import { MyAddressListDialog } from '@/components/order-round/my-address-list-dialog';
+import { OrderAddressForm } from '@/components/order-round/order-address-form';
 
 type Props = {
   isDelivery: boolean;
@@ -204,7 +190,9 @@ export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
           </p>
         )}
 
-        {isDelivery && <OrderAddressForm form={form} isMember={!!myContact} />}
+        {isDelivery && (
+          <OrderAddressForm form={form} isMember={!!myContact} labelMinWidth={labelMinWidth} />
+        )}
 
         <div className="pt-2" />
 
@@ -514,300 +502,5 @@ export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
         {buttonArea({ form })}
       </form>
     </Form>
-  );
-};
-
-const OrderAddressForm = ({ form, isMember }: { form: any; isMember: boolean }) => {
-  return (
-    <>
-      {/* 받으실 분 */}
-      <FormField
-        control={form.control}
-        name="recipientName"
-        render={({ field }) => (
-          <FormItem className="flex items-center">
-            <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
-              <span className="text-destructive">*</span> 받으실 분
-            </FormLabel>
-
-            <div className="w-full space-y-1">
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder="받으실분의 성함을 입력해주세요"
-                  maxLength={10}
-                  readOnly={isMember}
-                />
-              </FormControl>
-              <FormMessage className="text-xs" />
-            </div>
-          </FormItem>
-        )}
-      />
-
-      {/* 연락처 */}
-      <FormField
-        control={form.control}
-        name="recipientMobile"
-        render={({ field }) => (
-          <FormItem className="flex items-center">
-            <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
-              <span className="text-destructive">*</span> 연락처
-            </FormLabel>
-            <div className="w-full space-y-1">
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder="받으실분의 연락처를 입력해주세요"
-                  onChange={(e) => {
-                    const formattedValue = formatMobile(e.target.value);
-                    field.onChange(formattedValue);
-                  }}
-                  maxLength={13}
-                  readOnly={isMember}
-                />
-              </FormControl>
-              <FormMessage className="text-xs" />
-            </div>
-          </FormItem>
-        )}
-      />
-
-      {/* 주소 */}
-      <div className="flex items-center">
-        <Label className={`${labelMinWidth} whitespace-nowrap`}>
-          <span className="text-destructive">*</span> 배송지 주소
-        </Label>
-
-        {/* 우편번호 + 주소 검색 */}
-        <div className="w-full flex flex-col gap-2">
-          <div>
-            <FormField
-              control={form.control}
-              name="zipcode"
-              render={({ field }) => (
-                <FormItem className="flex gap-2">
-                  <FormControl>
-                    <Input {...field} placeholder="우편 번호" disabled className="mb-0" />
-                  </FormControl>
-
-                  <DaumPostApi
-                    setAddress={(data) => {
-                      if (!data) return;
-                      form.setValue('zipcode', data[0] ?? '');
-                      form.setValue('address', data[1] ?? '');
-                      // form.setValue('addressDetail', data[2] ?? '');
-                    }}
-                    variant="secondary"
-                    disabled={isMember}
-                  />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          {/* 주소 */}
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem className="flex items-center">
-                <div className="w-full space-y-1">
-                  <div className="flex items-center gap-2">
-                    <FormControl>
-                      <Input {...field} placeholder="배송지 주소" disabled />
-                    </FormControl>
-                  </div>
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* 상세 주소 */}
-          <FormField
-            control={form.control}
-            name="addressDetail"
-            render={({ field }) => (
-              <FormItem className="flex items-center">
-                <div className="w-full space-y-1">
-                  <div className="flex items-center gap-2">
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="배송지 상세 주소"
-                        disabled={!form.watch('zipcode')}
-                      />
-                    </FormControl>
-                  </div>
-                  <FormMessage className="text-xs" />
-                </div>
-              </FormItem>
-            )}
-          />
-        </div>
-      </div>
-
-      {/* 배송 메세지 */}
-      <FormField
-        control={form.control}
-        name="message"
-        render={({ field }) => (
-          <FormItem className="flex items-center">
-            <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
-              <span className="text-destructive">*</span> 배송메세지
-            </FormLabel>
-            <div className="w-full space-y-1">
-              <FormControl>
-                <Input {...field} placeholder="배송메세지를 입력해주세요." />
-              </FormControl>
-
-              <FormMessage className="text-xs" />
-            </div>
-          </FormItem>
-        )}
-      />
-    </>
-  );
-};
-
-const MyAddressListDialog = ({
-  children,
-  handleSelectAddress,
-}: {
-  children: React.ReactNode;
-  handleSelectAddress: (item: any) => void;
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { data: addressList } = useGetAddressListQuery();
-
-  const selectAddress = (item: any) => {
-    handleSelectAddress(item);
-    setIsOpen(false);
-  };
-
-  return (
-    <>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>{children}</DialogTrigger>
-
-        <DialogContent
-          onInteractOutside={(e) => {
-            e.preventDefault();
-          }}
-          className="overflow-y-auto max-h-11/12"
-        >
-          <DialogHeader>
-            <DialogTitle className="text-left">나의 배송지</DialogTitle>
-          </DialogHeader>
-          <DialogDescription className="hidden" />
-
-          <MyAddressList addressList={addressList} selectAddress={selectAddress} />
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-};
-
-const MyAddressList = ({
-  addressList,
-  selectAddress,
-}: {
-  addressList: any;
-  selectAddress: (item: any) => void;
-}) => {
-  const [isClicked, setIsClicked] = useState(false);
-  const [currentValues, setCurrentValues] = useState<any>(null);
-  const createAddressMutation = useCreateAddressMutation();
-  const updateAddressMutation = useUpdateAddressMutation();
-  const deleteAddressMutation = useDeleteAddressMutation();
-
-  const openEdit = (item?: any) => {
-    setCurrentValues(item);
-    setIsClicked(true);
-  };
-
-  const closeEdit = () => {
-    setIsClicked(false);
-    setCurrentValues(null);
-  };
-
-  const createAddress = async (data: any) => {
-    try {
-      await createAddressMutation.mutateAsync(data);
-      toast.success('배송지 등록 완료');
-      closeEdit();
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
-
-  const updateAddress = async (data: any) => {
-    try {
-      await updateAddressMutation.mutateAsync({ no: currentValues.no, data });
-      toast.success('배송지 수정 완료');
-      closeEdit();
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
-
-  const deleteAddress = async (no: number) => {
-    try {
-      await deleteAddressMutation.mutateAsync(no);
-      toast.success('배송지 삭제 완료');
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
-
-  return (
-    <div>
-      {!isClicked && !currentValues && (
-        <Button size="sm" className="mb-2" onClick={() => openEdit()}>
-          배송지 추가하기
-        </Button>
-      )}
-      {isClicked ? (
-        <div>
-          <AddressForm
-            onSubmit={!currentValues ? createAddress : updateAddress}
-            isLoading={
-              !currentValues ? createAddressMutation.isPending : updateAddressMutation.isPending
-            }
-            currentValues={currentValues}
-            onCancel={closeEdit}
-            {...(currentValues && {
-              deleteAddress,
-              deleteLoading: deleteAddressMutation.isPending,
-            })}
-          />
-        </div>
-      ) : (
-        addressList?.map((item: any) => (
-          <div
-            key={`address-${item.no}`}
-            className="border-b p-2 cursor-pointer flex flex-col gap-2 hover:bg-muted"
-            onClick={() => {
-              selectAddress(item);
-            }}
-          >
-            <div className="flex items-center gap-4">
-              <p className="font-bold">{item.recipientName}</p>
-
-              {item.isDefault && <Badge variant="secondary">기본배송지</Badge>}
-            </div>
-            <p>
-              {item.address},&nbsp;{item.addressDetail}({item.zipcode})
-            </p>
-            <p className="text-sm">{formatMobile(item.recipientMobile ?? '')}</p>
-
-            <p className="text-sm text-muted-foreground">배송메세지: {item.message}</p>
-            <Button variant="outline" size="sm" onClick={() => openEdit(item)} className="w-fit">
-              수정하기
-            </Button>
-          </div>
-        ))
-      )}
-    </div>
   );
 };
