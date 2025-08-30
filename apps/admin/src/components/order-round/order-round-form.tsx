@@ -51,6 +51,10 @@ export const orderRoundSchema = z
       .refine((arr) => arr.length > 0, {
         message: '하나 이상의 항목을 선택해주세요.',
       }),
+    minOrderQty: z
+      .number({ required_error: '최소 주문 수량을 입력해주세요.' })
+      .min(1, '최소 주문 수량은 1 이상이어야 합니다.'),
+    maxOrderQty: z.number({ required_error: '최대 주문 수량을 입력해주세요.' }),
     image: z
       .union([
         z.instanceof(File),
@@ -97,6 +101,8 @@ function OrderRoundForm({ currentValues, no, onSuccess, submitFn }: OrderRoundFo
           orderRoundBreads: [],
           startedAt: undefined,
           endedAt: undefined,
+          minOrderQty: undefined,
+          maxOrderQty: undefined,
         },
   });
   useEffect(() => {
@@ -124,8 +130,8 @@ function OrderRoundForm({ currentValues, no, onSuccess, submitFn }: OrderRoundFo
     formData.append('startedAt', startedAt);
     formData.append('endedAt', endedAt);
     formData.append('orderRoundBreads', orderRoundBreads);
-    formData.append('minOrderQty', '1');
-    formData.append('maxOrderQty', '99');
+    formData.append('minOrderQty', String(data.minOrderQty));
+    formData.append('maxOrderQty', String(data.maxOrderQty));
 
     if (data.image instanceof File) {
       formData.append('image', data.image);
@@ -549,6 +555,56 @@ function OrderRoundForm({ currentValues, no, onSuccess, submitFn }: OrderRoundFo
                 </Popover>
               </div>
               <FormMessage className="ml-auto" />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="minOrderQty"
+          render={({ field }) => (
+            <FormItem className="flex">
+              <FormLabel errorCheck={false} className="whitespace-nowrap pr-2 py-3 flex-1/4">
+                <strong className="text-red-500">*</strong> 최소 주문수량
+              </FormLabel>
+              <div className="flex-3/4 space-y-1">
+                <FormControl>
+                  <Input
+                    placeholder="최소 주문수량을 입력해주세요"
+                    value={field.value ?? ''}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      field.onChange(val === '' ? undefined : Number(val));
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </div>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="maxOrderQty"
+          render={({ field }) => (
+            <FormItem className="flex">
+              <FormLabel errorCheck={false} className="whitespace-nowrap pr-2 py-3 flex-1/4">
+                <strong className="text-red-500">*</strong> 최대 주문수량
+              </FormLabel>
+              <div className="flex-3/4 space-y-1">
+                <FormControl>
+                  <Input
+                    placeholder="최대 주문수량을 입력해주세요"
+                    value={field.value ?? ''}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      field.onChange(val === '' ? undefined : Number(val));
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </div>
             </FormItem>
           )}
         />
