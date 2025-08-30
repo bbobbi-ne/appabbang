@@ -11,9 +11,12 @@
  */
 
 import type {
+  CurrentListData,
   GetOrderRoundData,
   ImageDeleteBody,
+  IsOpenListData,
   LatestListData,
+  OpenDetailData,
   OrderRoundCreateData,
   OrderRoundCreatePayload,
   OrderRoundDetailData,
@@ -147,6 +150,58 @@ export class OrderRound<SecurityDataType = unknown> {
       body: data,
       secure: true,
       type: ContentType.FormData,
+      ...params,
+    });
+  /**
+   * @description 현재 진행중인 주문차수 또는 다음 주문차수를 조회합니다. (권한: 없음 - 누구나 접근 가능)
+   *
+   * @tags OrderRound
+   * @name CurrentList
+   * @summary 현재 주문차수 조회 (now or next)
+   * @request GET:/order-round/current
+   * @response `200` `CurrentListData` 현재 주문차수 조회 성공
+   */
+  currentList = (params: RequestParams = {}) =>
+    this.http.request<CurrentListData, any>({
+      path: `/order-round/current`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 특정 주문차수가 현재 오픈되어 있는지 확인하고 정보를 조회합니다.
+   *
+   * @tags OrderRound
+   * @name OpenDetail
+   * @summary 오픈된 특정 주문차수 조회
+   * @request GET:/order-round/open/{no}
+   * @secure
+   * @response `200` `OpenDetailData` 오픈된 주문차수 조회 성공
+   */
+  openDetail = (no: number, params: RequestParams = {}) =>
+    this.http.request<OpenDetailData, any>({
+      path: `/order-round/open/${no}`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 특정 주문차수가 현재 진행중인지 확인합니다.
+   *
+   * @tags OrderRound
+   * @name IsOpenList
+   * @summary 주문차수가 진행중인지 확인
+   * @request GET:/order-round/{no}/is-open
+   * @secure
+   * @response `200` `IsOpenListData` 주문차수 진행 상태 확인 성공
+   */
+  isOpenList = (no: number, params: RequestParams = {}) =>
+    this.http.request<IsOpenListData, any>({
+      path: `/order-round/${no}/is-open`,
+      method: "GET",
+      secure: true,
+      format: "json",
       ...params,
     });
   /**
