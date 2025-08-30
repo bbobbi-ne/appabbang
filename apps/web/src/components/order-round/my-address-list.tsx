@@ -35,7 +35,7 @@ export const MyAddressList = ({
   const createAddress = async (data: any) => {
     try {
       await createAddressMutation.mutateAsync(data);
-      toast.success('배송지 등록 완료');
+      toast.success('배송지가 등록되었습니다.');
       closeEdit();
     } catch (error: any) {
       toast.error(error.message);
@@ -45,7 +45,7 @@ export const MyAddressList = ({
   const updateAddress = async (data: any) => {
     try {
       await updateAddressMutation.mutateAsync({ no: currentValues.no, data });
-      toast.success('배송지 수정 완료');
+      toast.success('배송지가 수정되었습니다.');
       closeEdit();
     } catch (error: any) {
       toast.error(error.message);
@@ -55,7 +55,7 @@ export const MyAddressList = ({
   const deleteAddress = async (no: number) => {
     try {
       await deleteAddressMutation.mutateAsync(no);
-      toast.success('배송지 삭제 완료');
+      toast.success('배송지가 삭제되었습니다.');
     } catch (error: any) {
       toast.error(error.message);
     }
