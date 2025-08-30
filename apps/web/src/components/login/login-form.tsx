@@ -42,7 +42,7 @@ function LoginForm() {
       addToast({ type: 'success', message: `${res.data.name}님, 환영합니다!` });
       navigate({ to: '/' });
     } catch (error: any) {
-      addToast({ type: 'error', message: error || '로그인 오류입니다.' });
+      addToast({ type: 'error', message: error.message || '로그인 오류입니다.' });
     }
   };
 
