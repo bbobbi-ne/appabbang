@@ -2,12 +2,12 @@ import type { OrdersDetailData } from '@/api/data-contracts';
 import { formatCurrencyKR } from '@appabbang/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@appabbang/ui';
 
-type OrderItem = OrdersDetailData['orderItems'][number];
-
-function OrderTable({ orderItem, deliveryFee }: { orderItem: OrderItem[]; deliveryFee: number }) {
-  const totalPrice = orderItem.reduce((acc, item) => {
+function OrderTable({ orderData }: { orderData: OrdersDetailData }) {
+  const itemsTotalPrice = orderData.orderItems.reduce((acc, item) => {
     return acc + item.totalPrice;
   }, 0);
+
+  console.log(orderData.discountAmount);
 
   return (
     <>
@@ -25,7 +25,7 @@ function OrderTable({ orderItem, deliveryFee }: { orderItem: OrderItem[]; delive
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orderItem.map((item) => (
+            {orderData.orderItems.map((item) => (
               <TableRow key={item.breadNo}>
                 <TableCell className="line-clamp-2 pb-0 whitespace-normal break-words">
                   {item.breadName}
@@ -41,20 +41,24 @@ function OrderTable({ orderItem, deliveryFee }: { orderItem: OrderItem[]; delive
 
       <div className="text-right">
         <div className="flex">
-          <label className="flex-3/4">금액 :</label>
-          <p className="flex-1/4">{totalPrice}원</p>
+          <label className="flex-3/4">주문금액 :</label>
+          <p className="flex-1/4">{itemsTotalPrice + orderData.deliveryMethodFee}원</p>
+        </div>
+        <div className="flex">
+          <label className="flex-3/4">상품금액(+) :</label>
+          <p className="flex-1/4">{itemsTotalPrice}원</p>
         </div>
         <div className="flex">
           <label className="flex-3/4">배송비(+) :</label>
-          <p className="flex-1/4">{deliveryFee}원</p>
+          <p className="flex-1/4">{orderData.deliveryMethodFee}원</p>
         </div>
         <div className="flex">
           <label className="flex-3/4">할인금액(-) :</label>
-          <p className="flex-1/4">(할인지정 필요)원</p>
+          <p className="flex-1/4">{orderData.discountAmount}원</p>
         </div>
         <div className="flex text-red-500">
-          <label className="flex-3/4">총 금액 :</label>
-          <p className="flex-1/4">{totalPrice}원</p>
+          <label className="flex-3/4">결제금액 :</label>
+          <p className="flex-1/4">{orderData.totalPrice}원</p>
         </div>
       </div>
     </>

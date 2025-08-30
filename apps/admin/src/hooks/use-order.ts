@@ -1,6 +1,11 @@
 import type { CommonCodeDetailData, OrdersListData } from '@/api/data-contracts';
 import { getOrderDeliveryType, getOrderStatus } from '@/service/common-api';
-import { getOrdersDetail, getOrdersList, updateOrderStatus } from '@/service/order-api';
+import {
+  getOrdersDetail,
+  getOrdersList,
+  updateOrderStatus,
+  updateOrderTrackingNumber,
+} from '@/service/order-api';
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 
 /**
@@ -78,4 +83,20 @@ export function useOrderStatusUpdateMutation() {
   });
 
   return { orderStatusUpdateMutation: mutateAsync, isError, isSuccess, error };
+}
+/**
+ * 🔹 주문 상태 업데이트 Mutation
+ * 상태 업데이트 후 관련 캐시 무효화
+ */
+export function useOrderTrackingNumberUpdateMutation() {
+  const queryClient = useQueryClient();
+  const { mutateAsync, isError, isSuccess, error } = useMutation({
+    mutationFn: updateOrderTrackingNumber, // 주문 상태 업데이트 API
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] }); // 주문 리스트 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: ['order', { no: variables.no }] }); // 해당 주문 상세 캐시 무효화
+    },
+  });
+
+  return { orderTrackingNumberUpdateMutation: mutateAsync, isError, isSuccess, error };
 }

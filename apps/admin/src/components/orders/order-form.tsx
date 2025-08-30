@@ -10,18 +10,20 @@ import {
   FormMessage,
   Input,
   Label,
+  toast,
 } from '@appabbang/ui';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import type { OrdersDetailData } from '@/api/data-contracts';
 import { useGetOrderStatusQuery } from '@/hooks/use-common-code';
+import { useOrderTrackingNumberUpdateMutation } from '@/hooks/use-order';
 
 export const orderScheme = z.object({
   trackingNumber: z.string(),
 });
 export type OrderDialogScheme = z.infer<typeof orderScheme>;
 
-function OrderForm({ orderData }: { orderData: OrdersDetailData }) {
+function OrderForm({ orderData, close }: { orderData: OrdersDetailData; close: () => void }) {
   const form = useForm<OrderDialogScheme>({
     defaultValues: {
       trackingNumber: orderData.trackingNumber,
@@ -30,6 +32,17 @@ function OrderForm({ orderData }: { orderData: OrdersDetailData }) {
   const { data: ordersStatus } = useGetOrderStatusQuery();
 
   const ordersStatusName = ordersStatus?.find(({ code }) => code === orderData.orderStatus)?.name;
+  const { orderTrackingNumberUpdateMutation } = useOrderTrackingNumberUpdateMutation();
+
+  const onSubmit = async (data: OrderDialogScheme) => {
+    try {
+      await orderTrackingNumberUpdateMutation({ data, no: orderData.no });
+      toast.success('송장등록이 완료되었습니다.');
+      close();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <Form {...form}>
@@ -114,7 +127,7 @@ function OrderForm({ orderData }: { orderData: OrdersDetailData }) {
         </div>
       </div>
 
-      <form onSubmit={form.handleSubmit(() => {})} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="trackingNumber"
