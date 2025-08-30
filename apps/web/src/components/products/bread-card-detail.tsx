@@ -47,7 +47,7 @@ function BreadCardDetail({ bread }: { bread: WithOrderRoundListData[0] }) {
         <AlertDialogDescription hidden>{breadDetail?.description}</AlertDialogDescription>
 
         {/* 이미지 슬라이더 */}
-        <div className="w-full max-w-[500px] mx-auto">
+        <div className="mx-auto">
           {breadDetail?.images && breadDetail?.images?.length > 1 ? (
             <Carousel
               opts={{
@@ -56,16 +56,15 @@ function BreadCardDetail({ bread }: { bread: WithOrderRoundListData[0] }) {
                 slidesToScroll: 1,
                 containScroll: 'trimSnaps',
               }}
-              className="mr-10"
             >
               <CarouselContent>
                 {breadDetail?.images?.map((image, i) => (
                   <CarouselItem key={i}>
-                    <div key={i} className="flex justify-start items-center w-full">
+                    <div key={i} className="flex  w-full">
                       <img
                         src={image.url}
                         alt={`빵 이미지 ${i + 1}`}
-                        className="h-[100px] object-contain rounded"
+                        className="h-[150px] flex-1 object-contain rounded"
                       />
                     </div>
                   </CarouselItem>
