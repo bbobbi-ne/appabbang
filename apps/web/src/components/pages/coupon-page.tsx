@@ -10,15 +10,16 @@ import {
   CardTitle,
   cn,
 } from '@appabbang/ui';
+import { formatIsoToDateTime } from '@appabbang/utils';
 
 export default function CouponPage() {
   const { isLoading, data } = useGetCouponQuery();
 
-  if (isLoading) return <Loading title="쿠폰내역" />;
+  if (isLoading || !data) return <Loading title="쿠폰내역" />;
   return (
     <div className="mt-10">
-      {data?.map((customerCoupon: CouponsListData[number]) => (
-        <Card className="mb-5 hover:bg-muted hover:cursor-pointer">
+      {data.map((customerCoupon: CouponsListData[number]) => (
+        <Card key={customerCoupon.no} className="mb-5">
           <CardHeader>
             <CardTitle className="flex flex-row gap-2">
               <div>{customerCoupon.coupon.amount.toLocaleString()}원</div>
@@ -41,7 +42,13 @@ export default function CouponPage() {
           <CardContent className="flex flex-row justify-between">
             <CardDescription>{customerCoupon.coupon.name}</CardDescription>
             <div className="text-right">
-              {customerCoupon.expiredAt.toString().slice(0, 16).replace('T', ' ')} 까지
+              {customerCoupon.isExpired ? (
+                <del>{formatIsoToDateTime(customerCoupon.expiredAt)} 까지</del>
+              ) : customerCoupon.isUsed ? (
+                <del>{formatIsoToDateTime(customerCoupon.expiredAt)} 까지</del>
+              ) : (
+                <span>{formatIsoToDateTime(customerCoupon.expiredAt)} 까지</span>
+              )}
             </div>
           </CardContent>
         </Card>

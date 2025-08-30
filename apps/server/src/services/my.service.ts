@@ -26,10 +26,16 @@ export const getMyInfo = async (no: number) => {
   return result;
 };
 
-/** 고객의 할인쿠폰 개수 조회 */
+/** 고객의 할인쿠폰 개수 조회 : 사용되었거나 만료된 쿠폰 제외 */
 export const getCustomerCouponCount = async (no: number) => {
   // 고객의 할인정보
-  const data = await prisma.customerCoupon.count({ where: { customerNo: no } });
+  const data = await prisma.customerCoupon.count({
+    where: {
+      customerNo: no,
+      isUsed: false,
+      isExpired: false,
+    },
+  });
   return data;
 };
 
