@@ -128,11 +128,11 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: Contact
   }, [deliveryData]);
 
   /** 쿠폰 기본값 설정 */
-  useEffect(() => {
-    if (myContact && couponData) {
-      setSelectedCoupon(couponData[0]);
-    }
-  }, [myContact, couponData]);
+  // useEffect(() => {
+  //   if (myContact && couponData) {
+  //     setSelectedCoupon(couponData[0]);
+  //   }
+  // }, [myContact, couponData]);
 
   return false ? (
     <OrderFormSkeleton />
@@ -175,8 +175,13 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: Contact
         <div className="flex flex-row items-center gap-2">
           <div className="w-24 min-w-24">내 쿠폰</div>
           <Select
+            defaultValue=""
             value={selectedCoupon?.no.toString() ?? ''}
             onValueChange={(value) => {
+              if (value === 'none') {
+                setSelectedCoupon(undefined);
+                return;
+              }
               setSelectedCoupon(couponData?.find((item: any) => item.no.toString() === value));
             }}
           >
@@ -187,6 +192,7 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: Contact
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>내 쿠폰</SelectLabel>
+                <SelectItem value="none">미적용</SelectItem>
                 {couponData?.map((coupon: any, idx: number) => {
                   return (
                     <SelectItem key={idx} value={coupon.no.toString()}>
