@@ -48,14 +48,13 @@ import PaymentRefundTermsAgreedDialog from '../join/privacy-terms-agreed-dialog'
 
 type Props = {
   isDelivery: boolean;
-  onSubmit: (data: any) => Promise<void>;
   myContact: any;
-  isSubmitting: boolean;
+  buttonArea: (props: { form: any }) => React.ReactNode;
 };
 
 const labelMinWidth = 'min-w-[120px]';
 
-export const OrderForm = ({ isDelivery, onSubmit, myContact, isSubmitting }: Props) => {
+export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
   /** 은행 목록 API */
   const { data: bankData } = useGetCommonCodesQuery('bank_code');
 
@@ -98,11 +97,10 @@ export const OrderForm = ({ isDelivery, onSubmit, myContact, isSubmitting }: Pro
     form.clearErrors('zipcode');
     form.clearErrors('message');
   };
-
-  // 배송지 등록
-  const handleSubmit = async (data: any) => {
-    await onSubmit(data);
-  };
+  // // 주문 생성
+  // const createOrder = async (data: any) => {
+  //   await onSubmit(data);
+  // };
 
   useEffect(() => {
     if (!isDelivery) {
@@ -133,12 +131,7 @@ export const OrderForm = ({ isDelivery, onSubmit, myContact, isSubmitting }: Pro
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(handleSubmit, (error) => {
-          console.log(error);
-        })}
-        className="space-y-4"
-      >
+      <form className="space-y-4">
         {/* 주문자 이름 */}
         <FormField
           control={form.control}
@@ -517,9 +510,8 @@ export const OrderForm = ({ isDelivery, onSubmit, myContact, isSubmitting }: Pro
         )}
 
         <div className="pt-4" />
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
-          주문하기
-        </Button>
+
+        {buttonArea({ form })}
       </form>
     </Form>
   );

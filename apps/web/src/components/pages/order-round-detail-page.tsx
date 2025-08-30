@@ -9,6 +9,7 @@ import {
   SelectLabel,
   SelectItem,
   toast,
+  Button,
 } from '@appabbang/ui';
 import OrderFormSkeleton from '@/components/order/order-form-skeleton';
 import { useLoaderData, useNavigate, useParams } from '@tanstack/react-router';
@@ -24,6 +25,7 @@ import type {
   OrdersCreatePayload,
 } from '@/api/data-contracts';
 import { useGetAvailableCouponQuery } from '@/hooks/use-my';
+import ConfirmDialog from '../order-round/order-confirm-dialog';
 
 /** Main Function */
 export default function OrderRoundDetailPage({ myContact }: { myContact: ContactListData }) {
@@ -90,20 +92,6 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: Contact
   };
 
   const createOrder = async (data: Partial<OrdersCreatePayload>) => {
-    if (totalQuantity < orderRoundData?.minOrderQty) {
-      alert('최소 주문 수량을 확인해주세요.');
-      return;
-    }
-
-    if (totalQuantity > orderRoundData?.maxOrderQty) {
-      alert('최대 주문 수량을 초과하였습니다.');
-      return;
-    }
-
-    if (!window.confirm('주문을 진행하시겠습니까?')) {
-      return;
-    }
-
     const body = {
       ...data,
       orderRoundNo,
@@ -273,8 +261,41 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: Contact
         <OrderForm
           isDelivery={selectedDelivery?.deliveryTypeCode === '10'}
           myContact={myContact}
-          onSubmit={createOrder}
-          isSubmitting={createMutation.isPending}
+          buttonArea={({ form }) => (
+            <>
+              <ConfirmDialog
+                title="주문을 진행하시겠습니까?"
+                description="주문 이후 입금여부를 확인해주세요."
+                onConfirm={(data) => createOrder(data as Partial<OrdersCreatePayload>)}
+                isLoading={createMutation.isPending}
+              >
+                {({ open }) => (
+                  <Button
+                    type="button"
+                    className="w-full"
+                    disabled={createMutation.isPending}
+                    onClick={() => {
+                      form.handleSubmit((data: any) => {
+                        if (totalQuantity < orderRoundData?.minOrderQty) {
+                          toast.error('최소 주문 수량을 확인해주세요.');
+                          return;
+                        }
+
+                        if (totalQuantity > orderRoundData?.maxOrderQty) {
+                          toast.error('최대 주문 수량을 초과하였습니다.');
+                          return;
+                        }
+
+                        open(data);
+                      })();
+                    }}
+                  >
+                    주문하기
+                  </Button>
+                )}
+              </ConfirmDialog>
+            </>
+          )}
         />
       </div>
     </div>
