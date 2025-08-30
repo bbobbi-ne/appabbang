@@ -103,7 +103,16 @@ export const MyAddressList = ({
             <p className="text-sm">{formatMobile(item.recipientMobile ?? '')}</p>
 
             <p className="text-sm text-muted-foreground">배송메세지: {item.message}</p>
-            <Button variant="outline" size="sm" onClick={() => openEdit(item)} className="w-fit">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                openEdit(item);
+              }}
+              className="w-fit"
+            >
               수정하기
             </Button>
           </div>
