@@ -282,6 +282,13 @@ export const update = async (no: number, body: UpdateOrderRequestBody) => {
   });
 };
 
+export const updateTrackingNumber = async (orderNo: number, trackingNumber: string) => {
+  await prisma.order.update({
+    where: { no: orderNo },
+    data: { trackingNumber },
+  });
+};
+
 /** 뱅크코드 이름 조회 */
 export function getBankCodeName(code: string): string {
   return commonCodeMap.bankCodeMap.get(code) || '-';

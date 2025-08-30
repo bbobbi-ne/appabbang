@@ -33,6 +33,9 @@ router.put(
   asyncHandler(orderController.update),
 );
 
+/** patch /orders/{no}/tracking-number : 송장번호 업데이트 */
+router.patch('/:no/tracking-number', orderController.updateTrackingNumber);
+
 /** PUT /orders/{no}/status : 주문 상태 수정 */
 router.put(
   '/:no/status',

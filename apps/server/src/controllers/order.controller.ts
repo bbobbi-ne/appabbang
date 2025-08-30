@@ -75,6 +75,20 @@ export const update = async (req: Request, res: Response) => {
   res.status(200).json({ message: '주문이 수정되었습니다.' });
 };
 
+/** 주문 송장번호 업데이트 */
+export const updateTrackingNumber = async (req: Request, res: Response) => {
+  const { no } = req.params;
+  const { trackingNumber } = req.body;
+
+  if (!trackingNumber) {
+    throw AppError.badRequest('송장번호를 입력해주세요.');
+  }
+
+  await OrderService.updateTrackingNumber(Number(no), trackingNumber);
+
+  res.status(200).json({ message: '송장번호가 업데이트되었습니다.' });
+};
+
 /** 주문 상태 수정 */
 export const updateOrderStatus = async (req: Request, res: Response) => {
   const { no } = req.params;
