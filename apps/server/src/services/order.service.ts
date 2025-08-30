@@ -32,7 +32,7 @@ type CreateOrderRequestBody = Pick<
 type UpdateOrderRequestBody = Partial<Pick<Order, 'orderStatus' | 'trackingNumber'>>;
 
 /** 주문 생성 (비회원, 회원) */
-export const create = async (no: number | undefined, body: CreateOrderRequestBody) => {
+export const create = async (customerNo: number | undefined, body: CreateOrderRequestBody) => {
   const {
     ordererName,
     ordererMobile,
@@ -56,7 +56,23 @@ export const create = async (no: number | undefined, body: CreateOrderRequestBod
     customerCouponNo,
   } = body;
 
-  await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
+    // 이미 주문 했었는지?
+    if (customerNo) {
+      const existingOrder = await tx.order.findFirst({
+        where: {
+          orderRoundNo,
+          customerNo,
+          orderStatus: { notIn: ['50', '51', '52'] },
+        },
+        select: { no: true },
+      });
+
+      if (existingOrder) {
+        throw AppError.badRequest('이미 주문 했었습니다.');
+      }
+    }
+
     // 1. 배송 방법 조회
     const deliveryMethod = await tx.deliveryMethod.findUnique({
       where: { no: deliveryMethodNo },
@@ -69,7 +85,7 @@ export const create = async (no: number | undefined, body: CreateOrderRequestBod
     // 2. 쿠폰 처리
     let discountAmount = 0;
     let couponNo = null;
-    if (no && customerCouponNo) {
+    if (customerNo && customerCouponNo) {
       const customerCoupon = await tx.customerCoupon.findUnique({
         where: { no: customerCouponNo },
         select: {
@@ -85,12 +101,12 @@ export const create = async (no: number | undefined, body: CreateOrderRequestBod
       if (customerCoupon.isUsed) throw AppError.badRequest('이미 사용된 쿠폰입니다.');
       if (customerCoupon.isExpired || customerCoupon.expiredAt < new Date())
         throw AppError.badRequest('만료된 쿠폰입니다.');
-      if (customerCoupon.customerNo !== no)
+      if (customerCoupon.customerNo !== customerNo)
         throw AppError.badRequest('쿠폰 소유자가 일치하지 않습니다.');
 
       await tx.customerCoupon.update({ where: { no: customerCouponNo }, data: { isUsed: true } });
-      couponNo = customerCoupon.coupon.no;
       discountAmount = customerCoupon.coupon.amount || 0;
+      couponNo = customerCoupon.coupon.no;
     }
 
     // 3. 빵 조회
@@ -119,7 +135,8 @@ export const create = async (no: number | undefined, body: CreateOrderRequestBod
     }, 0);
 
     const deliveryMethodFee = deliveryMethod.fee;
-    const calculatedTotalPrice = originPrice - discountAmount + deliveryMethodFee;
+    const discountedPrice = originPrice - discountAmount > 0 ? originPrice - discountAmount : 0;
+    const calculatedTotalPrice = discountedPrice + deliveryMethodFee;
 
     if (calculatedTotalPrice !== totalPrice) {
       throw AppError.badRequest('주문 금액이 일치하지 않습니다.', {
@@ -153,9 +170,9 @@ export const create = async (no: number | undefined, body: CreateOrderRequestBod
         isPaymentRefundTermsAgreed,
         orderRoundNo,
         memo: '',
-        customer: no ? { connect: { no } } : {},
+        customer: customerNo ? { connect: { no: customerNo } } : {},
         coupon: couponNo ? { connect: { no: couponNo } } : {},
-        ...(!no
+        ...(!customerNo
           ? {
               orderPw: await hashPassword(orderPw || ''),
               isPrivacyTermsAgreed,
@@ -166,6 +183,7 @@ export const create = async (no: number | undefined, body: CreateOrderRequestBod
               isPrivacyTermsAgreed: false,
               isServiceTermsAgreed: false,
             }),
+        ...(customerCouponNo && { customerCouponNo }),
       },
     });
 
@@ -201,7 +219,11 @@ export const create = async (no: number | undefined, body: CreateOrderRequestBod
         accountHolderName,
       },
     });
+
+    return newOrder;
   });
+
+  return result.no;
 };
 
 /** 주문 목록 조회 */

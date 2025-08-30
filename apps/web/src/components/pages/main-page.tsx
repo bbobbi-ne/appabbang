@@ -4,20 +4,26 @@ import OrderRoundContent from '@/components/home/order-round-content';
 import SellPopularProducts from '@/components/home/sell-popular-products-content';
 import MainLoading from '@/components/home/loading';
 import Loading from '@/components/common/loading';
-import { useGetOrderRoundLatestQuery } from '@/hooks/use-order-round';
+import { useGetOrderRoundCurrentQuery } from '@/hooks/use-order-round';
+import { useCheckHasOrderQuery } from '@/hooks/use-my';
+import { useAccessTokenStore } from '@/store/session';
 
 function MainPage() {
   /************************************************************************/
+  const { accessToken } = useAccessTokenStore();
+
   /** APIs */
-  /** 1. 최신 주문차수 조회 API */
-  const { isLoading, data, error } = useGetOrderRoundLatestQuery();
+  const { data, isLoading, error } = useGetOrderRoundCurrentQuery();
+  // 로그인 여부를 확인할 수 있는 다른 방법이 없을지?
+  const { data: hasOrder } = useCheckHasOrderQuery(data?.no ?? 0, !!data?.no && !!accessToken);
+
   /************************************************************************/
   if (isLoading) return <MainLoading />;
   if (error || !data) return <Loading />;
 
   return (
     <>
-      <OrderRoundContent data={data} />
+      <OrderRoundContent data={data} hasOrder={!!hasOrder} />
       <SellPopularProducts />
       <InstagramContent />
       <Infomation />

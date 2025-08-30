@@ -3,7 +3,7 @@
  */
 import { Router } from 'express';
 import * as orderRoundController from '@/controllers/order-round.controller';
-import { validate } from '@/middlewares/validators/validate';
+import { paramsNoValidator, validate } from '@/middlewares/validators/validate';
 import { asyncHandler } from '@/middlewares/error.middleware';
 import { optionalAuth, requireAdmin } from '@/middlewares/auth.middleware';
 import {
@@ -14,17 +14,32 @@ import {
 
 const router = Router();
 
+/** GET /order-round/current : 현재 주문차수 조회 (now or next) */
+router.get('/current', asyncHandler(orderRoundController.getCurrent));
+
+/** GET /order-round/open/:no : 오픈된 특정 주문차수 조회 */
+router.get(
+  '/open/:no',
+  optionalAuth,
+  validate(paramsNoValidator),
+  asyncHandler(orderRoundController.getOpenByNo),
+);
+
+/** GET /order-round/:no/now : 주문차수가 진행중인지 확인하는 라우트 */
+router.get(
+  '/:no/is-open',
+  optionalAuth,
+  validate(paramsNoValidator),
+  asyncHandler(orderRoundController.checkOpenByNo),
+);
+
+////////////////////////////////////////////////////////////////////////////////////
+
 /** GET /order-round : 주문차수 목록 조회 */
-router.get('/', optionalAuth, asyncHandler(orderRoundController.getList));
-
-/** GET /order-round/latest : 최신 주문차수 조회 */
-router.get('/latest', optionalAuth, asyncHandler(orderRoundController.getLatest));
-
-/** GET /order-round/now : 현재일자에 진행중인 주문차수 조회 */
-router.get('/now', optionalAuth, asyncHandler(orderRoundController.getNow));
+router.get('/', requireAdmin, asyncHandler(orderRoundController.getList));
 
 /** GET /order-round/{no} : 주문차수 상세 조회 */
-router.get('/:no', optionalAuth, asyncHandler(orderRoundController.getOne));
+router.get('/:no', requireAdmin, asyncHandler(orderRoundController.getOne));
 
 /** POST /order-round : 주문차수 생성 */
 router.post(

@@ -47,6 +47,19 @@ export const getMyInfoDetail = async (id: string) => {
   return result;
 };
 
+/** 내 연락처 조회 */
+export const getMyContact = async (no: number) => {
+  const result = await prisma.customer.findUnique({
+    where: { no },
+    select: {
+      name: true,
+      mobileNumber: true,
+    },
+  });
+
+  return result;
+};
+
 /**
  * 주문 누적금액 조회
  */
@@ -221,6 +234,7 @@ export const getOrders = async (customerNo: number) => {
         no: true,
         orderNumber: true,
         orderStatus: true,
+        orderRoundNo: true,
         createdAt: true,
         orderItems: {
           select: {
@@ -292,10 +306,33 @@ export const getOrder = async (no: number) => {
 };
 
 /** 내 주문 취소 */
-export const cancelOrder = async (no: number, canceledReason: string) => {
+export const cancelOrder = async ({
+  orderNo,
+  customerNo,
+  canceledReason,
+}: {
+  orderNo: number;
+  customerNo: number;
+  canceledReason: string;
+}) => {
   await prisma.$transaction(async (tx) => {
-    await tx.order.update({ where: { no }, data: { orderStatus: '50' } });
-    await tx.payment.update({ where: { orderNo: no }, data: { canceledReason } });
+    await tx.order.update({ where: { no: orderNo, customerNo }, data: { orderStatus: '50' } });
+    await tx.payment.update({ where: { orderNo }, data: { canceledReason } });
+
+    // 이주문에 쿠폰이 사용되었었는지 확인 후 사용되었다면 만료여부를 확인하여 지나지 않았다면 isUse 를 다시 초기화
+    const order = await tx.order.findUnique({ where: { no: orderNo } });
+    if (order?.customerCouponNo && order?.couponNo) {
+      await tx.customerCoupon.update({
+        where: {
+          no: order.customerCouponNo,
+          customerNo,
+          couponNo: order.couponNo,
+          isUsed: true,
+          expiredAt: { gte: new Date() },
+        },
+        data: { isUsed: false },
+      });
+    }
   });
 };
 
@@ -336,20 +373,21 @@ export const getOrderDelivery = async (no: number) => {
 
 /** 내 주문 배송지 조회 */
 export const getOrderAddress = async (no: number) => {
-  const order = await prisma.order.findUnique({ where: { no } });
+  const order = await prisma.order.findUnique({
+    where: { no },
+    select: {
+      address: true,
+      addressDetail: true,
+      zipcode: true,
+      message: true,
+      recipientName: true,
+      recipientMobile: true,
+    },
+  });
 
   if (!order) throw AppError.notFound('주문을 찾을 수 없습니다.');
 
-  const result = {
-    address: order.address,
-    addressDetail: order.addressDetail,
-    zipcode: order.zipcode,
-    message: order.message,
-    recipientName: order.recipientName,
-    recipientMobile: order.recipientMobile,
-  };
-
-  return result;
+  return order;
 };
 
 /** 내 주문 배송지 수정 */
@@ -365,6 +403,24 @@ export const updateOrderAddress = async (
   },
 ) => {
   await prisma.order.update({ where: { no }, data });
+};
+
+/** 내가 주문했던 주문인지 확인하는 메서드 (완료, 취소, 환불 제외) */
+export const checkHasOrder = async (customerNo: number, orderRoundNo: number): Promise<boolean> => {
+  const order = await prisma.order.findFirst({
+    where: {
+      orderRoundNo,
+      customerNo,
+      orderStatus: { notIn: ['40', '50', '51', '52'] },
+      // 완료, 취소요청, 취소완료, 취소완료(환불)
+    },
+    select: {
+      no: true,
+    },
+  });
+
+  const hasOrder = !!order;
+  return hasOrder;
 };
 
 /** 내 쿠폰내역 조회 */
@@ -390,4 +446,40 @@ export const getCouponList = async (customerNo: number) => {
 
   if (!customerCoupon) throw AppError.notFound('고객님의 쿠폰을 찾을 수 없습니다.');
   return customerCoupon;
+};
+
+/** 내 사용 가능한 쿠폰 조회 */
+export const getAvailableCouponList = async (customerNo: number) => {
+  // 오늘기준으로 expiredAt 이 지났는지도 조건 체크 (안지났으면 조회가능)
+  const now = new Date();
+  const customerCoupon = await prisma.customerCoupon.findMany({
+    where: { customerNo, isUsed: false, isExpired: false, expiredAt: { gte: now } },
+    select: {
+      no: true,
+      customerNo: true,
+      couponNo: true,
+      expiredAt: true,
+      coupon: {
+        select: {
+          name: true,
+          amount: true,
+        },
+      },
+    },
+  });
+
+  const result = customerCoupon.map((item) => {
+    const {
+      coupon: { name, amount },
+      ...rest
+    } = item;
+
+    return {
+      ...rest,
+      name,
+      amount,
+    };
+  });
+
+  return result;
 };

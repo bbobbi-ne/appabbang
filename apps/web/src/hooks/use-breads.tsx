@@ -12,10 +12,21 @@ export function useGetBreadsQuery() {
 }
 
 /** 제품 상세 조회 */
-export function useGetBreadQuery(no: number) {
+export function useGetBreadQuery(no: number, enabled = false) {
   return useQuery({
     queryKey: [`/breads/${no}`, '제품 상세'],
     queryFn: () => BreadsService.getOne(no),
+    staleTime: Infinity,
+    retry: 3,
+    enabled,
+  });
+}
+
+/** 빵 목록 조회 (주문차수에 속했는지 포함) */
+export function useGetBreadsWithOrderRoundQuery() {
+  return useQuery({
+    queryKey: ['/breads/with-order-round', '빵 목록 조회'],
+    queryFn: () => BreadsService.getListWithOrderRound(),
     staleTime: Infinity,
     retry: 3,
   });

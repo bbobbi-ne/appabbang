@@ -18,6 +18,15 @@ export function useGetCustomerInfoQuery() {
   });
 }
 
+/** 내 연락처 조회 */
+export function useGetMyContactQuery({ enabled = true }: { enabled: boolean }) {
+  return useQuery({
+    queryKey: ['/my/contact', '내 연락처 조회'],
+    queryFn: MyService.getMyContact,
+    enabled,
+  });
+}
+
 /** 고객 정보 수정 */
 export function useUpdateCustomerMutation() {
   const queryClient = useQueryClient();
@@ -26,6 +35,7 @@ export function useUpdateCustomerMutation() {
     mutationFn: (data: UpdateMyProfilePayload) => MyService.updateCustomer(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/my', '내 정보 조회'] });
+      queryClient.invalidateQueries({ queryKey: ['/my/contact', '내 연락처 조회'] });
     },
   });
 }
@@ -112,7 +122,7 @@ export function useGetOrdersQuery() {
 /** 내 주문 상세 조회 */
 export function useGetOrderQuery(no: number) {
   return useQuery({
-    queryKey: [`/my/order/${no}`, '내 주문 상세 조회'],
+    queryKey: [`/my/orders/${no}`, '내 주문 상세 조회'],
     queryFn: () => MyService.getOrder(no),
   });
 }
@@ -121,10 +131,25 @@ export function useGetOrderQuery(no: number) {
 export function useCancelOrderMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ no, data }: { no: number; data: { canceledReason: string } }) =>
-      MyService.cancelOrder(no, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/my/orders', '내 주문 목록 조회'] });
+    mutationFn: (payload: {
+      no: number;
+      data: { canceledReason: string };
+      orderRoundNo: number;
+    }) => {
+      const { no, data } = payload;
+      return MyService.cancelOrder(no, data);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['/my/orders'] });
+      queryClient.invalidateQueries({
+        queryKey: [`/my/order-rounds/${variables.orderRoundNo}/has-order`],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [`/my/coupons`],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [`/my/coupons/available`],
+      });
     },
   });
 }
@@ -132,7 +157,7 @@ export function useCancelOrderMutation() {
 /** 내 주문 배송(수령) 조회 */
 export function useGetOrderDeliveryQuery(no: number) {
   return useQuery({
-    queryKey: [`/my/order/${no}/delivery`, '내 주문 배송(수령) 조회'],
+    queryKey: [`/my/orders/${no}/delivery`, '내 주문 배송(수령) 조회'],
     queryFn: () => MyService.getOrderDelivery(no),
   });
 }
@@ -140,7 +165,7 @@ export function useGetOrderDeliveryQuery(no: number) {
 /** 주문내역의 배송지 조회 */
 export function useGetOrderAddressQuery(no: number, enabled: boolean) {
   return useQuery({
-    queryKey: [`/my/order/${no}/address`, '주문내역의 배송지 조회'],
+    queryKey: [`/my/orders/${no}/address`, '주문내역의 배송지 조회'],
     queryFn: () => MyService.getOrderAddress(no),
     enabled,
   });
@@ -153,16 +178,34 @@ export function useUpdateOrderAddressMutation() {
     mutationFn: ({ no, data }: { no: number; data: any }) => MyService.updateOrderAddress(no, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: [`/my/order/${variables.no}/address`, '주문내역의 배송지 조회'],
+        queryKey: [`/my/orders/${variables.no}/address`, '주문내역의 배송지 조회'],
       });
     },
   });
 }
+
+/** 주문차수에 내 주문이 있는지 확인 (취소, 환불 제외) */
+export const useCheckHasOrderQuery = (no: number, enabled = false) => {
+  return useQuery({
+    queryKey: [`/my/order-rounds/${no}/has-order`, '내 주문 상세 조회'],
+    queryFn: () => MyService.checkHasOrder(no),
+    enabled,
+  });
+};
 
 /** 현재 보유하고 있는 쿠폰 조회 */
 export function useGetCouponQuery() {
   return useQuery({
     queryKey: ['/my/coupons', '마이페이지 > 쿠폰내역'],
     queryFn: () => MyService.getCouponList(),
+  });
+}
+
+/** 내 사용 가능한 쿠폰 조회 */
+export function useGetAvailableCouponQuery({ enabled = true }: { enabled: boolean }) {
+  return useQuery({
+    queryKey: ['/my/coupons/available', '마이페이지 > 사용 가능한 쿠폰'],
+    queryFn: () => MyService.getAvailableCouponList(),
+    enabled,
   });
 }

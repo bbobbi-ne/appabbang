@@ -31,7 +31,8 @@ export function formatDate(date?: Date): string {
  * @param date Date 객체
  * @returns '2025-08-14 13시45분30초' 형태 문자열
  */
-export function formatDateTime(date: Date): string {
+export function formatDateTime(date?: Date): string {
+  if (!date) return '';
   return format(date, 'yyyy년 MM월 dd일 HH시mm분ss초', { locale: ko });
 }
 

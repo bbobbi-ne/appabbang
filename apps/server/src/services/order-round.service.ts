@@ -2,11 +2,11 @@ import { prisma } from '@/lib/prisma';
 import { UploadedFile } from 'express-fileupload';
 import * as ImageService from './image.service';
 import { AppError } from '@/types';
-import { PrismaClient, Prisma, OrderRound, OrderRoundBread } from '@prisma/client';
+import { PrismaClient, Prisma, OrderRound, OrderRoundBread, Image } from '@prisma/client';
 
 // 1. 주문차수 이미지 공통코드 조회 - 전역 변수로 저장
 let IMAGE_TARGET_TYPE_CODE: string | null = null;
-const IMAGE_TARGET_TYPE_NAME = 'orderRound';
+const IMAGE_TARGET_TYPE_NAME = 'order_rounds';
 
 /** 클라우드 이미지 타입 */
 type ImageProps = {
@@ -564,40 +564,6 @@ export const getLatest = async () => {
 };
 
 /**
- * 현재일자에 진행중인 주문차수 조회
- */
-export const getNow = async () => {
-  const now = new Date();
-
-  const result = await prisma.$transaction(async (tx) => {
-    const data = await tx.orderRound.findFirst({
-      where: {
-        startedAt: { lte: now },
-        endedAt: { gte: now },
-      },
-      select: {
-        no: true,
-        name: true,
-        startedAt: true,
-        endedAt: true,
-        minOrderQty: true,
-        maxOrderQty: true,
-        orderRoundBreads: {
-          select: {
-            orderRoundNo: true,
-            breadNo: true,
-          },
-        },
-      },
-    });
-
-    return data;
-  });
-
-  return result;
-};
-
-/**
  * 현재 시작일자가 포함된 주문차수 조회
  */
 export const selectStartedAtOrderRound = async (startedAt: Date) => {
@@ -659,4 +625,159 @@ export const selectStartedAtOrderRoundUpdate = async (no: number, startedAt: Dat
   });
 
   return result;
+};
+
+/** 진행중(현재일자 기준)인 주문차수 조회 */
+export const getNow = async () => {
+  const now = new Date();
+
+  const result = await prisma.$transaction(async (tx) => {
+    const orderRound = await tx.orderRound.findFirst({
+      where: {
+        startedAt: { lte: now },
+        endedAt: { gte: now },
+      },
+      select: {
+        no: true,
+        name: true,
+        startedAt: true,
+        endedAt: true,
+      },
+    });
+
+    const image = await tx.image.findFirst({
+      where: {
+        imageTargetType: IMAGE_TARGET_TYPE_NAME,
+        imageTargetNo: orderRound?.no,
+        order: 1,
+      },
+      select: {
+        url: true,
+      },
+    });
+
+    return { ...orderRound, orderRoundImageUrl: image?.url || '' };
+  });
+
+  return result;
+};
+
+/** 다음 주문차수 조회 */
+export const getNextOrderRound = async () => {
+  const now = new Date();
+
+  const result = await prisma.$transaction(async (tx) => {
+    // 현재 이후 시작일 중 가장 가까운 주문차수
+    const orderRound = await tx.orderRound.findFirst({
+      where: {
+        startedAt: { gte: now },
+      },
+      select: {
+        no: true,
+        name: true,
+        startedAt: true,
+        endedAt: true,
+      },
+      orderBy: { startedAt: 'asc' }, // 현재 이후 중 가장 빠른 시작일
+    });
+
+    const image = await tx.image.findFirst({
+      where: {
+        imageTargetType: IMAGE_TARGET_TYPE_NAME,
+        imageTargetNo: orderRound?.no,
+        order: 1,
+      },
+      select: {
+        url: true,
+      },
+    });
+
+    return { ...orderRound, orderRoundImageUrl: image?.url || '' };
+  });
+
+  return result;
+};
+
+/** 오픈된 특정 주문차수 조회 */
+export const getOpenByNo = async (no: number) => {
+  const now = new Date();
+
+  const result = await prisma.$transaction(async (tx) => {
+    const orderRound = await tx.orderRound.findFirst({
+      where: {
+        no,
+        startedAt: { lte: now },
+        endedAt: { gte: now },
+      },
+      select: {
+        no: true,
+        name: true,
+        startedAt: true,
+        endedAt: true,
+        minOrderQty: true,
+        maxOrderQty: true,
+        orderRoundBreads: {
+          select: {
+            bread: {
+              select: {
+                no: true,
+                name: true,
+                unitPrice: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const images = await tx.image.findMany({
+      take: 10000,
+      orderBy: [{ no: 'desc' }, { order: 'asc' }],
+      where: {
+        imageTargetType: 'breads',
+        order: 1,
+      },
+      select: {
+        imageTargetNo: true,
+        url: true,
+      },
+    });
+
+    const imageMap = new Map<number, string>();
+    images.forEach((img: Pick<Image, 'imageTargetNo' | 'url'>) => {
+      // imageTargetNo 는 빵 no 와 동일함
+      imageMap.set(img.imageTargetNo, img.url ?? '');
+    });
+
+    const orderRoundBreads = orderRound?.orderRoundBreads.map((item) => ({
+      ...item.bread,
+      images: [
+        ...(imageMap.get(item.bread?.no || 0) ? [{ url: imageMap.get(item.bread?.no || 0) }] : []),
+      ],
+    }));
+
+    return { ...orderRound, orderRoundBreads };
+  });
+
+  return result;
+};
+
+/** 주문차수가 오픈되어있는지 확인하는 메서드 */
+export const checkOpenByNo = async (no: number): Promise<boolean> => {
+  const now = new Date();
+
+  const data = await prisma.orderRound.findUnique({
+    where: {
+      no,
+      startedAt: { lte: now },
+      endedAt: { gte: now },
+    },
+    select: {
+      no: true,
+    },
+  });
+
+  const isOpen = !!data;
+
+  return isOpen;
 };

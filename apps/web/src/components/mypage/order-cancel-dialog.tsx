@@ -31,15 +31,16 @@ import { toast } from '@appabbang/ui';
 type Props = {
   children: React.ReactNode;
   no: number;
+  orderRoundNo: number;
 };
 
-export default function OrderCalcenDialog({ children, no }: Props) {
+export default function OrderCalcenDialog({ children, no, orderRoundNo }: Props) {
   const [open, setOpen] = useState<boolean>(false);
   const cancelOrderMutation = useCancelOrderMutation();
 
   const cancelOrder = async (data: { canceledReason: string }) => {
     try {
-      await cancelOrderMutation.mutateAsync({ no, data });
+      await cancelOrderMutation.mutateAsync({ no, data, orderRoundNo });
       toast.success('주문이 취소되었습니다.');
     } catch (error) {
       toast.error('주문취소에 실패했습니다.');

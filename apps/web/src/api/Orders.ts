@@ -48,12 +48,13 @@ export class Orders<SecurityDataType = unknown> {
       ...params,
     });
   /**
-   * @description 비회원 주문을 생성합니다. (권한: 없음 - 누구나 접근 가능)
+   * @description 주문을 생성합니다. (권한: 선택적 로그인 - 회원/비회원 모두 가능)
    *
    * @tags Orders
    * @name OrdersCreate
-   * @summary 주문 생성 (비회원)
+   * @summary 주문 생성
    * @request POST:/orders
+   * @secure
    * @response `201` `OrdersCreateData` 주문 생성 성공
    */
   ordersCreate = (data: OrdersCreatePayload, params: RequestParams = {}) =>
@@ -61,7 +62,9 @@ export class Orders<SecurityDataType = unknown> {
       path: `/orders`,
       method: "POST",
       body: data,
+      secure: true,
       type: ContentType.Json,
+      format: "json",
       ...params,
     });
   /**

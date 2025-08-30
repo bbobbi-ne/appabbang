@@ -73,3 +73,9 @@ export async function removeImage(req: Request, res: Response) {
     return res.status(500).json({ message: '서버 오류로 삭제에 실패했습니다.' });
   }
 }
+
+/** 빵 목록 조회 (주문차수에 속했는지 포함) */
+export async function getBreadListWithOrderRound(_: Request, res: Response) {
+  const breads = await BreadService.getBreadListWithOrderRound();
+  res.status(200).json(breads);
+}

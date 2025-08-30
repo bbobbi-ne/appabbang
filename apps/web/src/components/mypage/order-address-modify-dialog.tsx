@@ -58,6 +58,7 @@ export default function OrderAddressModifyDialog({ children, no }: Props) {
           onSubmit={updateOrderAddress}
           isLoading={updateOrderAddressMutation.isPending}
           isHidden={true}
+          onCancel={() => setOpen(false)}
         />
       </DialogContent>
     </Dialog>

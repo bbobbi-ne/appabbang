@@ -246,7 +246,7 @@ export const getDeliveryMethodValidator = [
 ];
 
 export const createDeliveryMethodValidator = [
-  body('deliveryType').trim().notEmpty().withMessage('deliveryType는 필수입니다'),
+  body('deliveryTypeCode').trim().notEmpty().withMessage('deliveryTypeCode 필수입니다'),
   body('name').trim().notEmpty().withMessage('name은 필수입니다'),
   body('fee')
     .trim()
@@ -271,7 +271,7 @@ export const updateDeliveryMethodValidator = [
     .isInt()
     .toInt()
     .withMessage('no 를 올바르게 입력해주세요.'),
-  body('deliveryType').trim().notEmpty().withMessage('deliveryType는 필수입니다'),
+  body('deliveryTypeCode').trim().notEmpty().withMessage('deliveryTypeCode는 필수입니다'),
   body('name').trim().notEmpty().withMessage('name은 필수입니다'),
   body('fee')
     .trim()
@@ -302,11 +302,14 @@ export const deleteDeliveryMethodValidator = [
 export const createOrderValidator = [
   body('ordererName').trim().notEmpty().withMessage('ordererName 필수입니다'),
   body('ordererMobile').trim().notEmpty().withMessage('ordererMobile는 필수입니다'),
-  body('address').trim().notEmpty().withMessage('address는 필수입니다'),
-  body('addressDetail').trim().notEmpty().withMessage('addressDetail는 필수입니다'),
-  body('zipcode').trim().notEmpty().withMessage('zipcode는 필수입니다'),
-  body('recipientName').trim().notEmpty().withMessage('recipientName은 필수입니다'),
-  body('recipientMobile').trim().notEmpty().withMessage('recipientMobile은 필수입니다'),
+  ////
+  body('address').trim().optional(), // 옵셔널
+  body('addressDetail').trim().optional(), // 옵셔널
+  body('zipcode').trim().optional(), // 옵셔널
+  body('recipientName').trim().optional(), // 옵셔널
+  body('recipientMobile').trim().optional(), // 옵셔널
+  body('message').trim().optional(),
+  ////
   body('orderItems')
     .exists()
     .withMessage('orderItems는 필수입니다')
@@ -324,6 +327,14 @@ export const createOrderValidator = [
     .isInt({ min: 1 })
     .toInt()
     .withMessage('quantity는 1 이상의 숫자여야 합니다.'),
+  ////
+  body('deliveryTypeCode')
+    .trim()
+    .notEmpty()
+    .withMessage('deliveryTypeCode는 필수입니다')
+    .isIn(['10', '20'])
+    .withMessage('유효한 배송 타입코드가 아닙니다. (10, 20)'),
+  ////
   body('deliveryMethodNo')
     .trim()
     .notEmpty()
@@ -331,6 +342,7 @@ export const createOrderValidator = [
     .isInt()
     .toInt()
     .withMessage('deliveryMethodNo를 올바르게 입력해주세요.'),
+  ////
   body('totalPrice')
     .trim()
     .notEmpty()
@@ -338,9 +350,46 @@ export const createOrderValidator = [
     .isInt()
     .toInt()
     .withMessage('totalPrice는 정수여야 합니다'),
+  ////
   body('bankCode').trim().notEmpty().withMessage('bankCode는 필수입니다'),
   body('accountNumber').trim().notEmpty().withMessage('accountNumber는 필수입니다'),
   body('accountHolderName').trim().notEmpty().withMessage('accountHolderName는 필수입니다'),
+  //// 쿠폰은 옵션
+  body('customerCouponNo')
+    .trim()
+    .optional()
+    .isInt()
+    .toInt()
+    .withMessage('customerCouponNo를 올바르게 입력해주세요.'),
+  ////
+  body('orderRoundNo')
+    .trim()
+    .notEmpty()
+    .withMessage('orderRoundNo는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('orderRoundNo를 올바르게 입력해주세요.'),
+  body('isPaymentRefundTermsAgreed')
+    .trim()
+    .notEmpty()
+    .withMessage('isPaymentRefundTermsAgreed는 필수입니다')
+    .isBoolean()
+    .toBoolean()
+    .withMessage('boolean 타입이어야 합니다.'),
+  ////
+  body('orderPw').trim().optional(), // 옵션
+  body('isServiceTermsAgreed') // 옵션
+    .trim()
+    .optional()
+    .isBoolean()
+    .toBoolean()
+    .withMessage('boolean 타입이어야 합니다.'),
+  body('isPrivacyTermsAgreed') // 옵션
+    .trim()
+    .optional()
+    .isBoolean()
+    .toBoolean()
+    .withMessage('boolean 타입이어야 합니다.'),
 ];
 
 export const updateOrderValidator = [

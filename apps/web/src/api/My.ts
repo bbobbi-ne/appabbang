@@ -18,13 +18,16 @@ import type {
   AddressesListData,
   AddressesUpdateData,
   AddressesUpdatePayload,
+  ContactListData,
+  CouponsAvailableListData,
   CouponsListData,
   GetMyData,
+  OrderRoundsHasOrderListData,
   OrdersAddressListData,
   OrdersAddressUpdateData,
   OrdersAddressUpdatePayload,
-  OrdersCancelPartialUpdateData,
-  OrdersCancelPartialUpdatePayload,
+  OrdersCancelCreateData,
+  OrdersCancelCreatePayload,
   OrdersDeliveryListData,
   OrdersDetailResult,
   OrdersListResult,
@@ -263,20 +266,20 @@ export class My<SecurityDataType = unknown> {
    * @description 주문을 취소합니다. (권한: 고객만)
    *
    * @tags My
-   * @name OrdersCancelPartialUpdate
+   * @name OrdersCancelCreate
    * @summary 내 주문 취소
-   * @request PATCH:/my/orders/{no}/cancel
+   * @request POST:/my/orders/{no}/cancel
    * @secure
-   * @response `200` `OrdersCancelPartialUpdateData` 주문 취소 성공
+   * @response `200` `OrdersCancelCreateData` 주문 취소 성공
    */
-  ordersCancelPartialUpdate = (
+  ordersCancelCreate = (
     no: number,
-    data: OrdersCancelPartialUpdatePayload,
+    data: OrdersCancelCreatePayload,
     params: RequestParams = {},
   ) =>
-    this.http.request<OrdersCancelPartialUpdateData, any>({
+    this.http.request<OrdersCancelCreateData, any>({
       path: `/my/orders/${no}/cancel`,
-      method: "PATCH",
+      method: "POST",
       body: data,
       secure: true,
       type: ContentType.Json,
@@ -343,6 +346,42 @@ export class My<SecurityDataType = unknown> {
       ...params,
     });
   /**
+   * @description 현재 로그인한 고객의 연락처 정보를 조회합니다. (권한: 고객만)
+   *
+   * @tags My
+   * @name ContactList
+   * @summary 내 연락처 조회
+   * @request GET:/my/contact
+   * @secure
+   * @response `200` `ContactListData` 연락처 조회 성공
+   */
+  contactList = (params: RequestParams = {}) =>
+    this.http.request<ContactListData, any>({
+      path: `/my/contact`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 특정 주문이 현재 로그인한 고객이 주문한 것인지 확인합니다. (권한: 선택적 로그인)
+   *
+   * @tags My
+   * @name OrderRoundsHasOrderList
+   * @summary 내가 주문했던 주문인지 확인
+   * @request GET:/my/order-rounds/{no}/has-order
+   * @secure
+   * @response `200` `OrderRoundsHasOrderListData` 주문 확인 성공
+   */
+  orderRoundsHasOrderList = (no: number, params: RequestParams = {}) =>
+    this.http.request<OrderRoundsHasOrderListData, any>({
+      path: `/my/order-rounds/${no}/has-order`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
    * @description 로그인한 고객의 쿠폰 목록을 조회합니다. (권한: 고객만)
    *
    * @tags My
@@ -355,6 +394,24 @@ export class My<SecurityDataType = unknown> {
   couponsList = (params: RequestParams = {}) =>
     this.http.request<CouponsListData, any>({
       path: `/my/coupons`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 로그인한 고객의 사용 가능한 쿠폰 목록을 조회합니다. (권한: 고객만)
+   *
+   * @tags My
+   * @name CouponsAvailableList
+   * @summary 내 사용 가능한 쿠폰 조회
+   * @request GET:/my/coupons/available
+   * @secure
+   * @response `200` `CouponsAvailableListData` 쿠폰 목록 조회 성공
+   */
+  couponsAvailableList = (params: RequestParams = {}) =>
+    this.http.request<CouponsAvailableListData, any>({
+      path: `/my/coupons/available`,
       method: "GET",
       secure: true,
       format: "json",

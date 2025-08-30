@@ -24,6 +24,13 @@ export const getLayoutInfo = async (req: Request, res: Response) => {
   res.status(200).json({ customer, couponCount, totalAmount });
 };
 
+/** 내 연락처 조회 */
+export const getMyContact = async (req: Request, res: Response) => {
+  const customerNo = req.user.no;
+  const contact = await myService.getMyContact(customerNo);
+  res.status(200).json(contact);
+};
+
 /** 내 정보 수정 */
 export const update = async (req: Request, res: Response) => {
   if (!req.user) throw AppError.unauthorized('토큰에 저장된 고객정보를 확인할 수 없습니다.');
@@ -164,7 +171,8 @@ export const cancelOrder = async (req: Request, res: Response) => {
     throw AppError.badRequest('현재는 주문을 취소할 수 없습니다.');
   }
 
-  await myService.cancelOrder(orderNo, canceledReason);
+  const user = req.user;
+  await myService.cancelOrder({ orderNo, customerNo: user.no, canceledReason });
 
   res.status(200).json({ message: '주문이 취소되었습니다.' });
 };
@@ -209,9 +217,27 @@ export const updateOrderAddress = async (req: Request, res: Response) => {
   res.status(200).json({ message: '주문 배송지가 변경되었습니다.' });
 };
 
+/** 내가 주문했던 주문인지 확인하는 메서드 (취소, 환불 제외) */
+export async function checkHasOrder(req: Request, res: Response) {
+  const customerNo = req.user?.no;
+
+  if (!customerNo) return res.status(200).json(false);
+
+  const orderRoundNo = Number(req.params.no);
+  const hasOrder = await myService.checkHasOrder(customerNo, orderRoundNo);
+  res.status(200).json(hasOrder);
+}
+
 /** 쿠폰목록 조회 */
 export const getCouponList = async (req: Request, res: Response) => {
   const customerNo = req.user.no;
   const data = await myService.getCouponList(customerNo);
+  res.status(200).json(data);
+};
+
+/** 내 사용 가능한 쿠폰 조회 */
+export const getAvailableCouponList = async (req: Request, res: Response) => {
+  const customerNo = req.user.no;
+  const data = await myService.getAvailableCouponList(customerNo);
   res.status(200).json(data);
 };

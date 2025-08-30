@@ -4,7 +4,7 @@ import type {
   AddressesCreatePayload,
   AddressesUpdatePayload,
   OrdersAddressUpdatePayload,
-  OrdersCancelPartialUpdatePayload,
+  OrdersCancelCreatePayload,
   UpdateMyPasswordPayload,
   UpdateMyProfilePayload,
 } from '@/api/data-contracts';
@@ -21,6 +21,11 @@ export const MyService = {
   /** 내 정보 조회 */
   getCustomerInfo: async () => {
     const response = await myApi.getMy();
+    return response.data;
+  },
+  /** 내 연락처 조회 */
+  getMyContact: async () => {
+    const response = await myApi.contactList();
     return response.data;
   },
   /** 내 정보 수정 */
@@ -64,8 +69,8 @@ export const MyService = {
     return response.data;
   },
   /** 내 주문 취소 */
-  cancelOrder: async (no: number, data: OrdersCancelPartialUpdatePayload) => {
-    await myApi.ordersCancelPartialUpdate(no, data);
+  cancelOrder: async (no: number, data: OrdersCancelCreatePayload) => {
+    await myApi.ordersCancelCreate(no, data);
   },
   /** 내 주문 배송(수령) 조회 */
   getOrderDelivery: async (no: number) => {
@@ -81,8 +86,19 @@ export const MyService = {
   updateOrderAddress: async (no: number, data: OrdersAddressUpdatePayload) => {
     await myApi.ordersAddressUpdate(no, data);
   },
+  /** 쿠폰 목록 조회 */
   getCouponList: async () => {
     const response = await myApi.couponsList();
+    return response.data;
+  },
+  /** 내 사용 가능한 쿠폰 조회 */
+  getAvailableCouponList: async () => {
+    const response = await myApi.couponsAvailableList();
+    return response.data;
+  },
+  /** 특정 주문차수에 내 주문이 있는지 확인 (취소, 환불 제외) - 주문서 접근 확인 용도 */
+  checkHasOrder: async (no: number) => {
+    const response = await myApi.orderRoundsHasOrderList(no);
     return response.data;
   },
 };

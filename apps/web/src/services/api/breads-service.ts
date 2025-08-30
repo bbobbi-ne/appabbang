@@ -15,4 +15,8 @@ export const BreadsService = {
     const response = await breadsApi.breadsDetail(no);
     return response.data;
   },
+  getListWithOrderRound: async (): Promise<any> => {
+    const response = await breadsApi.withOrderRoundList();
+    return response.data;
+  },
 };

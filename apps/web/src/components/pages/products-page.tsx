@@ -1,31 +1,23 @@
 import { useEffect, useState } from 'react';
 import BreadSearch from '../products/bread-search';
-
 import ProductsLoading from '@/components/products/products-loading';
 import BreadCardDetail from '@/components/products/bread-card-detail';
-import { useGetOrderRoundNowQuery } from '@/hooks/use-order-round';
-import type { BreadsListData } from '@/api/data-contracts';
-import { useGetBreadsQuery } from '@/hooks/use-breads';
+import { useGetBreadsWithOrderRoundQuery } from '@/hooks/use-breads';
+import type { WithOrderRoundListData } from '@/api/data-contracts';
 
 export default function ProductsPage() {
   const [keyword, setKeyword] = useState<string>('');
-  const [breadList, setBreadList] = useState<BreadsListData>([]);
-  const [originBreadList, setOriginBreadList] = useState<BreadsListData>([]);
+  const [breadList, setBreadList] = useState<WithOrderRoundListData>([]);
+  const [originBreadList, setOriginBreadList] = useState<WithOrderRoundListData>([]);
 
-  /** 빵 목록 조회 API */
-  const { isLoading, data, error } = useGetBreadsQuery();
-
-  const { data: nowData, isLoading: nowLoading, isError: nowErr } = useGetOrderRoundNowQuery();
-
+  const { data, isLoading, error } = useGetBreadsWithOrderRoundQuery();
   /** 주문차수 빵 목록 조회 및 설정 */
   useEffect(() => {
     if (data) {
       setBreadList(data);
       setOriginBreadList(data);
     }
-
-    // nowData && setOrderRoundBreads(nowData.data.orderRoundBreads);
-  }, [data, error, nowData, nowErr]);
+  }, [data, error]);
 
   /** enter key 누를때 빵 검색 기능 수행 */
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -54,7 +46,7 @@ export default function ProductsPage() {
     setKeyword(e.target.value);
   };
 
-  return isLoading && nowLoading ? (
+  return isLoading ? (
     <ProductsLoading />
   ) : (
     <div>

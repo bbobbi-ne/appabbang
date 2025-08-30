@@ -1,8 +1,9 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import useToast from '@/hooks/useToast';
 import { useAccessTokenStore } from '@/store/session';
-import { User, NotepadText, LogIn, LogOut } from 'lucide-react';
-import { useGetOrderRoundNowQuery } from '@/hooks/use-order-round';
+import { User, LogIn, LogOut, NotepadText } from 'lucide-react';
+import { useGetOrderRoundCurrentQuery } from '@/hooks/use-order-round';
+import { useCheckHasOrderQuery } from '@/hooks/use-my';
 
 export default function Header() {
   const navigate = useNavigate();
@@ -10,7 +11,9 @@ export default function Header() {
   const { addToast } = useToast();
 
   // 현재 진행중인 주문차수 조회
-  const { isLoading, data } = useGetOrderRoundNowQuery();
+  const { data, isSuccess } = useGetOrderRoundCurrentQuery();
+  // 로그인 여부를 확인할 수 있는 다른 방법이 없을지?
+  const { data: hasOrder } = useCheckHasOrderQuery(data?.no ?? 0, !!data?.no && !!accessToken);
 
   const moveToOrderRoundDetail = (no: number) => {
     navigate({
@@ -38,7 +41,7 @@ export default function Header() {
       <div className="container mx-auto px-2">
         {/* 1 ROW : 아이콘 메뉴 (주문서, 마이페이지, 로그인, 로그아웃) */}
         <nav className="flex items-center justify-end gap-2 lg:gap-4 py-2 bg-background">
-          {!isLoading && data ? (
+          {isSuccess && data && !hasOrder ? (
             <NotepadText
               size={20}
               strokeWidth={1}

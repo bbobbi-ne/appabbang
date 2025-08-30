@@ -9,13 +9,13 @@ const createNameValidation = (type: string) => {
       : '예금주';
 
   return {
-    min: { value: 2, message: `${title} 이름은 2자 이상 입력 바랍니다.` },
-    max: { value: 30, message: `${title} 이름은 30자 이내로 입력 바랍니다.` },
+    min: { value: 2, message: `${title} 이름을 2자 이상 입력해주세요.` },
+    max: { value: 30, message: `${title} 이름을 30자 이내로 입력해주세요.` },
     regex: {
       value: /^[가-힣]{2,30}$/,
-      message: `${title} 이름은 한글 2~30자 입력 가능합니다.`,
+      message: `${title} 이름을 한글 2~30자 입력해주세요.`,
     },
-    required: { message: `${title} 이름을 입력하세요.` },
+    required: { message: `${title} 이름을 입력해주세요.` },
   };
 };
 const ORDERER = createNameValidation('orderer');
@@ -27,8 +27,8 @@ const createMobileNumberValidation = (type: string) => {
   const title = type.includes('orderer') ? '주문자' : '수령인';
 
   return {
-    regex: { value: /^01[016789]-?\d{3,4}-?\d{4}$/g, message: '유효한 휴대번호 양식이 아닙니다.' },
-    required: { message: `${title} 휴대번호를 입력하세요.` },
+    regex: { value: /^01[016789]-?\d{3,4}-?\d{4}$/, message: '유효한 휴대번호 양식이 아닙니다.' },
+    required: { message: `${title} 휴대번호를 입력해주세요.` },
   };
 };
 const ORDERER_MOBILE = createMobileNumberValidation('orderer');
@@ -39,18 +39,18 @@ const createAddressValidation = (type: string) => {
   const title = type.includes('detail') ? '배송지 상세주소' : '배송지 주소';
 
   return {
-    min: { value: 1, message: `${title}는 1자 이상 입력 바랍니다.` },
-    max: { value: 300, message: `${title}는 300자 이내로 입력 바랍니다.` },
-    required: { message: `${title}를 입력하세요.` },
+    min: { value: 1, message: `${title}를 입력해주세요.` },
+    max: { value: 300, message: `${title}는 300자 이내로 입력해주세요.` },
+    required: { message: `${title}를 입력해주세요.` },
   };
 };
 const ADDRESS = createAddressValidation('address');
 const ADDRESS_DTL = createAddressValidation('detail');
 
 const ZIPCODE = {
-  min: { value: 1, message: '우편번호는 1자 이상 입력 바랍니다.' },
-  max: { value: 10, message: '우편번호는 10자 이내로 입력 바랍니다.' },
-  required: { message: '우편번호를 입력하세요.' },
+  min: { value: 1, message: '우편번호를 입력해주세요.' },
+  max: { value: 10, message: '우편번호는 10자 이내로 입력해주세요.' },
+  required: { message: '우편번호를 입력해주세요.' },
 };
 
 const ORDER_ITEMS = {
@@ -66,9 +66,9 @@ const ORDER_ITEMS = {
 };
 
 const ORDER_PW = {
-  min: { value: 4, message: '주문 비밀번호는 4자 이상 입력 바랍니다.' },
-  max: { value: 20, message: '주문 비밀번호는 20자 이하 입력 바랍니다.' },
-  required: { message: '주문 비밀번호를 입력 바랍니다.' },
+  min: { value: 4, message: '주문 비밀번호를 4자 이상 입력해주세요.' },
+  max: { value: 20, message: '주문 비밀번호를 20자 이하로 입력해주세요.' },
+  required: { message: '주문 비밀번호를 입력해주세요.' },
 };
 
 /**
@@ -282,3 +282,179 @@ export const customerOrderFormSchema = z.object({
   orderRoundNo: z.number(),
 });
 export type CustomerOrderFormSchema = z.infer<typeof customerOrderFormSchema>;
+
+/** 고객과 비고객을 합침  */
+export const orderFormSchema = z
+  .object({
+    ordererName: z
+      .string()
+      .trim()
+      .min(ORDERER.min.value, ORDERER.min.message)
+      .max(ORDERER.max.value, ORDERER.max.message)
+      .regex(ORDERER.regex.value, ORDERER.regex.message),
+    ordererMobile: z
+      .string()
+      .trim()
+      .regex(ORDERER_MOBILE.regex.value, ORDERER_MOBILE.regex.message),
+    ////////////////////////
+    recipientName: z.string().trim().optional(),
+    recipientMobile: z.string().trim().optional(),
+    address: z.string().trim().optional(),
+    addressDetail: z.string().trim().optional(),
+    zipcode: z.string().trim().optional(),
+    message: z.string().trim().optional(),
+    ////////////////////////
+    bankCode: z.string().trim().min(1, '은행을 선택해주세요.'),
+    accountNumber: z.string().trim().min(1, '계좌번호를 입력해주세요.'),
+    accountHolderName: z
+      .string()
+      .trim()
+      .min(HOLDER.min.value, HOLDER.min.message)
+      .max(HOLDER.max.value, HOLDER.max.message)
+      .regex(HOLDER.regex.value, HOLDER.required.message),
+    ////////////////////////
+    isPaymentRefundTermsAgreed: z.boolean().refine((val) => val === true, {
+      message: '결제 환불 약관에 동의해주세요.',
+    }),
+    ////////////////////////
+    isServiceTermsAgreed: z.boolean().optional(),
+    isPrivacyTermsAgreed: z.boolean().optional(),
+    orderPw: z.string().trim().optional(),
+    ////////////////////////
+    ////////////////////////
+    isDelivery: z.boolean().optional(),
+    isMember: z.boolean().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.isMember) {
+      if (!data.isServiceTermsAgreed) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '서비스 이용약관에 동의해주세요',
+          path: ['isServiceTermsAgreed'],
+        });
+      }
+
+      if (!data.isPrivacyTermsAgreed) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '개인정보 수집 및 이용 동의에 동의해주세요',
+          path: ['isPrivacyTermsAgreed'],
+        });
+      }
+
+      if (!data.orderPw) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '주문서 비밀번호를 입력해주세요',
+          path: ['orderPw'],
+        });
+      } else if (data.orderPw.length < ORDER_PW.min.value) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: ORDER_PW.min.message,
+          path: ['orderPw'],
+        });
+      } else if (data.orderPw.length > ORDER_PW.max.value) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: ORDER_PW.max.message,
+          path: ['orderPw'],
+        });
+      }
+    }
+
+    if (data.isDelivery) {
+      if (!data.recipientName) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: RECIPIENT.min.message,
+          path: ['recipientName'],
+        });
+      } else if (data.recipientName.length > RECIPIENT.max.value) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: RECIPIENT.max.message,
+          path: ['recipientName'],
+        });
+      } else if (!RECIPIENT.regex.value.test(data.recipientName)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: RECIPIENT.regex.message,
+          path: ['recipientName'],
+        });
+      }
+
+      if (!data.recipientMobile) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: RECIPIENT_MOBILE.required.message,
+          path: ['recipientMobile'],
+        });
+      } else if (!RECIPIENT_MOBILE.regex.value.test(data.recipientMobile)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: RECIPIENT_MOBILE.regex.message,
+          path: ['recipientMobile'],
+        });
+      }
+
+      if (!data.address) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '배송지 주소를 입력해주세요',
+          path: ['address'],
+        });
+      } else if (data.address.length > ADDRESS.max.value) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: ADDRESS.max.message,
+          path: ['address'],
+        });
+      }
+
+      if (!data.addressDetail) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '배송지 상세 주소를 입력해주세요',
+          path: ['addressDetail'],
+        });
+      } else if (data.addressDetail.length > ADDRESS_DTL.max.value) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: ADDRESS_DTL.max.message,
+          path: ['addressDetail'],
+        });
+      }
+
+      if (!data.zipcode) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '우편번호를 입력해주세요',
+          path: ['zipcode'],
+        });
+      } else if (data.zipcode.length > ZIPCODE.max.value) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: ZIPCODE.max.message,
+          path: ['zipcode'],
+        });
+      }
+
+      if (!data.message) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '배송메세지를 입력해주세요',
+          path: ['message'],
+        });
+      } else if (data.message.length > 20) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: '배송메세지는 20자 이내로 입력해주세요',
+          path: ['message'],
+        });
+      }
+    }
+  });
+
+export type OrderFormSchema = z.infer<typeof orderFormSchema>;

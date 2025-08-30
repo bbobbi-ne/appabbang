@@ -73,17 +73,17 @@ export default function MyOrderDetailPage({ orderNo }: { orderNo: number }) {
               <div>{amount.toLocaleString()}원</div>
             </div>
 
-            {!!order.deliveryMethodFee && (
-              <div className="flex flex-row justify-between">
-                <div>배송비</div>
-                <div>{order.deliveryMethodFee.toLocaleString()}원</div>
-              </div>
-            )}
-
             {!!order.discountAmount && (
               <div className="flex flex-row justify-between">
                 <div>쿠폰할인</div>
                 <div>{order.discountAmount.toLocaleString()}원</div>
+              </div>
+            )}
+
+            {!!order.deliveryMethodFee && (
+              <div className="flex flex-row justify-between">
+                <div>배송비</div>
+                <div>{order.deliveryMethodFee.toLocaleString()}원</div>
               </div>
             )}
 
