@@ -230,7 +230,7 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: Contact
         </div>
 
         {/* 금액 요약 */}
-        <div className="flex flex-col items-end">
+        <div className="flex flex-col items-end gap-1">
           <div className="flex flex-row items-center gap-2">
             <p>상품 금액({totalQuantity}개 주문)</p>
             <p className="min-w-40 text-right">{totalBreadPrice.toLocaleString()} 원</p>
@@ -238,18 +238,20 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: Contact
           {selectedCoupon && (
             <div className="flex flex-row items-center gap-2">
               <p>할인금액</p>
-              <p className="min-w-40 text-right">{selectedCoupon?.amount.toLocaleString()} 원</p>
+              <p className="min-w-40 text-right">- {selectedCoupon?.amount.toLocaleString()} 원</p>
             </div>
           )}
           {selectedDelivery?.deliveryTypeCode === '10' && (
             <div className="flex flex-row items-center gap-2">
               <p>배송비</p>
-              <p className="min-w-40 text-right">{selectedDelivery?.fee.toLocaleString()} 원</p>
+              <p className="min-w-40 text-right">{selectedDelivery?.fee?.toLocaleString()} 원</p>
             </div>
           )}
-          <div className="flex flex-row items-center gap-2">
-            <p className="text-lg font-bold">총 금액</p>
-            <p className="font-bold min-w-40 text-right">{totalPrice.toLocaleString()} 원</p>
+          <div className="flex flex-row items-center gap-2 pt-2">
+            <p className="text-xl font-bold">총 금액</p>
+            <p className="text-xl font-bold min-w-40 text-right">
+              {totalPrice.toLocaleString()} 원
+            </p>
           </div>
         </div>
       </div>
