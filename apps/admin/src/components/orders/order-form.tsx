@@ -61,35 +61,39 @@ function OrderForm({ orderData, close }: { orderData: OrdersDetailData; close: (
         </div>
       </div>
 
-      <div className="flex">
-        <div className="flex-1/2">
-          <Label className="font-bold text-xs">수령인</Label>
-          <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
-            {orderData.recipientName}
-          </p>
-        </div>
-        <div className="flex-1/2">
-          <Label className="font-bold text-xs">수령인 전화번호</Label>
-          <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
-            {orderData.recipientMobile}
-          </p>
-        </div>
-      </div>
+      {orderData.deliveryTypeCode !== '20' && (
+        <>
+          <div className="flex">
+            <div className="flex-1/2">
+              <Label className="font-bold text-xs">수령인</Label>
+              <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
+                {orderData.recipientName}
+              </p>
+            </div>
+            <div className="flex-1/2">
+              <Label className="font-bold text-xs">수령인 전화번호</Label>
+              <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
+                {orderData.recipientMobile}
+              </p>
+            </div>
+          </div>
 
-      <div className="flex">
-        <div className="flex-3/5">
-          <Label className="font-bold text-xs">배송지 주소</Label>
-          <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
-            {orderData.address}
-          </p>
-        </div>
-        <div className="flex-2/5">
-          <Label className="font-bold text-xs">배송지 상세주소</Label>
-          <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
-            {orderData.addressDetail} ({orderData.zipcode})
-          </p>
-        </div>
-      </div>
+          <div className="flex">
+            <div className="flex-3/5">
+              <Label className="font-bold text-xs">배송지 주소</Label>
+              <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
+                {orderData.address}
+              </p>
+            </div>
+            <div className="flex-2/5">
+              <Label className="font-bold text-xs">배송지 상세주소</Label>
+              <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
+                {orderData.addressDetail} ({orderData.zipcode})
+              </p>
+            </div>
+          </div>
+        </>
+      )}
 
       <div className="flex">
         <div className="flex-1/4">
@@ -119,12 +123,14 @@ function OrderForm({ orderData, close }: { orderData: OrdersDetailData; close: (
             {orderData.deliveryMethodName}
           </p>
         </div>
-        <div className="flex-3/4">
-          <Label className="font-bold text-xs">배송 메시지</Label>
-          <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
-            {orderData.message}
-          </p>
-        </div>
+        {orderData.deliveryTypeCode !== '20' && (
+          <div className="flex-3/4">
+            <Label className="font-bold text-xs">배송 메시지</Label>
+            <p className="bg-background py-2 text-sm ring-offset-background cursor-not-allowed opacity-50">
+              {orderData.message}
+            </p>
+          </div>
+        )}
       </div>
 
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
