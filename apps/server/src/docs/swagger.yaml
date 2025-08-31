@@ -961,6 +961,7 @@ paths:
                   - message
                   - deliveryMethodName
                   - deliveryMethodFee
+                  - deliveryTypeCode
                   - discountAmount
                   - orderRoundNo
                   - totalPrice
@@ -1027,6 +1028,10 @@ paths:
                     type: integer
                     description: 배송비
                     example: 3000
+                  deliveryTypeCode:
+                    type: string
+                    description: 배송 방법 코드
+                    example: "20"
                   discountAmount:
                     type: integer
                     description: 할인 금액
@@ -1147,6 +1152,66 @@ paths:
       responses:
         '200':
           description: 주문 수정 성공
+
+  /orders/{no}/tracking-number:
+    put:
+      tags: [Orders]
+      summary: 주문 송장번호 수정
+      description: 특정 주문의 송장번호만 수정합니다. (권한: 관리자만)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 주문 번호
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - trackingNumber
+              properties:
+                trackingNumber:
+                  type: string
+                  description: 수정할 송장번호
+                  example: '1234567890'
+      responses:
+        '200':
+          description: 송장번호 수정 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: '송장번호가 수정되었습니다.'
+        '400':
+          description: 잘못된 요청
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: '유효하지 않은 주문 번호입니다.'
+        '404':
+          description: 주문을 찾을 수 없음
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: '주문을 찾을 수 없습니다.'
 
 
   /orders/{no}/status:

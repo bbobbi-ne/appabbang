@@ -2,7 +2,7 @@ import { Orders } from '@/api/Orders';
 import { CustomHttpClient } from './instance';
 import { toast } from '@appabbang/ui';
 import type { QueryFunctionContext } from '@tanstack/react-query';
-import type { StatusUpdateBody } from '@/api/data-contracts';
+import type { StatusUpdateBody, TrackingNumberUpdatePayload } from '@/api/data-contracts';
 import { refreshCreate } from './auth-api';
 
 // ✅ 주문 API 인스턴스 생성
@@ -81,6 +81,40 @@ export const updateOrderStatus = async ({
 
     const message = error.data.message || '주문 상태 업데이트를 실패했습니다.';
     toast.error('주문 상태 업데이트를 실패했습니다.', {
+      description: message,
+    });
+    throw new Error(message);
+  }
+};
+
+/**
+ * 송장번호 업데이트 API
+ *
+ * @param no 주문 번호
+ * @param orderStatus 상태 변경 요청 바디(StatusUpdateBody)
+ *
+ * - 주문의 상태를 변경
+ * - 성공 시 데이터 반환
+ * - 실패 시 toast 알림 및 에러 throw
+ */
+export const updateOrderTrackingNumber = async ({
+  no,
+  data,
+}: {
+  no: number;
+  data: TrackingNumberUpdatePayload;
+}) => {
+  try {
+    const response = await ordersApi.trackingNumberUpdate(no, data);
+    // toast.success('송장번호가 업데이트 되었습니다.');
+    return {
+      data: response.data,
+    };
+  } catch (error: any) {
+    console.log(error, '에러발생');
+
+    const message = error.data.message || '송장번호 업데이트를 실패했습니다.';
+    toast.error('송장번호 업데이트를 실패했습니다.', {
       description: message,
     });
     throw new Error(message);

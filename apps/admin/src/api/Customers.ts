@@ -20,8 +20,8 @@ import type {
   AddressUpdatePayload,
   CheckIdCreateData,
   CheckIdCreatePayload,
-  ComepareCodeCreateData,
-  ComepareCodeCreatePayload,
+  CompareCodeCreateData,
+  CompareCodeCreatePayload,
   CustomersCreateData,
   CustomersCreatePayload,
   CustomersDeleteData,
@@ -164,17 +164,17 @@ export class Customers<SecurityDataType = unknown> {
    * No description
    *
    * @tags Customers
-   * @name ComepareCodeCreate
+   * @name CompareCodeCreate
    * @summary 입력한 인증코드와 해싱된 인증코드를 비교합니다. (권한: 없음 - 누구나 접근가능)
-   * @request POST:/customers/comepare-code
-   * @response `200` `ComepareCodeCreateData` 입력한 인증코드와 해싱된 인증코드 비교 성공
+   * @request POST:/customers/compare-code
+   * @response `200` `CompareCodeCreateData` 입력한 인증코드와 해싱된 인증코드 비교 성공
    */
-  comepareCodeCreate = (
-    data: ComepareCodeCreatePayload,
+  compareCodeCreate = (
+    data: CompareCodeCreatePayload,
     params: RequestParams = {},
   ) =>
-    this.http.request<ComepareCodeCreateData, any>({
-      path: `/customers/comepare-code`,
+    this.http.request<CompareCodeCreateData, any>({
+      path: `/customers/compare-code`,
       method: "POST",
       body: data,
       type: ContentType.Json,

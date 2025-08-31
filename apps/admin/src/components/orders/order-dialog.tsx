@@ -13,12 +13,12 @@ interface orderDetailDialogProps {
 export function OrderDialog({ children, no }: orderDetailDialogProps) {
   return (
     <DialogLayout trigger={children} title="" description="">
-      {({ close }) => <DialogBody no={no} />}
+      {({ close }) => <DialogBody close={close} no={no} />}
     </DialogLayout>
   );
 }
 
-function DialogBody({ no }: { no: number }) {
+function DialogBody({ no, close }: { no: number; close: () => void }) {
   const { data: orderData, isLoading } = useOrderDetailQuery(no);
   const { data: ordersStatus } = useGetOrderStatusQuery();
 
@@ -36,17 +36,14 @@ function DialogBody({ no }: { no: number }) {
       </div>
       <div className="space-y-4 my-4">
         <DialogTitle className="text-base">주문정보</DialogTitle>
-        {!isLoading && (
-          <OrderTable
-            deliveryFee={orderData?.deliveryMethodFee!}
-            orderItem={orderData?.orderItems!}
-          />
-        )}
+        {!isLoading && <OrderTable orderData={orderData!} />}
       </div>
 
       <div className="w-full h-1 bg-muted rounded-r-lg my-4" />
 
-      <div className="space-y-4">{!isLoading && <OrderForm orderData={orderData!} />}</div>
+      <div className="space-y-4">
+        {!isLoading && <OrderForm orderData={orderData!} close={close} />}
+      </div>
     </>
   );
 }

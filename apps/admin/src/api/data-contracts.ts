@@ -350,12 +350,42 @@ export interface ImageDeletePayload {
   publicId: string;
   /**
    * 해당하는 빵의 No
-   * @example "1"
+   * @example 1
    */
   no: number;
 }
 
 export type ImageDeleteData = any;
+
+export type WithOrderRoundListData = {
+  /**
+   * 빵 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 빵 이름
+   * @example "크로아상"
+   */
+  name: string;
+  /**
+   * 빵 설명
+   * @example "바삭한 크로아상"
+   */
+  description: string;
+  images: {
+    /**
+     * 빵 이미지 URL
+     * @example "https://example.com/bread.jpg"
+     */
+    url: string;
+  }[];
+  /**
+   * 현재 주문차수에 속했는지 여부
+   * @example true
+   */
+  isCurrentOrderRound: boolean;
+}[];
 
 export type OrdersListData = {
   /**
@@ -439,12 +469,7 @@ export type OrdersListData = {
   };
 }[];
 
-/**
- * [필수값 안내]
- * - 비회원 주문: ordererName, ordererMobile, recipientName, recipientMobile, address, addressDetail, zipcode, message, orderRoundNo, totalPrice, orderPw, isServiceTermsAgreed, isPrivacyTermsAgreed, deliveryMethodNo, orderItems, bankCode, accountNumber, accountHolderName
- * - 회원 주문: ordererName, ordererMobile, recipientName, recipientMobile, address, addressDetail, zipcode, message, orderRoundNo, totalPrice, deliveryMethodNo, orderItems, bankCode, accountNumber, accountHolderName, customerCouponNo (선택)
- * (상세 예시는 아래 examples 참고)
- */
+/** 주문 생성 */
 export interface OrdersCreatePayload {
   /**
    * 주문자 이름
@@ -460,32 +485,32 @@ export interface OrdersCreatePayload {
    * 수령인 이름
    * @example "홍길동"
    */
-  recipientName: string;
+  recipientName?: string;
   /**
    * 수령인 전화번호
    * @example "010-1234-5678"
    */
-  recipientMobile: string;
+  recipientMobile?: string;
   /**
-   * 주소
+   * 주소 (택배배송시 필수)
    * @example "서울시 강남구"
    */
-  address: string;
+  address?: string;
   /**
-   * 상세주소
+   * 상세주소 (택배배송시 필수)
    * @example "123-45"
    */
-  addressDetail: string;
+  addressDetail?: string;
   /**
-   * 우편번호
+   * 우편번호 (택배배송시 필수)
    * @example "12345"
    */
-  zipcode: string;
+  zipcode?: string;
   /**
-   * 배송 메시지
+   * 배송 메시지 (택배배송시 필수)
    * @example "문 앞에 놓아주세요"
    */
-  message: string;
+  message?: string;
   /**
    * 주문차수 번호
    * @example 1
@@ -560,7 +585,13 @@ export interface OrdersCreatePayload {
   accountHolderName: string;
 }
 
-export type OrdersCreateData = any;
+export interface OrdersCreateData {
+  /**
+   * 생성된 주문 번호
+   * @example 1
+   */
+  no: number;
+}
 
 export interface OrdersDetailData {
   /**
@@ -633,6 +664,11 @@ export interface OrdersDetailData {
    * @example 3000
    */
   deliveryMethodFee: number;
+  /**
+   * 배송 방법 코드
+   * @example "20"
+   */
+  deliveryTypeCode: string;
   /**
    * 할인 금액
    * @example 0
@@ -736,6 +772,29 @@ export interface OrdersUpdatePayload {
 }
 
 export type OrdersUpdateData = any;
+
+export interface TrackingNumberUpdatePayload {
+  /**
+   * 수정할 송장번호
+   * @example "1234567890"
+   */
+  trackingNumber: string;
+}
+
+export interface TrackingNumberUpdateData {
+  /** @example "송장번호가 수정되었습니다." */
+  message?: string;
+}
+
+export type TrackingNumberUpdateError =
+  | {
+      /** @example "유효하지 않은 주문 번호입니다." */
+      error?: string;
+    }
+  | {
+      /** @example "주문을 찾을 수 없습니다." */
+      error?: string;
+    };
 
 export interface StatusUpdateBody {
   /**
@@ -1103,6 +1162,101 @@ export interface OrderRoundUpdatePayload {
 
 export type OrderRoundUpdateData = any;
 
+export interface CurrentListData {
+  /**
+   * 주문차수 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 주문차수명
+   * @example "주문 1차"
+   */
+  name: string;
+  /**
+   * 시작일시
+   * @format date-time
+   * @example "2025-07-01T11:00:00.000Z"
+   */
+  startedAt: string;
+  /**
+   * 종료일시
+   * @format date-time
+   * @example "2025-07-31T11:00:00.000Z"
+   */
+  endedAt: string;
+  /**
+   * 주문차수 이미지 URL
+   * @example "https://example.com/image.jpg"
+   */
+  orderRoundImageUrl: string;
+}
+
+export interface OpenDetailData {
+  /**
+   * 주문차수 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 주문차수명
+   * @example "주문 1차"
+   */
+  name: string;
+  /**
+   * 시작일시
+   * @format date-time
+   * @example "2025-07-01T11:00:00.000Z"
+   */
+  startedAt: string;
+  /**
+   * 종료일시
+   * @format date-time
+   * @example "2025-07-31T11:00:00.000Z"
+   */
+  endedAt: string;
+  /**
+   * 최소주문수량
+   * @example 1
+   */
+  minOrderQty: number;
+  /**
+   * 최대주문수량
+   * @example 999
+   */
+  maxOrderQty: number;
+  orderRoundBreads: {
+    /**
+     * 빵 번호
+     * @example 1
+     */
+    no: number;
+    /**
+     * 빵 이름
+     * @example "단팥빵"
+     */
+    name: string;
+    /**
+     * 가격
+     * @example 1000
+     */
+    unitPrice: number;
+    images?: {
+      /**
+       * 이미지 URL
+       * @example "https://example.com/image.jpg"
+       */
+      url?: string;
+    }[];
+  }[];
+}
+
+/**
+ * 진행중 여부 (true: 진행중, false: 진행중이 아님)
+ * @example true
+ */
+export type IsOpenListData = boolean;
+
 export interface ImageDeleteBody {
   /**
    * 삭제할 이미지의 공개 ID
@@ -1336,6 +1490,11 @@ export interface EmailCreatePayload {
 
 export interface EmailCreateData {
   /**
+   * 고객번호
+   * @example 1
+   */
+  no: number;
+  /**
    * 이메일
    * @example "test1231@naver.com"
    */
@@ -1384,7 +1543,7 @@ export interface IdEmailCreateData {
   email: string;
 }
 
-export interface ComepareCodeCreatePayload {
+export interface CompareCodeCreatePayload {
   /**
    * 입력한 인증코드
    * @example 123456
@@ -1395,9 +1554,19 @@ export interface ComepareCodeCreatePayload {
    * @example "$2b$12$KB5rI6XED.9o5LHGpE3.7u8yiX32SXDSgDm/NWiZQjQOfWpq/wKqi"
    */
   hashedCode: string;
+  /**
+   * 사용자 아이디
+   * @example "test000001"
+   */
+  id?: string;
+  /**
+   * 사용자 이메일
+   * @example "test1231@naver.com"
+   */
+  email?: string;
 }
 
-export interface ComepareCodeCreateData {
+export interface CompareCodeCreateData {
   /**
    * 인증번호 비교 결과
    * @example 200
@@ -1639,7 +1808,7 @@ export type DeliveryMethodsListData = {
    * 배송 타입 (10-택배배송, 20-직접수령, 90-기타)
    * @example "10"
    */
-  deliveryType: "10" | "20" | "90";
+  deliveryTypeCode: "10" | "20" | "90";
   /**
    * 배송 타입 이름 (쿼리 파라미터가 있을 때만 포함)
    * @example "택배배송"
@@ -1664,7 +1833,7 @@ export interface DeliveryMethodsCreatePayload {
    * 배송 타입 (10-택배배송, 20-직접수령, 90-기타)
    * @example "10"
    */
-  deliveryType: "10" | "20" | "90";
+  deliveryTypeCode: "10" | "20" | "90";
   /**
    * 배송 방법 이름
    * @example "우체국"
@@ -1714,7 +1883,7 @@ export type ActiveListData = {
    * 배송 타입 (10-택배배송, 20-직접수령, 90-기타)
    * @example "10"
    */
-  deliveryType: "10" | "20" | "90";
+  deliveryTypeCode: "10" | "20" | "90";
   /**
    * 배송 타입 이름
    * @example "택배배송"
@@ -1764,7 +1933,7 @@ export interface DeliveryMethodsDetailData {
    * 배송 타입 (10-택배배송, 20-직접수령, 90-기타)
    * @example "10"
    */
-  deliveryType: "10" | "20" | "90";
+  deliveryTypeCode: "10" | "20" | "90";
   /**
    * 배송 타입 이름
    * @example "택배배송"
@@ -1789,7 +1958,7 @@ export interface DeliveryMethodsUpdatePayload {
    * 배송 타입 (10-택배배송, 20-직접수령, 90-기타)
    * @example "10"
    */
-  deliveryType: "10" | "20" | "90";
+  deliveryTypeCode: "10" | "20" | "90";
   /**
    * 배송 방법 이름
    * @example "우체국"
@@ -2243,102 +2412,37 @@ export interface RefundUpdatePayload {
 export type RefundUpdateData = any;
 
 export interface GetMyData {
-  customer: {
-    /**
-     * 고객 번호
-     * @example 1
-     */
-    no: number;
-    /**
-     * 고객 ID
-     * @example "customer123"
-     */
-    id: string;
-    /**
-     * 고객명
-     * @example "홍길동"
-     */
-    name: string;
-    /**
-     * 전화번호
-     * @example "010-1234-5678"
-     */
-    mobileNumber: string;
-    /**
-     * 기본 배송지 번호
-     * @example 1
-     */
-    defaultAddressNo: number;
-    /**
-     * 생성일시
-     * @format date-time
-     * @example "2024-01-01T00:00:00.000Z"
-     */
-    createdAt: string;
-    /** 배송지 목록 */
-    address: {
-      /**
-       * 배송지 번호
-       * @example 1
-       */
-      no?: number;
-      /**
-       * 주소
-       * @example "서울시 강남구"
-       */
-      address?: string;
-      /**
-       * 상세주소
-       * @example "123-45"
-       */
-      addressDetail?: string;
-    }[];
-    /** 고객 쿠폰 목록 */
-    customerCoupon: {
-      /**
-       * 고객 쿠폰 번호
-       * @example 1
-       */
-      no?: number;
-      coupon?: {
-        /**
-         * 쿠폰명
-         * @example "첫 로그인 쿠폰"
-         */
-        name?: string;
-        /**
-         * 할인 금액
-         * @example 3000
-         */
-        amount?: number;
-      };
-    }[];
-  };
-  /** 할인 정보 */
-  coupon: {
-    /**
-     * 고객 쿠폰 번호
-     * @example 1
-     */
-    no?: number;
-    coupon?: {
-      /**
-       * 쿠폰명
-       * @example "첫 로그인 쿠폰"
-       */
-      name?: string;
-      /**
-       * 할인 금액
-       * @example 3000
-       */
-      amount?: number;
-    };
-  }[];
   /**
-   * 주문 누적 금액
-   * @example 150000
+   * 고객 번호
+   * @example 1
    */
-  totalAmount: number;
+  no: number;
+  /**
+   * 고객 ID
+   * @example "customer123"
+   */
+  id: string;
+  /**
+   * 고객 email
+   * @example "test1231@naver.com"
+   */
+  email: string;
+  /**
+   * 고객명
+   * @example "홍길동"
+   */
+  name: string;
+  /**
+   * 전화번호
+   * @example "010-1234-5678"
+   */
+  mobileNumber: string;
+  /**
+   * 생성일시
+   * @format date-time
+   * @example "2024-01-01T00:00:00.000Z"
+   */
+  createdAt: string;
 }
 
 export interface UpdateMyProfilePayload {
@@ -2392,6 +2496,52 @@ export interface UpdateMyProfileData {
    * @example "2024-01-01T00:00:00.000Z"
    */
   updatedAt: string;
+}
+
+export interface SummaryListData {
+  customer: {
+    /**
+     * 고객 번호
+     * @example 1
+     */
+    no: number;
+    /**
+     * 고객 ID
+     * @example "customer123"
+     */
+    id: string;
+    /**
+     * 고객 email
+     * @example "test1231@naver.com"
+     */
+    email: string;
+    /**
+     * 고객명
+     * @example "홍길동"
+     */
+    name: string;
+    /**
+     * 전화번호
+     * @example "010-1234-5678"
+     */
+    mobileNumber: string;
+    /**
+     * 생성일시
+     * @format date-time
+     * @example "2024-01-01T00:00:00.000Z"
+     */
+    createdAt: string;
+  };
+  /**
+   * 총 보유 쿠폰 수
+   * @example 1
+   */
+  couponCount: number;
+  /**
+   * 주문 누적 금액
+   * @example 150000
+   */
+  totalAmount: number;
 }
 
 export interface UpdateMyPasswordPayload {
@@ -2557,6 +2707,11 @@ export type OrdersListResult = {
    */
   orderStatusName: string;
   /**
+   * 주문차수 번호
+   * @example 1
+   */
+  orderRoundNo: number;
+  /**
    * 주문 생성일시
    * @format date-time
    * @example "2024-08-25T15:55:20.000Z"
@@ -2645,7 +2800,7 @@ export interface OrdersDetailResult {
   }[];
 }
 
-export interface OrdersCancelPartialUpdatePayload {
+export interface OrdersCancelCreatePayload {
   /**
    * 취소 사유
    * @example "주문 취소 요청"
@@ -2653,7 +2808,7 @@ export interface OrdersCancelPartialUpdatePayload {
   canceledReason: string;
 }
 
-export type OrdersCancelPartialUpdateData = any;
+export type OrdersCancelCreateData = any;
 
 export interface OrdersDeliveryListData {
   /** @example 1 */
@@ -2798,7 +2953,107 @@ export interface OrdersAddressUpdateData {
   recipientMobile: string;
 }
 
+export interface ContactListData {
+  /**
+   * 이름
+   * @example "홍길동"
+   */
+  name: string;
+  /**
+   * 전화번호
+   * @example "010-1234-5678"
+   */
+  mobileNumber: string;
+}
+
+/**
+ * 주문 여부 (true: 주문함, false: 주문하지 않음)
+ * @example true
+ */
+export type OrderRoundsHasOrderListData = boolean;
+
 export type CouponsListData = {
+  /**
+   * 고객-쿠폰 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 쿠폰 발급일
+   * @format date-time
+   * @example "2024-01-01T00:00:00.000Z"
+   */
+  issuedAt: string;
+  /**
+   * 쿠폰 만료일
+   * @format date-time
+   * @example "2024-01-31T00:00:00.000Z"
+   */
+  expiredAt: string;
+  /**
+   * 사용여부
+   * @example false
+   */
+  isUsed: boolean;
+  /**
+   * 만료여부
+   * @example false
+   */
+  isExpired: boolean;
+  coupon: {
+    /**
+     * 쿠폰번호
+     * @example 1
+     */
+    no: number;
+    /**
+     * 쿠폰명
+     * @example "회원가입 쿠폰"
+     */
+    name: string;
+    /**
+     * 할인금액
+     * @example 10000
+     */
+    amount: string;
+  };
+}[];
+
+export type CouponsAvailableListData = {
+  /**
+   * 쿠폰 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 고객 번호
+   * @example 1
+   */
+  customerNo: number;
+  /**
+   * 쿠폰 번호
+   * @example 1
+   */
+  couponNo: number;
+  /**
+   * 쿠폰 만료일
+   * @format date-time
+   * @example "2024-01-31T00:00:00.000Z"
+   */
+  expiredAt: string;
+  /**
+   * 쿠폰명
+   * @example "첫 로그인 쿠폰"
+   */
+  name: string;
+  /**
+   * 할인 금액 (원)
+   * @example 3000
+   */
+  amount: number;
+}[];
+
+export type CouponsListResult = {
   /**
    * 쿠폰 번호
    * @example 1
