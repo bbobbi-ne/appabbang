@@ -665,6 +665,11 @@ export interface OrdersDetailData {
    */
   deliveryMethodFee: number;
   /**
+   * 배송 방법 코드
+   * @example "20"
+   */
+  deliveryTypeCode: string;
+  /**
    * 할인 금액
    * @example 0
    */
@@ -768,7 +773,7 @@ export interface OrdersUpdatePayload {
 
 export type OrdersUpdateData = any;
 
-export interface TrackingNumberPartialUpdatePayload {
+export interface TrackingNumberUpdatePayload {
   /**
    * 수정할 송장번호
    * @example "1234567890"
@@ -776,12 +781,12 @@ export interface TrackingNumberPartialUpdatePayload {
   trackingNumber: string;
 }
 
-export interface TrackingNumberPartialUpdateData {
+export interface TrackingNumberUpdateData {
   /** @example "송장번호가 수정되었습니다." */
   message?: string;
 }
 
-export type TrackingNumberPartialUpdateError =
+export type TrackingNumberUpdateError =
   | {
       /** @example "유효하지 않은 주문 번호입니다." */
       error?: string;
