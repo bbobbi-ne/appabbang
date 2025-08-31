@@ -402,6 +402,16 @@ export const updateOrderValidator = [
   body('trackingNumber').trim().optional(),
 ];
 
+export const updateOrderTrackingNumberValidator = [
+  param('no')
+    .exists()
+    .withMessage('no는 필수입니다')
+    .isInt()
+    .toInt()
+    .withMessage('no 를 올바르게 입력해주세요.'),
+  body('trackingNumber').trim().notEmpty().withMessage('trackingNumber 필수입니다'),
+];
+
 export const updateOrderStatusValidator = [
   param('no')
     .exists()
