@@ -2,7 +2,7 @@ import { Orders } from '@/api/Orders';
 import { CustomHttpClient } from './instance';
 import { toast } from '@appabbang/ui';
 import type { QueryFunctionContext } from '@tanstack/react-query';
-import type { StatusUpdateBody, TrackingNumberPartialUpdatePayload } from '@/api/data-contracts';
+import type { StatusUpdateBody, TrackingNumberUpdatePayload } from '@/api/data-contracts';
 import { refreshCreate } from './auth-api';
 
 // ✅ 주문 API 인스턴스 생성
@@ -102,10 +102,10 @@ export const updateOrderTrackingNumber = async ({
   data,
 }: {
   no: number;
-  data: TrackingNumberPartialUpdatePayload;
+  data: TrackingNumberUpdatePayload;
 }) => {
   try {
-    const response = await ordersApi.trackingNumberPartialUpdate(no, data);
+    const response = await ordersApi.trackingNumberUpdate(no, data);
     // toast.success('송장번호가 업데이트 되었습니다.');
     return {
       data: response.data,
