@@ -282,6 +282,7 @@ export const update = async (no: number, body: UpdateOrderRequestBody) => {
   });
 };
 
+/** 주문 송장번호 수정 */
 export const updateTrackingNumber = async (orderNo: number, trackingNumber: string) => {
   await prisma.order.update({
     where: { no: orderNo },

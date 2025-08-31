@@ -80,10 +80,6 @@ export const updateTrackingNumber = async (req: Request, res: Response) => {
   const { no } = req.params;
   const { trackingNumber } = req.body;
 
-  if (!trackingNumber) {
-    throw AppError.badRequest('송장번호를 입력해주세요.');
-  }
-
   await OrderService.updateTrackingNumber(Number(no), trackingNumber);
 
   res.status(200).json({ message: '송장번호가 업데이트되었습니다.' });
