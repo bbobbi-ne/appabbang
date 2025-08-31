@@ -7,8 +7,6 @@ function OrderTable({ orderData }: { orderData: OrdersDetailData }) {
     return acc + item.totalPrice;
   }, 0);
 
-  console.log(orderData.discountAmount);
-
   return (
     <>
       <div
