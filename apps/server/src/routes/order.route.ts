@@ -3,6 +3,7 @@ import * as orderController from '@/controllers/order.controller';
 import {
   createOrderValidator,
   updateOrderStatusValidator,
+  updateOrderTrackingNumberValidator,
   updateOrderValidator,
   validate,
 } from '@/middlewares/validators/validate';
@@ -34,7 +35,12 @@ router.put(
 );
 
 /** patch /orders/{no}/tracking-number : 송장번호 업데이트 */
-router.patch('/:no/tracking-number', orderController.updateTrackingNumber);
+router.put(
+  '/:no/tracking-number',
+  requireAdmin,
+  validate(updateOrderTrackingNumberValidator),
+  asyncHandler(orderController.updateTrackingNumber),
+);
 
 /** PUT /orders/{no}/status : 주문 상태 수정 */
 router.put(
