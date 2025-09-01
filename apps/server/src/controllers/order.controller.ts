@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import * as OrderService from '@/services/order.service';
 import * as paymentService from '@/services/payment.service';
 import { AppError } from '@/types';
+import { comparePassword } from '@/services/auth.service';
 
 /** 주문 목록 조회 */
 export const getList = async (_: Request, res: Response) => {
@@ -111,4 +112,33 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
   }
 
   res.status(200).json({ message: '주문 상태가 수정되었습니다.' });
+};
+
+/** [비회원] 주문 목록 조회 */
+export const getGuestOrders = async (req: Request, res: Response) => {
+  const { ordererName, ordererMobile, ordererEmail, orderPw } = req.body;
+  console.log();
+  if (!ordererName || !ordererMobile || !ordererEmail || !orderPw)
+    throw AppError.notFound('비회원 로그인 정보를 입력 바랍니다.');
+
+  // 비회원 정보로 입력된 주문 목록 조회
+  const guestOrders = await OrderService.getGuestOrders({
+    ordererName,
+    ordererMobile,
+    ordererEmail,
+  });
+  const matchedOrders = new Array();
+
+  // list 중에서 orderPw와 compare해서 일치하는 주문목록만 matchedOrders에 담기
+  for (const order of guestOrders) {
+    if (order.orderPw && (await comparePassword(String(orderPw), order.orderPw))) {
+      matchedOrders.push(order);
+    }
+  }
+
+  if (matchedOrders.length === 0) {
+    throw AppError.notFound('비회원 정보와 일치하는 주문목록이 존재하지 않습니다.');
+  }
+
+  res.status(200).json(matchedOrders);
 };

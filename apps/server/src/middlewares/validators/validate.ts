@@ -606,7 +606,7 @@ export const cancelOrderValidator = [
 //// GUEST ////////////////////////////////////////////////////////////////////
 /** 주문자 검증 */
 const ORDERER = {
-  key: 'orderer',
+  key: 'ordererName',
   length: { min: 2, max: 20, message: '주문자는 2~30자 내로 입력해야 합니다.' },
   matches: {
     value: /^[가-힣]{2,30}$/,
@@ -616,7 +616,7 @@ const ORDERER = {
 };
 
 const MOBILE_NUMBER = {
-  key: 'mobileNumber',
+  key: 'ordererMobile',
   matches: { value: /^01[016789]-?\d{3,4}-?\d{4}$/g, message: '유효한 휴대번호 양식이 아닙니다.' },
   string: { message: '휴대번호는 문자열로 입력해야 합니다.' },
 };
@@ -628,14 +628,14 @@ const ORDER_PW = {
 };
 
 const EMAIL = {
-  key: 'email',
+  key: 'ordererEmail',
   length: { min: 1, max: 50, message: '이메일은 1~50자 이내 입력 바랍니다.' },
   matches: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/g, message: '유효한 이메일 형식이 아닙니다.' },
   string: { message: '이메일은 문자열로 입력 바랍니다.' },
 };
 
 /** 비회원 로그인 */
-export const loginGuestValidator = [
+export const guestValidator = [
   body(ORDERER.key)
     .notEmpty()
     .matches(ORDERER.matches.value)

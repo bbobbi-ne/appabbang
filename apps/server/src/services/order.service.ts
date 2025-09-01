@@ -302,3 +302,28 @@ export function getBankCodeName(code: string): string {
 export function getOrderStatusName(code: string): string {
   return commonCodeMap.orderStatusMap.get(code) || '-';
 }
+
+/** [비회원] 주문 목록 조회 */
+export const getGuestOrders = async ({
+  ordererName,
+  ordererMobile,
+  ordererEmail,
+}: {
+  ordererName: string;
+  ordererMobile: string;
+  ordererEmail: string;
+}) => {
+  const orders = await prisma.order.findMany({
+    where: {
+      ordererName,
+      ordererMobile,
+      ordererEmail,
+    },
+    include: {
+      payment: { select: { isPaid: true } },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return orders;
+};

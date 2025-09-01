@@ -22,6 +22,7 @@ import { Route as SubPageBrandImport } from './routes/_sub-page/brand'
 import { Route as SubPageOrderRoundIndexImport } from './routes/_sub-page/order-round/index'
 import { Route as SubPageMypageIndexImport } from './routes/_sub-page/mypage/index'
 import { Route as SubPageOrderRoundOrderRoundNoImport } from './routes/_sub-page/order-round/$orderRoundNo'
+import { Route as SubPageGuestOrderListImport } from './routes/_sub-page/guest/order-list'
 import { Route as SubPageMypagePasswordIndexImport } from './routes/_sub-page/mypage/password/index'
 import { Route as SubPageMypageOrderListIndexImport } from './routes/_sub-page/mypage/order-list/index'
 import { Route as SubPageMypageInfoIndexImport } from './routes/_sub-page/mypage/info/index'
@@ -98,6 +99,12 @@ const SubPageOrderRoundOrderRoundNoRoute =
     path: '/order-round/$orderRoundNo',
     getParentRoute: () => rootRoute,
   } as any)
+
+const SubPageGuestOrderListRoute = SubPageGuestOrderListImport.update({
+  id: '/_sub-page/guest/order-list',
+  path: '/guest/order-list',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const SubPageMypagePasswordIndexRoute = SubPageMypagePasswordIndexImport.update(
   {
@@ -206,6 +213,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CallbackKakaoImport
       parentRoute: typeof rootRoute
     }
+    '/_sub-page/guest/order-list': {
+      id: '/_sub-page/guest/order-list'
+      path: '/guest/order-list'
+      fullPath: '/guest/order-list'
+      preLoaderRoute: typeof SubPageGuestOrderListImport
+      parentRoute: typeof rootRoute
+    }
     '/_sub-page/order-round/$orderRoundNo': {
       id: '/_sub-page/order-round/$orderRoundNo'
       path: '/order-round/$orderRoundNo'
@@ -290,6 +304,7 @@ export interface FileRoutesByFullPath {
   '/faq': typeof SubPageFaqRoute
   '/products': typeof SubPageProductsRoute
   '/callback/kakao': typeof CallbackKakaoRoute
+  '/guest/order-list': typeof SubPageGuestOrderListRoute
   '/order-round/$orderRoundNo': typeof SubPageOrderRoundOrderRoundNoRoute
   '/mypage': typeof SubPageMypageIndexRoute
   '/order-round': typeof SubPageOrderRoundIndexRoute
@@ -311,6 +326,7 @@ export interface FileRoutesByTo {
   '/faq': typeof SubPageFaqRoute
   '/products': typeof SubPageProductsRoute
   '/callback/kakao': typeof CallbackKakaoRoute
+  '/guest/order-list': typeof SubPageGuestOrderListRoute
   '/order-round/$orderRoundNo': typeof SubPageOrderRoundOrderRoundNoRoute
   '/mypage': typeof SubPageMypageIndexRoute
   '/order-round': typeof SubPageOrderRoundIndexRoute
@@ -333,6 +349,7 @@ export interface FileRoutesById {
   '/_sub-page/faq': typeof SubPageFaqRoute
   '/_sub-page/products': typeof SubPageProductsRoute
   '/callback/kakao': typeof CallbackKakaoRoute
+  '/_sub-page/guest/order-list': typeof SubPageGuestOrderListRoute
   '/_sub-page/order-round/$orderRoundNo': typeof SubPageOrderRoundOrderRoundNoRoute
   '/_sub-page/mypage/': typeof SubPageMypageIndexRoute
   '/_sub-page/order-round/': typeof SubPageOrderRoundIndexRoute
@@ -356,6 +373,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/products'
     | '/callback/kakao'
+    | '/guest/order-list'
     | '/order-round/$orderRoundNo'
     | '/mypage'
     | '/order-round'
@@ -376,6 +394,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/products'
     | '/callback/kakao'
+    | '/guest/order-list'
     | '/order-round/$orderRoundNo'
     | '/mypage'
     | '/order-round'
@@ -396,6 +415,7 @@ export interface FileRouteTypes {
     | '/_sub-page/faq'
     | '/_sub-page/products'
     | '/callback/kakao'
+    | '/_sub-page/guest/order-list'
     | '/_sub-page/order-round/$orderRoundNo'
     | '/_sub-page/mypage/'
     | '/_sub-page/order-round/'
@@ -418,6 +438,7 @@ export interface RootRouteChildren {
   SubPageFaqRoute: typeof SubPageFaqRoute
   SubPageProductsRoute: typeof SubPageProductsRoute
   CallbackKakaoRoute: typeof CallbackKakaoRoute
+  SubPageGuestOrderListRoute: typeof SubPageGuestOrderListRoute
   SubPageOrderRoundOrderRoundNoRoute: typeof SubPageOrderRoundOrderRoundNoRoute
   SubPageMypageIndexRoute: typeof SubPageMypageIndexRoute
   SubPageOrderRoundIndexRoute: typeof SubPageOrderRoundIndexRoute
@@ -439,6 +460,7 @@ const rootRouteChildren: RootRouteChildren = {
   SubPageFaqRoute: SubPageFaqRoute,
   SubPageProductsRoute: SubPageProductsRoute,
   CallbackKakaoRoute: CallbackKakaoRoute,
+  SubPageGuestOrderListRoute: SubPageGuestOrderListRoute,
   SubPageOrderRoundOrderRoundNoRoute: SubPageOrderRoundOrderRoundNoRoute,
   SubPageMypageIndexRoute: SubPageMypageIndexRoute,
   SubPageOrderRoundIndexRoute: SubPageOrderRoundIndexRoute,
@@ -470,6 +492,7 @@ export const routeTree = rootRoute
         "/_sub-page/faq",
         "/_sub-page/products",
         "/callback/kakao",
+        "/_sub-page/guest/order-list",
         "/_sub-page/order-round/$orderRoundNo",
         "/_sub-page/mypage/",
         "/_sub-page/order-round/",
@@ -505,6 +528,9 @@ export const routeTree = rootRoute
     },
     "/callback/kakao": {
       "filePath": "callback.kakao.tsx"
+    },
+    "/_sub-page/guest/order-list": {
+      "filePath": "_sub-page/guest/order-list.tsx"
     },
     "/_sub-page/order-round/$orderRoundNo": {
       "filePath": "_sub-page/order-round/$orderRoundNo.tsx"
