@@ -755,6 +755,7 @@ paths:
               required:
                 - ordererName
                 - ordererMobile
+                - ordererEmail
                 - orderRoundNo
                 - totalPrice
                 - deliveryMethodNo
@@ -772,6 +773,10 @@ paths:
                   type: string
                   description: 주문자 전화번호
                   example: '010-1234-5678'
+                ordererEmail:
+                  type: string
+                  description: 주문자 이메일
+                  example: test1234@naver.com
                 recipientName:
                   type: string
                   description: 수령인 이름
@@ -866,6 +871,7 @@ paths:
                 value:
                   ordererName: "홍길동"
                   ordererMobile: "010-1234-5678"
+                  ordererEmail: "test1234@naver.com"
                   recipientName: "홍길동"
                   recipientMobile: "010-1234-5678"
                   address: "서울시 강남구"

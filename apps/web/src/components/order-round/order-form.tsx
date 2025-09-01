@@ -50,6 +50,7 @@ export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
     defaultValues: {
       ordererName: '',
       ordererMobile: '',
+      ordererEmail: '',
       recipientName: '',
       recipientMobile: '',
       address: '',
@@ -108,10 +109,12 @@ export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
       form.setValue('isMember', true);
       form.setValue('ordererName', myContact.name);
       form.setValue('ordererMobile', myContact.mobileNumber);
+      form.setValue('ordererEmail', myContact.email);
     } else {
       form.setValue('isMember', false);
       form.setValue('ordererName', '');
       form.setValue('ordererMobile', '');
+      form.setValue('ordererEmail', '');
     }
   }, [myContact]);
 
@@ -157,6 +160,34 @@ export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
                   <Input
                     {...field}
                     placeholder="주문자 연락처를 입력해주세요"
+                    onChange={(e) => {
+                      const formattedValue = formatMobile(e.target.value);
+                      field.onChange(formattedValue);
+                    }}
+                    maxLength={13}
+                    readOnly={!!myContact}
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </div>
+            </FormItem>
+          )}
+        />
+
+        {/* 이메일 */}
+        <FormField
+          control={form.control}
+          name="ordererEmail"
+          render={({ field }) => (
+            <FormItem className="flex items-center">
+              <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
+                <span className="text-destructive">*</span> 이메일
+              </FormLabel>
+              <div className="w-full space-y-1">
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="받으실분의 이메일을 입력해주세요"
                     onChange={(e) => {
                       const formattedValue = formatMobile(e.target.value);
                       field.onChange(formattedValue);

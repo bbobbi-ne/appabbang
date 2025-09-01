@@ -482,6 +482,11 @@ export interface OrdersCreatePayload {
    */
   ordererMobile: string;
   /**
+   * 주문자 이메일
+   * @example "test1234@naver.com"
+   */
+  ordererEmail: string;
+  /**
    * 수령인 이름
    * @example "홍길동"
    */
@@ -665,6 +670,11 @@ export interface OrdersDetailData {
    */
   deliveryMethodFee: number;
   /**
+   * 배송 방법 코드
+   * @example "20"
+   */
+  deliveryTypeCode: string;
+  /**
    * 할인 금액
    * @example 0
    */
@@ -767,6 +777,29 @@ export interface OrdersUpdatePayload {
 }
 
 export type OrdersUpdateData = any;
+
+export interface TrackingNumberUpdatePayload {
+  /**
+   * 수정할 송장번호
+   * @example "1234567890"
+   */
+  trackingNumber: string;
+}
+
+export interface TrackingNumberUpdateData {
+  /** @example "송장번호가 수정되었습니다." */
+  message?: string;
+}
+
+export type TrackingNumberUpdateError =
+  | {
+      /** @example "유효하지 않은 주문 번호입니다." */
+      error?: string;
+    }
+  | {
+      /** @example "주문을 찾을 수 없습니다." */
+      error?: string;
+    };
 
 export interface StatusUpdateBody {
   /**

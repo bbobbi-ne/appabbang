@@ -302,6 +302,7 @@ export const deleteDeliveryMethodValidator = [
 export const createOrderValidator = [
   body('ordererName').trim().notEmpty().withMessage('ordererName 필수입니다'),
   body('ordererMobile').trim().notEmpty().withMessage('ordererMobile는 필수입니다'),
+  body('ordererEmail').trim().notEmpty().withMessage('ordererEmail은 필수입니다'),
   ////
   body('address').trim().optional(), // 옵셔널
   body('addressDetail').trim().optional(), // 옵셔널

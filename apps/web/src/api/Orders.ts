@@ -19,6 +19,9 @@ import type {
   OrdersUpdatePayload,
   StatusUpdateBody,
   StatusUpdateResult,
+  TrackingNumberUpdateData,
+  TrackingNumberUpdateError,
+  TrackingNumberUpdatePayload,
 } from "./data-contracts";
 import { ContentType, HttpClient, type RequestParams } from "./http-client";
 
@@ -106,6 +109,40 @@ export class Orders<SecurityDataType = unknown> {
       body: data,
       secure: true,
       type: ContentType.Json,
+      ...params,
+    });
+  /**
+ * @description 특정 주문의 송장번호만 수정합니다. (권한: 관리자만)
+ *
+ * @tags Orders
+ * @name TrackingNumberUpdate
+ * @summary 주문 송장번호 수정
+ * @request PUT:/orders/{no}/tracking-number
+ * @secure
+ * @response `200` `TrackingNumberUpdateData` 송장번호 수정 성공
+ * @response `400` `{
+  \** @example "유효하지 않은 주문 번호입니다." *\
+    error?: string,
+
+}` 잘못된 요청
+ * @response `404` `{
+  \** @example "주문을 찾을 수 없습니다." *\
+    error?: string,
+
+}` 주문을 찾을 수 없음
+ */
+  trackingNumberUpdate = (
+    no: number,
+    data: TrackingNumberUpdatePayload,
+    params: RequestParams = {},
+  ) =>
+    this.http.request<TrackingNumberUpdateData, TrackingNumberUpdateError>({
+      path: `/orders/${no}/tracking-number`,
+      method: "PUT",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      format: "json",
       ...params,
     });
   /**

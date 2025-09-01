@@ -60,6 +60,7 @@ export const getMyContact = async (no: number) => {
     select: {
       name: true,
       mobileNumber: true,
+      email: true,
     },
   });
 
