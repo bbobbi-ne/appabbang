@@ -31,6 +31,7 @@ import PrivacyTermsAgreedDialog from '../join/privacy-terms-agreed-dialog';
 import PaymentRefundTermsAgreedDialog from '../join/privacy-terms-agreed-dialog';
 import { MyAddressListDialog } from '@/components/order-round/my-address-list-dialog';
 import { OrderAddressForm } from '@/components/order-round/order-address-form';
+import { useAccessTokenStore } from '@/store/session';
 
 type Props = {
   isDelivery: boolean;
@@ -43,6 +44,7 @@ const labelMinWidth = 'min-w-[120px]';
 export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
   /** 은행 목록 API */
   const { data: bankData } = useGetCommonCodesQuery('bank_code');
+  const { accessToken } = useAccessTokenStore();
 
   // 폼 선언
   const form = useForm<OrderFormSchema>({
@@ -137,7 +139,7 @@ export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
                     {...field}
                     placeholder="주문자 이름을 입력해주세요"
                     maxLength={10}
-                    readOnly={!!myContact}
+                    readOnly={accessToken.length > 0 || !!myContact}
                   />
                 </FormControl>
                 <FormMessage className="text-xs" />
@@ -165,7 +167,7 @@ export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
                       field.onChange(formattedValue);
                     }}
                     maxLength={13}
-                    readOnly={!!myContact}
+                    readOnly={accessToken.length > 0 || !!myContact}
                   />
                 </FormControl>
                 <FormMessage className="text-xs" />
@@ -189,11 +191,10 @@ export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
                     {...field}
                     placeholder="받으실분의 이메일을 입력해주세요"
                     onChange={(e) => {
-                      const formattedValue = formatMobile(e.target.value);
-                      field.onChange(formattedValue);
+                      field.onChange(e.target.value);
                     }}
-                    maxLength={13}
-                    readOnly={!!myContact}
+                    maxLength={50}
+                    readOnly={accessToken.length > 0 || !!myContact}
                   />
                 </FormControl>
                 <FormMessage className="text-xs" />

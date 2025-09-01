@@ -116,7 +116,7 @@ export default function OrderRoundDetailPage({
       if (myContact) {
         navigate({ to: `/mypage/order-list/${data.no}` });
       } else {
-        navigate({ to: `/` });
+        navigate({ to: `/login` });
       }
     } catch (error) {
       console.log(error);
