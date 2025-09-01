@@ -28,3 +28,4 @@ export * from './src/components/ui/command';
 export * from './src/components/ui/badge';
 export * from './src/components/ui/accordion';
 export * from './src/components/ui/carousel';
+export * from './src/components/ui/tabs';

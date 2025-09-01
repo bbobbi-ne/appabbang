@@ -20,6 +20,7 @@ import orderRoundRouter from './routes/order-round.route';
 import paymentRouter from './routes/payment.route';
 import myRouter from './routes/my.route';
 import couponRouter from './routes/coupon.route';
+import guestRouter from './routes/guest.route';
 
 /** utils */
 import { loadAllCommonCodes } from './services/common-code.service';
@@ -54,6 +55,7 @@ app.use('/order-round', orderRoundRouter);
 app.use('/payments', paymentRouter);
 app.use('/my', myRouter);
 app.use('/coupons', couponRouter);
+app.use('/guest', guestRouter);
 
 // 헬스 체크용 라우터
 app.get('/', (_, res) => {
