@@ -11,6 +11,8 @@
  */
 
 import type {
+  GuestCreateData,
+  GuestCreatePayload,
   OrdersCreateData,
   OrdersCreatePayload,
   OrdersDetailData,
@@ -66,6 +68,24 @@ export class Orders<SecurityDataType = unknown> {
       method: "POST",
       body: data,
       secure: true,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 비회원 정보와 일치하는 주문 목록을 조회합니다. (권한: 누구나)
+   *
+   * @tags Orders
+   * @name GuestCreate
+   * @summary (비회원) 주문 목록 조회
+   * @request POST:/orders/guest
+   * @response `200` `GuestCreateData` 주문 목록 조회 성공
+   */
+  guestCreate = (data: GuestCreatePayload, params: RequestParams = {}) =>
+    this.http.request<GuestCreateData, any>({
+      path: `/orders/guest`,
+      method: "POST",
+      body: data,
       type: ContentType.Json,
       format: "json",
       ...params,

@@ -38,21 +38,21 @@ const EMAIL = {
 
 export const loginGuestSchema = z.object({
   // 주문자
-  orderer: z
+  ordererName: z
     .string({ required_error: ORDERER.required.message })
     .trim()
     .min(ORDERER.min.value, ORDERER.min.message)
     .max(ORDERER.max.value, ORDERER.max.message)
     .regex(ORDERER.regex.value, { message: ORDERER.regex.message }),
   // 휴대번호
-  mobileNumber: z
+  ordererMobile: z
     .string({ required_error: MOBILE_NUMBER.required.message })
     .trim()
     .regex(MOBILE_NUMBER.regex.value, {
       message: MOBILE_NUMBER.regex.message,
     }),
   // 이메일
-  email: z
+  ordererEmail: z
     .string({ required_error: EMAIL.required.message })
     .trim()
     .min(EMAIL.min.value, EMAIL.min.message)

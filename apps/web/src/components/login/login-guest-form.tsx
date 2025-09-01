@@ -19,25 +19,49 @@ import { useForm } from 'react-hook-form';
 import FindIdDialog from './find-id-dialog';
 import { useAccessTokenStore } from '@/store/session';
 import useToast from '@/hooks/useToast';
+import { useGetGuestOrdersMutation } from '@/hooks/use-orders';
+import type { GuestCreatePayload } from '@/api/data-contracts';
+import { useNavigate } from '@tanstack/react-router';
 
 export default function LoginGuestForm() {
   const labelMinWidth = 'min-w-[100px]';
   const { addToast } = useToast();
+  const getGuestOrders = useGetGuestOrdersMutation();
+  const navigate = useNavigate();
+
   /** form 설정 */
   const form = useForm<LoginGuestFormType>({
     resolver: zodResolver(loginGuestSchema),
-    defaultValues: { orderer: '', mobileNumber: '', email: '', orderPw: '' },
+    defaultValues: { ordererName: '', ordererMobile: '', ordererEmail: '', orderPw: '' },
   });
 
   /*******************************************************************************************/
 
   /** 비회원 로그인 */
-  const onSubmit = () => {
+  const onSubmit = async (data: GuestCreatePayload) => {
     const { accessToken } = useAccessTokenStore.getState();
 
     if (accessToken.length > 0) {
       addToast({ type: 'error', message: '회원은 비회원 로그인이 불가합니다.' });
       return;
+    }
+
+    // 비회원 로그인 :: 주문내역을 조회해서 일치하는 주문 1건(이상) 조회. (주문자 이름, 휴대번호, 이메일)
+    const result = await getGuestOrders.mutateAsync(data);
+    debugger;
+    if (result && result.length > 0) {
+      addToast({
+        type: 'success',
+        message: '주문정보를 성공적으로 조회했습니다. 해당 화면으로 이동합니다.',
+      });
+      setTimeout(() => {
+        navigate({ to: '/guest/order-list' });
+      }, 3000);
+    } else {
+      addToast({
+        type: 'error',
+        message: '현재 입력한 비회원 정보의 주문목록이 존재하지 않습니다.',
+      });
     }
   };
 
@@ -46,11 +70,11 @@ export default function LoginGuestForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
         <FormField
           control={form.control}
-          name="orderer"
+          name="ordererName"
           render={({ field }) => (
             <FormItem className="flex items-center">
               <FormLabel
-                htmlFor="orderer"
+                htmlFor="ordererName"
                 errorCheck={false}
                 className={`${labelMinWidth} whitespace-nowrap px-2 py-3 flex-1/4`}
               >
@@ -60,7 +84,7 @@ export default function LoginGuestForm() {
               <div className="w-full space-y-1">
                 <FormControl>
                   <Input
-                    id="orderer"
+                    id="ordererName"
                     type="text"
                     {...field}
                     placeholder="주문자 입력"
@@ -75,11 +99,11 @@ export default function LoginGuestForm() {
 
         <FormField
           control={form.control}
-          name="mobileNumber"
+          name="ordererMobile"
           render={({ field }) => (
             <FormItem className="flex items-center">
               <FormLabel
-                htmlFor="mobileNumber"
+                htmlFor="ordererMobile"
                 errorCheck={false}
                 className={`${labelMinWidth} whitespace-nowrap px-2 py-3 flex-1/4 `}
               >
@@ -88,7 +112,7 @@ export default function LoginGuestForm() {
 
               <div className="w-full space-y-1">
                 <FormControl>
-                  <Input id="mobileNumber" {...field} placeholder="휴대번호 입력" maxLength={30} />
+                  <Input id="ordererMobile" {...field} placeholder="휴대번호 입력" maxLength={30} />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </div>
@@ -98,11 +122,11 @@ export default function LoginGuestForm() {
 
         <FormField
           control={form.control}
-          name="email"
+          name="ordererEmail"
           render={({ field }) => (
             <FormItem className="flex items-center">
               <FormLabel
-                htmlFor="email"
+                htmlFor="ordererEmail"
                 errorCheck={false}
                 className={`${labelMinWidth} whitespace-nowrap px-2 py-3 flex-1/4 `}
               >
@@ -113,7 +137,7 @@ export default function LoginGuestForm() {
                 <FormControl>
                   <div className="flex flex-row relative">
                     <Input
-                      id="email"
+                      id="ordererEmail"
                       type="email"
                       {...field}
                       placeholder="이메일 입력"
