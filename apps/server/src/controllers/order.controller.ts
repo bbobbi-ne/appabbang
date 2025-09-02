@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as OrderService from '@/services/order.service';
+import * as GuestService from '@/services/guest.service';
 import * as paymentService from '@/services/payment.service';
 import { AppError } from '@/types';
 import { comparePassword } from '@/services/auth.service';
@@ -122,7 +123,7 @@ export const getGuestOrders = async (req: Request, res: Response) => {
     throw AppError.notFound('비회원 로그인 정보를 입력 바랍니다.');
 
   // 비회원 정보로 입력된 주문 목록 조회
-  const guestOrders = await OrderService.getGuestOrders({
+  const guestOrders = await GuestService.getGuestOrders({
     ordererName,
     ordererMobile,
     ordererEmail,
@@ -139,6 +140,11 @@ export const getGuestOrders = async (req: Request, res: Response) => {
   if (matchedOrders.length === 0) {
     throw AppError.notFound('비회원 정보와 일치하는 주문목록이 존재하지 않습니다.');
   }
+
+  // orderPw 비교는 끝났으니 다시 리턴값에서 제외함. (보안)
+  matchedOrders.forEach((item) => {
+    delete item.orderPw;
+  });
 
   res.status(200).json(matchedOrders);
 };
