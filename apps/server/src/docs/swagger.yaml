@@ -983,6 +983,7 @@ paths:
                     - orderStatusName
                     - ordererMobile
                     - ordererName
+                    - ordererEmail
                     - recipientName
                     - totalPrice
                     - createdAt
@@ -1013,6 +1014,10 @@ paths:
                       type: string
                       description: 주문자 이름
                       example: '홍길동'
+                    ordererEmail:
+                      type: string
+                      description: 주문자 이메일
+                      example: 'test1234@naver.com'
                     recipientName:
                       type: string
                       description: 수령인 이름

@@ -78,7 +78,7 @@ export interface GetAuthData {
    * 관리자 역할 (10-관리자, 20-서브관리자)
    * @example "10"
    */
-  userRole?: '10' | '20';
+  userRole?: "10" | "20";
   /**
    * 클라이언트 타입 (user, client)
    * @example "user"
@@ -137,7 +137,7 @@ export type BreadsListData = {
    * 빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)
    * @example "10"
    */
-  breadStatus: '10' | '20' | '30' | '40' | '50';
+  breadStatus: "10" | "20" | "30" | "40" | "50";
   /**
    * 빵 상태 이름
    * @example "판매"
@@ -195,7 +195,7 @@ export interface BreadsCreatePayload {
    * 빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)
    * @example "10"
    */
-  breadStatus: '10' | '20' | '30' | '40' | '50';
+  breadStatus: "10" | "20" | "30" | "40" | "50";
   /**
    * 원산지
    * @example "빵류[밀가루(밀:미국,캐나다산),영양강화밀가루(프랑스산)],가공유크림(독일산)"
@@ -247,7 +247,7 @@ export interface BreadsDetailData {
    * 빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)
    * @example "10"
    */
-  breadStatus: '10' | '20' | '30' | '40' | '50';
+  breadStatus: "10" | "20" | "30" | "40" | "50";
   /**
    * 빵 상태 이름
    * @example "판매"
@@ -315,7 +315,7 @@ export interface BreadsUpdatePayload {
    * 빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)
    * @example "10"
    */
-  breadStatus: '10' | '20' | '30' | '40' | '50';
+  breadStatus: "10" | "20" | "30" | "40" | "50";
   /**
    * 원산지
    * @example "빵류[밀가루(밀:미국,캐나다산),영양강화밀가루(프랑스산)],가공유크림(독일산)"
@@ -337,7 +337,7 @@ export interface StatusUpdatePayload {
    * 변경할 빵 상태 (10-판매, 20-미판매, 30-임시저장, 40-재료소진, 50-출시예정)
    * @example "10"
    */
-  breadStatus: '10' | '20' | '30' | '40' | '50';
+  breadStatus: "10" | "20" | "30" | "40" | "50";
 }
 
 export type StatusUpdateData = any;
@@ -402,7 +402,7 @@ export type OrdersListData = {
    * 주문 상태 (10-접수요청, 20-제조중, 30-배송중, 40-완료, 50-취소요청, 51-취소완료, 52-취소완료(환불))
    * @example "10"
    */
-  orderStatus: '10' | '20' | '30' | '40' | '50' | '51' | '52';
+  orderStatus: "10" | "20" | "30" | "40" | "50" | "51" | "52";
   /**
    * 주문 상태명
    * @example "접수요청"
@@ -619,7 +619,7 @@ export interface GuestCreatePayload {
    * 주문 비밀번호
    * @example 1234
    */
-  orderPw: string;
+  orderPw?: string;
 }
 
 export type GuestCreateData = {
@@ -637,7 +637,7 @@ export type GuestCreateData = {
    * 주문 상태 (10-접수요청, 20-제조중, 30-배송중, 40-완료, 50-취소요청, 51-취소완료, 52-취소완료(환불))
    * @example "10"
    */
-  orderStatus: '10' | '20' | '30' | '40' | '50' | '51' | '52';
+  orderStatus: "10" | "20" | "30" | "40" | "50" | "51" | "52";
   /**
    * 주문 상태명
    * @example "접수요청"
@@ -654,6 +654,11 @@ export type GuestCreateData = {
    */
   ordererName: string;
   /**
+   * 주문자 이메일
+   * @example "test1234@naver.com"
+   */
+  ordererEmail: string;
+  /**
    * 수령인 이름
    * @example "홍길동"
    */
@@ -663,6 +668,11 @@ export type GuestCreateData = {
    * @example 15000
    */
   totalPrice: number;
+  /**
+   * 주문 비밀번호
+   * @example 1234
+   */
+  orderPw: string;
   /**
    * 주문 생성일시
    * @format date-time
@@ -719,7 +729,7 @@ export interface OrdersDetailData {
    * 주문 상태 (10-접수요청, 20-제조중, 30-배송중, 40-완료, 50-취소요청, 51-취소완료, 52-취소완료(환불))
    * @example "10"
    */
-  orderStatus: '10' | '20' | '30' | '40' | '50' | '51' | '52';
+  orderStatus: "10" | "20" | "30" | "40" | "50" | "51" | "52";
   /**
    * 주문 상태명
    * @example "접수요청"
@@ -874,7 +884,7 @@ export interface OrdersUpdatePayload {
    * 주문 상태 (10-접수요청, 20-제조중, 30-배송중, 40-완료, 50-취소요청, 51-취소완료, 52-취소완료(환불))
    * @example "20"
    */
-  orderStatus?: '10' | '20' | '30' | '40' | '50' | '51' | '52';
+  orderStatus?: "10" | "20" | "30" | "40" | "50" | "51" | "52";
   /**
    * 송장번호
    * @example "123456789"
@@ -912,7 +922,7 @@ export interface StatusUpdateBody {
    * 주문 상태 (10-접수요청, 20-제조중, 30-배송중, 40-완료, 50-취소요청, 51-취소완료, 52-취소완료(환불))
    * @example "10"
    */
-  orderStatus: '10' | '20' | '30' | '40' | '50' | '51' | '52';
+  orderStatus: "10" | "20" | "30" | "40" | "50" | "51" | "52";
 }
 
 export type StatusUpdateResult = any;
@@ -1919,7 +1929,7 @@ export type DeliveryMethodsListData = {
    * 배송 타입 (10-택배배송, 20-직접수령, 90-기타)
    * @example "10"
    */
-  deliveryTypeCode: '10' | '20' | '90';
+  deliveryTypeCode: "10" | "20" | "90";
   /**
    * 배송 타입 이름 (쿼리 파라미터가 있을 때만 포함)
    * @example "택배배송"
@@ -1944,7 +1954,7 @@ export interface DeliveryMethodsCreatePayload {
    * 배송 타입 (10-택배배송, 20-직접수령, 90-기타)
    * @example "10"
    */
-  deliveryTypeCode: '10' | '20' | '90';
+  deliveryTypeCode: "10" | "20" | "90";
   /**
    * 배송 방법 이름
    * @example "우체국"
@@ -1994,7 +2004,7 @@ export type ActiveListData = {
    * 배송 타입 (10-택배배송, 20-직접수령, 90-기타)
    * @example "10"
    */
-  deliveryTypeCode: '10' | '20' | '90';
+  deliveryTypeCode: "10" | "20" | "90";
   /**
    * 배송 타입 이름
    * @example "택배배송"
@@ -2044,7 +2054,7 @@ export interface DeliveryMethodsDetailData {
    * 배송 타입 (10-택배배송, 20-직접수령, 90-기타)
    * @example "10"
    */
-  deliveryTypeCode: '10' | '20' | '90';
+  deliveryTypeCode: "10" | "20" | "90";
   /**
    * 배송 타입 이름
    * @example "택배배송"
@@ -2069,7 +2079,7 @@ export interface DeliveryMethodsUpdatePayload {
    * 배송 타입 (10-택배배송, 20-직접수령, 90-기타)
    * @example "10"
    */
-  deliveryTypeCode: '10' | '20' | '90';
+  deliveryTypeCode: "10" | "20" | "90";
   /**
    * 배송 방법 이름
    * @example "우체국"
