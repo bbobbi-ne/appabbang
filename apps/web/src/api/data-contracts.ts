@@ -619,7 +619,7 @@ export interface GuestCreatePayload {
    * 주문 비밀번호
    * @example 1234
    */
-  orderPw?: string;
+  orderPw: string;
 }
 
 export type GuestCreateData = {
@@ -629,89 +629,58 @@ export type GuestCreateData = {
    */
   no: number;
   /**
-   * 주문 고유번호
-   * @example "ORD-20240622-12345"
+   * 주문 번호
+   * @example "ORD20240825001"
    */
   orderNumber: string;
   /**
-   * 주문 상태 (10-접수요청, 20-제조중, 30-배송중, 40-완료, 50-취소요청, 51-취소완료, 52-취소완료(환불))
+   * 주문 상태 코드
    * @example "10"
    */
-  orderStatus: "10" | "20" | "30" | "40" | "50" | "51" | "52";
+  orderStatus: string;
   /**
    * 주문 상태명
-   * @example "접수요청"
+   * @example "결제완료"
    */
-  orderStatusName: string;
+  orderStatusName?: string;
   /**
-   * 주문자 전화번호
-   * @example "010-1234-5678"
+   * 주문차수 번호
+   * @example 1
    */
-  ordererMobile: string;
-  /**
-   * 주문자 이름
-   * @example "홍길동"
-   */
-  ordererName: string;
-  /**
-   * 주문자 이메일
-   * @example "test1234@naver.com"
-   */
-  ordererEmail: string;
-  /**
-   * 수령인 이름
-   * @example "홍길동"
-   */
-  recipientName: string;
-  /**
-   * 총 주문 금액
-   * @example 15000
-   */
-  totalPrice: number;
-  /**
-   * 주문 비밀번호
-   * @example 1234
-   */
-  orderPw: string;
+  orderRoundNo: number;
   /**
    * 주문 생성일시
    * @format date-time
-   * @example "2024-06-22T12:34:56.000Z"
+   * @example "2024-08-25T15:55:20.000Z"
    */
   createdAt: string;
-  /**
-   * 주문 수정일시
-   * @format date-time
-   * @example "2024-06-22T12:34:56.000Z"
-   */
-  updatedAt: string;
-  /**
-   * 주소
-   * @example "서울시 강남구"
-   */
-  address: string;
-  /**
-   * 상세 주소
-   * @example "123-45"
-   */
-  addressDetail: string;
-  /**
-   * 배송방법
-   * @example "우체국"
-   */
-  deliveryMethodName: string;
-  /**
-   * 우편번호
-   * @example "12345"
-   */
-  zipcode?: string;
-  payment?: {
+  orderItems: {
     /**
-     * 입금 확인 여부
-     * @example false
+     * 주문 아이템 번호
+     * @example 1
      */
-    isPaid?: boolean;
-  };
+    no?: number;
+    /**
+     * 상품명
+     * @example "식빵"
+     */
+    breadName?: string;
+    /**
+     * 상품 이미지 URL
+     * @example "https://example.com/bread.jpg"
+     */
+    breadImageUrl?: string;
+    /**
+     * 단가
+     * @example 3000
+     */
+    unitPrice?: number;
+    /**
+     * 수량
+     * @example 2
+     */
+    quantity?: number;
+  }[];
 }[];
 
 export interface OrdersDetailData {
