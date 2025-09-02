@@ -46,38 +46,42 @@ export default function LoginGuestForm() {
       return;
     }
 
-    // 비회원 로그인 :: 주문내역을 조회해서 일치하는 주문 1건(이상) 조회. (주문자 이름, 휴대번호, 이메일)
-    const result = await getGuestOrders.mutateAsync(data);
+    try {
+      // 비회원 로그인 :: 주문내역을 조회해서 일치하는 주문 1건(이상) 조회. (주문자 이름, 휴대번호, 이메일)
+      const result = await getGuestOrders.mutateAsync(data);
 
-    if (result && result.length > 0) {
-      const firstOrder = result[0];
-      if (firstOrder) {
-        addToast({
-          type: 'success',
-          message: '주문정보를 성공적으로 조회했습니다. 해당 화면으로 이동합니다.',
-        });
-        setTimeout(() => {
-          navigate({
-            to: `/guest/order-list`,
-            search: {
-              ordererName: data.ordererName,
-              ordererMobile: data.ordererMobile,
-              ordererEmail: data.ordererEmail,
-              orderPw: data.orderPw,
-            },
+      if (result && result.length > 0) {
+        const firstOrder = result[0];
+        if (firstOrder) {
+          addToast({
+            type: 'success',
+            message: '주문정보를 성공적으로 조회했습니다. 해당 화면으로 이동합니다.',
           });
-        }, 3000);
+          setTimeout(() => {
+            navigate({
+              to: `/guest/order-list`,
+              search: {
+                ordererName: data.ordererName,
+                ordererMobile: data.ordererMobile,
+                ordererEmail: data.ordererEmail,
+                orderPw: data.orderPw,
+              },
+            });
+          }, 3000);
+        } else {
+          addToast({
+            type: 'error',
+            message: '주문 정보에 이메일이 없습니다.',
+          });
+        }
       } else {
         addToast({
           type: 'error',
-          message: '주문 정보에 이메일이 없습니다.',
+          message: '현재 입력한 비회원 정보의 주문목록이 존재하지 않습니다.',
         });
       }
-    } else {
-      addToast({
-        type: 'error',
-        message: '현재 입력한 비회원 정보의 주문목록이 존재하지 않습니다.',
-      });
+    } catch (error: any) {
+      addToast({ type: 'error', message: error.response.data.error.message });
     }
   };
 
