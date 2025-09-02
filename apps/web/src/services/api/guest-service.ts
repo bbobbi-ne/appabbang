@@ -1,4 +1,4 @@
-import type { GuestCreatePayload } from '@/api/data-contracts';
+import type { GuestAddressUpdatePayload, GuestCreatePayload } from '@/api/data-contracts';
 import { Orders } from '@/api/Orders';
 import { CustomHttpClient } from '../httpclient-instance';
 import { refreshCreate } from './auth-service';
@@ -14,6 +14,16 @@ export const GuestService = {
   /** 비회원 주문 조회 */
   getGuestOrder: async (no: number) => {
     const response = await orderApi.guestDetail(no);
+    return response.data;
+  },
+  /** 비회원 배송지 주소 조회 */
+  getOrderAddress: async (no: number) => {
+    const response = await orderApi.guestAddressList(no);
+    return response.data;
+  },
+  /** 비회원 배송지 주소 수정 */
+  updateOrderAddress: async (no: number, data: GuestAddressUpdatePayload) => {
+    const response = await orderApi.guestAddressUpdate(no, data);
     return response.data;
   },
 };

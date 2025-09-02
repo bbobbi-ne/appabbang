@@ -11,6 +11,9 @@
  */
 
 import type {
+  GuestAddressListData,
+  GuestAddressUpdateData,
+  GuestAddressUpdatePayload,
   GuestCreateData,
   GuestCreatePayload,
   GuestDetailData,
@@ -92,9 +95,9 @@ export class Orders<SecurityDataType = unknown> {
       ...params,
     });
   /**
-   * @description 특정 주문의 상세 정보를 조회합니다. (권한: 누구나)
+   * @description 비회원의 특정 주문의 상세 정보를 조회합니다. (권한: 누구나)
    *
-   * @tags Guest
+   * @tags Orders
    * @name GuestDetail
    * @summary (비회원) 주문 상세 조회
    * @request GET:/orders/guest/{no}
@@ -104,6 +107,44 @@ export class Orders<SecurityDataType = unknown> {
     this.http.request<GuestDetailData, any>({
       path: `/orders/guest/${no}`,
       method: "GET",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 비회원의 특정 주문의 배송지 정보를 조회합니다. (권한: 누구나)
+   *
+   * @tags Orders
+   * @name GuestAddressList
+   * @summary 주문내역의 배송지 조회
+   * @request GET:/orders/guest/{no}/address
+   * @response `200` `GuestAddressListData` 배송지 조회 성공
+   */
+  guestAddressList = (no: number, params: RequestParams = {}) =>
+    this.http.request<GuestAddressListData, any>({
+      path: `/orders/guest/${no}/address`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 비회원의 특정 주문의 배송지를 수정합니다. (권한: 누구나)
+   *
+   * @tags Orders
+   * @name GuestAddressUpdate
+   * @summary (비회원) 주문내역의 배송지 수정
+   * @request PUT:/orders/guest/{no}/address
+   * @response `200` `GuestAddressUpdateData` 배송지 수정 성공
+   */
+  guestAddressUpdate = (
+    no: number,
+    data: GuestAddressUpdatePayload,
+    params: RequestParams = {},
+  ) =>
+    this.http.request<GuestAddressUpdateData, any>({
+      path: `/orders/guest/${no}/address`,
+      method: "PUT",
+      body: data,
+      type: ContentType.Json,
       format: "json",
       ...params,
     });

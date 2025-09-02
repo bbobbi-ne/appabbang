@@ -1034,9 +1034,9 @@ paths:
 
   /orders/guest/{no}:
     get:
-      tags: [Guest]
+      tags: [Orders]
       summary: (비회원) 주문 상세 조회
-      description: 특정 주문의 상세 정보를 조회합니다. (권한: 누구나)
+      description: 비회원의 특정 주문의 상세 정보를 조회합니다. (권한: 누구나)
       parameters:
         - in: path
           name: no
@@ -1138,6 +1138,148 @@ paths:
                           type: integer
                           example: 2
 
+  /orders/guest/{no}/address:
+    get:
+      tags: [Orders]
+      summary: 주문내역의 배송지 조회
+      description: 비회원의 특정 주문의 배송지 정보를 조회합니다. (권한: 누구나)
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 주문 번호
+          example: 1
+      responses:
+        '200':
+          description: 배송지 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - address
+                  - addressDetail
+                  - zipcode
+                  - message
+                  - recipientName
+                  - recipientMobile
+                properties:
+                  address:
+                    type: string
+                    description: 주소
+                    example: '서울시 강남구 역삼동 123-456'
+                  addressDetail:
+                    type: string
+                    description: 상세 주소
+                    example: '101동 101호'
+                  zipcode:
+                    type: string
+                    description: 우편번호
+                    example: '12345'
+                  message:
+                    type: string
+                    description: 배송 메시지
+                    example: '문 앞에 놓아주세요.'
+                  recipientName:
+                    type: string
+                    description: 수령인 이름
+                    example: '홍길동'
+                  recipientMobile:
+                    type: string
+                    description: 수령인 전화번호
+                    example: '010-1234-5678'
+
+    put:
+      tags: [Orders]
+      summary: (비회원) 주문내역의 배송지 수정
+      description: 비회원의 특정 주문의 배송지를 수정합니다. (권한: 누구나)
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 주문 번호
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - address
+                - addressDetail
+                - zipcode
+                - message
+                - recipientName
+                - recipientMobile
+              properties:
+                address:
+                  type: string
+                  description: 주소
+                  example: '서울시 강남구 역삼동 123-456'
+                addressDetail:
+                  type: string
+                  description: 상세 주소
+                  example: '101동 101호'
+                zipcode:
+                  type: string
+                  description: 우편번호
+                  example: '12345'
+                message:
+                  type: string
+                  description: 배송 메시지
+                  example: '문 앞에 놓아주세요.'
+                recipientName:
+                  type: string
+                  description: 수령인 이름
+                  example: '홍길동'
+                recipientMobile:
+                  type: string
+                  description: 수령인 전화번호
+                  example: '010-1234-5678'
+      responses:
+        '200':
+          description: 배송지 수정 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - address
+                  - addressDetail
+                  - zipcode
+                  - message
+                  - recipientName
+                  - recipientMobile
+                properties:
+                  address:
+                    type: string
+                    description: 주소
+                    example: '서울시 강남구 역삼동 123-456'
+                  addressDetail:
+                    type: string
+                    description: 상세 주소
+                    example: '101동 101호'
+                  zipcode:
+                    type: string
+                    description: 우편번호
+                    example: '12345'
+                  message:
+                    type: string
+                    description: 배송 메시지
+                    example: '문 앞에 놓아주세요.'
+                  recipientName:
+                    type: string
+                    description: 수령인 이름
+                    example: '홍길동'
+                  recipientMobile:
+                    type: string
+                    description: 수령인 전화번호
+                    example: '010-1234-5678'
 
   /orders/{no}:
     get:

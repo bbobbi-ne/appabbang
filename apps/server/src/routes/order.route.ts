@@ -4,6 +4,7 @@ import * as myController from '@/controllers/my.controller';
 import {
   createOrderValidator,
   guestValidator,
+  updateOrderAddressValidator,
   updateOrderStatusValidator,
   updateOrderTrackingNumberValidator,
   updateOrderValidator,
@@ -17,11 +18,35 @@ const router = Router();
 /** GET /orders : 주문 목록 조회 */
 router.get('/', requireAdmin, asyncHandler(orderController.getList));
 
+/**
+ *
+ *
+ *
+ *
+ * guest 전용 router
+ */
 /** POST /orders/guest : [비회원] 주문 목록 조회 */
 router.post('/guest', validate(guestValidator), asyncHandler(orderController.getGuestOrders));
 
 /** GET /orders/guest/{no} : [비회원] 주문 조회 */
 router.get('/guest/:no', asyncHandler(myController.getOrder));
+
+/** GET /orders/guest/{no}/address : [비회원] 주문 상세내역의 배송지 조회 */
+router.get('/guest/:no/address', asyncHandler(myController.getOrderDelivery));
+
+/** PUT /orders/guest/{no}/address : [비회원] 주문 상세내역의 배송지 수정 */
+router.put(
+  '/guest/:no/address',
+  validate(updateOrderAddressValidator),
+  asyncHandler(myController.updateOrderAddress),
+);
+/**
+ *
+ *
+ *
+ *
+ *
+ */
 
 /** GET /orders/{no} : 주문 상세 조회 */
 router.get('/:no', requireAdmin, asyncHandler(orderController.getOne));
