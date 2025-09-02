@@ -1032,6 +1032,112 @@ paths:
                             description: 수량
                             example: 2
 
+  /orders/guest/{no}:
+    get:
+      tags: [Guest]
+      summary: (비회원) 주문 상세 조회
+      description: 특정 주문의 상세 정보를 조회합니다. (권한: 누구나)
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 주문 번호
+          example: 1
+      responses:
+        '200':
+          description: (비회원) 주문 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - no
+                  - orderNumber
+                  - orderStatus
+                  - orderStatusName
+                  - createdAt
+                  - totalPrice
+                  - orderItems
+                  - address
+                properties:
+                  no:
+                    type: integer
+                    example: 1
+                  orderNumber:
+                    type: string
+                    example: 'ORD20240825001'
+                  orderStatus:
+                    type: string
+                    example: '10'
+                  orderStatusName:
+                    type: string
+                    example: '결제완료'
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: '2024-08-25T15:55:20.000Z'
+                  totalPrice:
+                    type: number
+                    example: 15000
+                  deliveryMethodFee:
+                    type: number
+                    example: 3000
+                  discountAmount:
+                    type: number
+                    example: 2000
+                  address:
+                    type: string
+                    example: '서울시 강남구 역삼동 123-456'
+                  addressDetail:
+                    type: string
+                    example: '101동 101호'
+                  zipcode:
+                    type: string
+                    example: '12345'
+                  message:
+                    type: string
+                    example: '문 앞에 놓아주세요.'
+                  recipientName:
+                    type: string
+                    example: '홍길동'
+                  recipientMobile:
+                    type: string
+                    example: '010-1234-5678'
+                  ordererName:
+                    type: string
+                    example: '홍길동'
+                  ordererMobile:
+                    type: string
+                    example: '010-1234-5678'
+                  deliveryTypeCode:
+                    type: string
+                    example: '01'
+                  orderItems:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        no:
+                          type: integer
+                          example: 1
+                        breadName:
+                          type: string
+                          example: '식빵'
+                        breadImageUrl:
+                          type: string
+                          example: 'https://example.com/bread.jpg'
+                        unitPrice:
+                          type: number
+                          example: 3000
+                        totalPrice:
+                          type: number
+                          example: 6000
+                        quantity:
+                          type: integer
+                          example: 2
+
 
   /orders/{no}:
     get:

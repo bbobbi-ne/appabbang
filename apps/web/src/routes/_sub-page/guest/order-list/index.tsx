@@ -2,7 +2,7 @@ import type { GuestCreateData, GuestCreatePayload } from '@/api/data-contracts';
 import Loading from '@/components/common/loading';
 import GuestOrders from '@/components/guest/orders';
 import SubLayout from '@/components/templates/sub-layout';
-import { useGetGuestOrdersMutation } from '@/hooks/use-orders';
+import { useGetGuestOrdersMutation } from '@/hooks/use-guest';
 import useToast from '@/hooks/useToast';
 import { createFileRoute, useSearch } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { OrdersService } from '@/services/api/orders-service';
-import type { GuestCreatePayload, OrdersCreatePayload } from '@/api/data-contracts';
+import type { OrdersCreatePayload } from '@/api/data-contracts';
 
 export function useCreateOrderMutation() {
   const queryClient = useQueryClient();
@@ -16,13 +16,4 @@ export function useCreateOrderMutation() {
       queryClient.invalidateQueries({ queryKey: ['/my/coupons'] });
     },
   });
-}
-
-/** 비회원 주문목록 조회 mutation */
-export function useGetGuestOrdersMutation() {
-  const mutation = useMutation({
-    mutationFn: (data: GuestCreatePayload) => OrdersService.getGuestOrders(data),
-  });
-
-  return mutation;
 }

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import * as orderController from '@/controllers/order.controller';
+import * as myController from '@/controllers/my.controller';
 import {
   createOrderValidator,
   guestValidator,
@@ -18,6 +19,9 @@ router.get('/', requireAdmin, asyncHandler(orderController.getList));
 
 /** POST /orders/guest : [비회원] 주문 목록 조회 */
 router.post('/guest', validate(guestValidator), asyncHandler(orderController.getGuestOrders));
+
+/** GET /orders/guest/{no} : [비회원] 주문 조회 */
+router.get('/guest/:no', asyncHandler(myController.getOrder));
 
 /** GET /orders/{no} : 주문 상세 조회 */
 router.get('/:no', requireAdmin, asyncHandler(orderController.getOne));

@@ -683,6 +683,60 @@ export type GuestCreateData = {
   }[];
 }[];
 
+export interface GuestDetailData {
+  /** @example 1 */
+  no: number;
+  /** @example "ORD20240825001" */
+  orderNumber: string;
+  /** @example "10" */
+  orderStatus: string;
+  /** @example "결제완료" */
+  orderStatusName: string;
+  /**
+   * @format date-time
+   * @example "2024-08-25T15:55:20.000Z"
+   */
+  createdAt: string;
+  /** @example 15000 */
+  totalPrice: number;
+  /** @example 3000 */
+  deliveryMethodFee?: number;
+  /** @example 2000 */
+  discountAmount?: number;
+  /** @example "서울시 강남구 역삼동 123-456" */
+  address: string;
+  /** @example "101동 101호" */
+  addressDetail?: string;
+  /** @example "12345" */
+  zipcode?: string;
+  /** @example "문 앞에 놓아주세요." */
+  message?: string;
+  /** @example "홍길동" */
+  recipientName?: string;
+  /** @example "010-1234-5678" */
+  recipientMobile?: string;
+  /** @example "홍길동" */
+  ordererName?: string;
+  /** @example "010-1234-5678" */
+  ordererMobile?: string;
+  /** @example "01" */
+  deliveryTypeCode?: string;
+  orderItems: {
+    /** @example 1 */
+    no?: number;
+    /** @example "식빵" */
+    breadName?: string;
+    /** @example "https://example.com/bread.jpg" */
+    breadImageUrl?: string;
+    /** @example 3000 */
+    unitPrice?: number;
+    /** @example 6000 */
+    totalPrice?: number;
+    /** @example 2 */
+    quantity?: number;
+  }[];
+}
+
 export interface OrdersDetailData {
   /**
    * 주문 번호

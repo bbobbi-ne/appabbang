@@ -13,6 +13,7 @@
 import type {
   GuestCreateData,
   GuestCreatePayload,
+  GuestDetailData,
   OrdersCreateData,
   OrdersCreatePayload,
   OrdersDetailData,
@@ -87,6 +88,22 @@ export class Orders<SecurityDataType = unknown> {
       method: "POST",
       body: data,
       type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 특정 주문의 상세 정보를 조회합니다. (권한: 누구나)
+   *
+   * @tags Guest
+   * @name GuestDetail
+   * @summary (비회원) 주문 상세 조회
+   * @request GET:/orders/guest/{no}
+   * @response `200` `GuestDetailData` (비회원) 주문 상세 조회 성공
+   */
+  guestDetail = (no: number, params: RequestParams = {}) =>
+    this.http.request<GuestDetailData, any>({
+      path: `/orders/guest/${no}`,
+      method: "GET",
       format: "json",
       ...params,
     });

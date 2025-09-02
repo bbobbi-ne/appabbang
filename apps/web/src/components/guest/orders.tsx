@@ -19,12 +19,12 @@ export default function GuestOrders({ list }: GuestOrdersProps) {
 
   // 주문상세내역
   const moveToOrderDetail = (no: number) => {
-    navigate({ to: `/mypage/order-list/${no}` });
+    navigate({ to: `/guest/order-list/${no}` });
   };
 
   // 배송(수령)현황
-  const moveToDeliveryDetail = (orderNo: number) => {
-    navigate({ to: `/mypage/order-list/${orderNo}/delivery` });
+  const moveToDeliveryDetail = (no: number) => {
+    navigate({ to: `/guest/order-list/${no}/delivery` });
   };
 
   return (
