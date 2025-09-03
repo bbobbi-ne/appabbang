@@ -81,6 +81,7 @@ model Order {
   deliveryMethodFee            Int               @map("delivery_method_fee")                          // 배송비
   deliveryTypeCode             String            @db.VarChar(3) @map("delivery_type_code")            // 배송타입코드
   customerCouponNo             Int?              @map("customer_coupon_no")                           // 고객쿠폰번호
+  customerCoupon               CustomerCoupon?   @relation(fields: [customerCouponNo], references: [no], onDelete: SetNull)                      
   discountAmount               Int               @map("discount_amount")                              // 할인 금액
   orderRoundNo                 Int               @map("order_round_no")                               // 주문차수 번호
   totalPrice                   Int               @map("total_price")                                  // 총 금액
@@ -223,7 +224,7 @@ model CustomerCoupon {
   couponNo              Int                                                          // 쿠폰 번호
   customer              Customer?         @relation(fields: [customerNo], references: [no], onDelete: SetNull) // 고객 테이블 참조
   coupon                Coupon            @relation(fields: [couponNo], references: [no])                      // 쿠폰 테이블 참조
-
+  orders                Order[]   
   @@map("customer_coupon")
 }
 
