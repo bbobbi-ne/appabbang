@@ -63,44 +63,53 @@ export default function OrderRoundContent({ data, hasOrder }: Props) {
           <Card className="flex-1 rounded-lg overflow-hidden border-0 shadow-xl">
             <img
               // TODO: 주문차수 이미지가 없을때를 대비한 샘플 이미지 제작 필요
-              src={data?.orderRoundImageUrl || '/images/main-order-round-no-img.png'}
-              alt={data?.name || '주문차수 이미지'}
+              src={data.orderRoundImageUrl || '/images/main-order-round-no-img.png'}
+              alt={data.name || '주문차수 이미지'}
               className="w-full h-auto object-cover"
             />
           </Card>
 
           {/* 오른쪽 영역 */}
-          <div className="flex-1 flex flex-col gap-4">
-            <div className="space-y-2">
-              <div className="text-2xl lg:text-4xl">
-                {data?.no}차 주문 {isRun && '오픈!'}
-              </div>
-              <p className="text-xs lg:text-base text-gray-500">
-                {isRun
-                  ? '망설이면 늦어요!'
-                  : `오픈 예정일: ${formatIsoToDateTime(data?.startedAt || '')}`}
-              </p>
-            </div>
-
-            {isRun && (
-              <Card className="flex-1 p-4 space-y-4 lg:space-y-12">
-                <div className="flex flex-row gap-2 items-end">
-                  <AlarmClock size={28} className="animate-bounce transition-all duration-300" />
-                  <p className="text-2xl lg:text-4xl">{remainingTime}</p>
+          {data.no ? (
+            <div className="flex-1 flex flex-col gap-4">
+              <div className="space-y-2">
+                <div className="text-2xl lg:text-4xl">
+                  {data.no}차 주문 {isRun && '오픈!'}
                 </div>
+                <p className="text-xs lg:text-base text-gray-500">
+                  {isRun
+                    ? '망설이면 늦어요!'
+                    : `오픈 예정일: ${formatIsoToDateTime(data?.startedAt || '')}`}
+                </p>
+              </div>
 
-                {!hasOrder ? (
-                  <Button className="block ml-auto" onClick={onClick}>
-                    주문하러 가기
-                  </Button>
-                ) : (
-                  <Button className="block ml-auto" onClick={moveToMyOrderList}>
-                    내 주문 확인하기
-                  </Button>
-                )}
-              </Card>
-            )}
-          </div>
+              {isRun && (
+                <Card className="flex-1 p-4 space-y-4 lg:space-y-12">
+                  <div className="flex flex-row gap-2 items-end">
+                    <AlarmClock size={28} className="animate-bounce transition-all duration-300" />
+                    <p className="text-2xl lg:text-4xl">{remainingTime}</p>
+                  </div>
+
+                  {!hasOrder ? (
+                    <Button className="block ml-auto" onClick={onClick}>
+                      주문하러 가기
+                    </Button>
+                  ) : (
+                    <Button className="block ml-auto" onClick={moveToMyOrderList}>
+                      내 주문 확인하기
+                    </Button>
+                  )}
+                </Card>
+              )}
+            </div>
+          ) : (
+            <div className="flex-1 flex flex-col gap-4">
+              <div className="space-y-2">
+                <div className="text-2xl lg:text-4xl">현재 진행중인 주문이 없습니다.</div>
+                <p className="text-xs lg:text-base text-gray-500">다음 빵 주문을 기다려보아요!</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

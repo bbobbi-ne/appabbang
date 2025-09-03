@@ -108,9 +108,15 @@ export async function removeImage(req: Request, res: Response) {
 
 /** 현재 주문차수 조회 (now or next) */
 export async function getCurrent(_: Request, res: Response) {
-  const currentOrderRound =
-    (await OrderRoundService.getNow()) || (await OrderRoundService.getNextOrderRound());
-  res.status(200).json(currentOrderRound);
+  let current;
+  current = await OrderRoundService.getNow();
+
+  // 현재 진행중인 주문차수가 없으면 다음 주문차수 조회
+  if (!current.no) {
+    current = await OrderRoundService.getNextOrderRound();
+  }
+
+  res.status(200).json(current);
 }
 
 /** 오픈된 특정 주문차수 조회 */
