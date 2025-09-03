@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import * as OrderService from '@/services/order.service';
 import * as GuestService from '@/services/guest.service';
 import * as paymentService from '@/services/payment.service';
+import * as MyService from '@/services/my.service';
 import { AppError } from '@/types';
 import { comparePassword } from '@/services/auth.service';
 
@@ -147,4 +148,21 @@ export const getGuestOrders = async (req: Request, res: Response) => {
   });
 
   res.status(200).json(matchedOrders);
+};
+
+/** [비회원] 주문취소 */
+export const cancelOrder = async (req: Request, res: Response) => {
+  const orderNo = Number(req.params.no);
+  const { canceledReason } = req.body;
+
+  const order = await MyService.getOrder(orderNo);
+  if (!order) throw AppError.notFound('주문을 찾을 수 없습니다.');
+
+  if (Number(order.orderStatus) !== 10 && Number(order.orderStatus) !== 11)
+    throw AppError.badRequest('현재는 주문을 취소할 수 없습니다.');
+
+  // 주문취소
+  await GuestService.cancelOrder({ orderNo, canceledReason });
+
+  res.status(200).json({ message: '주문이 취소되었습니다.' });
 };

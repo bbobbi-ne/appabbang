@@ -26,4 +26,14 @@ export const GuestService = {
     const response = await orderApi.guestAddressUpdate(no, data);
     return response.data;
   },
+  /** 비회원 배송현황 조회 */
+  getOrderDelivery: async (no: number) => {
+    const response = await orderApi.guestDeliveryList(no);
+    return response.data;
+  },
+  /** 비회원 주문취소 */
+  cancelOrder: async (no: number, data: { canceledReason: string }) => {
+    const response = await orderApi.guestCancelCreate(no, data);
+    return response;
+  },
 };

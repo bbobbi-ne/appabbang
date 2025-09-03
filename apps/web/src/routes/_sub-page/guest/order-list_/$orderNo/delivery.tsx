@@ -5,12 +5,12 @@ import GuestDeliveryDetail from '@/components/guest/delivery';
 import SubLayout from '@/components/templates/sub-layout';
 import { createFileRoute, useParams } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/_sub-page/guest/order-list/$orderNo/delivery')({
+export const Route = createFileRoute('/_sub-page/guest/order-list_/$orderNo/delivery')({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { orderNo } = useParams({ from: '/_sub-page/mypage/order-list_/$orderNo/delivery' });
+  const { orderNo } = useParams({ from: '/_sub-page/guest/order-list_/$orderNo/delivery' });
 
   return (
     <SubLayout title="비회원 주문목록">

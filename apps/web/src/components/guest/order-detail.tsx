@@ -1,5 +1,5 @@
 import { useGetGuestOrderQuery } from '@/hooks/use-guest';
-import { useNavigate, useRouter } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import Loading from '../common/loading';
 import { Badge, Button, Card, CardContent } from '@appabbang/ui';
@@ -18,7 +18,6 @@ const AVALIABLE_DELIVERY_ORDER_STATUS = ['11', '20', '30', '31', '40'];
 export default function GuestOrderDetail({ orderNo }: Props) {
   const [amount, setAmount] = useState<number>(0);
   const navigate = useNavigate();
-  const router = useRouter();
   const { data: order, isLoading } = useGetGuestOrderQuery(orderNo);
 
   /** 상품금액 계산 */
@@ -34,15 +33,14 @@ export default function GuestOrderDetail({ orderNo }: Props) {
   }, [order]);
 
   // 배송현황 이동
-  const onDeliveryMove = (no: number) => navigate({ to: `/mypage/order-list/${no}/delivery` });
+  const onDeliveryMove = (no: number) => {
+    navigate({ to: `/guest/order-list/${no}/delivery` });
+  };
 
   if (isLoading || !order) return <Loading title="비회원 주문 상세내역" />;
 
   return (
     <div className="mt-10 flex flex-col justify-start">
-      <Button className="w-20 mb-2" onClick={() => router.history.go(-1)}>
-        뒤로가기
-      </Button>
       <Card className="mb-20">
         <CardContent className="pt-6 space-y-4">
           <div className="flex flex-row justify-between">

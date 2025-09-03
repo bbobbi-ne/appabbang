@@ -11,6 +11,17 @@ export function useGetGuestOrdersMutation() {
   return mutation;
 }
 
+/** 비회원 주문목록 조회 query */
+export function useGetGuestOrdersQuery(data: GuestCreatePayload, enabled: boolean = true) {
+  const query = useQuery({
+    queryKey: ['/orders/guest/order-list', '비회원 주문목록 조회', data],
+    queryFn: () => GuestService.getGuestOrders(data),
+    enabled,
+  });
+
+  return query;
+}
+
 /** 비회원 주문 상세조회 query */
 export function useGetGuestOrderQuery(no: number) {
   const query = useQuery({
@@ -43,6 +54,45 @@ export function updateGuestOrderAddressMutation() {
       queryClient.invalidateQueries({
         queryKey: [`/orders/guest/${variables.no}`],
       });
+    },
+  });
+
+  return mutation;
+}
+
+/** 비회원 배송(수령) 현황 조회 query */
+export function useGetGuestOrderDeliveryQuery(no: number) {
+  const query = useQuery({
+    queryKey: [`/orders/guest/${no}/delivery`, '비회원 주문 배송(수령) 조회'],
+    queryFn: () => GuestService.getOrderDelivery(no),
+  });
+
+  return query;
+}
+
+/** 비회원 주문 취소 */
+export function useGuestCancelOrderMutation() {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: (payload: {
+      no: number;
+      data: { canceledReason: string };
+      search?: {
+        ordererName: string;
+        ordererEmail: string;
+        ordererMobile: string;
+        orderPw: string;
+      };
+    }) => {
+      const { no, data } = payload;
+      return GuestService.cancelOrder(no, data);
+    },
+    onSuccess: (_, variables) => {
+      if (variables.search) {
+        queryClient.invalidateQueries({
+          queryKey: ['/orders/guest/order-list'],
+        });
+      }
     },
   });
 

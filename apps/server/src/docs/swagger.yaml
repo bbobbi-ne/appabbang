@@ -1281,6 +1281,119 @@ paths:
                     description: 수령인 전화번호
                     example: '010-1234-5678'
 
+  /orders/guest/{no}/cancel:
+    post:
+      tags: [Orders]
+      summary: 고객 주문 취소
+      description: 주문을 취소합니다. (권한: 누구나)
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 주문 번호
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - canceledReason
+              properties:
+                canceledReason:
+                  type: string
+                  description: 취소 사유
+                  example: '주문 취소 요청'
+      responses:
+        '200':
+          description: 주문 취소 성공
+
+  /orders/guest/{no}/delivery:
+    get:
+      tags: [Orders]
+      summary: (비회원) 주문 배송(수령) 조회
+      description: 비회원의 주문 배송 정보를 조회합니다. (권한: 누구나)
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 주문 번호
+          example: 1
+      responses:
+        '200':
+          description: 주문 배송 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  no:
+                    type: integer
+                    example: 1
+                  orderNumber:
+                    type: string
+                    example: 'ORD20240825001'
+                  orderStatus:
+                    type: string
+                    example: '20'
+                  orderStatusName:
+                    type: string
+                    example: '배송중'
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: '2024-08-25T15:55:20.000Z'
+                  trackingNumber:
+                    type: string
+                    example: 'TRK1234567890'
+                  orderItems:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        no:
+                          type: integer
+                          example: 1
+                        breadName:
+                          type: string
+                          example: '식빵'
+                        breadImageUrl:
+                          type: string
+                          example: 'https://example.com/bread.jpg'
+                        unitPrice:
+                          type: number
+                          example: 3000
+                        quantity:
+                          type: integer
+                          example: 2
+                  address:
+                    type: string
+                    example: '서울시 강남구 역삼동 123-456'
+                  addressDetail:
+                    type: string
+                    example: '101동 101호'
+                  zipcode:
+                    type: string
+                    example: '12345'
+                  recipientName:
+                    type: string
+                    example: '홍길동'
+                  recipientMobile:
+                    type: string
+                    example: '010-1234-5678'
+                  deliveryMethodName:
+                    type: string
+                    example: '택배'
+                  deliveryTypeCode:
+                    type: string
+                    example: '01'
+
+
   /orders/{no}:
     get:
       tags: [Orders]

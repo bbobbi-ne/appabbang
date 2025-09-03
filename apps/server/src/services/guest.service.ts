@@ -56,3 +56,26 @@ export const getGuestOrders = async ({
     orderStatusName: getCodeName(item.orderStatus),
   }));
 };
+
+/** [비회원] 주문취소 */
+export const cancelOrder = async ({
+  orderNo,
+  canceledReason,
+}: {
+  orderNo: number;
+  canceledReason: string;
+}) => {
+  await prisma.$transaction(async (tx) => {
+    // 주문취소 접수요청(50)으로 변경
+    await tx.order.update({
+      where: { no: orderNo },
+      data: { orderStatus: '50' },
+    });
+
+    // 결제내역 취소사유 변경
+    await tx.payment.update({
+      where: { orderNo },
+      data: { canceledReason },
+    });
+  });
+};

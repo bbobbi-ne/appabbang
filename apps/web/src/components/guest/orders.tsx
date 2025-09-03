@@ -9,12 +9,18 @@ import OrderItem from '../mypage/order-item';
 
 interface GuestOrdersProps {
   list: GuestCreateData;
+  search: {
+    ordererName: string;
+    ordererEmail: string;
+    ordererMobile: string;
+    orderPw: string;
+  };
 }
 
 const CANCEL_ORDER_STATUS = ['50', '51', '52'];
 const AVALIABLE_DELIVERY_ORDER_STATUS = ['10', '11', '20', '30', '31', '40'];
 
-export default function GuestOrders({ list }: GuestOrdersProps) {
+export default function GuestOrders({ list, search }: GuestOrdersProps) {
   const navigate = useNavigate();
 
   // 주문상세내역
@@ -69,7 +75,12 @@ export default function GuestOrders({ list }: GuestOrdersProps) {
                     </Button>
                   )}
                 {Number(order.orderStatus) < 20 ? (
-                  <OrderCalcenDialog no={order.no} orderRoundNo={order.orderRoundNo}>
+                  <OrderCalcenDialog
+                    no={order.no}
+                    orderRoundNo={order.orderRoundNo}
+                    guest={true}
+                    search={search}
+                  >
                     <Button variant="outline">주문취소</Button>
                   </OrderCalcenDialog>
                 ) : null}

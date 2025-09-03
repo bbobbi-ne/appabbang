@@ -2,8 +2,10 @@ import { Router } from 'express';
 import * as orderController from '@/controllers/order.controller';
 import * as myController from '@/controllers/my.controller';
 import {
+  cancelOrderValidator,
   createOrderValidator,
   guestValidator,
+  paramsNoValidator,
   updateOrderAddressValidator,
   updateOrderStatusValidator,
   updateOrderTrackingNumberValidator,
@@ -39,6 +41,20 @@ router.put(
   '/guest/:no/address',
   validate(updateOrderAddressValidator),
   asyncHandler(myController.updateOrderAddress),
+);
+
+/** GET /orders/guest/{no}/delivery : [비회원] 주문 상세내역의 배송(수령)현황 조회 */
+router.get(
+  '/guest/:no/delivery',
+  validate(paramsNoValidator),
+  asyncHandler(myController.getOrderDelivery),
+);
+
+/** POST /orders/guest/{no}/cancel : 내 주문 취소 */
+router.post(
+  '/guest/:no/cancel',
+  validate(cancelOrderValidator),
+  asyncHandler(orderController.cancelOrder),
 );
 /**
  *

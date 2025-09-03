@@ -836,6 +836,60 @@ export interface GuestAddressUpdateData {
   recipientMobile: string;
 }
 
+export interface GuestCancelCreatePayload {
+  /**
+   * 취소 사유
+   * @example "주문 취소 요청"
+   */
+  canceledReason: string;
+}
+
+export type GuestCancelCreateData = any;
+
+export interface GuestDeliveryListData {
+  /** @example 1 */
+  no?: number;
+  /** @example "ORD20240825001" */
+  orderNumber?: string;
+  /** @example "20" */
+  orderStatus?: string;
+  /** @example "배송중" */
+  orderStatusName?: string;
+  /**
+   * @format date-time
+   * @example "2024-08-25T15:55:20.000Z"
+   */
+  createdAt?: string;
+  /** @example "TRK1234567890" */
+  trackingNumber?: string;
+  orderItems?: {
+    /** @example 1 */
+    no?: number;
+    /** @example "식빵" */
+    breadName?: string;
+    /** @example "https://example.com/bread.jpg" */
+    breadImageUrl?: string;
+    /** @example 3000 */
+    unitPrice?: number;
+    /** @example 2 */
+    quantity?: number;
+  }[];
+  /** @example "서울시 강남구 역삼동 123-456" */
+  address?: string;
+  /** @example "101동 101호" */
+  addressDetail?: string;
+  /** @example "12345" */
+  zipcode?: string;
+  /** @example "홍길동" */
+  recipientName?: string;
+  /** @example "010-1234-5678" */
+  recipientMobile?: string;
+  /** @example "택배" */
+  deliveryMethodName?: string;
+  /** @example "01" */
+  deliveryTypeCode?: string;
+}
+
 export interface OrdersDetailData {
   /**
    * 주문 번호

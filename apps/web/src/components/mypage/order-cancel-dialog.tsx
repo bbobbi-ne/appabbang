@@ -27,21 +27,38 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { toast } from '@appabbang/ui';
+import { useGuestCancelOrderMutation } from '@/hooks/use-guest';
 
 type Props = {
   children: React.ReactNode;
   no: number;
   orderRoundNo: number;
+  guest?: boolean;
+  search?: {
+    // 비회원 query string search
+    ordererName: string;
+    ordererEmail: string;
+    ordererMobile: string;
+    orderPw: string;
+  };
 };
 
-export default function OrderCalcenDialog({ children, no, orderRoundNo }: Props) {
+export default function OrderCalcenDialog({ children, no, orderRoundNo, guest, search }: Props) {
   const [open, setOpen] = useState<boolean>(false);
-  const cancelOrderMutation = useCancelOrderMutation();
+  const cancelOrderMutation = useCancelOrderMutation(); // 고객 주문취소
+  const guestCancelOrderMutation = useGuestCancelOrderMutation(); // 비회원 주문취소
 
   const cancelOrder = async (data: { canceledReason: string }) => {
     try {
-      await cancelOrderMutation.mutateAsync({ no, data, orderRoundNo });
-      toast.success('주문이 취소되었습니다.');
+      // [비회원]인 경우
+      if (guest) {
+        await guestCancelOrderMutation.mutateAsync({ no, data, search });
+        toast.success('주문이 취소되었습니다.');
+        setOpen(false);
+      } else {
+        await cancelOrderMutation.mutateAsync({ no, data, orderRoundNo });
+        toast.success('주문이 취소되었습니다.');
+      }
     } catch (error) {
       toast.error('주문취소에 실패했습니다.');
     }

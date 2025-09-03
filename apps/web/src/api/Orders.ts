@@ -14,8 +14,11 @@ import type {
   GuestAddressListData,
   GuestAddressUpdateData,
   GuestAddressUpdatePayload,
+  GuestCancelCreateData,
+  GuestCancelCreatePayload,
   GuestCreateData,
   GuestCreatePayload,
+  GuestDeliveryListData,
   GuestDetailData,
   OrdersCreateData,
   OrdersCreatePayload,
@@ -145,6 +148,43 @@ export class Orders<SecurityDataType = unknown> {
       method: "PUT",
       body: data,
       type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 주문을 취소합니다. (권한: 누구나)
+   *
+   * @tags Orders
+   * @name GuestCancelCreate
+   * @summary 고객 주문 취소
+   * @request POST:/orders/guest/{no}/cancel
+   * @response `200` `GuestCancelCreateData` 주문 취소 성공
+   */
+  guestCancelCreate = (
+    no: number,
+    data: GuestCancelCreatePayload,
+    params: RequestParams = {},
+  ) =>
+    this.http.request<GuestCancelCreateData, any>({
+      path: `/orders/guest/${no}/cancel`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 비회원의 주문 배송 정보를 조회합니다. (권한: 누구나)
+   *
+   * @tags Orders
+   * @name GuestDeliveryList
+   * @summary (비회원) 주문 배송(수령) 조회
+   * @request GET:/orders/guest/{no}/delivery
+   * @response `200` `GuestDeliveryListData` 주문 배송 조회 성공
+   */
+  guestDeliveryList = (no: number, params: RequestParams = {}) =>
+    this.http.request<GuestDeliveryListData, any>({
+      path: `/orders/guest/${no}/delivery`,
+      method: "GET",
       format: "json",
       ...params,
     });
