@@ -26,6 +26,8 @@ import { Info } from 'lucide-react';
 import { useState } from 'react';
 import useToast from '@/hooks/useToast';
 import { useNavigate } from '@tanstack/react-router';
+import { useDeleteCustomerMutation } from '@/hooks/use-customer';
+import { useCustomerStore } from '@/store/customer';
 
 type Props = {
   children: React.ReactNode;
@@ -35,22 +37,23 @@ function FaqUnregisterDialog({ children }: Props) {
   const [check, setCheck] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
   const { addToast } = useToast();
+  const deleteCustomer = useDeleteCustomerMutation();
   const navigate = useNavigate();
+  const { name } = useCustomerStore.getState().customer;
 
   /** 회원탈퇴 */
-  const onUnregister = () => {
+  const onUnregister = async () => {
     if (!check)
       return addToast({
         type: 'error',
         message: '회원 탈퇴 유의사항을 동의해야 탈퇴가 가능합니다.',
       });
-
-    addToast({
-      type: 'success',
-      message: '그 동안 아빠빵을 이용해주셔서 감사합니다. 🙇‍♀️ 메인페이지로 이동합니다.',
-    });
-
-    navigate({ to: '/' });
+    try {
+      await deleteCustomer.mutateAsync();
+      navigate({ to: '/' });
+    } catch (error: any) {
+      console.log(error);
+    }
   };
 
   return (
@@ -63,7 +66,7 @@ function FaqUnregisterDialog({ children }: Props) {
         className="overflow-y-auto max-h-11/12"
       >
         <DialogHeader>
-          <DialogTitle>언제나 반가운 김가나님,</DialogTitle>
+          <DialogTitle>언제나 반가운 {name}님,</DialogTitle>
           <DialogDescription>
             회원 탈퇴는 언제든 가능하지만, 한 번 더 고민해보시는건 어떠신가요?
           </DialogDescription>
