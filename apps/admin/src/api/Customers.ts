@@ -86,6 +86,26 @@ export class Customers<SecurityDataType = unknown> {
       ...params,
     });
   /**
+   * @description 로그인된 고객이 본인 계정을 탈퇴합니다. (권한: 고객)
+   *
+   * @tags Customers
+   * @name CustomersDelete
+   * @summary 회원 탈퇴
+   * @request DELETE:/customers
+   * @secure
+   * @response `204` `CustomersDeleteData` 회원 탈퇴 성공
+   * @response `400` `void` 진행 중인 주문이 있어 탈퇴할 수 없음
+   * @response `401` `void` 인증 실패 (토큰 없음/유효하지 않음)
+   * @response `404` `void` 고객을 찾을 수 없음
+   */
+  customersDelete = (params: RequestParams = {}) =>
+    this.http.request<CustomersDeleteData, void>({
+      path: `/customers`,
+      method: "DELETE",
+      secure: true,
+      ...params,
+    });
+  /**
    * @description 요청한 이메일로 서버에서 만든 인증번호를 전달합니다. (권한: 없음 - 누구나 접근가능)
    *
    * @tags Customers
@@ -230,23 +250,6 @@ export class Customers<SecurityDataType = unknown> {
     this.http.request<CustomersUpdateData, any>({
       path: `/customers/${no}`,
       method: "PUT",
-      secure: true,
-      ...params,
-    });
-  /**
-   * @description 특정 고객을 삭제합니다. (권한: 관리자만)
-   *
-   * @tags Customers
-   * @name CustomersDelete
-   * @summary 고객 삭제
-   * @request DELETE:/customers/{no}
-   * @secure
-   * @response `204` `CustomersDeleteData` 고객 삭제 성공
-   */
-  customersDelete = (no: number, params: RequestParams = {}) =>
-    this.http.request<CustomersDeleteData, any>({
-      path: `/customers/${no}`,
-      method: "DELETE",
       secure: true,
       ...params,
     });
