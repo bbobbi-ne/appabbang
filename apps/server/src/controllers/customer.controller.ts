@@ -94,9 +94,9 @@ export const create = async (req: Request, res: Response) => {
 export const update = async (_: Request, res: Response) => {
   res.status(200).json('Hello World');
 };
-export const remove = async (_: Request, res: Response) => {
-  res.status(204).json('Hello World');
-};
+// export const remove = async (_: Request, res: Response) => {
+//   res.status(204).json('Hello World');
+// };
 
 /** 이메일로 인증코드 보내기 */
 export const sendEmailCode = async (req: Request, res: Response) => {
@@ -173,4 +173,25 @@ export const getCheckId = async (req: Request, res: Response) => {
   const response = await customerService.getCheckId(id);
   const data = response ? response.id : null;
   res.status(200).json({ id: data });
+};
+
+// 회원탈퇴
+
+export const remove = async (req: Request, res: Response) => {
+  const customerNo = req.user?.no;
+
+  if (!customerNo) throw AppError.unauthorized('회원 정보가 확인되지 않습니다.');
+
+  try {
+    await customerService.deleteCustomerByNo(Number(customerNo));
+    res.status(204).json({ message: '회원 탈퇴가 완료되었습니다.' });
+  } catch (error) {
+    console.error(error);
+
+    if (error instanceof AppError) {
+      throw error;
+    }
+
+    throw AppError.internalServerError('회원 탈퇴 중 알 수 없는 오류가 발생했습니다.');
+  }
 };

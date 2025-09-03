@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { AppError } from '@/types';
 import { Customer } from '@prisma/client';
-import { hashPassword } from './auth.service';
+import { hashPassword, comparePassword } from './auth.service';
 
 // 고객 전체 목록 조회
 export const getCustomerList = async () => {
@@ -247,6 +247,43 @@ export const modifyPw = async (id: string, email: string, pw: string) => {
       data: {
         pw: hashedPw,
       },
+    });
+  });
+};
+
+/**
+ * 회원 탈퇴 (본인, no 기준)
+ * @param no 고객 번호
+ */
+export const deleteCustomerByNo = async (no: number) => {
+  return await prisma.$transaction(async (tx) => {
+    // 0. 미완료 주문 존재 여부 확인
+    const pendingOrders = await tx.order.findMany({
+      where: {
+        customerNo: no,
+        orderStatus: { notIn: ['40', '51', '52'] },
+      },
+    });
+
+    console.log(pendingOrders);
+
+    if (pendingOrders.length > 0) {
+      throw AppError.badRequest('진행 중인 주문이 있어 회원 탈퇴를 진행할 수 없습니다.');
+    }
+
+    // 1. 고객-쿠폰 삭제
+    await tx.customerCoupon.deleteMany({
+      where: { customerNo: no },
+    });
+
+    // 2. 주소 삭제
+    await tx.address.deleteMany({
+      where: { customerNo: no },
+    });
+
+    // 3. 고객 삭제
+    await tx.customer.delete({
+      where: { no },
     });
   });
 };
