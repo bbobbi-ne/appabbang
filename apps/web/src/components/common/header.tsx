@@ -16,6 +16,15 @@ export default function Header() {
   const { data: hasOrder } = useCheckHasOrderQuery(data?.no ?? 0, !!data?.no && !!accessToken);
 
   const moveToOrderRoundDetail = (no: number) => {
+    if (!data?.no) {
+      addToast({
+        type: 'info',
+        message: '현재 진행중이거나 추후 진행될 빵 주문건이 존재하지 않습니다.',
+      });
+
+      return;
+    }
+
     navigate({
       to: '/order-round/$orderRoundNo',
       params: { orderRoundNo: String(no) },
