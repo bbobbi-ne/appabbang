@@ -120,9 +120,6 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
 /** [비회원] 주문 목록 조회 */
 export const getGuestOrders = async (req: Request, res: Response) => {
   const { ordererName, ordererMobile, ordererEmail, orderPw } = req.body;
-  console.log();
-  if (!ordererName || !ordererMobile || !ordererEmail || !orderPw)
-    throw AppError.notFound('비회원 로그인 정보를 입력 바랍니다.');
 
   // 비회원 정보로 입력된 주문 목록 조회
   const guestOrders = await GuestService.getGuestOrders({
@@ -170,9 +167,7 @@ export const cancelOrder = async (req: Request, res: Response) => {
 
 /** [비회원] 주문 비밀번호 찾기 */
 export const updateGuestOrderPwSendEmail = async (req: Request, res: Response) => {
-  const { ordererName, ordererMobile, ordererEmail } = req.body;
-  if (!ordererName || !ordererMobile || !ordererEmail)
-    throw AppError.notFound('비회원 정보가 누락되었습니다.');
+  const { ordererEmail } = req.body;
 
   // 임시 주문 비밀번호 생성
   const orderPw = generateTempPassword();
