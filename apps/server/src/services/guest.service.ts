@@ -79,3 +79,24 @@ export const cancelOrder = async ({
     });
   });
 };
+
+/**
+ * 비회원의 주문 비밀번호를 임시 비밀번호로 변경
+ * 이미 해싱처리된 주문 비밀번호를 비회원에게 전달할 수 없으므로, 임의의 비밀번호를 업데이트시킨 뒤, 이를 비회원에게 전달함.
+ *  */
+export const getUpdateOrderPw = async ({
+  ordererName,
+  ordererEmail,
+  ordererMobile,
+  hashedOrderPw,
+}: {
+  ordererName: string;
+  ordererEmail: string;
+  ordererMobile: string;
+  hashedOrderPw: string;
+}) => {
+  await prisma.order.updateMany({
+    where: { ordererName, ordererEmail, ordererMobile },
+    data: { orderPw: hashedOrderPw },
+  });
+};

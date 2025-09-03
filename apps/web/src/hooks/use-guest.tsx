@@ -1,4 +1,4 @@
-import type { GuestCreatePayload } from '@/api/data-contracts';
+import type { GuestCreatePayload, GuestPwUpdatePayload } from '@/api/data-contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { GuestService } from '@/services/api/guest-service';
 
@@ -94,6 +94,15 @@ export function useGuestCancelOrderMutation() {
         });
       }
     },
+  });
+
+  return mutation;
+}
+
+/** 비회원 주문 비밀번호 찾기 */
+export function useUpdateGuestOrderPwSendEmailMutation() {
+  const mutation = useMutation({
+    mutationFn: (data: GuestPwUpdatePayload) => GuestService.updateGuestOrderPwSendEmail(data),
   });
 
   return mutation;

@@ -1311,6 +1311,38 @@ paths:
         '200':
           description: 주문 취소 성공
 
+  /orders/guest/pw:
+    put:
+      tags: [Orders]
+      summary: (비회원) 임시 주문 비밀번호 발송
+      description: 비회원의 주문 비밀번호를 임시로 변경하고 임시 주문 비밀번호를 입력한 이메일로 전송합니다. (권한: 누구나)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ordererName
+                - ordererMobile
+                - ordererEmail
+              properties:
+                ordererName:
+                  type: string
+                  description: 주문자 이름
+                  example: 홍길동
+                ordererMobile:
+                  type: string
+                  description: 주문자 휴대번호
+                  example: 010-1234-5678
+                ordererEmail:
+                  type: string
+                  description: 주문자 이메일
+                  example: test1234@naver.com
+      responses:
+        '200':
+          description: 주문 상세 조회 성공
+
   /orders/guest/{no}/delivery:
     get:
       tags: [Orders]

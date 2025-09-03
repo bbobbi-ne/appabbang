@@ -1,4 +1,8 @@
-import type { GuestAddressUpdatePayload, GuestCreatePayload } from '@/api/data-contracts';
+import type {
+  GuestAddressUpdatePayload,
+  GuestCreatePayload,
+  GuestPwUpdatePayload,
+} from '@/api/data-contracts';
 import { Orders } from '@/api/Orders';
 import { CustomHttpClient } from '../httpclient-instance';
 import { refreshCreate } from './auth-service';
@@ -34,6 +38,10 @@ export const GuestService = {
   /** 비회원 주문취소 */
   cancelOrder: async (no: number, data: { canceledReason: string }) => {
     const response = await orderApi.guestCancelCreate(no, data);
-    return response;
+    return response.data;
+  },
+  updateGuestOrderPwSendEmail: async (data: GuestPwUpdatePayload) => {
+    const response = await orderApi.guestPwUpdate(data);
+    return response.data;
   },
 };

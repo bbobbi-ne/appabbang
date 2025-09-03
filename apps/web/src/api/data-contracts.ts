@@ -846,6 +846,26 @@ export interface GuestCancelCreatePayload {
 
 export type GuestCancelCreateData = any;
 
+export interface GuestPwUpdatePayload {
+  /**
+   * 주문자 이름
+   * @example "홍길동"
+   */
+  ordererName: string;
+  /**
+   * 주문자 휴대번호
+   * @example "010-1234-5678"
+   */
+  ordererMobile: string;
+  /**
+   * 주문자 이메일
+   * @example "test1234@naver.com"
+   */
+  ordererEmail: string;
+}
+
+export type GuestPwUpdateData = any;
+
 export interface GuestDeliveryListData {
   /** @example 1 */
   no?: number;

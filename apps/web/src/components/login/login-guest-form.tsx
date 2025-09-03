@@ -16,12 +16,12 @@ import {
 } from '@appabbang/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import FindIdDialog from './find-id-dialog';
 import { useAccessTokenStore } from '@/store/session';
 import useToast from '@/hooks/useToast';
 import type { GuestCreatePayload } from '@/api/data-contracts';
 import { useNavigate } from '@tanstack/react-router';
 import { useGetGuestOrdersMutation } from '@/hooks/use-guest';
+import FindOrderPwDialog from './find-order-pw-dialog';
 
 export default function LoginGuestForm() {
   const labelMinWidth = 'min-w-[100px]';
@@ -53,21 +53,15 @@ export default function LoginGuestForm() {
       if (result && result.length > 0) {
         const firstOrder = result[0];
         if (firstOrder) {
-          addToast({
-            type: 'success',
-            message: '주문정보를 성공적으로 조회했습니다. 해당 화면으로 이동합니다.',
+          navigate({
+            to: `/guest/order-list`,
+            search: {
+              ordererName: data.ordererName,
+              ordererMobile: data.ordererMobile,
+              ordererEmail: data.ordererEmail,
+              orderPw: data.orderPw,
+            },
           });
-          setTimeout(() => {
-            navigate({
-              to: `/guest/order-list`,
-              search: {
-                ordererName: data.ordererName,
-                ordererMobile: data.ordererMobile,
-                ordererEmail: data.ordererEmail,
-                orderPw: data.orderPw,
-              },
-            });
-          }, 3000);
         } else {
           addToast({
             type: 'error',
@@ -201,11 +195,11 @@ export default function LoginGuestForm() {
         />
 
         <div className="cursor-pointer pt-10 pb-2 flex flex-row justify-center items-center gap-2 text-gray-500 text-sm ">
+          <FindOrderPwDialog>
+            <div className="hover:underline">주문 비밀번호 찾기</div>
+          </FindOrderPwDialog>
           {/* 
-          추가기능 작업이 필요하면 해당 주석을 해제할 것.
-          <FindIdDialog>
-            <div className="hover:underline">아이디찾기</div>
-          </FindIdDialog>
+          
           
           <div> | </div>
           <FindPwDialog>

@@ -20,6 +20,8 @@ import type {
   GuestCreatePayload,
   GuestDeliveryListData,
   GuestDetailData,
+  GuestPwUpdateData,
+  GuestPwUpdatePayload,
   OrdersCreateData,
   OrdersCreatePayload,
   OrdersDetailData,
@@ -168,6 +170,23 @@ export class Orders<SecurityDataType = unknown> {
     this.http.request<GuestCancelCreateData, any>({
       path: `/orders/guest/${no}/cancel`,
       method: "POST",
+      body: data,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 비회원의 주문 비밀번호를 임시로 변경하고 임시 주문 비밀번호를 입력한 이메일로 전송합니다. (권한: 누구나)
+   *
+   * @tags Orders
+   * @name GuestPwUpdate
+   * @summary (비회원) 임시 주문 비밀번호 발송
+   * @request PUT:/orders/guest/pw
+   * @response `200` `GuestPwUpdateData` 주문 상세 조회 성공
+   */
+  guestPwUpdate = (data: GuestPwUpdatePayload, params: RequestParams = {}) =>
+    this.http.request<GuestPwUpdateData, any>({
+      path: `/orders/guest/pw`,
+      method: "PUT",
       body: data,
       type: ContentType.Json,
       ...params,

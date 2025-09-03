@@ -671,4 +671,33 @@ export const guestValidator = [
     .trim(),
 ];
 
+/** 비회원 주문 비밀번호 찾기 */
+export const guestOrderPwValidator = [
+  body(ORDERER.key)
+    .notEmpty()
+    .matches(ORDERER.matches.value)
+    .withMessage(ORDERER.matches.message)
+    .isString()
+    .withMessage(ORDERER.string.message)
+    .isLength({ min: ORDERER.length.min, max: ORDERER.length.max })
+    .withMessage(ORDERER.length.message)
+    .trim(),
+
+  body(MOBILE_NUMBER.key)
+    .notEmpty()
+    .matches(MOBILE_NUMBER.matches.value)
+    .withMessage(MOBILE_NUMBER.matches.message)
+    .isString()
+    .withMessage(MOBILE_NUMBER.string.message)
+    .trim(),
+
+  body(EMAIL.key)
+    .notEmpty()
+    .isString()
+    .withMessage(EMAIL.string.message)
+    .isLength({ min: EMAIL.length.min, max: EMAIL.length.max })
+    .withMessage(EMAIL.length.message)
+    .trim(),
+];
+
 ////////////////////////////////////////////////////////////////////////

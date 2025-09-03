@@ -4,7 +4,8 @@ import * as GuestService from '@/services/guest.service';
 import * as paymentService from '@/services/payment.service';
 import * as MyService from '@/services/my.service';
 import { AppError } from '@/types';
-import { comparePassword } from '@/services/auth.service';
+import { comparePassword, generateTempPassword, hashPassword } from '@/services/auth.service';
+import { guestOrderPwSendEmail } from '@/lib/send-email';
 
 /** 주문 목록 조회 */
 export const getList = async (_: Request, res: Response) => {
@@ -165,4 +166,23 @@ export const cancelOrder = async (req: Request, res: Response) => {
   await GuestService.cancelOrder({ orderNo, canceledReason });
 
   res.status(200).json({ message: '주문이 취소되었습니다.' });
+};
+
+/** [비회원] 주문 비밀번호 찾기 */
+export const updateGuestOrderPwSendEmail = async (req: Request, res: Response) => {
+  const { ordererName, ordererMobile, ordererEmail } = req.body;
+  if (!ordererName || !ordererMobile || !ordererEmail)
+    throw AppError.notFound('비회원 정보가 누락되었습니다.');
+
+  // 임시 주문 비밀번호 생성
+  const orderPw = generateTempPassword();
+  const hashedOrderPw = await hashPassword(orderPw);
+  const params = { ...req.body, hashedOrderPw };
+
+  await GuestService.getUpdateOrderPw(params);
+
+  // 입력한 이메일로 메일을 전송하여 주문 비밀번호를 알려주도록 한다.
+  // 비회원이므로 이메일을 굳이 인증절차를 밟을 이유는 없다.
+  await guestOrderPwSendEmail({ ordererEmail, orderPw });
+  res.sendStatus(200);
 };
