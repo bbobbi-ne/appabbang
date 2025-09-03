@@ -22,8 +22,6 @@ import {
 import DaumPostApi from '@/components/common/daum-post-api';
 import { formatMobile } from '@appabbang/utils';
 import { joinSchema, validEmail, type JoinSchemaType } from '@/validate/join-form-schema';
-import ServiceIsAgreedDialog from './service-terms-agreed-dialog';
-import PrivacyTermsAgreedDialog from './privacy-terms-agreed-dialog';
 import useToast from '@/hooks/useToast';
 import { useState } from 'react';
 import type { CustomersCreatePayload } from '@/api/data-contracts';
@@ -36,6 +34,8 @@ import {
 } from '@/hooks/use-customer';
 
 const labelMinWidth = 'min-w-[120px]';
+const VITE_TOS_URL = (import.meta as any).env.VITE_TOS_URL;
+const VITE_CUI_URL = (import.meta as any).env.VITE_CUI_URL;
 
 export default function JoinForm() {
   const { addToast } = useToast();
@@ -208,6 +208,14 @@ export default function JoinForm() {
       }
     } catch (error: any) {
       addToast({ type: 'error', message: error.response.data.error.message });
+    }
+  };
+
+  const openTerms = (type: 'tos' | 'cui') => {
+    if (type === 'tos') {
+      window.open(VITE_TOS_URL, '_blank', 'width=800,height=600');
+    } else {
+      window.open(VITE_CUI_URL, '_blank', 'width=800,height=600');
     }
   };
 
@@ -552,16 +560,19 @@ export default function JoinForm() {
                       errorCheck={false}
                       className={`${labelMinWidth} whitespace-nowrap cursor-pointer text-xs`}
                     >
-                      아빠빵 서비스 이용약관 처리방침에 동의합니다.
+                      아빠빵 서비스 이용약관에 동의합니다.
                     </FormLabel>
                   </div>
 
                   <div className="flex-shrink-0">
-                    <ServiceIsAgreedDialog>
-                      <Button type="button" variant="link" className="text-xs p-o">
-                        약관보기
-                      </Button>
-                    </ServiceIsAgreedDialog>
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="text-xs"
+                      onClick={() => openTerms('tos')}
+                    >
+                      약관보기
+                    </Button>
                   </div>
                 </div>
               </FormItem>
@@ -591,15 +602,18 @@ export default function JoinForm() {
                       errorCheck={false}
                       className={`${labelMinWidth} whitespace-nowrap cursor-pointer text-xs`}
                     >
-                      아빠빵 개인정보 수집 및 이용 처리방침에 동의합니다.
+                      아빠빵 개인정보 수집 및 이용에 동의합니다.
                     </FormLabel>
                   </div>
 
-                  <PrivacyTermsAgreedDialog>
-                    <Button type="button" variant="link" className="text-xs p-o">
-                      약관보기
-                    </Button>
-                  </PrivacyTermsAgreedDialog>
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="text-xs"
+                    onClick={() => openTerms('cui')}
+                  >
+                    약관보기
+                  </Button>
                 </div>
               </FormItem>
             )}
@@ -628,15 +642,20 @@ export default function JoinForm() {
                       errorCheck={false}
                       className={`${labelMinWidth} whitespace-nowrap cursor-pointer text-xs`}
                     >
-                      마케팅 목적 개인정보 이용 처리방침에 동의합니다. (선택)
+                      마케팅 목적 개인정보 수집 및 이용에 동의합니다. (선택)
                     </FormLabel>
                   </div>
 
-                  <ServiceIsAgreedDialog>
-                    <Button type="button" variant="link" className="text-xs p-o">
-                      약관보기
-                    </Button>
-                  </ServiceIsAgreedDialog>
+                  <div className="h-9" />
+
+                  {/* <Button
+                    type="button"
+                    variant="link"
+                    className="text-xs"
+                    onClick={() => openTerms('cui')}
+                  >
+                    약관보기
+                  </Button> */}
                 </div>
               </FormItem>
             )}

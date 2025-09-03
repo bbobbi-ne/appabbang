@@ -24,11 +24,6 @@ import { useForm } from 'react-hook-form';
 import { useEffect } from 'react';
 import { useGetCommonCodesQuery } from '@/hooks/use-common-code';
 import { orderFormSchema, type OrderFormSchema } from '@/validate/order-form-schema';
-
-// TODO: 점검 및 정리 필요 (약관들)
-import ServiceIsAgreedDialog from '../join/service-terms-agreed-dialog';
-import PrivacyTermsAgreedDialog from '../join/privacy-terms-agreed-dialog';
-import PaymentRefundTermsAgreedDialog from '../join/privacy-terms-agreed-dialog';
 import { MyAddressListDialog } from '@/components/order-round/my-address-list-dialog';
 import { OrderAddressForm } from '@/components/order-round/order-address-form';
 
@@ -39,6 +34,9 @@ type Props = {
 };
 
 const labelMinWidth = 'min-w-[120px]';
+const VITE_TOS_URL = (import.meta as any).env.VITE_TOS_URL;
+const VITE_CUI_URL = (import.meta as any).env.VITE_CUI_URL;
+const VITE_TPR_URL = (import.meta as any).env.VITE_TPR_URL;
 
 export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
   /** 은행 목록 API */
@@ -87,6 +85,16 @@ export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
   // const createOrder = async (data: any) => {
   //   await onSubmit(data);
   // };
+
+  const openTerms = (type: 'tos' | 'cui' | 'tpr') => {
+    if (type === 'tos') {
+      window.open(VITE_TOS_URL, '_blank', 'width=800,height=600');
+    } else if (type === 'cui') {
+      window.open(VITE_CUI_URL, '_blank', 'width=800,height=600');
+    } else if (type === 'tpr') {
+      window.open(VITE_TPR_URL, '_blank', 'width=800,height=600');
+    }
+  };
 
   useEffect(() => {
     if (!isDelivery) {
@@ -365,16 +373,19 @@ export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
                         errorCheck={false}
                         className={`${labelMinWidth} whitespace-nowrap cursor-pointer text-xs`}
                       >
-                        [필수] 아빠빵 서비스 이용약관 처리방침에 동의합니다.
+                        [필수] 아빠빵 서비스 이용약관에 동의합니다.
                       </FormLabel>
                     </div>
 
                     <div className="flex-shrink-0">
-                      <ServiceIsAgreedDialog>
-                        <Button type="button" variant="link" className="text-xs p-0">
-                          약관보기
-                        </Button>
-                      </ServiceIsAgreedDialog>
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="text-xs p-0"
+                        onClick={() => openTerms('tos')}
+                      >
+                        약관보기
+                      </Button>
                     </div>
                   </div>
                 </FormItem>
@@ -402,15 +413,18 @@ export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
                         errorCheck={false}
                         className={`${labelMinWidth} whitespace-nowrap cursor-pointer text-xs`}
                       >
-                        [필수] 아빠빵 개인정보 수집 및 이용 처리방침에 동의합니다.
+                        [필수] 아빠빵 개인정보 수집 및 이용에 동의합니다.
                       </FormLabel>
                     </div>
 
-                    <PrivacyTermsAgreedDialog>
-                      <Button type="button" variant="link" className="text-xs p-0">
-                        약관보기
-                      </Button>
-                    </PrivacyTermsAgreedDialog>
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="text-xs p-0"
+                      onClick={() => openTerms('cui')}
+                    >
+                      약관보기
+                    </Button>
                   </div>
                 </FormItem>
               )}
@@ -442,11 +456,14 @@ export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
                     </div>
 
                     <div className="flex-shrink-0">
-                      <PaymentRefundTermsAgreedDialog>
-                        <Button type="button" variant="link" className="text-xs p-0">
-                          약관보기
-                        </Button>
-                      </PaymentRefundTermsAgreedDialog>
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="text-xs p-0"
+                        onClick={() => openTerms('tpr')}
+                      >
+                        약관보기
+                      </Button>
                     </div>
                   </div>
                 </FormItem>
@@ -484,11 +501,14 @@ export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
                     </div>
 
                     <div className="flex-shrink-0">
-                      <ServiceIsAgreedDialog>
-                        <Button type="button" variant="link" className="text-xs p-0">
-                          약관보기
-                        </Button>
-                      </ServiceIsAgreedDialog>
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="text-xs p-0"
+                        onClick={() => openTerms('tpr')}
+                      >
+                        약관보기
+                      </Button>
                     </div>
                   </div>
                 </FormItem>
