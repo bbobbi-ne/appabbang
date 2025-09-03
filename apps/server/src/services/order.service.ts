@@ -170,8 +170,8 @@ export const create = async (customerNo: number | undefined, body: CreateOrderRe
         isPaymentRefundTermsAgreed,
         orderRoundNo,
         memo: '',
-        customer: customerNo ? { connect: { no: customerNo } } : {},
-        coupon: couponNo ? { connect: { no: couponNo } } : {},
+        customerNo: customerNo ?? undefined,
+        couponNo: couponNo ?? undefined,
         ...(!customerNo
           ? {
               orderPw: await hashPassword(orderPw || ''),
@@ -183,7 +183,7 @@ export const create = async (customerNo: number | undefined, body: CreateOrderRe
               isPrivacyTermsAgreed: false,
               isServiceTermsAgreed: false,
             }),
-        ...(customerCouponNo && { customerCouponNo }),
+        customerCouponNo: customerCouponNo ?? null,
       },
     });
 
