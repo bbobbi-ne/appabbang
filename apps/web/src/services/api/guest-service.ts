@@ -2,6 +2,7 @@ import type {
   GuestAddressUpdatePayload,
   GuestCreatePayload,
   GuestPwUpdatePayload,
+  GuestPwUpdateUpdatePayload,
 } from '@/api/data-contracts';
 import { Orders } from '@/api/Orders';
 import { CustomHttpClient } from '../httpclient-instance';
@@ -40,8 +41,14 @@ export const GuestService = {
     const response = await orderApi.guestCancelCreate(no, data);
     return response.data;
   },
+  /** 비회원 주문 비밀번호 임시 변경 및 이메일 전송 */
   updateGuestOrderPwSendEmail: async (data: GuestPwUpdatePayload) => {
     const response = await orderApi.guestPwUpdate(data);
+    return response.data;
+  },
+  /** 비회원 주문 비밀번호 변경 */
+  updateGuestOrderPw: async (data: GuestPwUpdateUpdatePayload) => {
+    const response = await orderApi.guestPwUpdateUpdate(data);
     return response.data;
   },
 };

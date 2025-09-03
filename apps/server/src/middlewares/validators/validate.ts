@@ -623,7 +623,7 @@ const MOBILE_NUMBER = {
 
 const ORDER_PW = {
   key: 'orderPw',
-  length: { min: 4, max: 20, message: '주문 비밀번호는 4~20자 이내로 입력 바랍니다.' },
+  length: { min: 4, max: 30, message: '주문 비밀번호는 4~30자 이내로 입력 바랍니다.' },
   string: { message: '주문 비밀번호는 문자열로 입력해야 합니다.' },
 };
 
@@ -700,4 +700,24 @@ export const guestOrderPwValidator = [
     .trim(),
 ];
 
+/** 비회원 주문 비밀번호 변경 */
+export const updateGuestOrderPwValidator = [
+  body('no').notEmpty().withMessage('주문서no는 필수값입니다.').trim(),
+
+  body(ORDER_PW.key)
+    .notEmpty()
+    .isString()
+    .withMessage(ORDER_PW.string.message)
+    .isLength({ min: ORDER_PW.length.min, max: ORDER_PW.length.max })
+    .withMessage(ORDER_PW.length.message)
+    .trim(),
+
+  body('orderPwModify')
+    .notEmpty()
+    .isString()
+    .withMessage(ORDER_PW.string.message)
+    .isLength({ min: ORDER_PW.length.min, max: ORDER_PW.length.max })
+    .withMessage(ORDER_PW.length.message)
+    .trim(),
+];
 ////////////////////////////////////////////////////////////////////////

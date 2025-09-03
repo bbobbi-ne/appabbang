@@ -866,6 +866,26 @@ export interface GuestPwUpdatePayload {
 
 export type GuestPwUpdateData = any;
 
+export interface GuestPwUpdateUpdatePayload {
+  /**
+   * 주문 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 현재 주문 비밀번호
+   * @example 1234
+   */
+  orderPw: string;
+  /**
+   * 변경할 주문 비밀번호
+   * @example "1234a"
+   */
+  orderPwModify: string;
+}
+
+export type GuestPwUpdateUpdateData = any;
+
 export interface GuestDeliveryListData {
   /** @example 1 */
   no?: number;

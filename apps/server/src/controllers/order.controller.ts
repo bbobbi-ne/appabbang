@@ -181,3 +181,23 @@ export const updateGuestOrderPwSendEmail = async (req: Request, res: Response) =
   await guestOrderPwSendEmail({ ordererEmail, orderPw });
   res.sendStatus(200);
 };
+
+/** [비회원] 주문 비밀번호 변경 */
+export const updateGuestOrderPw = async (req: Request, res: Response) => {
+  const { orderPw, orderPwModify, no } = req.body;
+
+  // 현재 주문서의 orderPw 조회
+  const order = await GuestService.getOrder(Number(no));
+  if (!order || !order.orderPw) throw AppError.notFound('현재 주문 비밀번호를 확인할 수 없습니다.');
+
+  // 주문 비밀번호 비교
+  const isValid = await comparePassword(orderPw, order.orderPw);
+  if (!isValid) throw AppError.internalServerError('현재 주문 비밀번호가 올바르지 않습니다.');
+
+  // 주문 비밀번호 해싱
+  const hashedPw = await hashPassword(orderPwModify);
+
+  // 주문 비밀번호 변경
+  await GuestService.updateOrderPw(Number(no), hashedPw);
+  res.sendStatus(200);
+};

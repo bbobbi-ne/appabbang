@@ -100,3 +100,25 @@ export const getUpdateOrderPw = async ({
     data: { orderPw: hashedOrderPw },
   });
 };
+
+/** 비회원의 주문서 조회 */
+export const getOrder = async (no: number) => {
+  const order = await prisma.order.findUnique({
+    where: { no },
+    select: { no: true, orderPw: true },
+  });
+
+  return order;
+};
+
+/** 비회원 주문 비밀번호 변경 */
+export const updateOrderPw = async (no: number, hashedOrderPw: string) => {
+  await prisma.$transaction(async (tx) => {
+    await tx.order.update({
+      where: { no },
+      data: {
+        orderPw: hashedOrderPw,
+      },
+    });
+  });
+};

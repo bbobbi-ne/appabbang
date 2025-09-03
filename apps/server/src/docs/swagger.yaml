@@ -1341,7 +1341,40 @@ paths:
                   example: test1234@naver.com
       responses:
         '200':
-          description: 주문 상세 조회 성공
+          description: 비회원 주문 비밀번호 임시 변경 및 이메일 전송 성공
+
+  /orders/guest/pw-update:
+    put:
+      tags: [Orders]
+      summary: (비회원) 주문 비밀번호 변경
+      description: 비회원의 주문 비밀번호를 변경합니다. (권한: 누구나)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - no
+                - orderPw
+                - orderPwModify
+              properties:
+                no:
+                  type: integer
+                  description: 주문 번호
+                  example: 1
+                orderPw:
+                  type: string
+                  description: 현재 주문 비밀번호
+                  example: 1234
+                orderPwModify:
+                  type: string
+                  description: 변경할 주문 비밀번호
+                  example: 1234a
+      responses:
+        '200':
+          description: 비회원 주문 비밀번호 변경 성공
+
 
   /orders/guest/{no}/delivery:
     get:

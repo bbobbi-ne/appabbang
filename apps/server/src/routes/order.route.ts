@@ -7,6 +7,7 @@ import {
   guestOrderPwValidator,
   guestValidator,
   paramsNoValidator,
+  updateGuestOrderPwValidator,
   updateOrderAddressValidator,
   updateOrderStatusValidator,
   updateOrderTrackingNumberValidator,
@@ -36,6 +37,13 @@ router.put(
   '/guest/pw',
   validate(guestOrderPwValidator),
   asyncHandler(orderController.updateGuestOrderPwSendEmail),
+);
+
+/** PUT /orders/guest/update : [비회원] 주문 비밀번호 변경 */
+router.put(
+  '/guest/pw-update',
+  validate(updateGuestOrderPwValidator),
+  asyncHandler(orderController.updateGuestOrderPw),
 );
 
 /** GET /orders/guest/{no} : [비회원] 주문 조회 */

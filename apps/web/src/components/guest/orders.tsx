@@ -6,6 +6,7 @@ import { formatDate } from '@appabbang/utils';
 import OrderCancelDialog from '@/components/mypage/order-cancel-dialog';
 import { useNavigate } from '@tanstack/react-router';
 import OrderItem from '@/components/mypage/order-item';
+import UpdateGuestOrderPw from './update-guest-order-pw';
 
 interface GuestOrdersProps {
   list: GuestCreateData;
@@ -34,7 +35,7 @@ export default function GuestOrders({ list, search }: GuestOrdersProps) {
   };
 
   return (
-    <div className="mt-10">
+    <div className="mt-10 ">
       <p className="py-2 text-xs">* 최근 1년 이내 주문건만 확인됩니다.</p>
 
       <div className="space-y-2">
@@ -84,6 +85,9 @@ export default function GuestOrders({ list, search }: GuestOrdersProps) {
                     <Button variant="outline">주문취소</Button>
                   </OrderCancelDialog>
                 ) : null}
+                <UpdateGuestOrderPw orderNo={order.no} search={search}>
+                  <Button variant="outline">주문 비밀번호 변경</Button>
+                </UpdateGuestOrderPw>
               </div>
             </CardContent>
           </Card>
