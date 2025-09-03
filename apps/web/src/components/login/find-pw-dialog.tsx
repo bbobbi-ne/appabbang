@@ -255,7 +255,12 @@ function FindPwDialog({ children }: Props) {
               />
             ) : null}
 
-            <Button type="button" disabled={success} onClick={onSubmit} className="w-full">
+            <Button
+              type="button"
+              disabled={success}
+              onClick={form.handleSubmit(onSubmit)}
+              className="w-full"
+            >
               인증번호 확인
             </Button>
           </form>
