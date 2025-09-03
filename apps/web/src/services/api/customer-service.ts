@@ -19,6 +19,11 @@ export const CustomerService = {
     const response = await customerApi.customersCreate(data);
     return response.data;
   },
+  /** 회원탈퇴 */
+  delete: async () => {
+    const response = await customerApi.customersDelete();
+    return response.data;
+  },
   /** 입력한 이메일로 아이디 조회하기 */
   getId: async (data: PostCustomersPayload) => {
     const response = await customerApi.postCustomers(data);

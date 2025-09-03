@@ -53,6 +53,31 @@ export function useCreateCustomerMutation() {
 
   return createAddressMutation;
 }
+/**
+ * 회원가입
+ * onSuccess 이후 저장소에 담긴 email code 리셋
+ *  */
+export function useDeleteCustomerMutation() {
+  const createAddressMutation = useMutation({
+    mutationFn: () => CustomerService.delete(),
+    onSuccess: () => {
+      addToast({
+        type: 'success',
+        message: '그 동안 아빠빵을 이용해주셔서 감사합니다. 🙇‍♀️ 메인페이지로 이동합니다.',
+      });
+      useAccessTokenStore.getState().reset();
+      useCustomerStore.getState().reset();
+    },
+    onError: (error: any) => {
+      addToast({
+        type: 'error',
+        message: error.response.data.error.message || '회원탈퇴 과정에서 오류가 발생했습니다.',
+      });
+    },
+  });
+
+  return createAddressMutation;
+}
 
 /**
  * 아이디 중복체크 :: 존재하는 아이디 찾기
