@@ -254,8 +254,9 @@ export const modifyPw = async (id: string, email: string, pw: string) => {
 /**
  * 회원 탈퇴 (본인, no 기준)
  * @param no 고객 번호
+ * @param id 고객 Id
  */
-export const deleteCustomerByNo = async (no: number) => {
+export const deleteCustomerByNo = async (no: number, id: string) => {
   return await prisma.$transaction(async (tx) => {
     // 0. 미완료 주문 존재 여부 확인
     const pendingOrders = await tx.order.findMany({
@@ -265,21 +266,22 @@ export const deleteCustomerByNo = async (no: number) => {
       },
     });
 
-    console.log(pendingOrders);
-
     if (pendingOrders.length > 0) {
       throw AppError.badRequest('진행 중인 주문이 있어 회원 탈퇴를 진행할 수 없습니다.');
     }
+
+    // 리프레시 토큰삭제
+    await updateRefreshToken(id, null);
 
     // 1. 고객-쿠폰 삭제
     await tx.customerCoupon.deleteMany({
       where: { customerNo: no },
     });
 
-    // 2. 주소 삭제
-    await tx.address.deleteMany({
-      where: { customerNo: no },
-    });
+    // // 2. 주소 삭제
+    // await tx.address.deleteMany({
+    //   where: { customerNo: no },
+    // });
 
     // 3. 고객 삭제
     await tx.customer.delete({

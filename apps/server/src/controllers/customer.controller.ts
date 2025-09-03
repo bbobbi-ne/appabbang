@@ -178,13 +178,25 @@ export const getCheckId = async (req: Request, res: Response) => {
 // 회원탈퇴
 
 export const remove = async (req: Request, res: Response) => {
-  const customerNo = req.user?.no;
+  const customer = req.user;
+  const id = req.user.id;
 
-  if (!customerNo) throw AppError.unauthorized('회원 정보가 확인되지 않습니다.');
+  if (!customer) throw AppError.unauthorized('회원 정보가 확인되지 않습니다.');
 
   try {
-    await customerService.deleteCustomerByNo(Number(customerNo));
-    res.status(204).json({ message: '회원 탈퇴가 완료되었습니다.' });
+    await customerService.deleteCustomerByNo(Number(customer.no), id);
+
+    res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, {
+      httpOnly: true,
+      sameSite: 'strict',
+      maxAge: 0,
+    });
+
+    res.status(200).json({
+      message: '회원 탈퇴가 완료되었습니다.',
+      customerNo: customer.no,
+      timestamp: new Date().toISOString(),
+    });
   } catch (error) {
     console.error(error);
 
