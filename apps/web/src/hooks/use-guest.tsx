@@ -5,7 +5,6 @@ import type {
 } from '@/api/data-contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { GuestService } from '@/services/api/guest-service';
-import type { SearchProp } from '@/components/guest/update-guest-order-pw';
 
 /** 비회원 주문목록 조회 mutation */
 export function useGetGuestOrdersMutation() {
@@ -115,24 +114,10 @@ export function useUpdateGuestOrderPwSendEmailMutation() {
 
 /** 비회원 주문 비밀번호 변경 */
 export function useUpdateGuestOrderPwMutation() {
-  const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: (
-      data: GuestPwUpdateUpdatePayload,
-      // & {
-      //   search: SearchProp;
-      // },
-    ) => {
-      // const { search, ...data } = payload;
+    mutationFn: (data: GuestPwUpdateUpdatePayload) => {
       return GuestService.updateGuestOrderPw(data);
     },
-    // onSuccess: (_, variables) => {
-    //   if (variables.search) {
-    //     queryClient.invalidateQueries({
-    //       queryKey: ['/orders/guest/order-list'],
-    //     });
-    //   }
-    // },
   });
 
   return mutation;
