@@ -1,5 +1,7 @@
-import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { toZonedTime, formatInTimeZone } from 'date-fns-tz';
+
+const KST_TZ = 'Asia/Seoul';
 
 /**
  * 💰 KRW 통화 형식으로 숫자 변환
@@ -17,52 +19,54 @@ export function formatCurrencyKR(value: string | number): string {
 }
 
 /**
- * 📅 Date 객체를 'yyyy-MM-dd' 형식으로 변환
+ * 📅 Date 객체를 'yyyy-MM-dd' 형식으로 변환 (KST)
  * @param date Date 객체
  * @returns '2025-08-14' 형태 문자열
  */
-export function formatDate(date?: Date): string {
+export function formatDate(date?: Date | string): string {
   if (!date) return '';
-  return format(date, 'yyyy-MM-dd');
+  const kstDate = toZonedTime(new Date(date), KST_TZ);
+  return formatInTimeZone(kstDate, KST_TZ, 'yyyy-MM-dd');
 }
 
 /**
- * 🕒 Date 객체를 'yyyy-MM-dd HH시mm분ss초' 형식으로 변환
+ * 🕒 Date 객체를 'yyyy년 MM월 dd일 HH시mm분ss초' 형식으로 변환 (KST)
  * @param date Date 객체
  * @returns '2025-08-14 13시45분30초' 형태 문자열
  */
-export function formatDateTime(date?: Date): string {
+export function formatDateTime(date?: Date | string): string {
   if (!date) return '';
-  return format(date, 'yyyy년 MM월 dd일 HH시mm분ss초', { locale: ko });
+  const kstDate = toZonedTime(new Date(date), KST_TZ);
+  return formatInTimeZone(kstDate, KST_TZ, 'yyyy년 MM월 dd일 HH시mm분ss초', { locale: ko });
 }
 
 /**
- * ⏱ 날짜(Date) + 시간 문자열 -> ISO 8601 문자열
+ * ⏱ Date 객체를 ISO 8601 문자열로 변환 (UTC 기준)
  * @param date Date 객체
- * @param time 'HH:mm:ss' 형태 문자열
- * @returns '2025-08-14T13:45:30.000Z' ISO 문자열
+ * @returns '2025-08-14T13:45:30.000Z' 형태 문자열
  */
-export function formatDateTimeToIso(date: Date): string {
-  const isoString = date.toISOString();
-  return isoString;
+export function formatDateTimeToIso(date: Date | string): string {
+  return new Date(date).toISOString(); // ISO는 항상 UTC
 }
 
 /**
- * 🕒 ISO 문자열을 'yyyy-MM-dd HH:mm:ss' 형식으로 변환
- * @param isoString ISO 8601 문자열
+ * 🕒 ISO 문자열을 'yyyy-MM-dd HH:mm:ss' 형식으로 변환 (KST)
+ * @param isoString ISO 문자열
  * @returns '2025-08-14 13:45:30' 형태 문자열
  */
 export function formatIsoToDateTime(isoString: string): string {
-  return format(new Date(isoString), 'yyyy-MM-dd HH:mm:ss', { locale: ko });
+  const kstDate = toZonedTime(new Date(isoString), KST_TZ);
+  return formatInTimeZone(kstDate, KST_TZ, 'yyyy-MM-dd HH:mm:ss', { locale: ko });
 }
 
 /**
- * 🕒 ISO 문자열을 'yyyy-MM-dd' 형식으로 변환
- * @param isoString ISO 8601 문자열
+ * 🕒 ISO 문자열을 'yyyy-MM-dd' 형식으로 변환 (KST)
+ * @param isoString ISO 문자열
  * @returns '2025-08-14' 형태 문자열
  */
 export function formatIsoToDate(isoString: string): string {
-  return format(new Date(isoString), 'yyyy-MM-dd', { locale: ko });
+  const kstDate = toZonedTime(new Date(isoString), KST_TZ);
+  return formatInTimeZone(kstDate, KST_TZ, 'yyyy-MM-dd', { locale: ko });
 }
 
 /**
@@ -71,21 +75,10 @@ export function formatIsoToDate(isoString: string): string {
  * @returns 숫자 길이에 따른 전화번호 형식의 문자열 예: 000-000-0000
  */
 export const formatMobile = (value: string) => {
-  // 입력값에서 숫자만 추출
   const onlyNumbers = value.replace(/\D/g, '');
-
-  // 숫자 길이에 따라 전화번호 형식으로 변환
-  let formattedValue = onlyNumbers;
-  if (onlyNumbers.length === 10) {
-    // 예: 000-000-0000
-    formattedValue = onlyNumbers.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
-  } else if (onlyNumbers.length === 11) {
-    // 예: 000-0000-0000
-    formattedValue = onlyNumbers.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
-  }
-
-  // 변환된 값
-  return formattedValue;
+  if (onlyNumbers.length === 10) return onlyNumbers.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+  if (onlyNumbers.length === 11) return onlyNumbers.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+  return onlyNumbers;
 };
 
 export { ko };
