@@ -665,6 +665,11 @@ export interface OrdersDetailData {
    */
   deliveryMethodFee: number;
   /**
+   * 배송 방법 코드
+   * @example "20"
+   */
+  deliveryTypeCode: string;
+  /**
    * 할인 금액
    * @example 0
    */
@@ -767,6 +772,29 @@ export interface OrdersUpdatePayload {
 }
 
 export type OrdersUpdateData = any;
+
+export interface TrackingNumberUpdatePayload {
+  /**
+   * 수정할 송장번호
+   * @example "1234567890"
+   */
+  trackingNumber: string;
+}
+
+export interface TrackingNumberUpdateData {
+  /** @example "송장번호가 수정되었습니다." */
+  message?: string;
+}
+
+export type TrackingNumberUpdateError =
+  | {
+      /** @example "유효하지 않은 주문 번호입니다." */
+      error?: string;
+    }
+  | {
+      /** @example "주문을 찾을 수 없습니다." */
+      error?: string;
+    };
 
 export interface StatusUpdateBody {
   /**
@@ -1436,6 +1464,8 @@ export interface CustomersCreateData {
   accessToken: string;
 }
 
+export type CustomersDeleteData = any;
+
 export interface SendEmailCreatePayload {
   /**
    * 이메일(테스트시, 실제 이메일을 작성하세요.)
@@ -1565,8 +1595,6 @@ export interface CheckIdCreateData {
 export type CustomersDetailData = any;
 
 export type CustomersUpdateData = any;
-
-export type CustomersDeleteData = any;
 
 export type AddressListData = {
   /**
