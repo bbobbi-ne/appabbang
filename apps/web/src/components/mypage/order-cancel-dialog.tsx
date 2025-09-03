@@ -43,7 +43,7 @@ type Props = {
   };
 };
 
-export default function OrderCalcenDialog({ children, no, orderRoundNo, guest, search }: Props) {
+export default function OrderCancelDialog({ children, no, orderRoundNo, guest, search }: Props) {
   const [open, setOpen] = useState<boolean>(false);
   const cancelOrderMutation = useCancelOrderMutation(); // 고객 주문취소
   const guestCancelOrderMutation = useGuestCancelOrderMutation(); // 비회원 주문취소

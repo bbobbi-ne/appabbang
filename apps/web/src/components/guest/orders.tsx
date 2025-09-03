@@ -3,7 +3,7 @@
 import type { GuestCreateData } from '@/api/data-contracts';
 import { Badge, Button, Card, CardContent } from '@appabbang/ui';
 import { formatDate } from '@appabbang/utils';
-import OrderCalcenDialog from '../mypage/order-cancel-dialog';
+import OrderCancelDialog from '../mypage/order-cancel-dialog';
 import { useNavigate } from '@tanstack/react-router';
 import OrderItem from '../mypage/order-item';
 
@@ -75,14 +75,14 @@ export default function GuestOrders({ list, search }: GuestOrdersProps) {
                     </Button>
                   )}
                 {Number(order.orderStatus) < 20 ? (
-                  <OrderCalcenDialog
+                  <OrderCancelDialog
                     no={order.no}
                     orderRoundNo={order.orderRoundNo}
                     guest={true}
                     search={search}
                   >
                     <Button variant="outline">주문취소</Button>
-                  </OrderCalcenDialog>
+                  </OrderCancelDialog>
                 ) : null}
               </div>
             </CardContent>
