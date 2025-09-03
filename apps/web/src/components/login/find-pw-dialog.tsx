@@ -266,7 +266,7 @@ function FindPwDialog({ children }: Props) {
             <CardHeader>
               <CardTitle className="text-lg">임시 비밀번호를 전달합니다!</CardTitle>
               <CardDescription>
-                고객님의 잃어버린 비밀번호는 임시 비밀번호를 대체되었습니다.
+                고객님의 잃어버린 비밀번호는 임시 비밀번호로 대체되었습니다.
               </CardDescription>
             </CardHeader>
             <CardContent>

@@ -28,7 +28,11 @@ import { useGetAvailableCouponQuery } from '@/hooks/use-my';
 import ConfirmDialog from '../order-round/order-confirm-dialog';
 
 /** Main Function */
-export default function OrderRoundDetailPage({ myContact }: { myContact: ContactListData }) {
+export default function OrderRoundDetailPage({
+  myContact,
+}: {
+  myContact: ContactListData | undefined;
+}) {
   const orderRoundData = useLoaderData({ from: '/_sub-page/order-round/$orderRoundNo' });
   const { orderRoundNo } = useParams({ from: '/_sub-page/order-round/$orderRoundNo' });
   const navigate = useNavigate();
@@ -112,7 +116,7 @@ export default function OrderRoundDetailPage({ myContact }: { myContact: Contact
       if (myContact) {
         navigate({ to: `/mypage/order-list/${data.no}` });
       } else {
-        navigate({ to: `/` });
+        navigate({ to: `/login` });
       }
     } catch (error) {
       console.log(error);

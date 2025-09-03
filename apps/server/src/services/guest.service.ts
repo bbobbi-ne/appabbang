@@ -1,0 +1,124 @@
+import { prisma } from '@/lib/prisma';
+import { commonCodeMap } from './common-code.service';
+
+/** 코드 조회 */
+export const getCodeName = (code: string): string => {
+  return commonCodeMap.orderStatusMap.get(code) || '-';
+};
+
+/** [비회원] 주문 목록 조회 */
+export const getGuestOrders = async ({
+  ordererName,
+  ordererMobile,
+  ordererEmail,
+}: {
+  ordererName: string;
+  ordererMobile: string;
+  ordererEmail: string;
+}) => {
+  const now = new Date();
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(now.getFullYear() - 1);
+
+  // 조회
+  const orders = await prisma.order.findMany({
+    select: {
+      no: true,
+      orderNumber: true,
+      orderStatus: true,
+      orderRoundNo: true,
+      createdAt: true,
+      orderPw: true,
+      orderItems: {
+        select: {
+          no: true,
+          breadImageUrl: true,
+          breadName: true,
+          unitPrice: true,
+          quantity: true,
+        },
+      },
+    },
+    where: {
+      ordererName,
+      ordererMobile,
+      ordererEmail,
+      createdAt: {
+        gte: oneYearAgo, // 1년 전 이후부터
+        lte: now, // 현재일자까지
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return orders.map((item) => ({
+    ...item,
+    orderStatusName: getCodeName(item.orderStatus),
+  }));
+};
+
+/** [비회원] 주문취소 */
+export const cancelOrder = async ({
+  orderNo,
+  canceledReason,
+}: {
+  orderNo: number;
+  canceledReason: string;
+}) => {
+  await prisma.$transaction(async (tx) => {
+    // 주문취소 접수요청(50)으로 변경
+    await tx.order.update({
+      where: { no: orderNo },
+      data: { orderStatus: '50' },
+    });
+
+    // 결제내역 취소사유 변경
+    await tx.payment.update({
+      where: { orderNo },
+      data: { canceledReason },
+    });
+  });
+};
+
+/**
+ * 비회원의 주문 비밀번호를 임시 비밀번호로 변경
+ * 이미 해싱처리된 주문 비밀번호를 비회원에게 전달할 수 없으므로, 임의의 비밀번호를 업데이트시킨 뒤, 이를 비회원에게 전달함.
+ *  */
+export const getUpdateOrderPw = async ({
+  ordererName,
+  ordererEmail,
+  ordererMobile,
+  hashedOrderPw,
+}: {
+  ordererName: string;
+  ordererEmail: string;
+  ordererMobile: string;
+  hashedOrderPw: string;
+}) => {
+  await prisma.order.updateMany({
+    where: { ordererName, ordererEmail, ordererMobile },
+    data: { orderPw: hashedOrderPw },
+  });
+};
+
+/** 비회원의 주문서 조회 */
+export const getOrder = async (no: number) => {
+  const order = await prisma.order.findUnique({
+    where: { no },
+    select: { no: true, orderPw: true },
+  });
+
+  return order;
+};
+
+/** 비회원 주문 비밀번호 변경 */
+export const updateOrderPw = async (no: number, hashedOrderPw: string) => {
+  await prisma.$transaction(async (tx) => {
+    await tx.order.update({
+      where: { no },
+      data: {
+        orderPw: hashedOrderPw,
+      },
+    });
+  });
+};

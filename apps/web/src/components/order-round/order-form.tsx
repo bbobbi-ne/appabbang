@@ -31,6 +31,7 @@ import PrivacyTermsAgreedDialog from '../join/privacy-terms-agreed-dialog';
 import PaymentRefundTermsAgreedDialog from '../join/privacy-terms-agreed-dialog';
 import { MyAddressListDialog } from '@/components/order-round/my-address-list-dialog';
 import { OrderAddressForm } from '@/components/order-round/order-address-form';
+import { useAccessTokenStore } from '@/store/session';
 
 type Props = {
   isDelivery: boolean;
@@ -43,6 +44,7 @@ const labelMinWidth = 'min-w-[120px]';
 export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
   /** 은행 목록 API */
   const { data: bankData } = useGetCommonCodesQuery('bank_code');
+  const { accessToken } = useAccessTokenStore();
 
   // 폼 선언
   const form = useForm<OrderFormSchema>({
@@ -50,6 +52,7 @@ export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
     defaultValues: {
       ordererName: '',
       ordererMobile: '',
+      ordererEmail: '',
       recipientName: '',
       recipientMobile: '',
       address: '',
@@ -108,10 +111,12 @@ export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
       form.setValue('isMember', true);
       form.setValue('ordererName', myContact.name);
       form.setValue('ordererMobile', myContact.mobileNumber);
+      form.setValue('ordererEmail', myContact.email);
     } else {
       form.setValue('isMember', false);
       form.setValue('ordererName', '');
       form.setValue('ordererMobile', '');
+      form.setValue('ordererEmail', '');
     }
   }, [myContact]);
 
@@ -134,7 +139,7 @@ export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
                     {...field}
                     placeholder="주문자 이름을 입력해주세요"
                     maxLength={10}
-                    readOnly={!!myContact}
+                    readOnly={accessToken.length > 0 || !!myContact}
                   />
                 </FormControl>
                 <FormMessage className="text-xs" />
@@ -162,7 +167,34 @@ export const OrderForm = ({ isDelivery, myContact, buttonArea }: Props) => {
                       field.onChange(formattedValue);
                     }}
                     maxLength={13}
-                    readOnly={!!myContact}
+                    readOnly={accessToken.length > 0 || !!myContact}
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </div>
+            </FormItem>
+          )}
+        />
+
+        {/* 이메일 */}
+        <FormField
+          control={form.control}
+          name="ordererEmail"
+          render={({ field }) => (
+            <FormItem className="flex items-center">
+              <FormLabel errorCheck={false} className={`${labelMinWidth} whitespace-nowrap`}>
+                <span className="text-destructive">*</span> 이메일
+              </FormLabel>
+              <div className="w-full space-y-1">
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="받으실분의 이메일을 입력해주세요"
+                    onChange={(e) => {
+                      field.onChange(e.target.value);
+                    }}
+                    maxLength={50}
+                    readOnly={accessToken.length > 0 || !!myContact}
                   />
                 </FormControl>
                 <FormMessage className="text-xs" />

@@ -71,6 +71,7 @@ model Order {
   orderStatus                  String            @db.VarChar(3) @map("order_status")                  // 주문 상태
   ordererName                  String            @db.VarChar(30) @map("orderer_name")                 // 주문인
   ordererMobile                String            @db.VarChar(20) @map("orderer_mobile")               // 주문인 전화번호
+  ordererEmail                 String            @db.VarChar(254)                                     // 주문인 이메일
   recipientName                String            @db.VarChar(30) @map("recipient_name")               // 수령인 
   recipientMobile              String            @db.VarChar(20) @map("recipient_mobile")             // 수령인 전화번호 
   address                      String            @db.VarChar(300) @map("address")                     // 주소

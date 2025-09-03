@@ -302,6 +302,7 @@ export const deleteDeliveryMethodValidator = [
 export const createOrderValidator = [
   body('ordererName').trim().notEmpty().withMessage('ordererName 필수입니다'),
   body('ordererMobile').trim().notEmpty().withMessage('ordererMobile는 필수입니다'),
+  body('ordererEmail').trim().notEmpty().withMessage('ordererEmail은 필수입니다'),
   ////
   body('address').trim().optional(), // 옵셔널
   body('addressDetail').trim().optional(), // 옵셔널
@@ -605,7 +606,7 @@ export const cancelOrderValidator = [
 //// GUEST ////////////////////////////////////////////////////////////////////
 /** 주문자 검증 */
 const ORDERER = {
-  key: 'orderer',
+  key: 'ordererName',
   length: { min: 2, max: 20, message: '주문자는 2~30자 내로 입력해야 합니다.' },
   matches: {
     value: /^[가-힣]{2,30}$/,
@@ -615,26 +616,26 @@ const ORDERER = {
 };
 
 const MOBILE_NUMBER = {
-  key: 'mobileNumber',
+  key: 'ordererMobile',
   matches: { value: /^01[016789]-?\d{3,4}-?\d{4}$/g, message: '유효한 휴대번호 양식이 아닙니다.' },
   string: { message: '휴대번호는 문자열로 입력해야 합니다.' },
 };
 
 const ORDER_PW = {
   key: 'orderPw',
-  length: { min: 4, max: 20, message: '주문 비밀번호는 4~20자 이내로 입력 바랍니다.' },
+  length: { min: 4, max: 30, message: '주문 비밀번호는 4~30자 이내로 입력 바랍니다.' },
   string: { message: '주문 비밀번호는 문자열로 입력해야 합니다.' },
 };
 
 const EMAIL = {
-  key: 'email',
+  key: 'ordererEmail',
   length: { min: 1, max: 50, message: '이메일은 1~50자 이내 입력 바랍니다.' },
   matches: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/g, message: '유효한 이메일 형식이 아닙니다.' },
   string: { message: '이메일은 문자열로 입력 바랍니다.' },
 };
 
 /** 비회원 로그인 */
-export const loginGuestValidator = [
+export const guestValidator = [
   body(ORDERER.key)
     .notEmpty()
     .matches(ORDERER.matches.value)
@@ -670,4 +671,53 @@ export const loginGuestValidator = [
     .trim(),
 ];
 
+/** 비회원 주문 비밀번호 찾기 */
+export const guestOrderPwValidator = [
+  body(ORDERER.key)
+    .notEmpty()
+    .matches(ORDERER.matches.value)
+    .withMessage(ORDERER.matches.message)
+    .isString()
+    .withMessage(ORDERER.string.message)
+    .isLength({ min: ORDERER.length.min, max: ORDERER.length.max })
+    .withMessage(ORDERER.length.message)
+    .trim(),
+
+  body(MOBILE_NUMBER.key)
+    .notEmpty()
+    .matches(MOBILE_NUMBER.matches.value)
+    .withMessage(MOBILE_NUMBER.matches.message)
+    .isString()
+    .withMessage(MOBILE_NUMBER.string.message)
+    .trim(),
+
+  body(EMAIL.key)
+    .notEmpty()
+    .isString()
+    .withMessage(EMAIL.string.message)
+    .isLength({ min: EMAIL.length.min, max: EMAIL.length.max })
+    .withMessage(EMAIL.length.message)
+    .trim(),
+];
+
+/** 비회원 주문 비밀번호 변경 */
+export const updateGuestOrderPwValidator = [
+  body('no').notEmpty().withMessage('주문서no는 필수값입니다.').trim(),
+
+  body(ORDER_PW.key)
+    .notEmpty()
+    .isString()
+    .withMessage(ORDER_PW.string.message)
+    .isLength({ min: ORDER_PW.length.min, max: ORDER_PW.length.max })
+    .withMessage(ORDER_PW.length.message)
+    .trim(),
+
+  body('orderPwModify')
+    .notEmpty()
+    .isString()
+    .withMessage(ORDER_PW.string.message)
+    .isLength({ min: ORDER_PW.length.min, max: ORDER_PW.length.max })
+    .withMessage(ORDER_PW.length.message)
+    .trim(),
+];
 ////////////////////////////////////////////////////////////////////////

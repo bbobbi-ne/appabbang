@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
 import * as OrderService from '@/services/order.service';
+import * as GuestService from '@/services/guest.service';
 import * as paymentService from '@/services/payment.service';
+import * as MyService from '@/services/my.service';
 import { AppError } from '@/types';
+import { comparePassword, generateTempPassword, hashPassword } from '@/services/auth.service';
+import { guestOrderPwSendEmail } from '@/lib/send-email';
 
 /** 주문 목록 조회 */
 export const getList = async (_: Request, res: Response) => {
@@ -111,4 +115,89 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
   }
 
   res.status(200).json({ message: '주문 상태가 수정되었습니다.' });
+};
+
+/** [비회원] 주문 목록 조회 */
+export const getGuestOrders = async (req: Request, res: Response) => {
+  const { ordererName, ordererMobile, ordererEmail, orderPw } = req.body;
+
+  // 비회원 정보로 입력된 주문 목록 조회
+  const guestOrders = await GuestService.getGuestOrders({
+    ordererName,
+    ordererMobile,
+    ordererEmail,
+  });
+  const matchedOrders = new Array();
+
+  // list 중에서 orderPw와 compare해서 일치하는 주문목록만 matchedOrders에 담기
+  for (const order of guestOrders) {
+    if (order.orderPw && (await comparePassword(String(orderPw), order.orderPw))) {
+      matchedOrders.push(order);
+    }
+  }
+
+  if (matchedOrders.length === 0) {
+    throw AppError.notFound('비회원 정보와 일치하는 주문목록이 존재하지 않습니다.');
+  }
+
+  // orderPw 비교는 끝났으니 다시 리턴값에서 제외함. (보안)
+  matchedOrders.forEach((item) => {
+    delete item.orderPw;
+  });
+
+  res.status(200).json(matchedOrders);
+};
+
+/** [비회원] 주문취소 */
+export const cancelOrder = async (req: Request, res: Response) => {
+  const orderNo = Number(req.params.no);
+  const { canceledReason } = req.body;
+
+  const order = await MyService.getOrder(orderNo);
+  if (!order) throw AppError.notFound('주문을 찾을 수 없습니다.');
+
+  if (Number(order.orderStatus) !== 10 && Number(order.orderStatus) !== 11)
+    throw AppError.badRequest('현재는 주문을 취소할 수 없습니다.');
+
+  // 주문취소
+  await GuestService.cancelOrder({ orderNo, canceledReason });
+
+  res.status(200).json({ message: '주문이 취소되었습니다.' });
+};
+
+/** [비회원] 주문 비밀번호 찾기 */
+export const updateGuestOrderPwSendEmail = async (req: Request, res: Response) => {
+  const { ordererEmail } = req.body;
+
+  // 임시 주문 비밀번호 생성
+  const orderPw = generateTempPassword();
+  const hashedOrderPw = await hashPassword(orderPw);
+  const params = { ...req.body, hashedOrderPw };
+
+  await GuestService.getUpdateOrderPw(params);
+
+  // 입력한 이메일로 메일을 전송하여 주문 비밀번호를 알려주도록 한다.
+  // 비회원이므로 이메일을 굳이 인증절차를 밟을 이유는 없다.
+  await guestOrderPwSendEmail({ ordererEmail, orderPw });
+  res.sendStatus(200);
+};
+
+/** [비회원] 주문 비밀번호 변경 */
+export const updateGuestOrderPw = async (req: Request, res: Response) => {
+  const { orderPw, orderPwModify, no } = req.body;
+
+  // 현재 주문서의 orderPw 조회
+  const order = await GuestService.getOrder(Number(no));
+  if (!order || !order.orderPw) throw AppError.notFound('현재 주문 비밀번호를 확인할 수 없습니다.');
+
+  // 주문 비밀번호 비교
+  const isValid = await comparePassword(orderPw, order.orderPw);
+  if (!isValid) throw AppError.internalServerError('현재 주문 비밀번호가 올바르지 않습니다.');
+
+  // 주문 비밀번호 해싱
+  const hashedPw = await hashPassword(orderPwModify);
+
+  // 주문 비밀번호 변경
+  await GuestService.updateOrderPw(Number(no), hashedPw);
+  res.sendStatus(200);
 };

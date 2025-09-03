@@ -79,3 +79,48 @@ export const sendEmailTempPw = async (email: string, tempPw: string) => {
     return tempPw;
   }
 };
+
+interface guestOrderPwSendEmailProp {
+  ordererEmail: string;
+  orderPw: string;
+}
+
+/** 주문 비밀번호를 비회원의 이메일로 전달 */
+export const guestOrderPwSendEmail = async ({
+  ordererEmail,
+  orderPw,
+}: guestOrderPwSendEmailProp) => {
+  if (!process.env.GMAIL_ID || !process.env.GMAIL_PASSKEY)
+    throw AppError.internalServerError(
+      '비회원 임시 주문 비밀번호 이메일 전송 과정에서 문제가 발생했습니다.',
+    );
+
+  if (ordererEmail) {
+    let transporter = nodemailer.createTransport({
+      service: 'gmail',
+      port: 465,
+      secure: true,
+      auth: {
+        user: process.env.GMAIL_ID,
+        pass: process.env.GMAIL_PASSKEY,
+      },
+    });
+
+    await transporter.sendMail({
+      from: '안녕하세요.', //보내는 주소 입력
+      to: ordererEmail, //위에서 선언해준 받는사람 이메일
+      subject: '안녕하세요. 아빠빵입니다. (비회원 주문 비밀번호 변경 안내)', //메일 제목
+      text: `
+        안녕하세요. 아빠빵입니다! 
+
+        아빠빵 비회원 주문 비밀번호 찾기 절차를 통해 고객님께서 입력하신 이메일로 주문 비밀번호 재설정이 정상적으로 완료되었음을 알려드립니다.
+        해당 임시 주문 비밀번호는 비회원 로그인 화면에서 주문 비밀번호 입력 칸에 작성 바랍니다.
+        또한, 임시 비밀번호이므로 주문내역에서 비밀번호 변경 작업을 권장합니다.
+
+        임시 비밀번호 : ${orderPw}
+
+        감사합니다.
+      `, //내용
+    });
+  }
+};

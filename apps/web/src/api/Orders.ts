@@ -11,6 +11,19 @@
  */
 
 import type {
+  GuestAddressListData,
+  GuestAddressUpdateData,
+  GuestAddressUpdatePayload,
+  GuestCancelCreateData,
+  GuestCancelCreatePayload,
+  GuestCreateData,
+  GuestCreatePayload,
+  GuestDeliveryListData,
+  GuestDetailData,
+  GuestPwUpdateData,
+  GuestPwUpdatePayload,
+  GuestPwUpdateUpdateData,
+  GuestPwUpdateUpdatePayload,
   OrdersCreateData,
   OrdersCreatePayload,
   OrdersDetailData,
@@ -67,6 +80,152 @@ export class Orders<SecurityDataType = unknown> {
       body: data,
       secure: true,
       type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 비회원 정보와 일치하는 주문 목록을 조회합니다. (권한: 누구나)
+   *
+   * @tags Orders
+   * @name GuestCreate
+   * @summary (비회원) 주문 목록 조회
+   * @request POST:/orders/guest
+   * @response `200` `GuestCreateData` (비회원) 주문 목록 조회 성공
+   */
+  guestCreate = (data: GuestCreatePayload, params: RequestParams = {}) =>
+    this.http.request<GuestCreateData, any>({
+      path: `/orders/guest`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 비회원의 특정 주문의 상세 정보를 조회합니다. (권한: 누구나)
+   *
+   * @tags Orders
+   * @name GuestDetail
+   * @summary (비회원) 주문 상세 조회
+   * @request GET:/orders/guest/{no}
+   * @response `200` `GuestDetailData` (비회원) 주문 상세 조회 성공
+   */
+  guestDetail = (no: number, params: RequestParams = {}) =>
+    this.http.request<GuestDetailData, any>({
+      path: `/orders/guest/${no}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 비회원의 특정 주문의 배송지 정보를 조회합니다. (권한: 누구나)
+   *
+   * @tags Orders
+   * @name GuestAddressList
+   * @summary 주문내역의 배송지 조회
+   * @request GET:/orders/guest/{no}/address
+   * @response `200` `GuestAddressListData` 배송지 조회 성공
+   */
+  guestAddressList = (no: number, params: RequestParams = {}) =>
+    this.http.request<GuestAddressListData, any>({
+      path: `/orders/guest/${no}/address`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 비회원의 특정 주문의 배송지를 수정합니다. (권한: 누구나)
+   *
+   * @tags Orders
+   * @name GuestAddressUpdate
+   * @summary (비회원) 주문내역의 배송지 수정
+   * @request PUT:/orders/guest/{no}/address
+   * @response `200` `GuestAddressUpdateData` 배송지 수정 성공
+   */
+  guestAddressUpdate = (
+    no: number,
+    data: GuestAddressUpdatePayload,
+    params: RequestParams = {},
+  ) =>
+    this.http.request<GuestAddressUpdateData, any>({
+      path: `/orders/guest/${no}/address`,
+      method: "PUT",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description 주문을 취소합니다. (권한: 누구나)
+   *
+   * @tags Orders
+   * @name GuestCancelCreate
+   * @summary 고객 주문 취소
+   * @request POST:/orders/guest/{no}/cancel
+   * @response `200` `GuestCancelCreateData` 주문 취소 성공
+   */
+  guestCancelCreate = (
+    no: number,
+    data: GuestCancelCreatePayload,
+    params: RequestParams = {},
+  ) =>
+    this.http.request<GuestCancelCreateData, any>({
+      path: `/orders/guest/${no}/cancel`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 비회원의 주문 비밀번호를 임시로 변경하고 임시 주문 비밀번호를 입력한 이메일로 전송합니다. (권한: 누구나)
+   *
+   * @tags Orders
+   * @name GuestPwUpdate
+   * @summary (비회원) 임시 주문 비밀번호 발송
+   * @request PUT:/orders/guest/pw
+   * @response `200` `GuestPwUpdateData` 비회원 주문 비밀번호 임시 변경 및 이메일 전송 성공
+   */
+  guestPwUpdate = (data: GuestPwUpdatePayload, params: RequestParams = {}) =>
+    this.http.request<GuestPwUpdateData, any>({
+      path: `/orders/guest/pw`,
+      method: "PUT",
+      body: data,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 비회원의 주문 비밀번호를 변경합니다. (권한: 누구나)
+   *
+   * @tags Orders
+   * @name GuestPwUpdateUpdate
+   * @summary (비회원) 주문 비밀번호 변경
+   * @request PUT:/orders/guest/pw-update
+   * @response `200` `GuestPwUpdateUpdateData` 비회원 주문 비밀번호 변경 성공
+   */
+  guestPwUpdateUpdate = (
+    data: GuestPwUpdateUpdatePayload,
+    params: RequestParams = {},
+  ) =>
+    this.http.request<GuestPwUpdateUpdateData, any>({
+      path: `/orders/guest/pw-update`,
+      method: "PUT",
+      body: data,
+      type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * @description 비회원의 주문 배송 정보를 조회합니다. (권한: 누구나)
+   *
+   * @tags Orders
+   * @name GuestDeliveryList
+   * @summary (비회원) 주문 배송(수령) 조회
+   * @request GET:/orders/guest/{no}/delivery
+   * @response `200` `GuestDeliveryListData` 주문 배송 조회 성공
+   */
+  guestDeliveryList = (no: number, params: RequestParams = {}) =>
+    this.http.request<GuestDeliveryListData, any>({
+      path: `/orders/guest/${no}/delivery`,
+      method: "GET",
       format: "json",
       ...params,
     });

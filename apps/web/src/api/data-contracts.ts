@@ -482,6 +482,11 @@ export interface OrdersCreatePayload {
    */
   ordererMobile: string;
   /**
+   * 주문자 이메일
+   * @example "test1234@naver.com"
+   */
+  ordererEmail: string;
+  /**
    * 수령인 이름
    * @example "홍길동"
    */
@@ -591,6 +596,338 @@ export interface OrdersCreateData {
    * @example 1
    */
   no: number;
+}
+
+/** (비회원) 주문목록 조회 */
+export interface GuestCreatePayload {
+  /**
+   * 주문자 이름
+   * @example "홍길동"
+   */
+  ordererName: string;
+  /**
+   * 주문자 전화번호
+   * @example "010-1234-5678"
+   */
+  ordererMobile: string;
+  /**
+   * 주문자 이메일
+   * @example "test1234@naver.com"
+   */
+  ordererEmail: string;
+  /**
+   * 주문 비밀번호
+   * @example 1234
+   */
+  orderPw: string;
+}
+
+export type GuestCreateData = {
+  /**
+   * 주문 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 주문 번호
+   * @example "ORD20240825001"
+   */
+  orderNumber: string;
+  /**
+   * 주문 상태 코드
+   * @example "10"
+   */
+  orderStatus: string;
+  /**
+   * 주문 상태명
+   * @example "결제완료"
+   */
+  orderStatusName?: string;
+  /**
+   * 주문차수 번호
+   * @example 1
+   */
+  orderRoundNo: number;
+  /**
+   * 주문 생성일시
+   * @format date-time
+   * @example "2024-08-25T15:55:20.000Z"
+   */
+  createdAt: string;
+  orderItems: {
+    /**
+     * 주문 아이템 번호
+     * @example 1
+     */
+    no?: number;
+    /**
+     * 상품명
+     * @example "식빵"
+     */
+    breadName?: string;
+    /**
+     * 상품 이미지 URL
+     * @example "https://example.com/bread.jpg"
+     */
+    breadImageUrl?: string;
+    /**
+     * 단가
+     * @example 3000
+     */
+    unitPrice?: number;
+    /**
+     * 수량
+     * @example 2
+     */
+    quantity?: number;
+  }[];
+}[];
+
+export interface GuestDetailData {
+  /** @example 1 */
+  no: number;
+  /** @example "ORD20240825001" */
+  orderNumber: string;
+  /** @example "10" */
+  orderStatus: string;
+  /** @example "결제완료" */
+  orderStatusName: string;
+  /**
+   * @format date-time
+   * @example "2024-08-25T15:55:20.000Z"
+   */
+  createdAt: string;
+  /** @example 15000 */
+  totalPrice: number;
+  /** @example 3000 */
+  deliveryMethodFee?: number;
+  /** @example 2000 */
+  discountAmount?: number;
+  /** @example "서울시 강남구 역삼동 123-456" */
+  address: string;
+  /** @example "101동 101호" */
+  addressDetail?: string;
+  /** @example "12345" */
+  zipcode?: string;
+  /** @example "문 앞에 놓아주세요." */
+  message?: string;
+  /** @example "홍길동" */
+  recipientName?: string;
+  /** @example "010-1234-5678" */
+  recipientMobile?: string;
+  /** @example "홍길동" */
+  ordererName?: string;
+  /** @example "010-1234-5678" */
+  ordererMobile?: string;
+  /** @example "01" */
+  deliveryTypeCode?: string;
+  orderItems: {
+    /** @example 1 */
+    no?: number;
+    /** @example "식빵" */
+    breadName?: string;
+    /** @example "https://example.com/bread.jpg" */
+    breadImageUrl?: string;
+    /** @example 3000 */
+    unitPrice?: number;
+    /** @example 6000 */
+    totalPrice?: number;
+    /** @example 2 */
+    quantity?: number;
+  }[];
+}
+
+export interface GuestAddressListData {
+  /**
+   * 주소
+   * @example "서울시 강남구 역삼동 123-456"
+   */
+  address: string;
+  /**
+   * 상세 주소
+   * @example "101동 101호"
+   */
+  addressDetail: string;
+  /**
+   * 우편번호
+   * @example "12345"
+   */
+  zipcode: string;
+  /**
+   * 배송 메시지
+   * @example "문 앞에 놓아주세요."
+   */
+  message: string;
+  /**
+   * 수령인 이름
+   * @example "홍길동"
+   */
+  recipientName: string;
+  /**
+   * 수령인 전화번호
+   * @example "010-1234-5678"
+   */
+  recipientMobile: string;
+}
+
+export interface GuestAddressUpdatePayload {
+  /**
+   * 주소
+   * @example "서울시 강남구 역삼동 123-456"
+   */
+  address: string;
+  /**
+   * 상세 주소
+   * @example "101동 101호"
+   */
+  addressDetail: string;
+  /**
+   * 우편번호
+   * @example "12345"
+   */
+  zipcode: string;
+  /**
+   * 배송 메시지
+   * @example "문 앞에 놓아주세요."
+   */
+  message: string;
+  /**
+   * 수령인 이름
+   * @example "홍길동"
+   */
+  recipientName: string;
+  /**
+   * 수령인 전화번호
+   * @example "010-1234-5678"
+   */
+  recipientMobile: string;
+}
+
+export interface GuestAddressUpdateData {
+  /**
+   * 주소
+   * @example "서울시 강남구 역삼동 123-456"
+   */
+  address: string;
+  /**
+   * 상세 주소
+   * @example "101동 101호"
+   */
+  addressDetail: string;
+  /**
+   * 우편번호
+   * @example "12345"
+   */
+  zipcode: string;
+  /**
+   * 배송 메시지
+   * @example "문 앞에 놓아주세요."
+   */
+  message: string;
+  /**
+   * 수령인 이름
+   * @example "홍길동"
+   */
+  recipientName: string;
+  /**
+   * 수령인 전화번호
+   * @example "010-1234-5678"
+   */
+  recipientMobile: string;
+}
+
+export interface GuestCancelCreatePayload {
+  /**
+   * 취소 사유
+   * @example "주문 취소 요청"
+   */
+  canceledReason: string;
+}
+
+export type GuestCancelCreateData = any;
+
+export interface GuestPwUpdatePayload {
+  /**
+   * 주문자 이름
+   * @example "홍길동"
+   */
+  ordererName: string;
+  /**
+   * 주문자 휴대번호
+   * @example "010-1234-5678"
+   */
+  ordererMobile: string;
+  /**
+   * 주문자 이메일
+   * @example "test1234@naver.com"
+   */
+  ordererEmail: string;
+}
+
+export type GuestPwUpdateData = any;
+
+export interface GuestPwUpdateUpdatePayload {
+  /**
+   * 주문 번호
+   * @example 1
+   */
+  no: number;
+  /**
+   * 현재 주문 비밀번호
+   * @example 1234
+   */
+  orderPw: string;
+  /**
+   * 변경할 주문 비밀번호
+   * @example "1234a"
+   */
+  orderPwModify: string;
+}
+
+export type GuestPwUpdateUpdateData = any;
+
+export interface GuestDeliveryListData {
+  /** @example 1 */
+  no?: number;
+  /** @example "ORD20240825001" */
+  orderNumber?: string;
+  /** @example "20" */
+  orderStatus?: string;
+  /** @example "배송중" */
+  orderStatusName?: string;
+  /**
+   * @format date-time
+   * @example "2024-08-25T15:55:20.000Z"
+   */
+  createdAt?: string;
+  /** @example "TRK1234567890" */
+  trackingNumber?: string;
+  orderItems?: {
+    /** @example 1 */
+    no?: number;
+    /** @example "식빵" */
+    breadName?: string;
+    /** @example "https://example.com/bread.jpg" */
+    breadImageUrl?: string;
+    /** @example 3000 */
+    unitPrice?: number;
+    /** @example 2 */
+    quantity?: number;
+  }[];
+  /** @example "서울시 강남구 역삼동 123-456" */
+  address?: string;
+  /** @example "101동 101호" */
+  addressDetail?: string;
+  /** @example "12345" */
+  zipcode?: string;
+  /** @example "홍길동" */
+  recipientName?: string;
+  /** @example "010-1234-5678" */
+  recipientMobile?: string;
+  /** @example "택배" */
+  deliveryMethodName?: string;
+  /** @example "01" */
+  deliveryTypeCode?: string;
 }
 
 export interface OrdersDetailData {
@@ -863,19 +1200,19 @@ export type OrderRoundListData = {
 export interface OrderRoundCreatePayload {
   /**
    * 주문차수명
-   * @example "주문 1월"
+   * @example "주문 9월"
    */
   name: string;
   /**
    * 시작일시
    * @format date-time
-   * @example "2025-01-01T11:00:00.000Z"
+   * @example "2025-09-01T00:00:00.000Z"
    */
   startedAt: string;
   /**
    * 종료일시
    * @format date-time
-   * @example "2025-01-31T11:00:00.000Z"
+   * @example "2025-09-30T23:59:59.000Z"
    */
   endedAt: string;
   /**
@@ -885,7 +1222,7 @@ export interface OrderRoundCreatePayload {
   minOrderQty: number;
   /**
    * 최대주문수량
-   * @example 1
+   * @example 999
    */
   maxOrderQty: number;
   /**

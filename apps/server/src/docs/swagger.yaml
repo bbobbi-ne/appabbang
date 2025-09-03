@@ -755,6 +755,7 @@ paths:
               required:
                 - ordererName
                 - ordererMobile
+                - ordererEmail
                 - orderRoundNo
                 - totalPrice
                 - deliveryMethodNo
@@ -772,6 +773,10 @@ paths:
                   type: string
                   description: 주문자 전화번호
                   example: '010-1234-5678'
+                ordererEmail:
+                  type: string
+                  description: 주문자 이메일
+                  example: test1234@naver.com
                 recipientName:
                   type: string
                   description: 수령인 이름
@@ -866,6 +871,7 @@ paths:
                 value:
                   ordererName: "홍길동"
                   ordererMobile: "010-1234-5678"
+                  ordererEmail: "test1234@naver.com"
                   recipientName: "홍길동"
                   recipientMobile: "010-1234-5678"
                   address: "서울시 강남구"
@@ -923,6 +929,535 @@ paths:
                     type: integer
                     description: 생성된 주문 번호
                     example: 1
+
+  /orders/guest:
+    post:
+      tags: [Orders]
+      summary: (비회원) 주문 목록 조회
+      description: 비회원 정보와 일치하는 주문 목록을 조회합니다. (권한: 누구나)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              description: (비회원) 주문목록 조회
+              type: object
+              required:
+                - ordererName
+                - ordererMobile
+                - ordererEmail
+                - orderPw
+              properties:
+                ordererName:
+                  type: string
+                  description: 주문자 이름
+                  example: '홍길동'
+                ordererMobile:
+                  type: string
+                  description: 주문자 전화번호
+                  example: '010-1234-5678'
+                ordererEmail:
+                  type: string
+                  description: 주문자 이메일
+                  example: test1234@naver.com
+                orderPw:
+                  type: string
+                  description: 주문 비밀번호
+                  example: 1234
+      responses:
+        '200':
+          description: (비회원) 주문 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - no
+                    - orderNumber
+                    - orderStatus
+                    - orderRoundNo
+                    - createdAt
+                    - orderItems
+                  properties:
+                    no:
+                      type: integer
+                      description: 주문 번호
+                      example: 1
+                    orderNumber:
+                      type: string
+                      description: 주문 번호
+                      example: 'ORD20240825001'
+                    orderStatus:
+                      type: string
+                      description: 주문 상태 코드
+                      example: '10'
+                    orderStatusName:
+                      type: string
+                      description: 주문 상태명
+                      example: '결제완료'
+                    orderRoundNo:
+                      type: integer
+                      description: 주문차수 번호
+                      example: 1
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: 주문 생성일시
+                      example: '2024-08-25T15:55:20.000Z'
+                    orderItems:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          no:
+                            type: integer
+                            description: 주문 아이템 번호
+                            example: 1
+                          breadName:
+                            type: string
+                            description: 상품명
+                            example: '식빵'
+                          breadImageUrl:
+                            type: string
+                            description: 상품 이미지 URL
+                            example: 'https://example.com/bread.jpg'
+                          unitPrice:
+                            type: number
+                            description: 단가
+                            example: 3000
+                          quantity:
+                            type: integer
+                            description: 수량
+                            example: 2
+
+  /orders/guest/{no}:
+    get:
+      tags: [Orders]
+      summary: (비회원) 주문 상세 조회
+      description: 비회원의 특정 주문의 상세 정보를 조회합니다. (권한: 누구나)
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 주문 번호
+          example: 1
+      responses:
+        '200':
+          description: (비회원) 주문 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - no
+                  - orderNumber
+                  - orderStatus
+                  - orderStatusName
+                  - createdAt
+                  - totalPrice
+                  - orderItems
+                  - address
+                properties:
+                  no:
+                    type: integer
+                    example: 1
+                  orderNumber:
+                    type: string
+                    example: 'ORD20240825001'
+                  orderStatus:
+                    type: string
+                    example: '10'
+                  orderStatusName:
+                    type: string
+                    example: '결제완료'
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: '2024-08-25T15:55:20.000Z'
+                  totalPrice:
+                    type: number
+                    example: 15000
+                  deliveryMethodFee:
+                    type: number
+                    example: 3000
+                  discountAmount:
+                    type: number
+                    example: 2000
+                  address:
+                    type: string
+                    example: '서울시 강남구 역삼동 123-456'
+                  addressDetail:
+                    type: string
+                    example: '101동 101호'
+                  zipcode:
+                    type: string
+                    example: '12345'
+                  message:
+                    type: string
+                    example: '문 앞에 놓아주세요.'
+                  recipientName:
+                    type: string
+                    example: '홍길동'
+                  recipientMobile:
+                    type: string
+                    example: '010-1234-5678'
+                  ordererName:
+                    type: string
+                    example: '홍길동'
+                  ordererMobile:
+                    type: string
+                    example: '010-1234-5678'
+                  deliveryTypeCode:
+                    type: string
+                    example: '01'
+                  orderItems:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        no:
+                          type: integer
+                          example: 1
+                        breadName:
+                          type: string
+                          example: '식빵'
+                        breadImageUrl:
+                          type: string
+                          example: 'https://example.com/bread.jpg'
+                        unitPrice:
+                          type: number
+                          example: 3000
+                        totalPrice:
+                          type: number
+                          example: 6000
+                        quantity:
+                          type: integer
+                          example: 2
+
+  /orders/guest/{no}/address:
+    get:
+      tags: [Orders]
+      summary: 주문내역의 배송지 조회
+      description: 비회원의 특정 주문의 배송지 정보를 조회합니다. (권한: 누구나)
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 주문 번호
+          example: 1
+      responses:
+        '200':
+          description: 배송지 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - address
+                  - addressDetail
+                  - zipcode
+                  - message
+                  - recipientName
+                  - recipientMobile
+                properties:
+                  address:
+                    type: string
+                    description: 주소
+                    example: '서울시 강남구 역삼동 123-456'
+                  addressDetail:
+                    type: string
+                    description: 상세 주소
+                    example: '101동 101호'
+                  zipcode:
+                    type: string
+                    description: 우편번호
+                    example: '12345'
+                  message:
+                    type: string
+                    description: 배송 메시지
+                    example: '문 앞에 놓아주세요.'
+                  recipientName:
+                    type: string
+                    description: 수령인 이름
+                    example: '홍길동'
+                  recipientMobile:
+                    type: string
+                    description: 수령인 전화번호
+                    example: '010-1234-5678'
+
+    put:
+      tags: [Orders]
+      summary: (비회원) 주문내역의 배송지 수정
+      description: 비회원의 특정 주문의 배송지를 수정합니다. (권한: 누구나)
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 주문 번호
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - address
+                - addressDetail
+                - zipcode
+                - message
+                - recipientName
+                - recipientMobile
+              properties:
+                address:
+                  type: string
+                  description: 주소
+                  example: '서울시 강남구 역삼동 123-456'
+                addressDetail:
+                  type: string
+                  description: 상세 주소
+                  example: '101동 101호'
+                zipcode:
+                  type: string
+                  description: 우편번호
+                  example: '12345'
+                message:
+                  type: string
+                  description: 배송 메시지
+                  example: '문 앞에 놓아주세요.'
+                recipientName:
+                  type: string
+                  description: 수령인 이름
+                  example: '홍길동'
+                recipientMobile:
+                  type: string
+                  description: 수령인 전화번호
+                  example: '010-1234-5678'
+      responses:
+        '200':
+          description: 배송지 수정 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - address
+                  - addressDetail
+                  - zipcode
+                  - message
+                  - recipientName
+                  - recipientMobile
+                properties:
+                  address:
+                    type: string
+                    description: 주소
+                    example: '서울시 강남구 역삼동 123-456'
+                  addressDetail:
+                    type: string
+                    description: 상세 주소
+                    example: '101동 101호'
+                  zipcode:
+                    type: string
+                    description: 우편번호
+                    example: '12345'
+                  message:
+                    type: string
+                    description: 배송 메시지
+                    example: '문 앞에 놓아주세요.'
+                  recipientName:
+                    type: string
+                    description: 수령인 이름
+                    example: '홍길동'
+                  recipientMobile:
+                    type: string
+                    description: 수령인 전화번호
+                    example: '010-1234-5678'
+
+  /orders/guest/{no}/cancel:
+    post:
+      tags: [Orders]
+      summary: 고객 주문 취소
+      description: 주문을 취소합니다. (권한: 누구나)
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 주문 번호
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - canceledReason
+              properties:
+                canceledReason:
+                  type: string
+                  description: 취소 사유
+                  example: '주문 취소 요청'
+      responses:
+        '200':
+          description: 주문 취소 성공
+
+  /orders/guest/pw:
+    put:
+      tags: [Orders]
+      summary: (비회원) 임시 주문 비밀번호 발송
+      description: 비회원의 주문 비밀번호를 임시로 변경하고 임시 주문 비밀번호를 입력한 이메일로 전송합니다. (권한: 누구나)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ordererName
+                - ordererMobile
+                - ordererEmail
+              properties:
+                ordererName:
+                  type: string
+                  description: 주문자 이름
+                  example: 홍길동
+                ordererMobile:
+                  type: string
+                  description: 주문자 휴대번호
+                  example: 010-1234-5678
+                ordererEmail:
+                  type: string
+                  description: 주문자 이메일
+                  example: test1234@naver.com
+      responses:
+        '200':
+          description: 비회원 주문 비밀번호 임시 변경 및 이메일 전송 성공
+
+  /orders/guest/pw-update:
+    put:
+      tags: [Orders]
+      summary: (비회원) 주문 비밀번호 변경
+      description: 비회원의 주문 비밀번호를 변경합니다. (권한: 누구나)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - no
+                - orderPw
+                - orderPwModify
+              properties:
+                no:
+                  type: integer
+                  description: 주문 번호
+                  example: 1
+                orderPw:
+                  type: string
+                  description: 현재 주문 비밀번호
+                  example: 1234
+                orderPwModify:
+                  type: string
+                  description: 변경할 주문 비밀번호
+                  example: 1234a
+      responses:
+        '200':
+          description: 비회원 주문 비밀번호 변경 성공
+
+
+  /orders/guest/{no}/delivery:
+    get:
+      tags: [Orders]
+      summary: (비회원) 주문 배송(수령) 조회
+      description: 비회원의 주문 배송 정보를 조회합니다. (권한: 누구나)
+      parameters:
+        - in: path
+          name: no
+          required: true
+          schema:
+            type: integer
+          description: 주문 번호
+          example: 1
+      responses:
+        '200':
+          description: 주문 배송 조회 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  no:
+                    type: integer
+                    example: 1
+                  orderNumber:
+                    type: string
+                    example: 'ORD20240825001'
+                  orderStatus:
+                    type: string
+                    example: '20'
+                  orderStatusName:
+                    type: string
+                    example: '배송중'
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: '2024-08-25T15:55:20.000Z'
+                  trackingNumber:
+                    type: string
+                    example: 'TRK1234567890'
+                  orderItems:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        no:
+                          type: integer
+                          example: 1
+                        breadName:
+                          type: string
+                          example: '식빵'
+                        breadImageUrl:
+                          type: string
+                          example: 'https://example.com/bread.jpg'
+                        unitPrice:
+                          type: number
+                          example: 3000
+                        quantity:
+                          type: integer
+                          example: 2
+                  address:
+                    type: string
+                    example: '서울시 강남구 역삼동 123-456'
+                  addressDetail:
+                    type: string
+                    example: '101동 101호'
+                  zipcode:
+                    type: string
+                    example: '12345'
+                  recipientName:
+                    type: string
+                    example: '홍길동'
+                  recipientMobile:
+                    type: string
+                    example: '010-1234-5678'
+                  deliveryMethodName:
+                    type: string
+                    example: '택배'
+                  deliveryTypeCode:
+                    type: string
+                    example: '01'
+
 
   /orders/{no}:
     get:
@@ -1368,17 +1903,17 @@ paths:
                 name:
                   type: string
                   description: 주문차수명
-                  example: '주문 1월'
+                  example: '주문 9월'
                 startedAt:
                   type: string
                   format: date-time
                   description: 시작일시
-                  example: 2025-01-01T11:00:00.000Z
+                  example: 2025-09-01T00:00:00.000Z
                 endedAt:
                   type: string
                   format: date-time
                   description: 종료일시
-                  example: 2025-01-31T11:00:00.000Z
+                  example: 2025-09-30T23:59:59.000Z
                 minOrderQty:
                   type: integer
                   description: 최소주문수량
@@ -1386,7 +1921,7 @@ paths:
                 maxOrderQty:
                   type: integer
                   description: 최대주문수량
-                  example: 1
+                  example: 999
                 orderRoundBreads:
                   type: array
                   description: 빵 번호 목록 (JSON 문자열 형태로 전송)

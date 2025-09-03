@@ -11,6 +11,7 @@ type CreateOrderRequestBody = Pick<
   Order,
   | 'ordererName'
   | 'ordererMobile'
+  | 'ordererEmail'
   | 'recipientName'
   | 'recipientMobile'
   | 'address'
@@ -36,6 +37,7 @@ export const create = async (customerNo: number | undefined, body: CreateOrderRe
   const {
     ordererName,
     ordererMobile,
+    ordererEmail,
     recipientName,
     recipientMobile,
     address,
@@ -156,6 +158,7 @@ export const create = async (customerNo: number | undefined, body: CreateOrderRe
         trackingNumber: '',
         ordererName,
         ordererMobile,
+        ordererEmail,
         recipientName,
         recipientMobile,
         address,
