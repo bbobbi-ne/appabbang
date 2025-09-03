@@ -3,9 +3,9 @@
 import type { GuestCreateData } from '@/api/data-contracts';
 import { Badge, Button, Card, CardContent } from '@appabbang/ui';
 import { formatDate } from '@appabbang/utils';
-import OrderCancelDialog from '../mypage/order-cancel-dialog';
+import OrderCancelDialog from '@/components/mypage/order-cancel-dialog';
 import { useNavigate } from '@tanstack/react-router';
-import OrderItem from '../mypage/order-item';
+import OrderItem from '@/components/mypage/order-item';
 
 interface GuestOrdersProps {
   list: GuestCreateData;
