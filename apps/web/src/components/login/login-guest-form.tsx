@@ -201,10 +201,12 @@ export default function LoginGuestForm() {
         />
 
         <div className="cursor-pointer pt-10 pb-2 flex flex-row justify-center items-center gap-2 text-gray-500 text-sm ">
+          {/* 
+          추가기능 작업이 필요하면 해당 주석을 해제할 것.
           <FindIdDialog>
             <div className="hover:underline">아이디찾기</div>
           </FindIdDialog>
-          {/* 
+          
           <div> | </div>
           <FindPwDialog>
             <div className="hover:underline">비밀번호찾기</div>
