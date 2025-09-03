@@ -55,12 +55,13 @@ export default function LoginGuestForm() {
         if (firstOrder) {
           navigate({
             to: `/guest/order-list`,
-            search: {
-              ordererName: data.ordererName,
-              ordererMobile: data.ordererMobile,
-              ordererEmail: data.ordererEmail,
-              orderPw: data.orderPw,
-            },
+            state: { data } as any,
+            // search: {
+            //   ordererName: data.ordererName,
+            //   ordererMobile: data.ordererMobile,
+            //   ordererEmail: data.ordererEmail,
+            //   orderPw: data.orderPw,
+            // },
           });
         } else {
           addToast({
