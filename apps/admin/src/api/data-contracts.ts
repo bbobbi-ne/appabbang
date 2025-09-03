@@ -1464,6 +1464,8 @@ export interface CustomersCreateData {
   accessToken: string;
 }
 
+export type CustomersDeleteData = any;
+
 export interface SendEmailCreatePayload {
   /**
    * 이메일(테스트시, 실제 이메일을 작성하세요.)
@@ -1593,8 +1595,6 @@ export interface CheckIdCreateData {
 export type CustomersDetailData = any;
 
 export type CustomersUpdateData = any;
-
-export type CustomersDeleteData = any;
 
 export type AddressListData = {
   /**

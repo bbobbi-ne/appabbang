@@ -223,7 +223,6 @@ model CustomerCoupon {
   couponNo              Int                                                          // 쿠폰 번호
   customer              Customer?         @relation(fields: [customerNo], references: [no], onDelete: SetNull) // 고객 테이블 참조
   coupon                Coupon            @relation(fields: [couponNo], references: [no])                      // 쿠폰 테이블 참조
-
   @@map("customer_coupon")
 }
 

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import * as customerController from '@/controllers/customer.controller';
 import * as addressController from '@/controllers/address.controller';
 import { asyncHandler } from '@/middlewares/error.middleware';
-import { requireAdmin } from '@/middlewares/auth.middleware';
+import { requireAdmin, requireCustomerOwner } from '@/middlewares/auth.middleware';
 import {
   createAddressValidator,
   deleteAddressValidator,
@@ -31,7 +31,7 @@ router.get('/:no', requireAdmin, asyncHandler(customerController.getOne));
 // router.put('/:no', requireAdmin, asyncHandler(customerController.update));
 
 /** DELETE /customers/{no} : 고객 삭제 */
-// router.delete('/:no', requireAdmin, asyncHandler(customerController.remove));
+router.delete('/', requireCustomerOwner, asyncHandler(customerController.remove));
 
 /** POST /auth/customers/join : 고객 회원가입 */
 router.post('/', validate(createCustomerValidator), asyncHandler(customerController.create));
