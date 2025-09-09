@@ -21,9 +21,10 @@
     "typeRoots": [
       "./node_modules/@types", // 기본 타입들
       "./src/types" // 내 프로젝트 커스텀 타입들
-    ]
+    ],
+    "noEmit": false
   },
 
   "include": ["src"], // 빌드 및 타입체크할 소스
-  "exclude": ["node_modules", "dist", "generated", "prisma"] // 제외할 경로
+  "exclude": ["node_modules", "dist", "generated", "prisma"] // 제외할 경로,
 }
