@@ -1,0 +1,13 @@
+# Node.js 관련 일반적인 제외 파일
+node_modules
+npm-debug.log
+.DS_Store
+
+# 민감한 환경 변수 파일
+.env
+.env.local
+.env.*.local
+
+# 프로젝트 폴더 제외
+apps/admin
+apps/web
