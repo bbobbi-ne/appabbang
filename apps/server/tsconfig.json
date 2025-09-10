@@ -22,7 +22,7 @@
       "./node_modules/@types", // 기본 타입들
       "./src/types" // 내 프로젝트 커스텀 타입들
     ],
-    "noEmit": false
+    "noEmit": false // 컴파일 결과(js 파일 등)를 생성할지 여부를 결정(false: 컴파일은 하지만 파일은 생성하지 않음)
   },
 
   "include": ["src"], // 빌드 및 타입체크할 소스
