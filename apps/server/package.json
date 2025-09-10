@@ -8,6 +8,11 @@
     "dev:prisma": "pnpm run reset && pnpm run migrate && pnpm run generate && pnpm run seed",
     "reset": "prisma migrate reset",
     "migrate": "prisma migrate dev",
+    "generate": "prisma generate",
+    "seed": "ts-node prisma/seed.ts",
+    "build": "tsc && tsc-alias",
+    "start": "node dist/index.js",
+    "swagger": "ts-node src/swagger/swagger.ts"
   },
   "dependencies": {
     "@appabbang/typescript": "workspace:*"
