@@ -56,6 +56,9 @@ importers:
       cors:
         specifier: ^2.8.5
         version: 2.8.5
+      dotenv:
+        specifier: ^17.2.2
+        version: 17.2.2
       express:
         specifier: ^5.1.0
         version: 5.1.0
@@ -71,6 +74,9 @@ importers:
       lucide-react:
         specifier: ^0.511.0
         version: 0.511.0(react@19.1.0)
+      nodemailer:
+        specifier: ^7.0.5
+        version: 7.0.5
       prisma:
         specifier: ^6.8.2
         version: 6.9.0(typescript@5.8.3)
@@ -89,6 +95,9 @@ importers:
       tailwindcss:
         specifier: ^4.0.6
         version: 4.1.8
+      tsc-alias:
+        specifier: ^1.8.16
+        version: 1.8.16
       zod:
         specifier: ^3.25.32
         version: 3.25.36
@@ -135,12 +144,24 @@ importers:
       '@types/node':
         specifier: ^22.15.21
         version: 22.15.21
+      '@types/nodemailer':
+        specifier: ^7.0.1
+        version: 7.0.1
       '@types/react':
         specifier: ^19.0.8
         version: 19.1.5
       '@types/react-dom':
         specifier: ^19.0.3
         version: 19.1.5(@types/react@19.1.5)
+      '@types/swagger-jsdoc':
+        specifier: ^6.0.4
+        version: 6.0.4
+      '@types/swagger-ui-express':
+        specifier: ^4.1.8
+        version: 4.1.8
+      '@types/yamljs':
+        specifier: ^0.2.34
+        version: 0.2.34
       '@typescript-eslint/eslint-plugin':
         specifier: ^6.21.0
         version: 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)
@@ -186,6 +207,12 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: ^0.6.11
         version: 0.6.11(prettier@3.5.3)
+      swagger-jsdoc:
+        specifier: ^6.2.8
+        version: 6.2.8(openapi-types@12.1.3)
+      swagger-ui-express:
+        specifier: ^5.0.1
+        version: 5.0.1(express@5.1.0)
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@22.15.21)(typescript@5.8.3)
@@ -207,6 +234,9 @@ importers:
       web-vitals:
         specifier: ^4.2.4
         version: 4.2.4
+      yamljs:
+        specifier: ^0.3.0
+        version: 0.3.0
 
   apps/admin:
     dependencies:
@@ -235,46 +265,6 @@ importers:
       '@appabbang/typescript':
         specifier: workspace:*
         version: link:../../tools/typescript
-      '@types/nodemailer':
-        specifier: ^7.0.1
-        version: 7.0.1
-      dotenv:
-        specifier: ^17.0.1
-        version: 17.0.1
-      nodemailer:
-        specifier: ^7.0.5
-        version: 7.0.5
-      swagger-jsdoc:
-        specifier: ^6.2.8
-        version: 6.2.8(openapi-types@12.1.3)
-      swagger-ui-express:
-        specifier: ^5.0.1
-        version: 5.0.1(express@5.1.0)
-      yamljs:
-        specifier: ^0.3.0
-        version: 0.3.0
-    devDependencies:
-      '@prisma/client':
-        specifier: '*'
-        version: 6.8.2(prisma@6.9.0(typescript@5.8.3))(typescript@5.8.3)
-      '@types/swagger-jsdoc':
-        specifier: ^6.0.4
-        version: 6.0.4
-      '@types/swagger-ui-express':
-        specifier: ^4.1.8
-        version: 4.1.8
-      '@types/yamljs':
-        specifier: ^0.2.34
-        version: 0.2.34
-      cloudinary:
-        specifier: '*'
-        version: 2.6.1
-      express-validator:
-        specifier: '*'
-        version: 7.2.1
-      prisma:
-        specifier: '*'
-        version: 6.9.0(typescript@5.8.3)
 
   apps/web:
     dependencies:
@@ -2871,8 +2861,8 @@ packages:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
     engines: {node: '>=12'}
 
-  dotenv@17.0.1:
-    resolution: {integrity: sha512-GLjkduuAL7IMJg/ZnOPm9AnWKJ82mSE2tzXLaJ/6hD6DhwGfZaXG77oB8qbReyiczNxnbxQKyh0OE5mXq0bAHA==}
+  dotenv@17.2.2:
+    resolution: {integrity: sha512-Sf2LSQP+bOlhKWWyhFsn0UsfdK/kCWRv1iuA2gXAwt3dyNabr6QSj00I2V10pidqz69soatm9ZwZvpQMTIOd5Q==}
     engines: {node: '>=12'}
 
   dunder-proto@1.0.1:
@@ -3777,6 +3767,10 @@ packages:
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
+  mylas@2.1.13:
+    resolution: {integrity: sha512-+MrqnJRtxdF+xngFfUUkIMQrUUL0KsxbADUkn23Z/4ibGg192Q+z+CQyiYwvWTsYjJygmMR8+w3ZDa98Zh6ESg==}
+    engines: {node: '>=12.0.0'}
+
   nanoid@3.3.11:
     resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
@@ -3981,6 +3975,10 @@ packages:
   pkg-types@2.2.0:
     resolution: {integrity: sha512-2SM/GZGAEkPp3KWORxQZns4M+WSeXbC2HEvmOIJe3Cmiv6ieAJvdVhDldtHqM5J1Y7MrR1XhkBT/rMlhh9FdqQ==}
 
+  plimit-lit@1.6.1:
+    resolution: {integrity: sha512-B7+VDyb8Tl6oMJT9oSO2CW8XC/T4UcJGrwOVoNGwOQsQYhlpfajmrMj5xeejqaASq3V/EqThyOeATEOMuSEXiA==}
+    engines: {node: '>=12'}
+
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
     engines: {node: '>= 0.4'}
@@ -4095,6 +4093,10 @@ packages:
   qs@6.14.0:
     resolution: {integrity: sha512-YWWTjgABSKcvs/nWBi9PycY/JiPJqOD4JA6o9Sej2AtvSGarXxKC3OQSk4pAarbdQlKAh5D4FCQkJNkW+GAn3w==}
     engines: {node: '>=0.6'}
+
+  queue-lit@1.5.2:
+    resolution: {integrity: sha512-tLc36IOPeMAubu8BkW8YDBV+WyIgKlYU7zUNs0J5Vk9skSZ4JfGlPOqplP0aHdfv7HL0B2Pg6nwiq60Qc6M2Hw==}
+    engines: {node: '>=12'}
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
@@ -4597,6 +4599,11 @@ packages:
         optional: true
       '@swc/wasm':
         optional: true
+
+  tsc-alias@1.8.16:
+    resolution: {integrity: sha512-QjCyu55NFyRSBAl6+MTFwplpFcnm2Pq01rR/uxfqJoLMm6X3O14KEGtaSDZpJYaE1bJBGDjD0eSuiIWPe2T58g==}
+    engines: {node: '>=16.20.2'}
+    hasBin: true
 
   tsconfig-paths@4.2.0:
     resolution: {integrity: sha512-NoZ4roiN7LnbKn9QqE1amc9DJfzvZXxF4xDavcOWt1BPkdx+m+0gJuPM+S0vCe7zTJMYUP0R8pO2XMr+Y8oLIg==}
@@ -7643,8 +7650,7 @@ snapshots:
 
   commander@6.2.0: {}
 
-  commander@9.5.0:
-    optional: true
+  commander@9.5.0: {}
 
   comment-parser@1.4.1: {}
 
@@ -7788,7 +7794,7 @@ snapshots:
 
   dotenv@16.6.1: {}
 
-  dotenv@17.0.1: {}
+  dotenv@17.2.2: {}
 
   dunder-proto@1.0.1:
     dependencies:
@@ -8859,6 +8865,8 @@ snapshots:
 
   ms@2.1.3: {}
 
+  mylas@2.1.13: {}
+
   nanoid@3.3.11: {}
 
   nanoid@5.1.5: {}
@@ -9058,6 +9066,10 @@ snapshots:
       exsolve: 1.0.7
       pathe: 2.0.3
 
+  plimit-lit@1.6.1:
+    dependencies:
+      queue-lit: 1.5.2
+
   possible-typed-array-names@1.1.0: {}
 
   postcss@8.5.4:
@@ -9109,6 +9121,8 @@ snapshots:
   qs@6.14.0:
     dependencies:
       side-channel: 1.1.0
+
+  queue-lit@1.5.2: {}
 
   queue-microtask@1.2.3: {}
 
@@ -9702,6 +9716,16 @@ snapshots:
       typescript: 5.8.3
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
+
+  tsc-alias@1.8.16:
+    dependencies:
+      chokidar: 3.6.0
+      commander: 9.5.0
+      get-tsconfig: 4.10.1
+      globby: 11.1.0
+      mylas: 2.1.13
+      normalize-path: 3.0.0
+      plimit-lit: 1.6.1
 
   tsconfig-paths@4.2.0:
     dependencies:
