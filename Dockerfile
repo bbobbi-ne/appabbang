@@ -20,16 +20,15 @@ COPY apps/server/prisma ./apps/server/prisma/
 # 의존성 설치
 RUN pnpm install --frozen-lockfile
 
+
 # 나머지 소스 코드 복사
 COPY . .
 
 # 마이그레이션 실행 및 Prisma 클라이언트 생성. 'prisma' 폴더를 복사한 후 실행해야 합니다.
 RUN pnpm exec prisma generate --schema=apps/server/prisma/schema.prisma
 
-
 # 서버 애플리케이션 빌드
 RUN pnpm run build:server
-
 
 # 빌드 된 이후, dist 폴더가 생겼으므로 docs폴더를 이동시킴
 RUN mkdir -p apps/server/dist/docs \
@@ -55,7 +54,6 @@ COPY --from=builder /app/apps/server/prisma ./apps/server/prisma
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/pnpm-workspace.yaml ./pnpm-workspace.yaml 
-
 
 # 서버 실행 명령어
 CMD ["node", "apps/server/dist/index.js"]
