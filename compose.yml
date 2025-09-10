@@ -1,0 +1,32 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile # root의 Dockerfile 사용
+    container_name: appabbang-server
+    env_file:
+      - ./apps/server/.env # 실행 시 컨테이너에 주입
+    ports:
+      - '4000:4000'
+    depends_on:
+      - db
+    command: >
+      sh -c "
+        pnpm exec prisma migrate deploy --schema=apps/server/prisma/schema.prisma &&
+        node apps/server/dist/index.js
+      "
+
+  db:
+    image: postgres:15-alpine
+    container_name: appabbang-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: appabbang
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+volumes:
+  db_data:

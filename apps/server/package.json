@@ -5,6 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "dev": "nodemon --exec \"node -r tsconfig-paths/register -r ts-node/register\" src/index.ts",
+    "build": "tsc && tsc-alias",
     "generate": "prisma generate",
     "migrate": "prisma migrate reset && prisma migrate dev",
     "seed": "ts-node prisma/seed.ts",
@@ -27,6 +28,7 @@
     "@types/yamljs": "^0.2.34",
     "cloudinary": "*",
     "express-validator": "*",
-    "prisma": "*"
+    "prisma": "*",
+    "tsc-alias": "^1.8.16"
   }
 }
